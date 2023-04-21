@@ -1,0 +1,106 @@
+﻿ @model Inv_InventoryBox
+
+<div class="modal-dialog">
+    <div class="modal-content" style="height:200px; margin-top:50px;">
+        <div class="modal-header">
+            <a href="javascript:void();" onclick="CloseModalImportExcel()" class="close" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </a>
+            <h3 class="modal-title text-center" id="exampleModalLabel">Sinh mã Hộp</h3>
+        </div>
+        <div class="modal-body">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "manageFormImportExcel" }))
+            {
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="NetworkID" name="NetworkID" class="col-xs-11" value="@Model.OrgID" autocomplete="off">
+                <div class="col-xs-12 text-center">
+                    <div class="col-xs-12 form-group margin-bottom-5">
+                        <label for="OrgId" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500">Tổ chức</label>
+                        <div class="col-xs-12 col-sm-8">
+                            <input type="text" id="OrgId" name="OrgId" class="col-xs-11" value="@Model.OrgID" autocomplete="off" disabled>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 form-group margin-bottom-5">
+                        <label for="Qty" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500">Số lượng</label>
+                        <div class="col-xs-12 col-sm-8">
+                            <input type="text" id="Qty" name="Qty" class="col-xs-11" value="@MvcHtmlString.Create(ViewBag.Qty)" autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    @RenderItemFormat("BTN_QL_MA_HOP_SINH_SO", "<a class=\"btn font-color mybtn-Button\" onclick=\"Save()\" href=\"javascript:void(0);\" style=\"margin-top:20px; \">Sinh số</a>", "", "")
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>
+<script type="text/javascript">
+
+    function CloseModalImportExcel() {
+        $('#ImportExcelModal').modal("hide");
+        $('#ImportExcelModal').html('');
+    }
+    function CheckForm() {
+        if (!CheckIsNullOrEmpty('#OrgId', 'has-error-fix', '@MvcHtmlString.Create("Tổ chức không được trống!")'))
+        {
+            return false;
+        }
+
+        if (!CheckIsNullOrEmpty('#Qty', 'has-error-fix', '@MvcHtmlString.Create("Chưa nhập số lượng!")'))
+        {
+            return false;
+        }
+        var slg = ReturnValueText('#Qty');
+        if (slg > 100000)
+        {
+            alert('số lượng nhập <= 100000')
+            return false;
+        }
+        return true;
+    }
+    function Save() {
+        var Inv_InventoryBox = new Object();
+        Inv_InventoryBox.OrgId = ReturnValueText('#OrgId');
+        Inv_InventoryBox.Qty = ReturnValueText('#Qty');
+        Inv_InventoryBox.NetworkID = ReturnValueText('#NetworkID');
+        var modelCur = JSON.stringify(Inv_InventoryBox);
+       var check = CheckForm();
+       if (check) {
+           debugger;
+            var url = '@Url.Action("Create", "Inv_InventoryBox")';
+           var token = $('#manageFormImportExcel input[name=__RequestVerificationToken]').val();
+            $.ajax({
+                url: url,
+                data: {
+                    __RequestVerificationToken: token
+                    , model: modelCur
+                },
+                type: 'post',
+                dataType: 'json',
+                traditional: true,
+                success: function (data) {
+                    if (data.Success) {
+                        alert(data.Messages[0]);
+                        window.location.href = data.RedirectUrl;
+                    } else {
+                        if (data.Detail !== undefined && data.Detail !== null) {
+                            _showErrorMsg123('Lỗi!', data.Detail);
+                        }
+                        else {
+                            _showErrorMsg123('Lỗi!', data.Title[0]);
+                        }
+                    }
+                }
+            });
+        }
+
+    }
+</script>
+
+
+
+
+
+

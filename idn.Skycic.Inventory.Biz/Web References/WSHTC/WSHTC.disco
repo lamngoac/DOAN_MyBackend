@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<discovery xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.xmlsoap.org/disco/">
+  <contractRef ref="http://11.22.0.1:11208/Test.DMS.HTC.Sales.WH.WS/WSHTC.asmx?wsdl" docRef="http://11.22.0.1:11208/Test.DMS.HTC.Sales.WH.WS/WSHTC.asmx" xmlns="http://schemas.xmlsoap.org/disco/scl/" />
+  <soap address="http://11.22.0.1:11208/Test.DMS.HTC.Sales.WH.WS/WSHTC.asmx" xmlns:q1="http://tempuri.org/" binding="q1:WSHTC64Soap" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+  <soap address="http://11.22.0.1:11208/Test.DMS.HTC.Sales.WH.WS/WSHTC.asmx" xmlns:q2="http://tempuri.org/" binding="q2:WSHTC64Soap12" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+</discovery>

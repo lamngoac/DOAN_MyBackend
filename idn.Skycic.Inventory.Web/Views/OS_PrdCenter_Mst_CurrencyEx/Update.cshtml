@@ -1,0 +1,137 @@
+﻿@model Mst_CurrencyEx
+@{
+    Layout = "~/Views/Shared/_LayoutQuantri.cshtml";
+    var title = "SỬA LOẠI TIỀN";
+    var titleMng = "Danh mục loại tiền";
+    ViewBag.Title = title;
+}
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="row no-margin box-shadow-tk">
+                        @using (Html.BeginForm("Update", "OS_PrdCenter_Mst_CurrencyEx", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="CurrencyCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã loại tiền <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="CurrencyCode" name="CurrencyCode" class="col-xs-12 disabled-fix CurrencyCode" onkeyup="locdau(this);" value="@if (Model != null && Model.CurrencyCode != null){@MvcHtmlString.Create(Model.CurrencyCode.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="CurrencyName" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên loại tiền <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="CurrencyName" name="CurrencyName" class="col-xs-12 CurrencyName" value="@if (Model != null && Model.CurrencyName != null){@MvcHtmlString.Create(Model.CurrencyName.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="BaseCurrencyCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Loại tiền gốc")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="BaseCurrencyCode" name="BaseCurrencyCode" class="col-xs-12 BaseCurrencyCode" value="@if (Model != null && Model.BaseCurrencyCode != null){@MvcHtmlString.Create(Model.BaseCurrencyCode.ToString())} else { @("")}" autocomplete="off" required disabled />
+                                        </span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="BuyRate" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tỉ giá mua <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="BuyRate" name="BuyRate" class="col-xs-12 text-right BuyRate" value="@if (Model != null && Model.BuyRate != null){@MvcHtmlString.Create(Model.BuyRate.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="SellRate" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tỉ giá bán <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="SellRate" name="SellRate" class="col-xs-12 SellRate" value="@if (Model != null && Model.SellRate != null){@MvcHtmlString.Create(Model.SellRate.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Nguồn lấy tỉ giá")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            @{
+                                                var interEx = "";
+                                                if (Model != null && !CUtils.IsNullOrEmpty(Model.InterEx))
+                                                {
+                                                    interEx = CUtils.StrValueOrNull(Model.InterEx);
+                                                }
+                                            }
+                                            <textarea rows="3" cols="50" id="InterEx" name="InterEx" class="col-xs-12 InterEx" maxlength="400" autocomplete="off">@MvcHtmlString.Create(interEx)</textarea>
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                        }
+                    </aside>
+                    <div class="col-xs-12 no-padding">
+                        <div class="clearfix">
+                            <div class="row no-margin" style="float: right">
+                                @RenderItemFormat("BTN_SUA_OS_PRDCENTER_MST_CURRENCYEX_LUU", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px; \" onclick=\"SaveData();\">Lưu</a>", "", "")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/OS_PrdCenter_Mst_CurrencyEx.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "OS_PrdCenter_Mst_CurrencyEx")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+        });
+        @* Set focus *@
+        $(document).ready(function () {
+            $('#CurrencyCode').focus();
+        });
+        jQuery(function ($) {
+            $('.BuyRate, .SellRate').number(true, 2);
+        });
+
+        function SaveData() {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Edit", "OS_PrdCenter_Mst_CurrencyEx")';
+            var objOS_PrdCenter_Mst_CurrencyEx = new OS_PrdCenter_Mst_CurrencyEx();
+
+            objOS_PrdCenter_Mst_CurrencyEx.ActionType = 'edit';
+            objOS_PrdCenter_Mst_CurrencyEx.ajaxSettings = ajaxSettings;
+            objOS_PrdCenter_Mst_CurrencyEx.saveData();
+        }
+    </script>
+}

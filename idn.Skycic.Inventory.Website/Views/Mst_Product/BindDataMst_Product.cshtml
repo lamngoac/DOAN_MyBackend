@@ -1,0 +1,419 @@
+﻿@model PageInfo<Mst_ProductUI>
+@{
+    var init = CUtils.StrValue(ViewBag.init);
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+    var recordCount = CUtils.StrValue(ViewBag.RecordCount);
+    var totalPage = "0";
+    if (Model != null)
+    {
+        totalPage = CUtils.StrValue(Model.PageCount);
+    }
+
+
+    var showtext = "";
+    if (Model.ItemCount > 0)
+    {
+        var recordstart = (Model.PageIndex) * Model.PageSize + 1;
+        var recordend = (Model.PageIndex + 1) * Model.PageSize;
+        if (recordend > Model.ItemCount)
+        {
+            recordend = Model.ItemCount;
+        }
+        showtext = recordstart + "-" + recordend + " trong số " + Model.ItemCount;
+    }
+}
+
+<input type="hidden" id="page" value="@ViewBag.PageCur" />
+<input type="hidden" id="totalpage" value="@Model.PageCount" />
+
+
+<style>
+    ul.ulshowdata{
+        margin-top: 50px !important;
+    }
+</style>
+
+<div class="col-xs-12 layout-bot-top-16" style="">
+    <div class="row">
+        <div class="col-6">
+            @*<a class="btn btn-nc-button" href="@Url.Action("Create", "Mst_Product" )" style=""><i class="fa fa-plus-circle" aria-hidden="true"></i> Tạo</a>
+                <a class="btn btn-nc-button" onclick="ShowPopupImportExcel()" href="javascript:void(0);" style=""><i class="fas fa-upload" aria-hidden="true"></i> Nhập Excel</a>
+                <a class="btn btn-nc-button" onclick="Export()" href="javascript:void(0);" style=""><i class="fas fa-download" aria-hidden="true"></i> Xuất Excel</a>*@
+
+            @RenderItemFormat("BTN_QL_HANG_HOA_TAO", "<a class=\"btn btn-nc-button\" href=\'" + @Url.Action("Create", "Mst_Product") + "\'><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i> Tạo</a>", "", "")
+            @RenderItemFormat("BTN_QL_HANG_HOA_NHAP_EXCEL", "<a class=\"btn btn-nc-button\" onclick=\"ShowPopupImportExcel()\" href=\"javascript: void(0);\"><i class=\"fas fa-upload\" aria-hidden=\"true\"></i> Nhập Excel</a>", "", "")
+            @RenderItemFormat("BTN_QL_HANG_HOA_XUAT_EXCEL", "<a class=\"btn btn-nc-button\" onclick=\"Export()\" href=\"javascript: void(0);\"><i class=\"fas fa-download\" aria-hidden=\"true\"></i> Xuất Excel</a>", "", "")
+
+
+
+            <a class="btn font-color mybtn-Button" data-toggle="dropdown" aria-expanded="false" style="font-size: 13px; position: relative;"><i class="fas fa-ellipsis-h"></i></a>
+            <ul class="dropdown-menu dropdown-action" role="menu" >
+                <li style="padding: 10px 5px">
+                    @RenderItemFormat("BTN_QL_HANG_HOA_XOA", "<a class=\"row no-margin col-12 no-padding\" onclick=\"DeleteProducts()\" href=\"javascript: void(0);\" style=\"line-height: 13px; color: #000000\"><i class=\"far fa-trash-alt\" style=\"margin-right: 7px\" aria-hidden=\"true\"></i> Xóa hàng hóa</a>", "", "")
+                    @*<a class="row no-margin col-12 no-padding" onclick="DeleteProducts()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="far fa-trash-alt" style="margin-right: 7px" aria-hidden="true"></i> Xóa hàng hóa</a>*@
+                </li>
+                <li style="padding: 10px 5px">
+                    @RenderItemFormat("BTN_QL_HANG_HOA_DUNG_KINH_DOANH", "<a class=\"row no-margin col-12 no-padding\" onclick=\"StopProducts()\" href=\"javascript: void(0);\" style=\"line-height: 13px; color: #000000\"><i class=\"fas fa-ban\" style=\"margin-right: 7px\" aria-hidden=\"true\"></i> Ngừng kinh doanh</a>", "", "")
+                    @*<a class="row no-margin col-12 no-padding" onclick="StopProducts()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-ban" style="margin-right: 7px" aria-hidden="true"></i> Ngừng kinh doanh</a>*@
+                </li>
+                <li style="padding: 10px 5px">
+                    @RenderItemFormat("BTN_QL_HANG_HOA_KINH_DOANH_HH", "<a class=\"row no-margin col-12 no-padding\" onclick=\"ActiveProducts()\" href=\"javascript: void(0);\" style=\"line-height: 13px; color: #000000\"><i class=\"fas fa-check-circle\" style=\"margin-right: 7px\" aria-hidden=\"true\"></i> Kinh doanh hàng hóa</a>", "", "")
+                    @*<a class="row no-margin col-12 no-padding" onclick="ActiveProducts()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-check-circle" style="margin-right: 7px" aria-hidden="true"></i> Kinh doanh hàng hóa</a>*@
+                </li>
+                <li style="padding: 10px 5px">
+                    @RenderItemFormat("BTN_QL_HANG_HOA_XUAT_EXCEL_TEMP", "<a class=\"row no-margin col-12 no-padding\" onclick=\"ExportTemplate()\" href=\"javascript: void(0);\" style=\"line-height: 13px; color: #000000\"><i class=\"fas fa-download\" style=\"margin-right: 7px\" aria-hidden=\"true\"></i> Xuất Excel template</a>", "", "")
+                    @*<a class="row no-margin col-12 no-padding" onclick="ExportTemplate()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" style="margin-right: 7px" aria-hidden="true"></i> Xuất Excel template</a>*@
+                </li>
+            </ul>
+            <span class="search-bar" style="margin-left:5px;margin-top:3px;">
+                <input type="text" id="dynamic-table-thead-search" class="quicksearch txtSearchObj" name="search">
+                <input type="text" class="quicksearch1 txtSearchObj1" name="search" style="z-index: -1000; height: 0; padding: 0; margin: 0; border: 0">
+            </span>
+        </div>
+        <div class="col-6">
+            @Html.Partial("Pagination", null, new ViewDataDictionary() { { "PageCur", MvcHtmlString.Create(pageCur) }, { "RecordCount", MvcHtmlString.Create(recordCount) }, { "ShowText", showtext } })
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+<div class="panel-body no-padding" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+    <aside class="col-xs-12 layout-table no-padding">
+        @Html.AntiForgeryToken()
+        <div class="scrollable-horizontal padding-left-0 padding-right-0" style="padding-top: 0!important;">
+            <div style="width: 100%; float: left;">
+                <table id="dynamic-table-thead" idn-datatable-id="dynamic-table-thead-tbody" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                    <thead>
+                        <tr class="trthead" filterroot="" bfilter="0">
+                            <th fieldId="CONTROL" fieldName="CONTROL" fieldActive="0" class="text-center cell-50">
+                                <input type="checkbox" class="cl-check" onclick="CheckAll(this);" name="check-box-all" />
+                            </th>
+                            <th fieldId="STT" fieldName="STT" fieldActive="0" class="text-left cell-50">@MvcHtmlString.Create("STT")</th>
+                            <th fieldId="PRODUCTCODEUSER" fieldName="Mã hàng" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-200">
+                                @("Mã hàng".HtmlItemString("product"))
+                            </th>
+                            <th fieldId="PRODUCTNAME" fieldName="Tên hàng" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-250">
+                                @("Tên hàng".HtmlItemString("product"))
+                            </th>
+                            <th fieldId="PRODUCTTYPE" fieldName="Loại hàng" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-100">
+                                @("Loại hàng".HtmlItemString("product"))
+                            </th>
+                            <th fieldId="PRODUCTGRPCODE" fieldName="Nhóm hàng" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-100">
+                                @("Nhóm hàng".HtmlItemString("product"))
+                            </th>
+                            <th fieldId="BRANDCODE" fieldName="Nhãn hiệu" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-100">
+                                @("Nhãn hiệu".HtmlItemString("product"))
+                            </th>
+                            <th fieldId="UNITNAME" fieldName="Đơn vị" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-100">
+                                @("Đơn vị".HtmlItemString("product"))
+                            </th>
+                            <th fieldId="FLAGBUY" fieldName="Được mua" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-75">
+                                @("Được mua".HtmlItemString("product"))
+                            </th>
+                            <th fieldId="FLAGSELL" fieldName="Được bán" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-75">
+                                @("Được bán".HtmlItemString("product"))
+                            </th>
+                            <th fieldId="UPBUY" fieldName="Giá mua" fieldActive="0" idn-data-type="N" idn-data-sort="1" idn-data-filter="1" class="text-left cell-130">
+                                @("Giá mua".HtmlItemString("product"))
+                            </th>
+                            <th fieldId="UPSELL" fieldName="Giá bán" fieldActive="0" idn-data-type="N" idn-data-sort="1" idn-data-filter="1" class="text-left cell-130">
+                                @("Giá bán".HtmlItemString("product"))
+                            </th>
+                            <th fieldId="FLAGACTIVE" fieldName="Trạng thái hoạt động" fieldActive="1" class="text-left cell-130 idn-hidden">
+                                @("Trạng thái hoạt động".HtmlItemString("product"))
+                            </th>
+                            <th fieldId="PRODUCTBARCODE" fieldName="Mã vạch" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-130 idn-hidden">
+                                @("Mã vạch".HtmlItemString("product"))
+                            </th>
+
+                            <th fieldId="PRODUCTCODEROOT" fieldName="Mã hàng gốc" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-130 idn-hidden">
+                                @("Mã hàng gốc".HtmlItemString("product"))
+                            </th>
+
+                            <th fieldId="PRODUCTNAMEEN" fieldName="Tên tiếng Anh" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-130 idn-hidden">
+                                @("Tên tiếng Anh".HtmlItemString("product"))
+                            </th>
+
+                            <th fieldId="BRANDCODE" fieldName="Mã nhãn hiệu" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-130 idn-hidden">
+                                @("Mã nhãn hiệu".HtmlItemString("product"))
+                            </th>
+
+                            <th fieldId="PRODUCTYGRPCODE" fieldName="Mã nhóm hàng" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-130 idn-hidden">
+                                @("Mã nhóm hàng".HtmlItemString("product"))
+                            </th>
+
+                            <th fieldId="FLAGSERIAL" fieldName="QL Serial" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-130 idn-hidden">
+                                @("QL Serial".HtmlItemString("product"))
+                            </th>
+                            <th fieldId="FLAGLOT" fieldName="QL LOT" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-130 idn-hidden">
+                                @("QL LOT".HtmlItemString("product"))
+                            </th>
+
+                            <th fieldId="UNITCODE" fieldName="Mã đơn vị" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-130 idn-hidden">
+                                @("Mã đơn vị".HtmlItemString("product"))
+                            </th>
+                            <th fieldId="PRODUCTSTD" fieldName="Tiêu chuẩn" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-130 idn-hidden">
+                                @("Tiêu chuẩn".HtmlItemString("product"))
+                            </th>
+
+                            <th fieldId="PRODUCTEXPIRY" fieldName="Hạn sử dụng" fieldActive="1" idn-data-type="N" idn-data-sort="1" idn-data-filter="1" class="text-left cell-130 idn-hidden">
+                                @("Hạn sử dụng".HtmlItemString("product"))
+                            </th>
+
+                            <th fieldId="PRODUCTORIGIN" fieldName="Xuất xứ" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-130 idn-hidden">
+                                @("Xuất xứ".HtmlItemString("product"))
+                            </th>
+                            <th fieldId="PRODUCTQUYCACH" fieldName="Quy cách" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-130 idn-hidden">
+                                @("Quy cách".HtmlItemString("product"))
+                            </th>
+
+                            <th fieldId="QTYMINST" fieldName="Tồn nhỏ nhất" fieldActive="1" idn-data-type="N" idn-data-sort="1" idn-data-filter="1" class="text-left cell-130 idn-hidden">
+                                @("Tồn nhỏ nhất".HtmlItemString("product"))
+                            </th>
+                            <th fieldId="QTYEFFST" fieldName="Tồn tối ưu" fieldActive="1" idn-data-type="N" idn-data-sort="1" idn-data-filter="1" class="text-left cell-130 idn-hidden">
+                                @("Tồn tối ưu".HtmlItemString("product"))
+                            </th>
+                            <th fieldId="QTYMAXST" fieldName="Tồn lớn nhất" fieldActive="1" idn-data-type="N" idn-data-sort="1" idn-data-filter="1" class="text-left cell-130 idn-hidden">
+                                @("Tồn lớn nhất".HtmlItemString("product"))
+                            </th>
+
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin tbl-products">
+                    <tbody id="table-tbodyID">
+                        @if (Model != null && Model.DataList != null && Model.DataList.Count > 0)
+                        {
+                            var i = 1;
+                            foreach (var item in Model.DataList)
+                            {
+                                var tooltip = "";
+                                var title = "";
+                                if (item.ProductName.ToString().Length > 80)
+                                {
+                                    tooltip = "tooltip";
+                                    title = item.ProductName.ToString();
+                                }
+                                <tr idx="@(i)" class="data-item trdata" onclick="PrdOnClick(this);" productcode="@item.ProductCode">
+                                    <input type="hidden" name="ListProduct[@i].ProductCode" value="@item.ProductCode" />
+                                    <input type="hidden" name="ListProduct[@i].ProductCodeUser" value="@item.ProductCodeUser" />
+                                    <input type="hidden" name="ListProduct[@i].ProductType" value="@item.ProductType" />
+                                    <input type="hidden" name="ListProduct[@i].ProductGrpCode" value="@item.ProductGrpCode" />
+                                    <input type="hidden" name="ListProduct[@i].BrandCode" value="@item.BrandCode" />
+                                    <input type="hidden" name="ListProduct[@i].ProductLevelSys" value="@item.ProductLevelSys" />
+                                    <input type="hidden" name="ListProduct[@i].ProductDelType" value="@Client_DelProductLevelSys.RootPrd" />
+                                    <input type="hidden" name="ListProduct[@i].ProductCodeBase" value="@item.ProductCodeBase" />
+                                    <input type="hidden" name="ListProduct[@i].ProductCodeRoot" value="@item.ProductCodeRoot" />
+                                    <input type="hidden" name="ListProduct[@i].OrgID" value="@item.OrgID" />
+                                    <input type="hidden" name="ListProduct[@i].NetworkID" value="@item.NetworkID" />
+                                    <input type="hidden" name="ListProduct[@i].FlagActive" value="@item.FlagActive" />
+
+                                    <td fieldId="CONTROL" fieldActive="0" class="text-center cell-50">
+                                        <input type="checkbox" class="cl-check" onclick="CheckBoxRoot(this);" name="ckb" />
+                                    </td>
+                                    <td fieldId="STT" fieldActive="0" class="text-center cell-50" style="">
+                                        @(i++)
+                                    </td>
+                                    <td fieldId="PRODUCTCODEUSER" fieldActive="0" class="text-left cell-200">
+                                        (@item.CountPrdBase) @item.ProductCodeUser
+                                        @*Mã hàng
+                                            <p style="color:#848181;font-size:11px;padding-left:10px;margin-bottom:0;">@item.ProductCodeUser</p>*@
+                                    </td>
+                                    <td fieldId="PRODUCTNAME" fieldActive="0" data-toggle="@tooltip" title="@title" class="text-left cell-250">
+                                        @item.ProductName
+                                    </td>
+                                    <td fieldId="PRODUCTTYPE" fieldActive="1" class="text-left cell-100">
+                                        @item.mpt_ProductTypeName
+                                    </td>
+                                    <td fieldId="PRODUCTGRPCODE" fieldActive="0" class="text-left cell-100">
+                                        @item.mpg_ProductGrpName
+                                    </td>
+                                    <td fieldId="BRANDCODE" fieldActive="0" class="text-left cell-100">
+                                        @item.mb_BrandName
+                                    </td>
+                                    <td fieldId="UNITNAME" fieldActive="0" class="text-left cell-100">
+                                        @item.UnitCode
+                                    </td>
+                                    <td fieldId="FLAGBUY" fieldActive="0" class="text-center cell-75">
+                                        @if (!CUtils.IsNullOrEmpty(item.FlagBuy))
+                                        {
+                                            if (item.FlagBuy.Equals("1"))
+                                            {
+                                                <span class="label label-sm label-success">Có</span>
+                                            }
+                                            else
+                                            {
+
+                                                <span class="label label-sm label-success">Không</span>
+                                            }
+                                        }
+                                    </td>
+                                    <td fieldId="FLAGSELL" fieldActive="0" class="text-center cell-75">
+                                        @if (item.FlagSell.Equals("1"))
+                                        {
+                                            <span class="label label-sm label-success">Có</span>
+                                        }
+                                        else
+                                        {
+
+                                            <span class="label label-sm label-success">Không</span>
+                                        }
+                                    </td>
+                                    <td fieldId="UPBUY" fieldActive="0" class="text-right cell-130 mn-upbuy">
+                                        @item.UPBuy
+                                    </td>
+                                    <td fieldId="UPSELL" fieldActive="0" class="text-right cell-130 mn-upsell">
+                                        @item.UPSell
+                                    </td>
+                                    <td fieldId="FLAGACTIVE" fieldActive="1" class="text-center cell-130 idn-hidden">
+                                        @if (!CUtils.IsNullOrEmpty(item.FlagActive))
+                                        {
+                                            if (item.FlagActive.Equals("1"))
+                                            {
+                                                <div class="status approve">Đang kinh doanh</div>
+                                            }
+                                            else
+                                            {
+                                                <div class="status cancel">Ngừng kinh doanh</div>
+                                            }
+                                        }
+                                    </td>
+
+                                    <td fieldId="PRODUCTBARCODE"  fieldActive="1"  class="text-left cell-130 idn-hidden">
+                                        @item.ProductBarCode
+                                    </td>
+
+                                    <td fieldId="PRODUCTCODEROOT" fieldActive="1"  class="text-left cell-130 idn-hidden">
+                                        @item.ProductCodeRoot
+                                    </td>
+
+                                    <td fieldId="PRODUCTNAMEEN"  fieldActive="1"  class="text-left cell-130 idn-hidden">
+                                       @item.ProductNameEN
+                                    </td>
+
+                                    <td fieldId="BRANDCODE"  fieldActive="1" class="text-left cell-130 idn-hidden">
+                                        @item.BrandCode
+                                    </td>
+
+                                    <td fieldId="PRODUCTYGRPCODE" fieldActive="1"  class="text-left cell-130 idn-hidden">
+                                        @item.ProductGrpCode
+                                    </td>
+
+                                    <td fieldId="FLAGSERIAL" fieldName="QL Serial" fieldActive="1" class="text-left cell-130 idn-hidden">
+                                        @if (!CUtils.IsNullOrEmpty(item.FlagSerial))
+                                        {
+                                            if (item.FlagSerial.Equals("1"))
+                                            {
+                                                <span class="label label-sm label-success">Có</span>
+                                            }
+                                            else
+                                            {
+
+                                                <span class="label label-sm label-success">Không</span>
+                                            }
+                                        }
+                                    </td>
+                                    <td fieldId="FLAGLOT"  fieldActive="1"  class="text-left cell-130 idn-hidden">
+                                        @if (!CUtils.IsNullOrEmpty(item.FlagLo))
+                                        {
+                                            if (item.FlagLo.Equals("1"))
+                                            {
+                                                <span class="label label-sm label-success">Có</span>
+                                            }
+                                            else
+                                            {
+
+                                                <span class="label label-sm label-success">Không</span>
+                                            }
+                                        }
+                                    </td>
+
+                                    <td fieldId="UNITCODE"  fieldActive="1"  class="text-left cell-130 idn-hidden">
+                                        @item.UnitCode
+                                    </td>
+                                    <td fieldId="PRODUCTSTD"  fieldActive="1"  class="text-left cell-130 idn-hidden">
+                                        @item.ProductStd
+                                    </td>
+
+                                    <td fieldId="PRODUCTEXPIRY" fieldActive="1"  class="text-left cell-130 idn-hidden">
+                                        @item.ProductExpiry
+                                    </td>
+
+                                    <td fieldId="PRODUCTORIGIN"  fieldActive="1"  class="text-left cell-130 idn-hidden">
+                                        @item.ProductOrigin
+                                    </td>
+                                    <td fieldId="PRODUCTQUYCACH"  fieldActive="1"  class="text-left cell-130 idn-hidden">
+                                        @item.ProductQuyCach
+                                    </td>
+
+                                    <td fieldId="QTYMINST"  fieldActive="1"  class="text-left cell-130 idn-hidden">
+                                        @item.QtyMinSt
+                                    </td>
+                                    <td fieldId="QTYEFFST"  fieldActive="1"  class="text-left cell-130 idn-hidden">
+                                        @item.QtyEffSt
+                                    </td>
+                                    <td fieldId="QTYMAXST"  fieldActive="1"  class="text-left cell-130 idn-hidden">
+                                        @item.QtyMaxSt
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </aside>
+</div>
+
+<script>
+    //$('.scrollable-horizontal').hScroll();
+
+    //$(document).ready(function () {
+    //    $('[data-toggle="tooltip"]').tooltip();
+    //});
+    function CheckAll(thiz) {
+        debugger;
+        let trArr = $('.tbl-products tbody');
+        if (trArr !== null && trArr.length > 0) {
+            for (var i = 0; i < trArr.length; i++) {
+                var trCur = trArr[i];
+                if (trCur !== null && trCur !== undefined) {
+                    var inputCkb = $(trCur).find('input[type="checkbox"]');
+                    var check = false;
+                    if ($(thiz).is(":checked")) {
+                        check = true;
+                    }
+                    $(inputCkb).prop("checked", check);
+                }
+            }
+        }
+    }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

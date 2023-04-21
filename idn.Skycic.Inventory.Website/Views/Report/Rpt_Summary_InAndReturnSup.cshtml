@@ -1,0 +1,463 @@
+﻿@{
+    ViewBag.Title = "Báo nhập kho theo NCC";
+
+    var apprdtimeutcfrom = ViewBag.apprdtimeutcfrom as string;
+    var apprdtimeutcto = ViewBag.apprdtimeutcto as string;
+    var productcodeuser = ViewBag.productcodeuser as string;
+    var productname = ViewBag.productname as string;
+    var unitcode = ViewBag.unitcode as string;
+
+    var listData = ViewBag.ListData as List<Rpt_Summary_InAndReturnSupUI>;
+    var listMst_Customer = ViewBag.Lst_MstCustomer as List<Mst_Customer>;
+
+
+    var cutsomercodeSys = ViewBag.CustomerCode;
+}
+<script>
+    setAdminCurrentUrl('@Url.Action("Rpt_Summary_InAndReturnSup", "Report")');
+</script>
+<style>
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        /* display: none; <- Crashes Chrome on hover */
+        -webkit-appearance: none;
+        margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+    }
+</style>
+
+<div class="row no-margin">
+    <div class="col-sm-12">
+        <aside class="row no-margin">
+            @using (Html.BeginForm("Rpt_Summary_InAndReturnSup", "Report", FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <input hidden id="init" name="init" value="search" />
+                <div class="layout-search layout-bot-top-16">
+                    <div class="row no-margin">
+                        <div class="col-4 row no-margin">
+                            <label for="ApprDTimeUTCFrom" class="col-12 col-sm-2 control-label no-padding-right font-weight-500 ">@("Từ ngày".HtmlItemString("report")) <span style="color: red;"> *</span></label>
+                            <div class="col-sm-9 row date-input-group no-margin">
+                                <div class="row col-5 no-margin">
+                                    <div class="col-12 no-padding">
+                                        <div class="input-group form-group" id="dtdatefrom">
+                                            <input type="text" id="ApprDTimeUTCFrom" name="ApprDTimeUTCFrom" class="col-9 cl-date ApprDTimeUTCFrom hasDatepicker" data-date-format="yyyy-mm-dd" value="@apprdtimeutcfrom" autocomplete="off">
+                                            <span class="input-group-addon col-3">
+                                                <i class="far fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <label for="ApprDTimeUTCTo" class="col-2 control-label no-padding-right font-weight-500 text-center">@("đến".HtmlItemString("report"))</label>
+                                <div class="row col-5 no-margin">
+                                    <div class="col-12 no-padding">
+                                        <div class="input-group form-group" id="dtdateto">
+                                            <input type="text" id="ApprDTimeUTCTo" name="ApprDTimeUTCTo" class="col-9 cl-date ApprDTimeUTCTo hasDatepicker" data-date-format="yyyy-mm-dd" value="@apprdtimeutcto" autocomplete="off">
+                                            <span class="input-group-addon col-3">
+                                                <i class="far fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4 row no-margin">
+                            
+                            <div class="form-group margin-bottom-9">
+                                <label class="control-label col-md-4" for="input1">
+                                    @("Nhà cung cấp".HtmlItemString("customer_inventoryout"))
+                                    
+                                </label>
+                                <div class="col-md-8">
+                                    <select class="col-md-12" id="CustomerCode" name="CustomerCode" onchange="ChangeCustomer(this);">
+                                        <option value="">--Chọn nhà cung cấp--</option>
+                                        @if (listMst_Customer != null && listMst_Customer.Count > 0)
+                                        {
+                                            foreach (var item in listMst_Customer)
+                                            {
+                                                var select = "";
+
+                                                if (!CUtils.IsNullOrEmpty(cutsomercodeSys))
+                                                {
+                                                    if (cutsomercodeSys.Equals(item.CustomerCodeSys))
+                                                    {
+                                                        select = "selected";
+                                                    }
+                                                }
+                                                <option @select value="@item.CustomerCodeSys">@item.CustomerCode - @item.CustomerName</option>
+                                            }
+                                            <option value="Search">Tìm kiếm</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-4 row no-margin">
+                            <div class="form-group margin-bottom-9">
+                                <div class="row no-margin">
+                                    <span class="block input-icon input-icon-right">
+
+                                        @{ var imgSearch = Url.Content("~/Images/search.svg");}
+                                        @RenderItemFormat("BTN_BC_NHAP_KHO_THEO_NCC_TIM_KIEM", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\"  onclick=\"SearchData();\"><img class=\"img-button-search\" src=" + imgSearch + "></a>", "", "")
+                                        @RenderItemFormat("BTN_BC_NHAP_KHO_THEO_NCC_EXCEL", "<a class=\"btn btn-nc-button\" style=\"line-height: 13px; color: #000000\" onclick=\"Export()\" href=\"javascript:void(0);\" style=\"\"><i class=\"fas fa-file-excel\" aria-hidden=\"true\" style=\"margin-right: 7px\"></i> Xuất Excel</a>", "", "")
+                                        @*<a class="btn btn-nc-button" onclick="SearchData()" href="javascript:void(0);" style=""><img class="img-button-search" src="@Url.Content("~/Images/search.svg")"></a>
+                                        <a class="btn btn-nc-button" href="javascript:;" onclick="Export();" style=""><i class="far fa-file-excel" aria-hidden="true"></i> Xuất Excel</a>*@
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-margin">
+                        <div class="col-4 row no-margin">
+                            <div class="row form-group">
+                                <label for="ProductCodeUser" class="col-12 col-sm-2 control-label no-padding-right font-weight-500 ">@("Hàng hoá".HtmlItemString("report")) <span style="color: red "> *</span></label>
+                                <div class="col-12 col-sm-9 form-group">
+                                    <span class="block input-icon input-icon-right col-12">
+                                        <input class="col-10" id="myInput" type="text" name="myInput" onkeyup="Autocompletesearch()" placeholder="@("Nhập mã, tên để tìm kiếm".HtmlItemString("report"))" value="@productcodeuser">
+                                        <input type="hidden" id="ProductCodeUser" name="ProductCodeUser" class="col-10 ProductCodeUser" value="@productcodeuser" autocomplete="off" required />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-12 col-sm-2 control-label no-padding-right font-weight-500 "></label>
+                                <div class="col-12 col-sm-9 form-group">
+                                    <span class="block input-icon input-icon-right col-12">
+                                        <input type="text" id="ProductName" name="ProductName" readonly="readonly" class="ProductName" style="border: none; width: 400px" value="@productname" />
+                                        <input type="hidden" id="UnitCode" name="UnitCode" value="@unitcode" />
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </aside>
+        <div class="row no-margin">
+            <div class="row col-12 no-padding">
+                <!--Vẽ biểu đồ-->
+                <div id="RptSummaryInAndReturnSup" class="row col-12" style="margin: 10px auto;@*height: 400px;*@"></div>
+                <!--End vẽ biểu đồ-->
+                <br />
+                @{
+                    using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "mngForm" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        if (listData != null && listData.Count > 0)
+                        {
+                            <div class="col-xs-12 no-padding" style="margin-left: 66px">
+                                <table class="table table-hover table-striped table-bordered table-order" id="tblData" style="border: 1px solid #ddd;">
+                                    <thead>
+                                        <tr>
+
+                                            <th class="text-center cell-300">Tên nhà cung cấp</th>
+                                            <th class="text-center cell-200">Tổng nhập</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="listData">
+
+                                        @foreach (var item in listData)
+                                        {
+                                            <tr class="trData">
+                                                <td class="text-left">@CUtils.StrValue(item.CustomerName)</td>
+                                                <td class="text-right numberic valTotalQtyRemain">@item.TotalQtyRemain</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="@Url.Content("~/Scripts/js/mycharts.js")"></script>
+<script src="https://code.highcharts.com/highcharts.src.js"></script>
+<script src="https://code.highcharts.com/highcharts-3d.js"></script>
+
+<script>
+    $('#ApprDTimeUTCFrom , #ApprDTimeUTCTo').datepicker({
+        autoclose: true,
+        format: 'yyyy-mm-dd'
+    })
+    jQuery(function ($) {
+        //$('.numberic').number(true, 2);
+    });
+    $('select#CustomerCode').select2().on('select2:close', function () { commonUtils.showPopup(this); });
+</script>
+<!-- Search -->
+<script>
+        @*@*Active Menu*@
+        //setAdminCurrentUrl('@Url.Action("Rpt_Summary_InAndReturnSup", "Report")');
+
+    function checkForm() {
+        var productCodeUser = commonUtils.returnValueText('#ProductCodeUser');
+        var apprDTimeUTCFrom = commonUtils.returnValueText('#ApprDTimeUTCFrom');
+
+        var customerCode = commonUtils.returnValueText('#CustomerCode');
+        if (commonUtils.isNullOrEmpty(productCodeUser)) {
+            alert('Chưa nhập hàng hóa tìm kiếm');
+            $('#ProductCodeUser').focus();
+            return false;
+        }
+        if (apprDTimeUTCFrom == undefined || apprDTimeUTCFrom.length == 0) {
+            $('#ApprDTimeUTCFrom').focus();
+            alert('Chưa chọn Từ ngày');
+            return false;
+        }
+
+        return true;
+    }
+
+    function SearchData() {
+        var check = checkForm();
+        if (check) {
+            $('#manageForm').attr('action', '@(Url.Action("Rpt_Summary_InAndReturnSup", "Report"))').submit();
+        }
+        
+    }
+</script>
+<!-- Excel -->
+<script>
+    function Export() {
+        var check = checkForm();
+        if (check) {
+            var customerCode = commonUtils.returnValueText('#CustomerCode');
+            var productCodeUser = commonUtils.returnValueText('#ProductCodeUser');
+        var apprDTimeUTCFrom = commonUtils.returnValueText('#ApprDTimeUTCFrom');
+        var apprDTimeUTCTo = commonUtils.returnValueText('#ApprDTimeUTCTo');
+        //if (productCodeUser == undefined || productCodeUser.length == 0) {
+        //    alert('Chưa chọn hàng hóa');
+        //    $('#ProductCodeUser').focus();
+        //    return false;
+        //}
+        if (apprDTimeUTCFrom == undefined || apprDTimeUTCFrom.length == 0) {
+            $('#ApprDTimeUTCFrom').focus();
+            alert('Chưa chọn Từ ngày');
+            return false;
+        }
+
+        var objCommonExcel = new CommonExcel();
+        var ajaxSettings_Excel = {};
+        ajaxSettings_Excel.Type = 'post';
+        ajaxSettings_Excel.DataType = 'json';
+        ajaxSettings_Excel.Url = '@Url.Action("Rpt_Summary_InAndReturnSup_Export", "Report")';
+
+        var listParams = [
+            { "Key": 'productcodeuser', "Value": productCodeUser },
+            { "Key": 'apprdtimeutcfrom', "Value": apprDTimeUTCFrom },
+            { "Key": 'apprdtimeutcto', "Value": apprDTimeUTCTo }
+            { "Key": 'customercodesys', "Value": customerCode }
+        ];
+
+        objCommonExcel.ajaxSettingsInit();
+        objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+        objCommonExcel.exportExcel(listParams);
+        }
+        
+    }
+</script>
+
+@*Chart*@
+<script>
+
+    $(document).ready(function () {
+        debugger
+        var arr = JSON.parse('@Html.Raw(Json.Encode(listData))');
+        var tableName = 'Rpt_Summary_InAndReturnSup';
+        var totalQtyRemainFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalQtyRemain');
+        var myarr = [];
+        if (arr != null && arr.length > 0) {
+            debugger
+            for (var i = 0; i < arr.length; i++) {
+                debugger
+                var chart = new Object();
+                //chart.name = arr[i].CustomerName + ' - ' + formatNumber(parseFloat(arr[i].Percent)) + '%';
+                chart.name = arr[i].CustomerName + ' - ' + commonUtils.formatNumber(arr[i].Percent, totalQtyRemainFormat) + '%';
+                chart.y = parseFloat(arr[i].TotalQtyRemain);
+                myarr.push(chart);
+            }
+
+            myarr.sort();
+            pieChart('RptSummaryInAndReturnSup', 'pie', 'Báo nhập kho theo NCC', 'Chiếm', myarr);
+    format_Number1();
+        }
+    });
+
+    function formatNumber(number) {
+        debugger
+        var number = number.toFixed(2) + '';
+        var x = number.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
+    }
+</script>
+
+<script type="text/javascript">
+        function Autocompletesearch() {
+            function autocomplete(inp, arrr) {
+                var currentFocus;
+                var a, b, i, c, val = inp.value;
+                    closeAllLists();
+                    if (!val) { return false; }
+                    currentFocus = -1;
+                    a = document.createElement("DIV");
+                    a.setAttribute("id", inp.id + "autocomplete-list");
+                    a.setAttribute("class", "autocomplete-items row col-10 no-padding");
+                    inp.parentNode.appendChild(a);
+                for (i = 0; i < arrr.length; i++) {
+                        /* kiểm tra xem mục có bắt đầu bằng các chữ cái giống như giá trị trường văn bản không: */
+                    let productCur = arrr[i];
+                    if (productCur.ProductName.toUpperCase().includes(val.toUpperCase())) {
+                            /* tạo thành phần DIV cho từng thành phần phù hợp: */
+                            b = document.createElement("DIV");
+                            b.setAttribute("class", "col-12 autocomplete-itemssmall");
+                            /* làm cho các chữ cái phù hợp in đậm: */
+                        b.innerHTML = "<span>" + productCur.ProductName + "</span>";
+                            //b.innerHTML += arrr[i].ProducName;
+                            /* chèn trường đầu vào sẽ giữ giá trị của mục mảng hiện tại: */
+                        b.innerHTML += "<input type='hidden' value='" + productCur.ProductCode + "'>";
+                            /* thực thi chức năng khi ai đó nhấp vào giá trị mục (phần tử DIV): */
+                            b.addEventListener("click", function (e) {
+                                /* chèn giá trị cho trường văn bản tự động hoàn thành: */
+                                inp.value = productCur.ProductName;
+                                GetProduct(productCur.ProductCode);
+                                closeAllLists();
+                            });
+                            a.appendChild(b);
+                        }
+
+                    }
+                    /* thực thi một chức năng nhấn một phím trên bàn phím: */
+                inp.addEventListener("keydown", function (e) {
+                    var x = document.getElementById(inp.id + "autocomplete-list");
+                    if (x) x = x.getElementsByTagName("div");
+                    if (e.keyCode == 40) {
+                        /* Nếu nhấn phím mũi tên DOWN, hãy tăng biến Focus hiện tại: */
+                        currentFocus++;
+                        /* và làm cho mục hiện tại rõ hơn: */
+                        addActive(x);
+                    } else if (e.keyCode == 38) {
+                        currentFocus--;
+                        addActive(x);
+                    } else if (e.keyCode == 13) {
+                        e.preventDefault();
+                        if (currentFocus > -1) {
+                            if (x) x[currentFocus].click();
+                        }
+                    }
+                });
+                document.addEventListener("click", function (e) {
+                    closeAllLists(e.target);
+                });
+                function addActive(x) {
+                    if (!x) return false;
+                    removeActive(x);
+                    if (currentFocus >= x.length) currentFocus = 0;
+                    if (currentFocus < 0) currentFocus = (x.length - 1);
+                    x[currentFocus].classList.add("autocomplete-active");
+                }
+                function removeActive(x) {
+                    for (var i = 0; i < x.length; i++) {
+                        x[i].classList.remove("autocomplete-active");
+                    }
+                }
+                function closeAllLists(elmnt) {
+                    var x = document.getElementsByClassName("autocomplete-items");
+                    for (var i = 0; i < x.length; i++) {
+                        if (elmnt != x[i] && elmnt != inp) {
+                            x[i].parentNode.removeChild(x[i]);
+                        }
+                    }
+                }
+            }
+            function GetProduct(prdid) {
+            let url = '@Url.Action("GetProductExactly", "Report")';
+                $.ajax({
+                    url: url,
+                    type: 'post',
+                    data: {
+                        prdid: prdid
+                        //__RequestVerificationToken: token
+                    },
+                    cache: false,
+                    dataType: 'json',
+                    traditional: true,
+                    //contentType: "application/json; charset=utf-8",
+                    //success: function (data) {
+                    //    $(".GetBom").html(data);
+
+                    //}
+                    success: function (data) {
+                        if (data.Data !== undefined) {
+                            var dataPrd = data.Data;
+
+                            $("#ProductName").val(dataPrd.ProductCodeUser + ' - ' + dataPrd.ProductName + ' - ' + dataPrd.UnitCode);
+                            $("#ProductCodeUser").val(dataPrd.ProductCodeUser);
+                            $("#UnitCode").val(dataPrd.UnitCode);
+                            $("#myInput").val(dataPrd.ProductCodeUser);
+                        }
+                        else {
+                            //$('.GetPrd').append('');
+                        }
+                    }
+
+                });
+            }
+            var x = document.getElementById("myInput");
+            Getkeyup(x.value);
+            function Getkeyup(prdid) {
+                if (prdid.length < 2) { return; }
+
+                var url = '@Url.Action("SearchProduct", "Report")';
+                $.ajax({
+                    url: url,
+                    type: 'post',
+                    data: {
+                        prdid: prdid,
+                    },
+                    cache: false,
+                    dataType: 'json',
+                    traditional: true,
+                    success: function (data) {
+                        var arr = [];
+                        if (data.length >0) {
+                            for (var i = 0; i < data.length; i++) {
+                                let prd = {};
+                                prd.ProductCode = data[i].ProductCode;
+                                prd.ProductName = data[i].ProductCodeUser + ' - ' + data[i].ProductName;
+
+                                arr.push(prd);
+                            }
+                        }
+                        debugger;
+                        autocomplete(document.getElementById("myInput"), arr);
+                    }
+                });
+
+            }
+        }
+</script>
+
+
+@*format number*@
+<script type="text/javascript">
+    function format_Number1(){
+        var tableName = 'Rpt_Summary_InAndReturnSup';
+        var totalQtyRemainFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalQtyRemain');
+              $('.valTotalQtyRemain').number(true, totalQtyRemainFormat);
+
+    
+
+
+        
+    }
+</script>

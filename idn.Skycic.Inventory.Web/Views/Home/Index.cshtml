@@ -1,0 +1,172 @@
+﻿@*@model List<OS_Inos_OrgUI>*@
+@model List<OS_Inos_Org>
+@{
+    ViewBag.Title = "Home Page";
+    Layout = "~/Views/Shared/_LayoutHome.cshtml";
+}
+
+@*@if (Model != null && Model.Count == 1)
+    {
+        var networkidone = Model[0].Id.ToString().Trim();
+        var parentidone = Model[0].ParentId.ToString().Trim();
+
+        <script>
+            $(document).ready(function () {
+                LoginOS('@MvcHtmlString.Create(networkidone)', '@MvcHtmlString.Create(parentidone.Equals("0") ? networkidone : parentidone)');
+            });
+        </script>
+    }*@
+
+
+@using (Html.BeginForm("LoginOS", "Account", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+{
+
+    <div class="clearfix"></div>
+    <div class="col-xs-12 no-margin" style="height: 670px; background-size: contain;padding:0;">
+        <div class="col-xs-5 no-margin no-padding">
+            <img style="position:fixed;height:680px;" class="img-responsive" src="~/images/Welcome.png" alt="Alternate Text" />
+        </div>
+        <div class="col-xs-8 no-margin no-padding" style=" float: right; text-align: -moz-center; text-align: -webkit-center;">
+            <a class="btn font-color mybtn-Button" href="@Url.Action("Login", "Account")" style="float: right;font-size: 13px; margin-top: 20px;margin-right: 10px; "><i class="fa fa-sign-out" aria-hidden="true"></i> Đăng xuất</a>
+            <h1 style="margin: 70px 0 0 20px; font-weight: bold; color: #15795E">CHÀO MỪNG BẠN ĐẾN VỚI GIẢI PHÁP INBRAND</h1>
+            <h3>Tài khoản của bạn được liên kết với nhiều tổ chức.</h3>
+            <h3>Vui lòng chọn bắt đầu làm việc tại:</h3>
+            @if (Model != null && Model.Count > 0)
+            {
+                var i = 0;
+                foreach (var item in Model)
+                {
+                    // Nếu item.ParentId.Equals("0") => NetworkID = item.Id
+                    // Nếu !item.ParentId.Equals("0") => NetworkID = item.ParentId và OrgID = item.Id
+                    var orgid = item.Id.ToString().Trim();
+                    var parentid = item.ParentId.ToString().Trim();
+                    var urlCur = "/";
+                    var url = Url.ActionLocalized("Index", "Dashboard");
+                    if (url.IndexOf("//", StringComparison.Ordinal) == 0)
+                    {
+                        urlCur = url.Replace("//", "/");
+                    }
+                    else
+                    {
+                        urlCur = url;
+                    }
+                    if (!urlCur.StartsWith("/" + parentid))
+                    {
+                        urlCur = string.Format("/{0}{1}", parentid, urlCur);
+                    }
+                    if (item.FlagNetworkExist.Equals("1"))
+                    {
+                    <h3>
+                        <a href="javascript:;" onclick="LoginOS('@MvcHtmlString.Create(orgid)', '@MvcHtmlString.Create(parentid.Equals("0") ? orgid : parentid)')">@MvcHtmlString.Create(item.Name.ToString().Trim())</a>
+                    </h3>
+                    }
+                    else
+                    {
+                        var inosNetwork = "";
+                        if (CUtils.StrValueNew(item.ParentId).Equals("0"))
+                        {
+                            inosNetwork = CUtils.StrValueNew(item.Id);
+                        }
+                        else
+                        {
+                            inosNetwork = CUtils.StrValueNew(item.ParentId);
+                        }
+                        <h3>
+                            <a style="color: red" href="@Url.Action("CreateNetworkNoCreateOrg", "Register", new { inosNetwork = inosNetwork})">@MvcHtmlString.Create(item.Name.ToString().Trim())</a>
+                        </h3>
+                    }
+                    i++;
+                }
+            }
+            <a class="btn font-color mybtn-Button" href="@Url.Action("CreateNetwork", "Register")" style="font-size: 13px; margin-top: 20px;margin-right: 10px; ">Tạo network</a>
+        </div>
+    </div>
+
+}
+
+@using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" }))
+{
+    @Html.AntiForgeryToken()
+}
+
+<div class="modal fade" id="ShowPopupGenNetwork" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+
+<script type="text/javascript">
+    processAjaxForm($('#manageForm'), function (response) {
+        processAjaxFormResult(response);
+
+    });
+</script>
+
+<script type="text/javascript">
+
+    function LoginOS(orgid, parentid) {
+        var url = '@Url.Action("LoginOS", "Account")';
+        //var token = $('input[name=__RequestVerificationToken]').val();
+        $.ajax({
+            url: url,
+            data: {
+                orgid: orgid,
+                parentid: parentid
+                //__RequestVerificationToken: token
+            },
+            type: 'post',
+            dataType: 'json',
+            success: function (data) {
+                if (data.Success) {
+                    window.location.href = data.RedirectUrl;
+                } else {
+                    if (data.NoNetWork == true) {
+                        var notice = data.Detail;
+                        if (notice != "") {
+                        var orgID = data.orgID;
+                        if (orgID != "") {
+                             bootbox.confirm({
+                            title: "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO",
+                                 message: notice,
+                            buttons: {
+                                'cancel': {
+                                    label: 'Thoát',
+                                    className: 'btn mybtn-Button btnButton'
+                                },
+                                'confirm': {
+                                    label: 'Đồng ý',
+                                    className: 'btn mybtn-Button btnButton'
+                                }
+                            },
+                                 callback: function (result) {
+                                     if (result == true) {
+                                         window.location.href = '@Url.ActionLocalized("BuyPackage", "agent/register", new { orgID = ViewBag.orgID == null ? "" : ViewBag.orgID })'
+                                     }
+                            }
+                        });
+                        }
+                        else {
+                            alert(notice);
+                        }
+                    }
+
+                    }
+
+
+                    _showErrorMsg123("Lỗi!", data.Detail);
+
+                }
+            }
+        });
+    }
+</script>
+
+<!--Start of icic script-->
+<script type='text/javascript'>
+    var icic_api = icic_api || {};
+    (function () {
+        var s1 = document.createElement('script'), s0 = document.getElementsByTagName('script')[0];
+        s1.async = true;
+        s1.src = 'https://skycic.com/client/script/3273767000/236f24';
+        s1.charset = 'UTF-8';
+        s1.setAttribute('crossorigin', '*');
+        s0.parentNode.insertBefore(s1, s0);
+    })();
+</script>
+<!--End of icic script-->

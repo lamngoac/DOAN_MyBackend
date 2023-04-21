@@ -1,0 +1,584 @@
+﻿@model Mst_NNT
+@{
+    Layout = "~/Views/Shared/CoreLayoutQuantri.cshtml";
+    var title = "Tạo mới tổ chức trực thuộc";
+    var titleMng = "Danh mục khách hàng";
+    ViewBag.Title = title;
+    var listMst_Province = ViewBag.ListMst_Province as List<Mst_Province>;
+    if (listMst_Province == null || listMst_Province.Count == 0)
+    {
+        listMst_Province = new List<Mst_Province>();
+    }
+    var listMst_District = ViewBag.ListMst_District as List<Mst_District>;
+    if (listMst_District == null || listMst_District.Count == 0)
+    {
+        listMst_District = new List<Mst_District>();
+    }
+    var listMst_GovTaxID = ViewBag.ListMst_GovTaxID as List<Mst_GovTaxID>;
+    if (listMst_GovTaxID == null || listMst_GovTaxID.Count == 0)
+    {
+        listMst_GovTaxID = new List<Mst_GovTaxID>();
+    }
+    var listMst_NNTType = ViewBag.ListMst_NNTType as List<Mst_NNTType>;
+    if (listMst_NNTType == null || listMst_NNTType.Count == 0)
+    {
+        listMst_NNTType = new List<Mst_NNTType>();
+    }
+    var listMst_Dealer = ViewBag.ListMst_Dealer as List<Mst_Dealer>;
+    if (listMst_Dealer == null || listMst_Dealer.Count == 0)
+    {
+        listMst_Dealer = new List<Mst_Dealer>();
+    }
+    var listMst_GovIDType = ViewBag.ListMst_GovIDType as List<Mst_GovIDType>;
+    if (listMst_GovIDType == null || listMst_GovIDType.Count == 0)
+    {
+        listMst_GovIDType = new List<Mst_GovIDType>();
+    }
+
+    var listiNOS_Mst_BizType = ViewBag.ListiNOS_Mst_BizType as List<iNOS_Mst_BizType>;
+    if (listiNOS_Mst_BizType == null || listiNOS_Mst_BizType.Count == 0)
+    {
+        listiNOS_Mst_BizType = new List<iNOS_Mst_BizType>();
+    }
+
+    var listiNOS_Mst_BizField = ViewBag.ListiNOS_Mst_BizField as List<iNOS_Mst_BizField>;
+    if (listiNOS_Mst_BizField == null || listiNOS_Mst_BizField.Count == 0)
+    {
+        listiNOS_Mst_BizField = new List<iNOS_Mst_BizField>();
+    }
+
+    var listiNOS_Mst_BizSize = ViewBag.ListiNOS_Mst_BizSize as List<iNOS_Mst_BizSize>;
+    if (listiNOS_Mst_BizSize == null || listiNOS_Mst_BizSize.Count == 0)
+    {
+        listiNOS_Mst_BizSize = new List<iNOS_Mst_BizSize>();
+    }
+    var mstnnt = "";
+    if (!CUtils.IsNullOrEmpty(ViewBag.MST))
+    {
+        mstnnt = ViewBag.MST;
+    }
+}
+
+<style>
+    .w_chungthuso {
+        /*width: 97.5%;*/
+    }
+</style>
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="title">
+                    <p style="vertical-align: bottom">TẠO ĐƠN VỊ TRỰC THUỘC</p>
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="row no-margin box-shadow-tk">
+                        @using (Html.BeginForm("Create", "Mst_NNT", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <input hidden id="nkid" name="nkid" value="@MvcHtmlString.Create(ViewBag.NetworkID)" />
+                            <div class="row no-margin">
+                                <div class="col-xs-3 no-padding">
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="MST" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã tổ chức <span style=\"color: red\">*</span>")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="MST" name="MST" class="col-xs-12 MST disabled-fix" onkeyup="locdau(this);" value="@mstnnt" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <input type="hidden" id="CreatedDate" value="@DateTime.Now.ToString("yyyy-MM-dd 00:00:00")" />
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="NNTFullName" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên tổ chức <span style=\"color: red\">*</span>")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="NNTFullName" name="NNTFullName" class="col-xs-12 NNTFullName" value="" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="MSTParent" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Trực thuộc đơn vị")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="MSTParent" name="MSTParent" class="col-xs-12 MSTParent disabled-fix" value="@ViewBag.MSTPARENT" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="BusinessRegNo" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Giấy phép KD")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="BusinessRegNo" name="BusinessRegNo" class="col-xs-12 BusinessRegNo" value="" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="PresentBy" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Người đại diện")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="PresentBy" name="PresentBy" class="col-xs-12 PresentBy" value="" autocomplete="off" />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="NNTPosition" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Chức vụ")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="NNTPosition" name="NNTPosition" class="col-xs-12 NNTPosition" value="" autocomplete="off" />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="PresentIDNo" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Số giấy tờ")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="PresentIDNo" name="PresentIDNo" class="col-xs-12 PresentIDNo" value="" autocomplete="off" />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 no-padding">
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="PresentIDType" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Loại giấy tờ")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <select id="PresentIDType" name="PresentIDType" class="col-xs-12 PresentIDType" >
+                                                    <option value=""></option>
+                                                    @if (listMst_GovIDType != null && listMst_GovIDType.Count > 0)
+                                                    {
+                                                        foreach (var item in listMst_GovIDType)
+                                                        {
+                                                            <option value="@MvcHtmlString.Create(item.GovIDType.ToString().Trim())" desc="@MvcHtmlString.Create(item.GovIDTypeName.ToString().Trim())">@MvcHtmlString.Create(item.GovIDTypeName.ToString().Trim())</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="NNTAddress" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Địa chỉ <span style=\"color: red\">*</span>")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="NNTAddress" name="NNTAddress" class="col-xs-12 NNTAddress" value="" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="ProvinceCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tỉnh/Thành phố <span style=\"color: red\">*</span>")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+
+                                                <select id="ProvinceCode" name="ProvinceCode" class="col-xs-12 ProvinceCode" onchange="LoadDistrict(this)" required="">
+                                                    <option value=""></option>
+                                                    @if (listMst_Province != null && listMst_Province.Count > 0)
+                                                    {
+                                                        foreach (var item in listMst_Province)
+                                                        {
+                                                            <option value="@MvcHtmlString.Create(item.ProvinceCode.ToString().Trim())" desc="@MvcHtmlString.Create(item.ProvinceCode.ToString().Trim())">@MvcHtmlString.Create(item.ProvinceName.ToString().Trim())</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="DistrictCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Quận/Huyện <span style=\"color: red\">*</span>")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+
+                                                <select id="DistrictCode" name="DistrictCode" class="col-xs-12 DistrictCode" onchange="LoadMst_GovTaxID(this)" required=""></select>
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="GovTaxID" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("CQT quản lý")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <select id="GovTaxID" name="GovTaxID" class="col-xs-12 GovTaxID" required=""></select>
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="NNTMobile" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("ĐT Di động")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="NNTMobile" name="NNTMobile" class="col-xs-12 NNTMobile" value="" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="NNTPhone" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("ĐT Cố định")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="NNTPhone" name="NNTPhone" class="col-xs-12 NNTPhone" value="" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 no-padding">
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="NNTFax" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Fax")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="NNTFax" name="NNTFax" class="col-xs-12 NNTFax" value="" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="AccNo" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Số tài khoản")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="AccNo" name="AccNo" class="col-xs-12 AccNo" value="" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="AccHolder" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Chủ tài khoản")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="AccHolder" name="AccHolder" class="col-xs-12 AccHolder" value="" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="BankName" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tại ngân hàng")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="BankName" name="BankName" class="col-xs-12 BankName" value="" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="CANumber" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Chứng thư số")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="CANumber" name="CANumber" class="col-xs-12 w_chungthuso " value="" autocomplete="off" readonly />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="ContactName" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tổ thức cấp CTS")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="CAOrg" name="CAOrg" class="col-xs-12 CAOrg w_chungthuso " value="" autocomplete="off" readonly />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group  margin-bottom-9">
+                                        <label class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Bắt đầu hiệu lực")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="CAEffDTimeUTCStart" name="CAEffDTimeUTCStart" class="col-xs-12 CAEffDTimeUTCStart " value="" autocomplete="off" readonly />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="DealerType" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500">Loại đại lý<span style="color: red">*</span></label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <select id="DealerType" name="DealerType" class="col-xs-12 DealerType" title="">
+                                                    <option value=""></option>
+                                                    <option value="NPP">Nhà phân phối</option>
+                                                    <option value="NCC">Nhà cung cấp</option>
+                                                </select>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 no-padding">
+                                    <div class="form-group  margin-bottom-9">
+                                        <label class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Hết hiệu lực")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="CAEffDTimeUTCEnd" name="CAEffDTimeUTCEnd" class="col-xs-12 CAEffDTimeUTCEnd" value="" autocomplete="off" readonly />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="ContactName" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Người liên hệ")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="ContactName" name="ContactName" class="col-xs-12 ContactName" value="" autocomplete="off" />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="ContactPhone" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Điện thoại")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="ContactPhone" name="ContactPhone" class="col-xs-12 ContactPhone" value="" autocomplete="off" />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="ContactEmail" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Email liên hệ")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="ContactEmail" name="ContactEmail" class="col-xs-12 ContactEmail" value="" autocomplete="off" />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="Website" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Website")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="Website" name="Website" class="col-xs-12 Website" value="" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="BizFieldCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Loại hình tổ chức")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <select id="BizType" name="BizType" class="col-xs-12 BizType" required="">
+                                                    <option value=""></option>
+                                                    @if (listiNOS_Mst_BizType != null && listiNOS_Mst_BizType.Count > 0)
+                                                    {
+                                                        foreach (var item in listiNOS_Mst_BizType)
+                                                        {
+                                                            <option value="@MvcHtmlString.Create(item.BizType.ToString().Trim())" desc="@MvcHtmlString.Create(item.BizTypeName.ToString().Trim())">@MvcHtmlString.Create(item.BizTypeName.ToString().Trim())</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="BizFieldCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Lĩnh vực hoạt động")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <select id="BizFieldCode" name="BizFieldCode" class="col-xs-12 BizFieldCode" required="">
+                                                    <option value=""></option>
+                                                    @if (listiNOS_Mst_BizField != null && listiNOS_Mst_BizField.Count > 0)
+                                                    {
+                                                        foreach (var item in listiNOS_Mst_BizField)
+                                                        {
+                                                            <option value="@MvcHtmlString.Create(item.BizFieldCode.ToString().Trim())" desc="@MvcHtmlString.Create(item.BizFieldName.ToString().Trim())">@MvcHtmlString.Create(item.BizFieldName.ToString().Trim())</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group  margin-bottom-9">
+                                        <label for="BizSizeCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Quy mô tổ chức")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <select id="BizSizeCode" name="BizSizeCode" class="col-xs-12 BizSizeCode" required="">
+                                                    <option value=""></option>
+                                                    @if (listiNOS_Mst_BizSize != null && listiNOS_Mst_BizSize.Count > 0)
+                                                    {
+                                                        foreach (var item in listiNOS_Mst_BizSize)
+                                                        {
+                                                            <option value="@MvcHtmlString.Create(item.BizSizeCode.ToString().Trim())" desc="@MvcHtmlString.Create(item.BizSizeName.ToString().Trim())">@MvcHtmlString.Create(item.BizSizeName.ToString().Trim())</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row no-margin">
+                                <div class="col-sm-6">
+                                    <input id="DLCode" type="hidden" value="@ViewBag.DLCode" />
+                                    <input id="FlagActive" type="hidden" value="1" />
+                                    <input id="TCTStatus" type="hidden" value="1" />
+                                </div>
+                            </div>
+                        }
+                    </aside>
+                    <div class="col-xs-12 no-padding">
+                        <div class="clearfix">
+                            @*<div class="row no-margin" style="float: right">
+                                <a href="javascript:void(0);" class="btn font-color mybtn-Button" style="margin-top: 20px" onclick="GetCert();">Lấy thông tin</a>
+
+                            </div>*@
+                            <div class="row no-margin" style="float: right">
+                                @RenderItemFormat("BTN_TAO_NNT_LUU", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px; margin-right: 10px!important\" onclick=\"SaveData();\">Lưu</a>", "", "")
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Mst_NNT.js")"></script>
+
+    @*Active Menu*@
+    <script type="text/javascript">
+        setAdminCurrentUrl('@Url.Action("Index", "Mst_NNT")');
+    </script>
+
+    <script type="text/javascript">
+        var _getForm = document.getElementById("manageForm");
+        _getForm.addEventListener('reset', function () {
+            document.getElementById("MST").focus()
+        })
+    </script>
+
+    @*SaveData*@
+    <script type="text/javascript">
+        function SaveData() {
+            debugger
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Create", "Mst_NNT")';
+            var objMst_NNT = new Mst_NNT();
+            objMst_NNT.ActionType = 'create';
+            objMst_NNT.ajaxSettings = ajaxSettings;
+            objMst_NNT.saveData();
+        }
+    </script>
+
+    @*LoadDistrict*@
+    <script>
+        function LoadDistrict(thiz) {
+            var objMst_NNT = new Mst_NNT();
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("LoadMst_DistrictInSolution", "AdminBase")';
+
+            objMst_NNT.ajaxSettings = ajaxSettings;
+            objMst_NNT.loadDistrict(thiz);
+        }
+    </script>
+
+    @*LoadMst_GovTaxID*@
+    <script>
+        function LoadMst_GovTaxID(thiz) {
+            var objMst_NNT = new Mst_NNT();
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("LoadMst_GovTaxIDInSolution", "AdminBase")';
+
+            objMst_NNT.ajaxSettings = ajaxSettings;
+            objMst_NNT.loadMst_GovTaxID(thiz);
+        }
+    </script>
+
+    @*GetCert*@
+    <script>
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+        });
+
+        function GetCert() {
+            debugger
+            var objMst_NNT = new Mst_NNT();
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = 'http://localhost:12888/api/Signature/GetCertificateInfo';
+
+            objMst_NNT.ajaxSettings = ajaxSettings;
+            objMst_NNT.getCert();
+        }
+    </script>
+}
+
+@*<script type="text/javascript">
+    function GetCert() {
+        debugger;
+        var nkid = ReturnValueText('#nkid');
+        var tem = {};
+        tem.NetworkID = nkid;
+        var modelCur = ReJSONValue(tem);
+        var urlCur = "";
+        urlCur = "http://localhost:12888/api/Signature/GetCertificateInfo";
+
+        $.ajax({
+            type: "post",
+            //data: modelCur,
+            data: tem,
+            url: urlCur,
+            dataType: 'json',
+            //contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+            //traditional: true,
+            success: function (result) {
+                debugger;
+                if (result.Success) {
+                    var cert = result.Data;
+                    if (cert !== null && cert !== undefined) {
+                        var serialNumber = ReturnValue(cert.SerialNumber);
+                        var SubjectCN = ReturnValue(cert.Subject.CN);
+                        var cAOrg = ReturnValue(cert.Issuer.CN);
+                        //var cAOrg = ReturnValue(cert.Issuer.O);
+                        var cAStartEff = ReturnValue(cert.NotBefore);
+                        var cAEndEff = ReturnValue(cert.NotAfter);
+
+                        $('#CANumber').val(serialNumber);
+                        $('#Subject').val(SubjectCN);
+                        $('#CAOrg').val(cAOrg);
+                        $('#CAEffDTimeUTCStart').val(cAStartEff);
+                        $('#CAEffDTimeUTCEnd').val(cAEndEff);
+                    }
+                } else {
+                    var exception = result.Exception;
+                    if (exception !== null && exception !== undefined) {
+                        if (!IsNullOrEmpty(exception.ErrorDetail)) {
+                            _showErrorMsg123("Lỗi!", exception.ErrorDetail);
+                        } else {
+                            if (!IsNullOrEmpty(exception.ErrorMessage))
+                            {
+                                alert(exception.ErrorMessage);
+                            } else {
+                                alert("Có lỗi xảy ra xin vui lòng thử lại!");
+                            }
+                        }
+                    } else {
+                        alert("Có lỗi xảy ra xin vui lòng thử lại!");
+                    }
+                    //
+                }
+            }, error: function (xhr, textStatus, errorThrown) {
+                var mess = xhr.responseJSON;
+                alert("@MvcHtmlString.Create("Bạn chưa cài chương trình ký số điện tử!")");
+            }
+        }, function (err) {
+            alert("Có lỗi xảy ra xin vui lòng thử lại!");
+
+        });
+    }
+</script>*@
+
+
+

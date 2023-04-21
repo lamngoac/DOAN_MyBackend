@@ -1,0 +1,741 @@
+﻿@model Mst_NNT
+@{
+    var title = "Cập nhật thông tin người nộp thuế";
+    var titleMng = "Danh sách khách hàng";
+    ViewBag.Title = title;
+    var listMst_Province = ViewBag.ListMst_Province as List<Mst_Province>;
+    if (listMst_Province == null || listMst_Province.Count == 0)
+    {
+        listMst_Province = new List<Mst_Province>();
+    }
+    var listMst_District = ViewBag.ListMst_District as List<Mst_District>;
+    if (listMst_District == null || listMst_District.Count == 0)
+    {
+        listMst_District = new List<Mst_District>();
+    }
+    var listMst_GovTaxID = ViewBag.ListMst_GovTaxID as List<Mst_GovTaxID>;
+    if (listMst_GovTaxID == null || listMst_GovTaxID.Count == 0)
+    {
+        listMst_GovTaxID = new List<Mst_GovTaxID>();
+    }
+    var listMst_NNTType = ViewBag.ListMst_NNTType as List<Mst_NNTType>;
+    if (listMst_NNTType == null || listMst_NNTType.Count == 0)
+    {
+        listMst_NNTType = new List<Mst_NNTType>();
+    }
+    var listMst_Dealer = ViewBag.ListMst_Dealer as List<Mst_Dealer>;
+    if (listMst_Dealer == null || listMst_Dealer.Count == 0)
+    {
+        listMst_Dealer = new List<Mst_Dealer>();
+    }
+    var listMst_GovIDType = ViewBag.ListMst_GovIDType as List<Mst_GovIDType>;
+    if (listMst_GovIDType == null || listMst_GovIDType.Count == 0)
+    {
+        listMst_GovIDType = new List<Mst_GovIDType>();
+    }
+
+    var listiNOS_Mst_BizType = ViewBag.ListiNOS_Mst_BizType as List<iNOS_Mst_BizType>;
+    if (listiNOS_Mst_BizType == null || listiNOS_Mst_BizType.Count == 0)
+    {
+        listiNOS_Mst_BizType = new List<iNOS_Mst_BizType>();
+    }
+
+    var listiNOS_Mst_BizField = ViewBag.ListiNOS_Mst_BizField as List<iNOS_Mst_BizField>;
+    if (listiNOS_Mst_BizField == null || listiNOS_Mst_BizField.Count == 0)
+    {
+        listiNOS_Mst_BizField = new List<iNOS_Mst_BizField>();
+    }
+
+    var listiNOS_Mst_BizSize = ViewBag.ListiNOS_Mst_BizSize as List<iNOS_Mst_BizSize>;
+    if (listiNOS_Mst_BizSize == null || listiNOS_Mst_BizSize.Count == 0)
+    {
+        listiNOS_Mst_BizSize = new List<iNOS_Mst_BizSize>();
+    }
+    var registerStatus = "";
+}
+<div class="container">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="col-xs-12">
+                        @using (Html.BeginForm("Update", "Mst_NNT", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="">
+                                <div class="">
+                                    <div class="title">
+                                        <p style="vertical-align: bottom">CẬP NHẬT THÔNG TIN NGƯỜI NỘP THUẾ</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row no-margin">
+                                <div class="col-sm-6">
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="MST" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã số thuế <span style=\"color: red\">*</span>")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="MST" name="MST" class="col-xs-11 MST disabled-fix" onkeyup="locdau(this);" value="@if (Model != null && Model.MST != null){@MvcHtmlString.Create(Model.MST.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="CreatedDate" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Ngày tạo")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="CreatedDate" name="CreatedDate" class="col-xs-11 disabled-fix CreatedDate" value="@if (Model != null && Model.CreatedDate != null){@MvcHtmlString.Create(Model.CreatedDate.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="NNTFullName" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên tổ chức <span style=\"color: red\">*</span>")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="NNTFullName" name="NNTFullName" class="col-xs-11 disabled-fix NNTFullName" value="@if (Model != null && Model.NNTFullName != null){@MvcHtmlString.Create(Model.NNTFullName.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="MSTParent" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Trực thuộc đơn vị")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="MSTParent" name="MSTParent" class="col-xs-11 disabled-fix MSTParent" value="@if (Model != null && Model.MSTParent != null){@MvcHtmlString.Create(Model.MSTParent.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="NNTAddress" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Địa chỉ <span style=\"color: red\">*</span>")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="NNTAddress" name="NNTAddress" class="col-xs-11 disabled-fix NNTAddress" value="@if (Model != null && Model.NNTAddress != null){@MvcHtmlString.Create(Model.NNTAddress.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="ProvinceCode" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tỉnh/Thành phố <span style=\"color: red\">*</span>")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                @{
+                                                    var provincecode = "";
+                                                    if (Model != null)
+                                                    {
+                                                        if (Model.ProvinceCode != null)
+                                                        {
+                                                            provincecode = Model.ProvinceCode.ToString();
+                                                        }
+                                                    }
+                                                }
+                                                <select id="ProvinceCode" name="ProvinceCode" class="col-xs-11 disabled-fix ProvinceCode" required="">
+                                                    <option value=""></option>
+                                                    @if (listMst_Province != null && listMst_Province.Count > 0)
+                                                    {
+                                                        foreach (var item in listMst_Province)
+                                                        {
+                                                            <option value="@MvcHtmlString.Create(item.ProvinceCode.ToString().Trim())" desc="@MvcHtmlString.Create(item.ProvinceCode.ToString().Trim())" @(item.ProvinceCode.ToString().Trim().Equals(provincecode) ? "selected" : "")>@MvcHtmlString.Create(item.ProvinceName.ToString().Trim())</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="DistrictCode" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Quận/Huyện <span style=\"color: red\">*</span>")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                @{
+                                                    var districtcode = "";
+                                                    if (Model != null)
+                                                    {
+                                                        if (Model.DistrictCode != null)
+                                                        {
+                                                            districtcode = Model.DistrictCode.ToString();
+                                                        }
+                                                    }
+                                                }
+                                                <select id="DistrictCode" name="DistrictCode" class="col-xs-11 disabled-fix DistrictCode" required="">
+                                                    <option value=""></option>
+                                                    @if (listMst_District != null && listMst_District.Count > 0)
+                                                    {
+                                                        foreach (var item in listMst_District)
+                                                        {
+                                                            <option value="@MvcHtmlString.Create(item.DistrictCode.ToString().Trim())" desc="@MvcHtmlString.Create(item.DistrictCode.ToString().Trim())" @(item.DistrictCode.ToString().Trim().Equals(districtcode) ? "selected" : "")>@MvcHtmlString.Create(item.DistrictName.ToString().Trim())</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="ContactName" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Người liên hệ <span style=\"color: red\">*</span>")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="ContactName" name="ContactName" class="col-xs-11 disabled-fix ContactName" value="@if (Model != null && Model.ContactName != null){@MvcHtmlString.Create(Model.ContactName.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="ContactPhone" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Điện thoại <span style=\"color: red\">*</span>")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="ContactPhone" name="ContactPhone" class="col-xs-11 disabled-fix ContactPhone" value="@if (Model != null && Model.ContactPhone != null){@MvcHtmlString.Create(Model.ContactPhone.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="ContactEmail" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Email liên hệ <span style=\"color: red\">*</span>")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="ContactEmail" name="ContactEmail" class="col-xs-11 disabled-fix ContactEmail" value="@if (Model != null && Model.ContactEmail != null){@MvcHtmlString.Create(Model.ContactEmail.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="Website" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Website")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="Website" name="Website" class="col-xs-11 disabled-fix Website" value="@if (Model != null && Model.Website != null){@MvcHtmlString.Create(Model.Website.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="NNTMobile" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("ĐT Di động")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="NNTMobile" name="NNTMobile" class="col-xs-11 disabled-fix NNTMobile" value="@if (Model != null && Model.NNTMobile != null){@MvcHtmlString.Create(Model.NNTMobile.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="NNTPhone" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("ĐT Cố định")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="NNTPhone" name="NNTPhone" class="col-xs-11 disabled-fix NNTPhone" value="@if (Model != null && Model.NNTPhone != null){@MvcHtmlString.Create(Model.NNTPhone.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <labe class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Thời hạn bắt đầu hiệu lực")</labe>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="CAEffDTimeUTCStart" name="CAEffDTimeUTCStart" class="col-xs-11 disabled-fix CAEffDTimeUTCStart" value="@if (Model != null && Model.CAEffDTimeUTCStart != null){@MvcHtmlString.Create(CUtils.FormatDate(Model.CAEffDTimeUTCStart.ToString(), Nonsense.DATE_TIME_FULL_DB_FORMAT))} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <labe class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Thời gian hết hiệu lực")</labe>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="CAEffDTimeUTCEnd" name="CAEffDTimeUTCEnd" class="col-xs-11 disabled-fix CAEffDTimeUTCEnd" value="@if (Model != null && Model.CAEffDTimeUTCEnd != null){@MvcHtmlString.Create(CUtils.FormatDate(Model.CAEffDTimeUTCEnd.ToString(), Nonsense.DATE_TIME_FULL_DB_FORMAT))} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="RegisterStatus" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Trạng thái đăng ký")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            @{
+
+                                                if (Model != null && !CUtils.IsNullOrEmpty(Model.RegisterStatus))
+                                                {
+                                                    registerStatus = CUtils.StrValue(Model.RegisterStatus);
+                                                }
+                                            }
+                                            <span class="block input-icon input-icon-right">
+                                                <select id="RegisterStatus" name="RegisterStatus" class="col-xs-11 disabled-fix RegisterStatus" required="">
+                                                    <option value=""></option>
+                                                    <option value="@MvcHtmlString.Create(InputStatus.Pending)" @(InputStatus.Pending.Trim().Equals(registerStatus) ? "selected" : "")>@MvcHtmlString.Create(InputStatus.Pending)</option>
+                                                    <option value="@MvcHtmlString.Create(InputStatus.Approve)" @(InputStatus.Approve.Trim().Equals(registerStatus) ? "selected" : "")>@MvcHtmlString.Create(InputStatus.Approve)</option>
+                                                    <option value="@MvcHtmlString.Create(InputStatus.Cancel)" @(InputStatus.Cancel.Trim().Equals(registerStatus) ? "selected" : "")>@MvcHtmlString.Create(InputStatus.Cancel)</option>
+                                                    <option value="@MvcHtmlString.Create(InputStatus.Finish)" @(InputStatus.Finish.Trim().Equals(registerStatus) ? "selected" : "")>@MvcHtmlString.Create(InputStatus.Finish)</option>
+                                                </select>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="Remark" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Ghi chú")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                @{
+                                                    var remark = "";
+                                                    if (Model != null && !CUtils.IsNullOrEmpty(Model.Remark))
+                                                    {
+                                                        remark = CUtils.StrValue(Model.Remark);
+                                                    }
+                                                }
+                                                <textarea rows="3" id="Remark" name="Remark" class="col-xs-11 Remark disabled-fix">@MvcHtmlString.Create(remark)</textarea>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="row no-margin">
+                                <div class="col-sm-6">
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="BizFieldCode" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Loại hình tổ chức")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                @{
+                                                    var bizType = "";
+                                                    if (Model != null)
+                                                    {
+                                                        if (Model.BizType != null)
+                                                        {
+                                                            bizType = Model.BizType.ToString();
+                                                        }
+                                                    }
+                                                }
+                                                <select id="BizType" name="BizType" class="col-xs-11 disabled-fix BizType" required="">
+                                                    <option value=""></option>
+                                                    @if (listiNOS_Mst_BizType != null && listiNOS_Mst_BizType.Count > 0)
+                                                    {
+                                                        foreach (var item in listiNOS_Mst_BizType)
+                                                        {
+                                                            <option value="@MvcHtmlString.Create(item.BizType.ToString().Trim())" desc="@MvcHtmlString.Create(item.BizTypeName.ToString().Trim())" @(item.BizType.ToString().Trim().Equals(bizType) ? "selected" : "")>@MvcHtmlString.Create(item.BizTypeName.ToString().Trim())</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="BizFieldCode" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Lĩnh vực hoạt động")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                @{
+                                                    var bizFieldCode = "";
+                                                    if (Model != null)
+                                                    {
+                                                        if (Model.BizFieldCode != null)
+                                                        {
+                                                            bizFieldCode = Model.BizFieldCode.ToString();
+                                                        }
+                                                    }
+                                                }
+                                                <select id="BizFieldCode" name="BizFieldCode" class="col-xs-11 disabled-fix BizFieldCode" required="">
+                                                    <option value=""></option>
+                                                    @if (listiNOS_Mst_BizField != null && listiNOS_Mst_BizField.Count > 0)
+                                                    {
+                                                        foreach (var item in listiNOS_Mst_BizField)
+                                                        {
+                                                            <option value="@MvcHtmlString.Create(item.BizFieldCode.ToString().Trim())" desc="@MvcHtmlString.Create(item.BizFieldName.ToString().Trim())" @(item.BizFieldCode.ToString().Trim().Equals(bizFieldCode) ? "selected" : "")>@MvcHtmlString.Create(item.BizFieldName.ToString().Trim())</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="BizSizeCode" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Quy mô tổ chức")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                @{
+                                                    var bizSizeCode = "";
+                                                    if (Model != null)
+                                                    {
+                                                        if (Model.BizSizeCode != null)
+                                                        {
+                                                            bizSizeCode = Model.BizSizeCode.ToString();
+                                                        }
+                                                    }
+                                                }
+                                                <select id="BizSizeCode" name="BizSizeCode" class="col-xs-11 disabled-fix BizSizeCode" required="">
+                                                    <option value=""></option>
+                                                    @if (listiNOS_Mst_BizSize != null && listiNOS_Mst_BizSize.Count > 0)
+                                                    {
+                                                        foreach (var item in listiNOS_Mst_BizSize)
+                                                        {
+                                                            <option value="@MvcHtmlString.Create(item.BizSizeCode.ToString().Trim())" desc="@MvcHtmlString.Create(item.BizSizeName.ToString().Trim())" @(item.BizSizeCode.ToString().Trim().Equals(bizFieldCode) ? "selected" : "")>@MvcHtmlString.Create(item.BizSizeName.ToString().Trim())</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="DLCode" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã đại lý <span style=\"color: red\">*</span>")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                @{
+                                                    var dLCode = "";
+                                                    if (Model != null)
+                                                    {
+                                                        if (Model.DLCode != null)
+                                                        {
+                                                            dLCode = Model.DLCode.ToString();
+                                                        }
+                                                    }
+                                                }
+                                                <select id="DLCode" name="DLCode" class="col-xs-11 disabled-fix DLCode" required="">
+                                                    <option value="@dLCode">@dLCode</option>
+                                                    @*@if (listMst_Dealer != null && listMst_Dealer.Count > 0)
+                                                        {
+                                                            foreach (var item in listMst_Dealer)
+                                                            {
+                                                                <option value="@MvcHtmlString.Create(item.DLCode.ToString().Trim())" desc="@MvcHtmlString.Create(item.DLName.ToString().Trim())" @(item.DLCode.ToString().Trim().Equals(dLCode) ? "selected" : "")>@MvcHtmlString.Create(item.DLName.ToString().Trim())</option>
+                                                            }
+                                                        }*@
+                                                </select>
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        @{
+                                            var checkActive = "";
+                                            if (Model != null && Model.FlagActive.Equals("1"))
+                                            {
+                                                checkActive = "checked";
+                                            }
+                                            else
+                                            {
+                                                checkActive = "";
+                                            }
+                                        }
+                                        <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">TT sử dụng</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right padding-top-5 disabled-checkbox-fix">
+                                                <label>
+                                                    <input name="FlagActive" id="FlagActive" class="ace ace-switch ace-switch-4" type="checkbox" value="1" @checkActive />
+                                                    <span class="lbl"></span>
+                                                    <input name="" type="hidden" value="0" />
+                                                </label>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <input id="TCTStatus" type="hidden" value="@MvcHtmlString.Create(Model.TCTStatus.ToString())" />
+                                </div>
+                            </div>
+                        }
+                    </aside>
+                    <div class="col-xs-12 text-center">
+                        @*<div class="clearfix">
+                            <div class="row no-margin text-center">
+                                @if (registerStatus.ToUpper().Equals(InputStatus.Pending))
+                                {
+
+                                    @RenderItemFormat("BTN_SUA_NNT_CANCEL", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px; margin-right: 10px!important \" onclick=\"SaveData('CANCEL');\">Hủy</a>", "", "")
+
+                                    @RenderItemFormat("BTN_SUA_NNT_APPROVE", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px; margin-right: 10px!important \" onclick=\"SaveData('APPROVE');\">Duyệt ĐH</a>", "", "")
+                                }
+
+                                @RenderItemFormat("BTN_SUA_NNT_LUU", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px; margin-right: 10px!important \" onclick=\"SaveData('');\">Lưu</a>", "", "")
+                                @if (registerStatus.ToUpper().Equals(InputStatus.Approve))
+                                {
+
+                                    @RenderItemFormat("BTN_SUA_NNT_KHOI_TAO_HE_THONG", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px; margin-right: 10px!important \" onclick=\"KhoiTaoHeThong();\">Khởi tạo hệ thống</a>", "", "")
+                                }
+                                @if (registerStatus.ToUpper().Equals(InputStatus.Pending))
+                                {
+
+                                    @RenderItemFormat("BTN_SUA_NNT_XOA", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px; margin-right: 10px!important \" onclick=\"Delete('@Model.MST');\">Xóa</a>", "", "")
+                                }
+                            </div>
+                        </div>*@
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+@*Active Menu*@
+<script type="text/javascript">
+    setAdminCurrentUrl('@Url.Action("Index", "Mst_NNT")');
+</script>
+<script type="text/javascript">
+    processAjaxForm($('#manageForm'), function (response) {
+        processAjaxFormResult(response);
+
+    });
+
+</script>
+
+<script>
+    function CheckForm() {
+        if (!CheckIsNullOrEmpty('#MST', 'has-error-fix', '@MvcHtmlString.Create("Mã số thuế không được trống!")'))
+        {
+            return false;
+        }
+        if (!CheckIsNullOrEmpty('#NNTFullName', 'has-error-fix', '@MvcHtmlString.Create("Tên tổ chức không được trống!")'))
+        {
+            return false;
+        }
+
+        if (!CheckIsNullOrEmpty('#NNTAddress', 'has-error-fix', '@MvcHtmlString.Create("Địa chỉ không được trống!")'))
+        {
+            return false;
+        }
+        if (!CheckIsNullOrEmpty('#ProviceCode', 'has-error-fix', '@MvcHtmlString.Create("Tỉnh/Thành phố không được trống!")'))
+        {
+            return false;
+        }
+        if (!CheckIsNullOrEmpty('#DistrictCode', 'has-error-fix', '@MvcHtmlString.Create("Quận/Huyện không được trống!")'))
+        {
+            return false;
+        }
+
+        if (!CheckIsNullOrEmpty('#ContactName', 'has-error-fix', '@MvcHtmlString.Create("Người liên hệ không được trống!")'))
+        {
+            return false;
+        }
+        if (!CheckIsNullOrEmpty('#ContactPhone', 'has-error-fix', '@MvcHtmlString.Create("Điện thoại không được trống!")'))
+        {
+            return false;
+        }
+        if (!CheckIsNullOrEmpty('#ContactEmail', 'has-error-fix', '@MvcHtmlString.Create("Email liên hệ không được trống!")'))
+        {
+            return false;
+        }
+        if (!CheckIsNullOrEmpty('#DLCode', 'has-error-fix', '@MvcHtmlString.Create("Mã đại lý không được trống!")'))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    function SaveData(status) {
+        debugger;
+        var check = CheckForm();
+        if (check) {
+            debugger
+            var mst = ReturnValueText('#MST');
+            var registerStatus = ReturnValueText('#RegisterStatus');
+            if (!IsNullOrEmpty(status)) {
+                registerStatus = status;
+            }
+            var remark = ReturnValueText('#Remark');
+            //var nNTFullName = ReturnValueText('#NNTFullName');
+            //var mSTParent = ReturnValueText('#MSTParent');
+            //var provinceCode = ReturnValueText('#ProvinceCode');
+            //var districtCode = ReturnValueText('#DistrictCode');
+            //var dLCode = ReturnValueText('#DLCode');
+            //var nNTAddress = ReturnValueText('#NNTAddress');
+            //var nNTMobile = ReturnValueText('#NNTMobile');
+            //var nNTPhone = ReturnValueText('#NNTPhone');
+            //var nNTFax = ReturnValueText('#NNTFax');
+            //var presentBy = ReturnValueText('#PresentBy');
+            //var businessRegNo = ReturnValueText('#BusinessRegNo');
+            //var nNTPosition = ReturnValueText('#NNTPosition');
+            //var presentIDNo = ReturnValueText('#PresentIDNo');
+            //var presentIDType = ReturnValueText('#PresentIDType');
+            //var govTaxID = ReturnValueText('#GovTaxID');
+            //var contactName = ReturnValueText('#ContactName');
+            //var contactPhone = ReturnValueText('#ContactPhone');
+            //var contactEmail = ReturnValueText('#ContactEmail');
+            //var website = ReturnValueText('#Website');
+            //var bizType = ReturnValueText('#BizType');
+            //var bizFieldCode = ReturnValueText('#BizFieldCode');
+            //var bizSizeCode = ReturnValueText('#BizSizeCode');
+            //var cANumber = ReturnValueText('#CANumber');
+            //var cAOrg = ReturnValueText('#CAOrg');
+            //var cAEffDTimeUTCStart = ReturnValueText('#CAEffDTimeUTCStart');
+            //var cAEffDTimeUTCEnd = ReturnValueText('#CAEffDTimeUTCEnd');
+            //var createdDate = ReturnValueText('#CreatedDate');
+            //var accNo = ReturnValueText('#AccNo');
+            //var accHolder = ReturnValueText('#AccHolder');
+            //var bankName = ReturnValueText('#BankName');
+            //var tCTStatus = ReturnValueText('#TCTStatus');
+            var tem = new Object();
+
+
+            tem.MST = mst;
+            tem.RegisterStatus = registerStatus;
+            tem.Remark = remark;
+            //tem.MSTParent = mSTParent;
+            //tem.ProvinceCode = provinceCode;
+            //tem.DistrictCode = districtCode;
+            //tem.DLCode = dLCode;
+            //tem.NNTFullName = nNTFullName;
+            //tem.NNTAddress = nNTAddress;
+            //tem.NNTMobile = nNTMobile;
+            //tem.NNTPhone = nNTPhone;
+            //tem.NNTFax = nNTFax;
+            //tem.PresentBy = presentBy;
+            //tem.BusinessRegNo = businessRegNo;
+            //tem.NNTPosition = nNTPosition;
+            //tem.PresentIDNo = presentIDNo;
+            //tem.PresentIDType = presentIDType;
+            //tem.GovTaxID = govTaxID;
+            //tem.ContactName = contactName;
+            //tem.ContactPhone = contactPhone;
+            //tem.ContactEmail = contactEmail;
+            //tem.Website = website;
+            //tem.BizType = bizType;
+            //tem.BizFieldCode = bizFieldCode;
+            //tem.BizSizeCode = bizSizeCode;
+            //tem.CANumber = cANumber;
+            //tem.CAOrg = cAOrg;
+            //tem.CAEffDTimeUTCStart = cAEffDTimeUTCStart;
+            //tem.CAEffDTimeUTCEnd = cAEffDTimeUTCEnd;
+            //tem.CreatedDate = createdDate;
+            //tem.AccNo = accNo;
+            //tem.AccHolder = accHolder;
+            //tem.BankName = bankName;
+            //tem.TCTStatus = tCTStatus;
+
+            var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+            var modelCur = JSON.stringify(tem);
+            var url = '@Url.Action("Edit", "Mst_NNT")';
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    __RequestVerificationToken: token
+                    , model: modelCur
+                },
+                traditional: true,
+                //contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    if (data.Success) {
+                        if (data.Messages !== null && data.Messages !== undefined && data.Messages.length > 0) {
+                            alert(data.Messages[0]);
+                        }
+                        //window.location.href = data.RedirectUrl;
+                        window.location.href = window.location.href;
+                    }
+                    else {
+                        if (data.Detail != null) {
+                            _showErrorMsg123("Lỗi!", data.Detail);
+                        }
+                    }
+                }, error: function (xmlHttpRequest, textStatus, errorThrown) {
+                    debugger;
+                    if (textStatus === 'Unauthorized') {
+                        alert('custom message. Error: ' + errorThrown);
+                    } else {
+                        //alert('custom message. Error2: ' + errorThrown);
+                    }
+                }
+            });
+        }
+    }
+
+    function KhoiTaoHeThong() {
+        debugger;
+        var check = CheckForm();
+        if (check) {
+            var mst = ReturnValueText('#MST');
+            var registerStatus = ReturnValueText('#RegisterStatus');
+            var remark = ReturnValueText('#Remark');
+            var tem = new Object();
+
+
+            tem.MST = mst;
+            tem.RegisterStatus = registerStatus;
+            tem.Remark = remark;
+
+            var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+            var modelCur = JSON.stringify(tem);
+            var url = '@Url.Action("KhoiTaoHeThong", "Mst_NNT")';
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    __RequestVerificationToken: token
+                    , model: modelCur
+                },
+                traditional: true,
+                //contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    if (data.Success) {
+                        if (data.Messages !== null && data.Messages !== undefined && data.Messages.length > 0) {
+                            alert(data.Messages[0]);
+                        }
+                        window.location.href = data.RedirectUrl;
+                    }
+                    else {
+                        if (data.Detail != null) {
+                            _showErrorMsg123("Lỗi!", data.Detail);
+                        }
+                    }
+                }, error: function (xmlHttpRequest, textStatus, errorThrown) {
+                    debugger;
+                    if (textStatus === 'Unauthorized') {
+                        alert('custom message. Error: ' + errorThrown);
+                    } else {
+                        //alert('custom message. Error2: ' + errorThrown);
+                    }
+                }
+            });
+        }
+    }
+</script>
+
+<script type="text/javascript">
+        function Delete(mst) {
+            if (!IsNullOrEmpty(mst)) {
+                bootbox.confirm({
+                    title: "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO",
+                    message: "Đồng ý xóa NNT '" + mst + "' ?",
+                    buttons: {
+                        'cancel': {
+                            label: 'Thoát',
+                            className: 'btn mybtn-Button btnButton'
+                        },
+                        'confirm': {
+                            label: 'Đồng ý',
+                            className: 'btn mybtn-Button btnButton'
+                        }
+                    },
+                    callback: function (result) {
+                        if (result) {
+                            var url = '@Url.ActionLocalized("Delete", "Mst_NNT")';
+                            var token = $('input[name=__RequestVerificationToken]').val();
+                            $.ajax({
+                                url: url,
+                                data: {
+                                    mst: mst,
+                                    __RequestVerificationToken: token
+                                },
+                                type: 'post',
+                                dataType: 'json',
+                                success: function (data) {
+                                    if (data.Success) {
+                                        if (data.Messages != null && data.Messages !== undefined && data.Messages.length > 0) {
+                                            alert(data.Messages[0]);
+                                        }
+                                        window.location.href = '@Url.Action("Index")';
+                                    } else {
+                                        _showErrorMsg123("Lỗi!",data.Detail);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+            } else {
+                alert("Chưa chọn bản ghi cần xóa!");
+                return;
+            }
+        }
+</script>
+
+
+

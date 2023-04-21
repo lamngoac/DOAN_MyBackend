@@ -1,0 +1,199 @@
+﻿@model Mst_Province
+@{
+    var title = "SỬA DANH MỤC TỈNH/THÀNH PHỐ";
+    var titleMng = "Danh mục tỉnh/thành phố";
+    ViewBag.Title = title;
+    var userState = ViewBag.UserState as UserState;
+}
+<script type="text/javascript">
+    var parents = new Array();
+    parents.push("@Url.Action("Index", "Mst_Province")");
+    parents.push("");
+    var parentsText = new Array();
+    parentsText.push("@MvcHtmlString.Create("titleMng")");
+    parentsText.push("@MvcHtmlString.Create("title")");
+    setAdminCurrentTag(parents, parentsText);
+</script>
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="row no-margin box-shadow-tk">
+                        @using (Html.BeginForm("Update", "Mst_Province", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="ProvinceCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã tỉnh/ thành phố <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="ProvinceCode" name="ProvinceCode" class="col-xs-12 ProvinceCode" onkeyup="locdau(this);" value="@if (Model != null && Model.ProvinceCode != null){@MvcHtmlString.Create(Model.ProvinceCode.ToString())} else { @("")}" disabled autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="ProvinceName" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên tỉnh/ thành phố <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="ProvinceName" name="ProvinceName" class="col-xs-12 Code ProvinceName" value="@if (Model != null && Model.ProvinceName != null){@MvcHtmlString.Create(Model.ProvinceName.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    @{
+                                        var checkActive = "";
+                                        if (Model != null && Model.FlagActive.Equals("1"))
+                                        {
+                                            checkActive = "checked";
+                                        }
+                                        else
+                                        {
+                                            checkActive = "";
+                                        }
+                                    }
+                                    <label for="FlagActive" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">Trạng thái</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right padding-top-5">
+                                            <label>
+                                                <input name="FlagActive" id="FlagActive" class="ace ace-switch ace-switch-4 " type="checkbox" value="1" @checkActive />
+                                                <span class="lbl"></span>
+                                                <input name="" type="hidden" value="0" />
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        }
+                    </aside>
+                    <div class="col-xs-12 no-padding">
+                        <div class="clearfix">
+                            <div class="row no-margin" style="float: right">
+                                @*@if (userState != null && userState.RptSv_Sys_User.FlagSysAdmin.Equals("1"))
+        {
+            <a href="javascript:void(0);" class="btn font-color mybtn-Button" style="margin-top: 20px; padding-left: 15px !important; padding-right: 15px !important;" onclick="SaveData();"><i class="ace-icon fa fa-floppy-o bigger-110"></i>Cập nhật</a>
+        }*@
+                                @RenderItemFormat("BTN_SUA_TINH_TP_LUU", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px\" onclick=\"SaveData();\">Lưu</a>", "", "")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+<script type="text/javascript">
+    processAjaxForm($('#manageForm'), function (response) {
+        processAjaxFormResult(response);
+
+    });
+</script>
+
+@*Active Menu*@
+<script type="text/javascript">
+    setAdminCurrentUrl('@Url.Action("Index", "Mst_Province")');
+</script>
+@*Set focus*@
+<script type="text/javascript">
+    var _getForm = document.getElementById("manageForm");
+    _getForm.addEventListener('reset', function () {
+        document.getElementById("").focus()
+    })
+</script>
+<script>
+    function CheckForm() {
+        if (!CheckIsNullOrEmpty('#CountryCode', 'has-error-fix', '@MvcHtmlString.Create("Mã quốc gia không được trống!")'))
+        {
+            return false;
+        }
+        if (!CheckIsNullOrEmpty('#CountryName', 'has-error-fix', '@MvcHtmlString.Create("Tên quốc gia không được trống!")'))
+        {
+            return false;
+        }
+        return true;
+    }
+
+    function SaveData()
+    {
+        var check = CheckForm();
+
+        if (check)
+        {
+            var provincecode = ReturnValueText('#ProvinceCode');
+            var provincename = ReturnValueText('#ProvinceName');
+            var flagActive = '0';
+            var inputFlagActive = $('#FlagActive');
+            if (inputFlagActive !== undefined && inputFlagActive !== null) {
+                if (inputFlagActive.prop('checked')) {
+                    flagActive = '1';
+                }
+            }
+            var tem = new Object();
+            tem.ProvinceCode = provincecode;
+            tem.ProvinceName = provincename;
+            tem.FlagActive = flagActive;
+
+            var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+            var modelCur = JSON.stringify(tem);
+            var url = '@Url.Action("Edit", "Mst_Province")';
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    __RequestVerificationToken: token
+                    , model: modelCur
+                },
+                traditional: true,
+                //contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    if (data.Success) {
+                        if (data.Messages !== null && data.Messages !== undefined && data.Messages.length > 0) {
+                            alert(data.Messages[0]);
+                        }
+                        window.location.href = data.RedirectUrl;
+                    }
+                    else {
+                        if (data.Detail != null) {
+                            _showErrorMsg123("Lỗi!", data.Detail);
+                        }
+                    }
+                }, error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    debugger;
+                    if (textStatus === 'Unauthorized') {
+                        alert('custom message. Error: ' + errorThrown);
+                    } else {
+                        //alert('custom message. Error2: ' + errorThrown);
+                    }
+                }
+            });
+
+
+        }
+    }
+</script>
+
+
+
+
+
+
+
+

@@ -1,0 +1,25 @@
+﻿@if (Request.IsAuthenticated)
+{
+    <a data-toggle="dropdown" href="javascript:;" class="dropdown-toggle">
+        <img class="nav-user-photo" src="@Url.Content("~/Content/assets/images/avatars/avatar2.png")" alt="avatar" />
+
+        <i class="ace-icon fa fa-caret-down"></i>
+    </a>
+
+
+    <ul class="user-menu dropdown-menu-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+        <li>
+            <a class="mybtn-Button-1" style=""><i class="fa fa-user" style="color: #057D5A; font-size: 15px;" aria-hidden="true"></i> @MvcHtmlString.Create(ViewBag.UserName)</a>
+        </li>
+        <li>
+            <a class="mybtn-Button-1 logout" href="javascript:document.getElementById('logoutForm').submit()"><i class="fa fa-sign-out" style="color: #057D5A; font-size: 15px;" aria-hidden="true"></i> @MvcHtmlString.Create("Log off")</a>
+        </li>
+    </ul>
+
+
+}
+
+@using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" }))
+{
+    @Html.AntiForgeryToken()
+}

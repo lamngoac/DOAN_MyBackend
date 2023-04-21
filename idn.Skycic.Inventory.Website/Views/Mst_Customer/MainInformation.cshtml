@@ -1,0 +1,339 @@
+﻿@model Mst_Customer
+@{
+    var flagCustomerExsist = CUtils.StrValue(ViewBag.FlagCustomerExsist);
+    var list_Mst_CustomerType = ViewBag.List_Mst_CustomerType as List<Mst_CustomerType>;
+    var listMst_CustomerGroup = ViewBag.ListMst_CustomerGroup as List<Mst_CustomerGroup>;
+    var list_Mst_CustomerInArea = ViewBag.Lst_Mst_CustomerInArea as List<Mst_CustomerInArea>;
+    var listMst_CustomerSource = ViewBag.ListMst_CustomerSource as List<Mst_CustomerSource>;
+    var listMst_Province = ViewBag.ListMst_Province as List<Mst_Province>;
+    var listMst_District = ViewBag.ListMst_District as List<Mst_District>;
+    var listMst_Ward = ViewBag.ListMst_Ward as List<Mst_Ward>;
+    var listMst_AreaExt = ViewBag.ListMst_AreaExt as List<Mst_AreaExt>;
+    var listMst_GovIDType = ViewBag.ListMst_GovIDType as List<Mst_GovIDType>;
+    var listCustomer_DynamicField = ViewBag.ListCustomer_DynamicField as List<Customer_DynamicField>;
+    var objMst_Customer = new Mst_Customer();
+    if (Model != null)
+    {
+        objMst_Customer = Model;
+    }
+    var view = CUtils.StrValue(ViewBag.View);
+    var disabled = "";
+    var displayNone = "";
+    if (!view.Equals("create"))
+    {
+        disabled = "disabled-fix";
+        displayNone = "display-none";
+    }
+}
+
+
+@*Thông tin chính*@
+<div id="cusct_maininfo" class="row no-margin" style="padding-top: 20px;">
+
+    <!-- Avatar -->
+    <div id="div-Avatar" class="row no-margin col-2 no-padding">
+        <div class="avatar-wrapper">
+            <div class="avatar-img">
+                <input id="avatar-input" type='file' accept="image/*" hidden>
+                <input id="AvatarImage" name="" value="" type="text" image-name="" image-type="" hidden> <!-- For save base64 src -->
+            </div>
+            <div id="div-button-avatar" class="overlay-customer @displayNone">
+                <span id="change-avatar" class="change-delete-avatar">
+                    <i class="fas fa-camera"></i>
+                </span>
+                <span id="delete-avatar" class="change-delete-avatar">
+                    <i class="fas fa-trash-alt"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="row no-margin col-10 no-padding">
+        <div class="row no-margin col-12 no-padding">
+            <div class="row no-margin col-6 no-padding">
+                <div class="row no-margin form-group margin-bottom-9">
+                    <label for="" class="col-4 control-label no-padding-right font-weight-500 ">@("Loại khách hàng".HtmlItemString("customer"))</label>
+                    <div class="col-8" style="padding-top: 7px; display: inline-flex;">
+                        @if (list_Mst_CustomerType != null && list_Mst_CustomerType.Count > 0)
+                        {
+                            var i = 0;
+                            var customerType = CUtils.StrValue(objMst_Customer.CustomerType);
+                            if (CUtils.IsNullOrEmpty(customerType))
+                            {
+                                customerType = Client_Mst_CustomerType.CANHAN;
+                            }
+                            foreach (var item in list_Mst_CustomerType)
+                            {
+                                var customerTypeCur = CUtils.StrValue(item.CustomerType);
+                                var customerTypeNameCur = CUtils.StrValue(item.CustomerTypeName);
+                                var _checked = "";
+                                if (customerTypeCur.Equals(customerType))
+                                {
+                                    _checked = "checked";
+                                }
+                                <div style="display: inline-flex; margin-right: 15px;">
+                                    <input type="radio" class="cl-check @disabled" name="ckb-customertype" id="ckb-customertype_@i" value="@MvcHtmlString.Create(customerTypeCur)" @MvcHtmlString.Create(_checked)>
+                                    <div class="span-title-check" style="margin-right:5px;">@MvcHtmlString.Create(customerTypeNameCur)</div>
+                                </div>
+                                i++;
+                            }
+                        }
+                    </div>
+                </div>
+                <div class="row no-margin form-group margin-bottom-9">
+                    <label for="" class="col-4 control-label no-padding-right font-weight-500">@("Mã khách hàng".HtmlItemString("customer"))<span style="color: red "> *</span></label>
+                    <div class="col-8">
+                        <input type="hidden" name="FlagCustomerExsist" id="FlagCustomerExsist" value="@MvcHtmlString.Create(flagCustomerExsist)" />
+                        <input type="hidden" name="CustomerCodeSys" id="CustomerCodeSys" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Customer.CustomerCodeSys))">
+                        <input type="text" name="CustomerCode" id="CustomerCode" class="col-12 CustomerCode @disabled" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Customer.CustomerCode))">
+                    </div>
+                </div>
+                <div class="row no-margin form-group margin-bottom-9">
+                    <label for="" class="col-4 control-label no-padding-right font-weight-500">@("Tên khách hàng".HtmlItemString("customer"))<span style="color: red "> *</span></label>
+                    <div class="col-8">
+                        <input type="text" name="CustomerName" id="CustomerName" class="col-12 CustomerName @disabled" placeholder="@("Nhập vào tên khách hàng".HtmlItemString("customer"))" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Customer.CustomerName))" onblur="Blur_Element(this);" />
+                    </div>
+                </div>
+                <div class="row no-margin form-group margin-bottom-9">
+                    <label for="" class="col-4 control-label no-padding-right font-weight-500 ">@("Nhóm khách hàng".HtmlItemString("customer"))<span style="color: red "> *</span></label>
+                    <div id="div-CustomerGrpCode" class="col-8 @disabled">
+                        <select id="CustomerGrpCode" name="CustomerGrpCode" class="CustomerGrpCode col-12 disabled-fix" showpopup-control-adddata="#ShowPopupAddCustomerGroup" multiple="multiple">
+                            @Html.Partial("~/Views/LoadData/LoadMst_CustomerGroup.cshtml", listMst_CustomerGroup, new ViewDataDictionary() { { "CustomerGrpCode", CUtils.StrValue(objMst_Customer.CustomerGrpCode) } })
+                        </select>
+                    </div>
+                </div>
+                <div class="row no-margin form-group margin-bottom-9">
+                    <label for="" class="col-4 control-label no-padding-right font-weight-500 ">@("Nguồn khách".HtmlItemString("customer"))</label>
+                    <div id="div-CustomerSourceCode" class="col-8 @disabled">
+                        <select id="CustomerSourceCode" name="CustomerSourceCode" class="CustomerSourceCode col-12" showpopup-control-adddata="#ShowPopupAddCustomerSource">
+                            @Html.Partial("~/Views/LoadData/LoadMst_CustomerSource.cshtml", listMst_CustomerSource, new ViewDataDictionary() { { "CustomerSourceCode", CUtils.StrValue(objMst_Customer.CustomerSourceCode) } })
+                        </select>
+                    </div>
+                </div>
+                <div class="row no-margin form-group margin-bottom-9">
+                    <label for="" class="col-4 control-label no-padding-right font-weight-500">@("ĐT cố định".HtmlItemString("customer"))</label>
+                    <div class="col-8">
+                        <input type="text" name="CustomerPhoneNo" id="CustomerPhoneNo" class="col-12 CustomerPhoneNo @disabled" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Customer.CustomerPhoneNo))">
+                    </div>
+                </div>
+                <div class="row no-margin form-group margin-bottom-9">
+                    <label for="" class="col-4 control-label no-padding-right font-weight-500">@("ĐT di động".HtmlItemString("customer"))</label>
+                    <div class="col-8">
+                        <input type="text" name="CustomerMobilePhone" id="CustomerMobilePhone" class="col-12 CustomerMobilePhone @disabled" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Customer.CustomerMobilePhone))">
+                    </div>
+                </div>
+            </div>
+            <div class="row no-margin col-6 no-padding">
+                @if (!view.Equals("create"))
+                {
+                    <div class="row no-margin form-group margin-bottom-9">
+                        <label for="" class="col-4 control-label no-padding-right font-weight-500" style="padding-top: 13px;">@("Chi nhánh tạo".HtmlItemString("customer"))</label>
+                        <div class="col-8 disabled-fix" style="padding-top: 7px; display: inline-flex;">
+                            <input type="text" name="Network_NNTFullName" id="Network_NNTFullName" class="col-12 Network_NNTFullName" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Customer.Network_NNTFullName))">
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="row no-margin form-group margin-bottom-9">
+                        <label for="" class="col-4 control-label no-padding-right font-weight-500 ">&nbsp;</label>
+                        <div class="col-8" style="padding-top: 7px; display: inline-flex;">
+                            &nbsp;
+                        </div>
+                    </div>
+                }
+                <div class="row no-margin form-group margin-bottom-9">
+                    <label for="" class="col-4 control-label no-padding-right font-weight-500 ">@("Giới tính".HtmlItemString("customer"))</label>
+                    <div class="col-8" style="padding-top: 7px; display: inline-flex;">
+                        @{
+                            var customerGender = CUtils.StrValue(objMst_Customer.CustomerGender);
+                            if (CUtils.IsNullOrEmpty(customerGender))
+                            {
+                                customerGender = "MALE";
+                            }
+                        }
+                        <div style="display: inline-flex; margin-right: 15px;">
+                            <input type="radio" class="cl-check @disabled" name="ckb-customergender" id="ckb-customergender1" value="MALE" @("MALE".Equals(customerGender) ? "checked" : "")>
+                            <div class="span-title-check" style="margin-right:5px;">@("Nam".HtmlItemString("customer"))</div>
+                        </div>
+                        <div style="display: inline-flex">
+                            <input type="radio" class="cl-check @disabled" name="ckb-customergender" id="ckb-customergender2" value="FEMALE" @("FEMALE".Equals(customerGender) ? "checked" : "")>
+                            <div class="span-title-check" style="margin-right:5px;">@("Nữ".HtmlItemString("customer"))</div>
+                        </div>
+                        <div style="display: inline-flex">
+                            <input type="radio" class="cl-check @disabled" name="ckb-customergender" id="ckb-customergender3" value="OTHER" @("OTHER".Equals(customerGender) ? "checked" : "")>
+                            <div class="span-title-check" style="margin-right:5px;">@("Khác".HtmlItemString("customer"))</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-margin form-group margin-bottom-9">
+                    <label for="" class="col-4 control-label no-padding-right font-weight-500">@("Địa chỉ".HtmlItemString("customer"))</label>
+                    <div class="col-8">
+                        <input type="text" name="CustomerAddress" id="CustomerAddress" class="col-12 CustomerAddress @disabled" onblur="Blur_Element(this);" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Customer.CustomerAddress))">
+                    </div>
+                </div>
+                <div class="row no-margin form-group margin-bottom-9">
+                    <label for="" class="col-4 control-label no-padding-right font-weight-500 ">@("Tỉnh/Thành".HtmlItemString("customer"))</label>
+                    <div id="div-ProvinceCode" class="col-8 @disabled">
+                        <select id="ProvinceCode" name="col-10 ProvinceCode" class="ProvinceCode" onchange="LoadMst_District(this)">
+                            @Html.Partial("~/Views/LoadData/LoadMst_Province.cshtml", listMst_Province, new ViewDataDictionary() { { "ProvinceCode", CUtils.StrValue(objMst_Customer.ProvinceCode) } })
+                            @*@Html.Partial("~/Views/LoadDataCustomer/LoadMst_Province.cshtml", listMst_Province, new ViewDataDictionary() { { "ProvinceCode", CUtils.StrValue(objMst_Customer.ProvinceCode) } })*@
+                        </select>
+                    </div>
+
+                </div>
+                <div class="row no-margin form-group margin-bottom-9">
+                    <label for="" class="col-4 control-label no-padding-right font-weight-500 ">@("Quận/Huyện".HtmlItemString("customer"))</label>
+                    <div id="div-DistrictCode" class="col-8 @disabled">
+                        <select id="DistrictCode" name="DistrictCode" class="DistrictCode" onchange="LoadMst_Ward(this);">
+                            @Html.Partial("~/Views/LoadData/LoadMst_District.cshtml", listMst_District, new ViewDataDictionary() { { "DistrictCode", CUtils.StrValue(objMst_Customer.DistrictCode) } })
+                        </select>
+                    </div>
+                </div>
+                <div class="row no-margin form-group margin-bottom-9">
+                    <label for="" class="col-4 control-label no-padding-right font-weight-500 ">@("Phường/Xã".HtmlItemString("customer"))</label>
+                    <div id="div-WardCode" class="col-8 @disabled">
+                        <select id="WardCode" name="WardCode" class="WardCode">
+                            @Html.Partial("~/Views/LoadData/LoadMst_Ward.cshtml", listMst_Ward, new ViewDataDictionary() { { "ProvinceCode", CUtils.StrValue(objMst_Customer.ProvinceCode) }, { "DistrictCode", CUtils.StrValue(objMst_Customer.DistrictCode) }, { "WardCode", CUtils.StrValue(objMst_Customer.WardCode) } })
+                        </select>
+                    </div>
+                </div>
+                <div class="row no-margin form-group margin-bottom-9">
+                    <label for="" class="col-4 control-label no-padding-right font-weight-500 ">@("Khu vực".HtmlItemString("customer"))</label>
+                    <div id="div-AreaCode" class="col-8 @disabled">
+                        <select id="AreaCode" name="AreaCode" class="AreaCode col-12" showpopup-control-adddata="#ShowPopupAddArea" multiple="multiple">
+                            @Html.Partial("~/Views/LoadData/LoadMst_Area.cshtml", listMst_AreaExt, new ViewDataDictionary() { { "AreaCode", CUtils.StrValue(objMst_Customer.AreaCode) }, { "List_Mst_CustomerInArea", list_Mst_CustomerInArea } })
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row no-margin col-12 no-padding">
+            <div class="row no-margin form-group margin-bottom-9">
+                <label for="" class="col-2 control-label no-padding-right font-weight-500 "></label>
+                <div class="row no-margin col-10">
+                    <div class="row no-margin" style="margin-right: 15px !important;">
+                        @{
+                            var flagDealerChecked = "";
+                            var flagDealer = CUtils.StrValue(objMst_Customer.FlagDealer);
+                            if (flagDealer.Equals("1"))
+                            {
+                                flagDealerChecked = "checked";
+                            }
+                        }
+                        <input type="checkbox" class="cl-check FlagDealer @disabled" name="FlagDealer" id="FlagDealer" @MvcHtmlString.Create(flagDealerChecked)>
+                        <div class="span-title-check">@("Đại lý".HtmlItemString("customer"))</div>
+                    </div>
+                    <div class="row no-margin" style="margin-right: 15px !important;">
+                        @{
+                            var flagSupplierChecked = "";
+                            var flagSupplier = CUtils.StrValue(objMst_Customer.FlagSupplier);
+                            if (flagSupplier.Equals("1"))
+                            {
+                                flagSupplierChecked = "checked";
+                            }
+                        }
+                        <input type="checkbox" class="cl-check FlagSupplier @disabled" name="FlagSupplier" id="FlagSupplier" @MvcHtmlString.Create(flagSupplierChecked)>
+                        <div class="span-title-check">@("Nhà cung cấp".HtmlItemString("customer"))</div>
+                    </div>
+                    <div class="row no-margin" style="margin-right: 15px !important;">
+                        @{
+                            var flagShipperChecked = "";
+                            var flagShipper = CUtils.StrValue(objMst_Customer.FlagShipper);
+                            if (flagShipper.Equals("1"))
+                            {
+                                flagShipperChecked = "checked";
+                            }
+                        }
+                        <input type="checkbox" class="cl-check FlagShipper @disabled" name="FlagShipper" id="FlagShipper" @MvcHtmlString.Create(flagShipperChecked)>
+                        <div class="span-title-check">@("Đơn vị giao hàng".HtmlItemString("customer"))</div>
+                    </div>
+                    <div class="row no-margin" style="margin-right: 15px !important;">
+                        @{
+                            var flagEndUserChecked = "";
+                            var flagEndUser = CUtils.StrValue(objMst_Customer.FlagEndUser);
+                            if (flagEndUser.Equals("1") || flagEndUser.Length == 0)
+                            {
+                                flagEndUserChecked = "checked";
+                            }
+                        }
+                        <input type="checkbox" class="cl-check FlagEndUser @disabled" name="FlagEndUser" id="FlagEndUser" @MvcHtmlString.Create(flagEndUserChecked)>
+                        <div class="span-title-check">@("Khách hàng cuối".HtmlItemString("customer"))</div>
+                    </div>
+                    <div class="row no-margin" style="margin-right: 15px !important;">
+                        @{
+                            var flagBankChecked = "";
+                            var flagBank = CUtils.StrValue(objMst_Customer.FlagBank);
+                            if (flagBank.Equals("1"))
+                            {
+                                flagBankChecked = "checked";
+                            }
+                        }
+                        <input type="checkbox" class="cl-check FlagBank @disabled" name="FlagBank" id="FlagBank" @MvcHtmlString.Create(flagBankChecked)>
+                        <div class="span-title-check">@("Ngân hàng".HtmlItemString("customer"))</div>
+                    </div>
+                    <div class="row no-margin">
+                        @{
+                            var flagInsurranceChecked = "";
+                            var flagInsurrance = CUtils.StrValue(objMst_Customer.FlagInsurrance);
+                            if (flagInsurrance.Equals("1"))
+                            {
+                                flagInsurranceChecked = "checked";
+                            }
+                        }
+                        <input type="checkbox" class="cl-check FlagInsurrance @disabled" name="FlagInsurrance" id="FlagInsurrance" @MvcHtmlString.Create(flagInsurranceChecked)>
+                        <div class="span-title-check">@("Bảo hiểm".HtmlItemString("customer"))</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row no-margin form-group margin-bottom-9">
+                <label for="Remark" class="col-2 control-label no-padding-right font-weight-500 ">Ghi chú</label>
+                <div class="row no-margin col-10">
+                    @{
+                        var remark = CUtils.StrValue(objMst_Customer.Remark);
+                    }
+                    <textarea type="text" name="Remark" id="Remark" class="col-12 Remark @disabled">@MvcHtmlString.Create(remark)</textarea>
+                </div>
+            </div>
+            @if (!view.Equals("create"))
+            {
+                <div class="row no-margin form-group margin-bottom-9">
+                    @*<label for="FlagActive" class="col-2 control-label no-padding-right font-weight-500 ">Trạng thái</label>
+                    <div class="row no-margin col-10">
+                        @{
+                            var flagActive = CUtils.StrValue(objMst_Customer.FlagActive);
+                            var flagActiveName = "";
+                            if (flagActive.Equals("1"))
+                            {
+                                flagActiveName = "Đang hoạt động";
+                            }
+                            else
+                            {
+                                flagActiveName = "Ngừng hoạt động";
+                            }
+                        }
+                        <input type="text" name="FlagActive" id="FlagActive" class="col-2 FlagActive disabled-fix" value="@MvcHtmlString.Create(flagActiveName)">
+                    </div>*@
+
+                    <label for="FlagActive" class="col-2 control-label no-padding-right font-weight-500">@("Trạng thái".HtmlItemString("inventory"))</label>
+                    <div class="col-10">
+                        @{
+                            var flagActive = CUtils.StrValue(objMst_Customer.FlagActive);
+                            var check = flagActive.Equals("1") ? "checked" : "";
+                        }
+                        <span class="block input-icon input-icon-right padding-top-5">
+                            <label class="lbl-flag FlagActive @disabled">
+                                <input name="FlagActive" id="FlagActive" class="icon-flag" type="checkbox" value="1" @check>
+                                <span class="lbl"></span>
+                                <input name="FlagActive" type="hidden" value="0">
+                            </label>
+                        </span>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+
+</div>
+
+

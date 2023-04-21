@@ -1,0 +1,133 @@
+﻿@model List<Rpt_Inv_InventoryBalanceUI>
+@{
+    ViewBag.Title = "Báo cáo tồn kho";
+    Layout = "~/Views/Shared/_LayoutHome.cshtml";
+    var lstMstInventory = new List<Mst_Inventory>();
+    if(ViewBag.lstMstInventory != null)
+    {
+        lstMstInventory = ViewBag.lstMstInventory as List<Mst_Inventory>;
+    }
+}
+<div class="col-xs-12 col-md-12">
+    <div class="col-md-2 col-xs-6" style="float: left">
+        <h3>Báo cáo tồn kho</h3>
+    </div>    
+    <div onclick="ShowModalMstInventory();" class="col-md-10 col-xs-6 flex flex-column justify-center relative shadow-hover default hover-bg-white br2 hide-child"><a href="/icons/bars?style=solid" class="flex flex-column items-center justify-center color-inherit w-100 pa2 br2 br--top no-underline hover-bg-blue4 hover-white"><i class="fas fa-bars" style="font-size: 30px;"></i></a> <div class="w-100 ph1 pv2 tc f2"><span class="db gray5 hover-gray7 text select-all">bars</span><!----></div> <!----></div>
+</div>
+
+<div class="panel-body no-padding" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+    <aside class="col-xs-12 layout-table no-padding">
+        @Html.AntiForgeryToken()
+        <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+            <div style="width: 100%; float: left;">
+                <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                    <thead>
+                        <tr class="trthead">
+                            <th class="text-center cell-150" fieldId="ProductCode" fieldName="Mã sản phẩm" style="vertical-align: middle">
+                                @("Mã sản phẩm".HtmlItemString(""))
+                            </th>
+                            <th fieldId="mp_ProductName" fieldName="Tên sản phẩm" fieldActive="0" class="text-center cell-250">
+                                @("Tên sản phẩm".HtmlItemString(""))
+                            </th>
+                            <th fieldId="IF_InvOutNo" sorttype="T" fieldName="Đơn vị" fieldActive="0" class="text-left cell-150">
+                                @("Đơn vị".HtmlItemString(""))
+                            </th>
+                            <th fieldId="ApprDTimeUTC" sorttype="T" fieldName="Số lượng" fieldActive="0" class="text-left cell-150">
+                                @("Số lượng".HtmlItemString(""))
+                            </th>                            
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                    <tbody id="table-tbodyID_WG_Rpt_Inv_InventoryBalance">
+                        @Html.Partial("BindData_WG_Rpt_Inv_InventoryBalance", Model)
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </aside>
+</div>
+
+@*modal*@
+<div class="modal fade" id="PopupMstInventory" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="exampleModalLabel">Chọn kho</h3>
+                <a href="javascript:;" onclick="ClosePopupMstInventory()" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </a>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "manageCreate" }))
+                {
+                    @Html.AntiForgeryToken()
+                    if (lstMstInventory != null)
+                    {
+                        foreach (var it in lstMstInventory)
+                        {
+                            <div class="row form-group margin-bottom-9">
+                                <input type="checkbox" class="cb_invcode" InvCode="@it.InvCode" style="margin-top: 1.5%;"/>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <label type="text" class="col-12 InvCode" autocomplete="off" style="text-align: left;">@it.InvName</label>
+                                    </span>
+                                </div>
+                            </div>
+                        }
+                    }
+                }
+
+            </div>
+            <div class="modal-footer">
+                @RenderItemFormat("BTN_WG_RPT_INV_INVENTORYBALANCE_CHON", "<a href=\"javascript:void(0);\" class=\"btn mybtn-Button\" onclick=\"SearchData()\" id=\"btnCreate\" style=\"padding-left: 10px!important; padding-right: 10px!important; font-size: 16px; font-weight: 500;\">Chọn</a>", "", "")
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function ClosePopupMstInventory() {
+        $('#PopupMstInventory').modal('hide');    
+    };
+    function ShowModalMstInventory() {
+        $('#PopupMstInventory').modal('show');        
+    }
+
+    function SearchData() {
+        debugger;
+        var len = $('.cb_invcode:checked').length;
+        if (len == "") {
+            alert("Không có kho nào được chọn.");
+            return;
+        }
+        var lstInvCode = [];
+        $('.cb_invcode:checked').each(function () {
+            var invCode = $(this).attr("invcode");
+            lstInvCode.push(invCode);
+        })
+
+        $.ajax({
+        url: '@Url.Action("WG_Rpt_Inv_InventoryBalance","Report")',
+            data: {
+                lstinvcode: JSON.stringify(lstInvCode),
+                callajax: "1"
+        },
+        type: 'post',
+        dataType: 'json',
+        traditional: true,
+            success: function (data) {
+            debugger;
+                if (data.Success) {                      
+                    $('#table-tbodyID_WG_Rpt_Inv_InventoryBalance').html(data.Html);
+                ClosePopupMstInventory();
+            } else {
+                showErrorDialog(data.Detail);
+            }
+        }
+    });
+    }
+</script>
+

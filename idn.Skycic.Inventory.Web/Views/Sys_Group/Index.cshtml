@@ -1,0 +1,357 @@
+﻿
+@model PageInfo<Sys_Group>
+@{
+    Layout = "~/Views/Shared/CoreLayoutQuanTri.cshtml";
+    var title = "QUẢN LÝ NHÓM NGƯỜI DÙNG";
+    ViewBag.Title = title;
+    var startCount = 0;
+    var strStartCount = ViewBag.StartCount as string;
+    if (!CUtils.IsNullOrEmpty(strStartCount))
+    {
+        startCount = Convert.ToInt32(strStartCount);
+    }
+
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+
+    var showtext = "";
+    if (Model.ItemCount > 0)
+    {
+        var recordstart = (Model.PageIndex) * Model.PageSize + 1;
+        var recordend = (Model.PageIndex + 1) * Model.PageSize;
+        if (recordend > Model.ItemCount)
+        {
+            recordend = Model.ItemCount;
+        }
+        showtext = recordstart + "-" + recordend + " trong số " + Model.ItemCount;
+    }
+}
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                @*<div class="title">
+                        <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                    </div>*@
+                <div class="panel-body no-padding" id="panel-body" style="">
+                    <aside class="col-xs-12 no-padding">
+                        @using (Html.BeginForm(null, null, FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" value="search" name="init" id="init" />
+                            <div class="col-xs-12 layout-search layout-bot-top-16">
+                                <div class="form-group margin-bottom-9">
+                                    <label for="" class="control-label no-padding-right font-weight-500" style="float: left">Tên nhóm người dùng</label>
+                                    <div class="col-xs-12 col-sm-3">
+                                        <input type="text" id="groupname" name="groupname" class="col-xs-12" value="@MvcHtmlString.Create(ViewBag.GroupName)" autocomplete="off">
+                                    </div>
+                                    <div class="col-xs-12 col-sm-1 no-padding">
+                                        <div class="col-xs-11" style="padding: 0">
+                                            <span class="block input-icon input-icon-right" style="">
+
+                                                @RenderItemFormat("BTN_QL_NHOM_ND_TK", "<a class=\"btn font-color button-search\" onclick=\"Search()\" href=\"javascript: void(0);\"><img class=\"img-search\" src=" + @Url.Content("~/Images/search.svg") + "></a>", "", "")
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 layout-bot-top-16" style="">
+                                @RenderItemFormat("BTN_QL_NHOM_ND_TAO", "<a class=\"btn btn-nc-button\" href=\'" + @Url.Action("Create", "Sys_Group") + "\' style=\"\" title=\"Tạo mới\"><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i> Tạo</a>", "", "")
+                                <a class="btn font-color mybtn-Button" data-toggle="dropdown" aria-expanded="false" style="font-size: 13px; margin-right: 5px;position: relative;"><i class="fas fa-ellipsis-h"></i></a>
+                                <ul class="dropdown-menu" role="menu" style="">
+                                    <li>
+                                        @RenderItemFormat("BTN_QL_NHOM_ND_NHAP_EXCEL", "<a class=\"mybtn-Button-1\" onclick=\"ShowPopupImportExcel()\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/import.svg") + "'>Nhập Excel</a>", "", "")
+                                    </li>
+                                    <li>
+                                        @RenderItemFormat("BTN_QL_NHOM_ND_XUAT_EXCEL_TEM", "<a class=\"mybtn-Button-1\" onclick=\"ExportTemplate()\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/export.svg") + "'>Xuất Template</a>", "", "")
+                                    </li>
+                                    <li>
+                                        @RenderItemFormat("BTN_QL_NHOM_ND_XUAT_EXCEL", "<a class=\"mybtn-Button-1\" onclick=\"Export()\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/export.svg") + "'>Export Excel</a>", "", "")
+                                    </li>
+                                </ul>
+                                <span class="search-bar">
+                                    <input type="text" id="dynamic-table-thead-search" class="quicksearch txtSearchObj" name="search">
+                                    <input type="text" class="quicksearch1 txtSearchObj1" name="search" style="z-index: -1000; height: 0; padding: 0; margin: 0; border: 0">
+                                </span>
+                                @if (CheckAccess("BTN_QL_NHOM_ND_TK"))
+                                {
+                                    @Html.Partial("Pagination", null, new ViewDataDictionary() { { "PageCur", MvcHtmlString.Create("1") }, { "RecordCount", MvcHtmlString.Create(Model.PageSize.ToString()) }, { "ShowText", showtext } })
+                                }
+                            </div>
+                            <input type="hidden" value="@MvcHtmlString.Create(pageCur)" name="page" id="page" />
+                        }
+                        <input type="hidden" value="@MvcHtmlString.Create(Model.PageCount.ToString())" name="totalpage" id="totalpage" />
+                    </aside>
+                </div>
+
+                <div class="panel-body no-padding" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+
+                    <aside class="col-xs-12 layout-table no-padding">
+                        <div class="scrollable-horizontal padding-left-0 padding-right-0 div-scrollable" style="padding-top: 0!important;">
+                            <div style="width: 100%; float: left;">
+                                <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                                    <thead>
+                                        <tr class="trthead">
+                                            <th class="cell-120">&nbsp;</th>
+                                            <th class="text-center cell-50">@MvcHtmlString.Create("TT")</th>
+                                            <th fieldId="MADONVI" sorttype="T" class="text-center cell-200">
+                                                @MvcHtmlString.Create("Mã đơn vị")
+                                            </th>
+                                            <th fieldId="TENNHOM" sorttype="T" class="text-center cell-250">
+                                                @MvcHtmlString.Create("Tên nhóm")
+                                            </th>
+                                            <th fieldId="MANHOM" sorttype="T" class="text-center cell-200">
+                                                @MvcHtmlString.Create("Mã nhóm")
+                                            </th>
+                                            <th class="text-center cell-100">
+                                                @MvcHtmlString.Create("Trạng thái")
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                            <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                                <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody">
+                                    <tbody id="table-tbodyID">
+                                        @if (Model != null && Model.DataList != null && Model.DataList.Count > 0)
+                                        {
+                                            var idx = 0;
+                                            foreach (var item in Model.DataList)
+                                            {
+                                                var iindex = startCount + (idx + 1);
+
+                                                <tr idx="@idx" class="data-item trdata">
+                                                    <td class="text-center cell-120">
+                                                        <div class="action-buttons padding-top-2">
+                                                            @{
+                                                                var urlDetail = Url.Action("Detail", "Sys_Group", new { groupcode = item.GroupCode });
+                                                                var urlUpdate = Url.Action("Update", "Sys_Group", new { groupcode = item.GroupCode });
+
+                                                            }
+
+                                                            @RenderItemFormat("BTN_QL_NHOM_ND_CHI_TIET", "<a class=\"icon-detail\" href=\'" + urlDetail + "\' title=\"Chi tiết\"><i class=\"far fa-eye\" ></i></a>", "", "")
+                                                            @RenderItemFormat("BTN_QL_NHOM_ND_SUA", "<a class=\"icon-edit\" href=\'" + urlUpdate + "\' title=\"Sửa\"><i class=\"fas fa-pencil-alt\" ></i></a>", "", "")
+                                                            @if (item.FlagActive.Equals("1"))
+                                                            {
+
+                                                                @RenderItemFormat("BTN_QL_NHOM_ND_GAN_ND_VAO_NHOM", "<a href=\"javascript:;\" id=\"btnAddUserInGroup\" class=\"icon-freeze\" title=\"Gán người dùng vào nhóm\" onclick=\"GetSysUser('" + item.GroupCode + "')\"><i class=\"fas fa-sitemap\"></i></a>", "", "")
+                                                                @RenderItemFormat("BTN_QL_NHOM_ND_GAN_MENU_BUTTON_VAO_NHOM", "<a href=\"javascript:;\" id=\"btnAddMenuButtonInGroup\" class=\"icon-cardrenew\" title=\"Gán Menu - Button vào nhóm\" onclick=\"GetSysObject('" + item.GroupCode + "')\"><i class=\"fa fa-th\" ></i></a>", "", "")
+                                                            }
+                                                            @RenderItemFormat("BTN_QL_NHOM_ND_XOA", "<a href=\"javascript:;\" class=\"icon-delete\" title=\"Xóa\" onclick=\"Delete('" + item.GroupCode + "')\"><i class=\"fas fa-trash-alt\" ></i></a>", "", "")
+
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-center cell-50" style="">
+                                                        @MvcHtmlString.Create(iindex.ToString())
+                                                    </td>
+                                                    <td fieldId="MADONVI" class="text-left cell-200">
+                                                        @MvcHtmlString.Create(item.MST)
+                                                    </td>
+                                                    <td fieldId="TENNHOM" class="text-left cell-250">
+                                                        @MvcHtmlString.Create(item.GroupName)
+                                                    </td>
+                                                    <td fieldId="MANHOM" class="text-left cell-200">
+                                                        @MvcHtmlString.Create(item.GroupCode)
+                                                    </td>
+                                                    <td class="text-center cell-100">
+                                                        @if (item.FlagActive.Equals("1"))
+                                                        {
+                                                            <span class="label label-sm label-success">Active</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="label label-sm label-danger">Inactive</span>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                                idx++;
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- PAGE CONTENT ENDS -->
+</div><!-- /.row -->
+
+<div class="modal fade" id="ShowPopup" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+
+@*Import Excel*@
+<div class="modal fade" id="ImportExcelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Sys_Group.js")"></script>
+    <script type="text/javascript">
+        @* Active Menu *@
+        setAdminCurrentUrl('@Url.Action("Index", "Sys_Group")');
+
+        var objSys_Group = new Sys_Group();
+
+        function Delete(groupCode) {
+            var objSys_Group_Delete = {
+                GroupCode: groupCode,
+            };
+
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Delete", "Sys_Group")';
+
+            objSys_Group.Image_Message = "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO";
+            objSys_Group.Confirm_Message = "Đồng ý xóa nhóm người dùng '" + groupCode + "' ?";
+            objSys_Group.ajaxSettings = ajaxSettings;
+            objSys_Group.deleteData(objSys_Group_Delete);
+        }
+
+        var objCommonExcel = new CommonExcel();
+        var objVariablesInit = {
+            Id_FormMain: '',
+            Id_FormImportExcel: 'manageFormImportExcel',
+            Id_Modal: 'ImportExcelModal',
+            Id_FileInput: 'file',
+        };
+
+        var ajaxSettings_Excel = {};
+        ajaxSettings_Excel.Type = 'post';
+        ajaxSettings_Excel.DataType = 'json';
+
+        function ShowPopupImportExcel() {
+            ajaxSettings_Excel.Url = '@Url.Action("ShowPopupImportExcel", "Admin")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.variablesInit(objVariablesInit);
+            objCommonExcel.showPopupImportExcel();
+        }
+
+        function ImportFileExcel() {
+            ajaxSettings_Excel.Url = '@Url.Action("Import", "Sys_Group")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.variablesInit(objVariablesInit);
+            objCommonExcel.importFileExcel();
+        }
+
+        function ExportTemplate() {
+            ajaxSettings_Excel.Url = '@Url.Action("ExportTemplate", "Sys_Group")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.exportExcel();
+        }
+
+        function Export() {
+            ajaxSettings_Excel.Url = '@Url.Action("Export", "Sys_Group")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            var groupname = commonUtils.returnValueTextOrNull('#groupname');
+
+            var ListSearchInput = [
+                { Key: 'groupname', Value: groupname },
+            ];
+            objCommonExcel.exportExcel(ListSearchInput);
+        }
+        function GetSysUser(groupcode) {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("GetSysUser", "Sys_Group")';
+
+            objSys_Group.ajaxSettings = ajaxSettings;
+            objSys_Group.getSysUser(groupcode);
+        }
+        function GetSysObject(groupcode) {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("GetSysObject", "Sys_Group")';
+
+            objSys_Group.ajaxSettings = ajaxSettings;
+            objSys_Group.getSysObject(groupcode);
+        }
+        function Search()
+        {
+            debugger;
+            $('#manageForm').attr('action', '@Url.Action("Index", "Sys_Group")').submit();
+        }
+        function ClosePopup() {
+            objSys_Group.closePopup();
+        }
+
+        @* scroll *@
+        //$(document).ready(function () {
+        //    $('.scrollable-horizontal').each(function () {
+        //        var $this = $(this);
+        //        $(this).ace_scroll(
+        //            {
+        //                horizontal: true,
+        //                //styleClass: 'scroll-top',//show the scrollbars on top(default is bottom)
+        //                size: $this.attr('data-size') || 6500,
+        //                mouseWheelLock: true
+        //            }
+        //        ).css({ 'padding-top': 0 });
+        //    });
+        //});
+        //$('.scrollable').each(function () {
+        //    var $this = $(this);
+        //    $(this).ace_scroll({
+        //        //size: 500,
+        //        size: $this.attr('data-size') || 1000,
+        //        mouseWheelLock: true
+        //        //styleClass: 'scroll-left scroll-margin scroll-thin scroll-dark scroll-light no-track scroll-visible'
+        //    });
+        //});
+        @* End scroll *@
+    </script>
+
+    @*<script type="text/javascript">
+        $(document).ready(function () {
+            (function ($) {
+                var body = $('body');
+                body.on('keyup', '#txtSearchObj', function () {
+                    var datafilter = $(this).val();
+                    if (datafilter !== undefined && datafilter !== null && datafilter.toString().trim()) {
+                        datafilter = datafilter.toUpperCase().trim();
+                    }
+                    var rex = new RegExp($(this).val(), 'i');
+                    $('#table-tbodyID tr').hide();
+                    $('#table-tbodyID tr').filter(function () {
+                        var dataOfRow = $(this).text();
+                        if (dataOfRow !== undefined && dataOfRow !== null && dataOfRow.toString().trim().length > 0) {
+                            dataOfRow = dataOfRow.toUpperCase().trim();
+                        }
+                        if (dataOfRow.toUpperCase().indexOf(datafilter) > -1) {
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }
+                    }).show();
+                });
+
+            }(jQuery));
+
+        });
+
+    </script>*@
+    <script type="text/javascript">
+        var listColumns = {
+            //'STT': [],//['abc', 'def'],
+            'MADONVI': [],//['ghi', 'klm'],
+            'TENNHOM': [],
+            'MANHOM': []
+        };
+        var options = {};
+        options.Columns = listColumns;
+        $('#dynamic-table-thead').table_Sortable(options);
+    </script>
+}

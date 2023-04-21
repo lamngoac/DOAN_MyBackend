@@ -1,0 +1,39 @@
+﻿@using idn.Skycic.Inventory.Common.Models.ProductCentrer
+@{
+    var list_Mst_Attribute = ViewBag.List_Mst_Attribute as List<Mst_Attribute>;
+}
+
+@*Thuộc tính*@
+<script type="text/template" id="tmpl_attribute">
+    <tr>
+        <td class="cell-50">
+            <i class="fas fa-trash-alt"></i>
+            <input type="hidden" />
+        </td>
+        <td>
+            <div class="form-group no-margin">
+                <select class="col-10 select-attribute">
+                    <option opt="null" value="">--Lựa chọn--</option>
+                    @if (list_Mst_Attribute != null && list_Mst_Attribute.Count > 0)
+                    {
+                        foreach (var item in list_Mst_Attribute)
+                        {
+                            var attributeCode = CUtils.StrValue(item.AttributeCode);
+                            var attributeName = CUtils.StrValue(item.AttributeName);
+                            <option value="@MvcHtmlString.Create(attributeCode)">@MvcHtmlString.Create(attributeName)</option>
+                        }
+                    }
+                </select>
+                <a class="btn btn-nc-button btn-add-or-edit" title="Add" tabindex="0" onclick="ShowPopupAddAttribute()"><i class="fa fa-plus"></i></a>
+            </div>
+        </td>
+        <td class="cell-50">
+            <i class="fas fa-pencil-alt"></i>
+        </td>
+        <td>
+            <div class="form-group no-margin">
+                <input type="text" class="col-12 value-attribute" value="" data-role="tagsinput" placeholder="@(("Enter an input and press Enter").HtmlItemString("product"))">
+            </div>
+        </td>
+    </tr>
+</script>

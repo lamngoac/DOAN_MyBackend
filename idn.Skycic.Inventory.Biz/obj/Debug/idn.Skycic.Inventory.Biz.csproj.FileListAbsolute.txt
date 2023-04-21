@@ -1,0 +1,156 @@
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\EzDAL.VN239c.FW35.AnyCPU
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Biz.dll.config
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Biz.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Biz.pdb
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\CommonUtils.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.Core.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth.Consumer.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth2.Client.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth2.ClientAuthorization.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth2.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\EncryptionLib.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\EPPlus.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\EzDAL.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\EzSql.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\EzSqlServer.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.BizService.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Common.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Constants.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Utils.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\inos.common.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\mbiz.core.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\Newtonsoft.Json.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\TLog.Core.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\TSession.Core.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\System.Net.Http.Formatting.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\RestSharp.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\System.Web.Helpers.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\System.Web.WebPages.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\Microsoft.Web.Infrastructure.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\System.Web.WebPages.Deployment.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.BizService.pdb
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Common.pdb
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Constants.pdb
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Utils.pdb
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.Core.xml
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth.xml
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth.Consumer.xml
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth2.xml
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth2.Client.xml
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth2.ClientAuthorization.xml
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\Newtonsoft.Json.xml
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\System.Net.Http.Formatting.xml
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\System.Web.Helpers.xml
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\System.Web.WebPages.xml
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\Microsoft.Web.Infrastructure.xml
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\bin\Debug\System.Web.WebPages.Deployment.xml
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\obj\Debug\idn.Skycic.Inventory.Biz.csprojAssemblyReference.cache
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\obj\Debug\idn.Skycic.Inventory.Biz.csproj.CoreCompileInputs.cache
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\obj\Debug\idn.Skycic.Inventory.Biz.csproj.CopyComplete
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\obj\Debug\idn.Skycic.Inventory.Biz.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Biz\obj\Debug\idn.Skycic.Inventory.Biz.pdb
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\EzDAL.VN239c.FW35.AnyCPU
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Biz.dll.config
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Biz.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Biz.pdb
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\CommonUtils.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.Core.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth.Consumer.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth2.Client.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth2.ClientAuthorization.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth2.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\EncryptionLib.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\EPPlus.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\EzDAL.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\EzSql.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\EzSqlServer.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.BizService.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Common.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Constants.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Utils.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\inos.common.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\mbiz.core.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\Newtonsoft.Json.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\RestSharp.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\TLog.Core.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\TSession.Core.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\System.Net.Http.Formatting.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\System.Web.Helpers.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\System.Web.WebPages.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\Microsoft.Web.Infrastructure.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\System.Web.WebPages.Deployment.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.BizService.pdb
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Common.pdb
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Constants.pdb
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Utils.pdb
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.Core.xml
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth.xml
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth.Consumer.xml
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth2.xml
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth2.Client.xml
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth2.ClientAuthorization.xml
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\Newtonsoft.Json.xml
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\System.Net.Http.Formatting.xml
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\System.Web.Helpers.xml
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\System.Web.WebPages.xml
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\Microsoft.Web.Infrastructure.xml
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\System.Web.WebPages.Deployment.xml
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\obj\Debug\idn.Skycic.Inventory.Biz.csprojAssemblyReference.cache
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\obj\Debug\idn.Skycic.Inventory.Biz.csproj.CoreCompileInputs.cache
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\obj\Debug\idn.Skycic.Inventory.Biz.csproj.CopyComplete
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\obj\Debug\idn.Skycic.Inventory.Biz.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\obj\Debug\idn.Skycic.Inventory.Biz.pdb
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\EzDAL.VN239c.FW35.AnyCPU
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Biz.dll.config
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Biz.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Biz.pdb
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\CommonUtils.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.Core.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth.Consumer.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth2.Client.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth2.ClientAuthorization.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth2.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\EncryptionLib.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\EPPlus.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\EzDAL.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\EzSql.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\EzSqlServer.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.BizService.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Common.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Constants.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Utils.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\inos.common.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\mbiz.core.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\Newtonsoft.Json.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\RestSharp.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\TLog.Core.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\TSession.Core.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\System.Net.Http.Formatting.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\System.Web.Helpers.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\System.Web.WebPages.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\Microsoft.Web.Infrastructure.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\System.Web.WebPages.Deployment.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.BizService.pdb
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Common.pdb
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Constants.pdb
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\idn.Skycic.Inventory.Utils.pdb
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.Core.xml
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth.xml
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth.Consumer.xml
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth2.xml
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth2.Client.xml
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\DotNetOpenAuth.OAuth2.ClientAuthorization.xml
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\Newtonsoft.Json.xml
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\System.Net.Http.Formatting.xml
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\System.Web.Helpers.xml
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\System.Web.WebPages.xml
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\Microsoft.Web.Infrastructure.xml
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\bin\Debug\System.Web.WebPages.Deployment.xml
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\obj\Debug\idn.Skycic.Inventory.Biz.csprojAssemblyReference.cache
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\obj\Debug\idn.Skycic.Inventory.Biz.csproj.CoreCompileInputs.cache
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\obj\Debug\idn.Skycic.Inventory.Biz.csproj.CopyComplete
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\obj\Debug\idn.Skycic.Inventory.Biz.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.Biz\obj\Debug\idn.Skycic.Inventory.Biz.pdb

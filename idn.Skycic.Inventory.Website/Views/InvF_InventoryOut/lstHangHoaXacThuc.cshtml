@@ -1,0 +1,103 @@
+﻿@{ 
+    var lstInvF_InventoryOutQR = new List<InvF_InventoryOutQR>();
+    if(ViewBag.lstInvF_InventoryOutQR != null)
+    {
+        lstInvF_InventoryOutQR = ViewBag.lstInvF_InventoryOutQR as List<InvF_InventoryOutQR>;
+    }
+}
+<div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+    <div style="width: 100%; float: left;">
+        <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+            <thead>
+                <tr class="trthead">
+                    <th class="text-center cell-50">
+                    </th>
+                    <th fieldId="ProductCode" sorttype="T" fieldName="Mã hàng hóa" fieldActive="0" class="text-left cell-100">
+                        @("Mã hàng hóa".HtmlItemString("productcode"))
+                    </th>
+                    <th fieldId="ProductName" sorttype="T" fieldName="Tên hàng hóa (TV)" fieldActive="0" class="text-left cell-150">
+                        @("Tên hàng hóa (TV)".HtmlItemString("productname"))
+                    </th>
+                    <th fieldId="QRCode" sorttype="T" fieldName="Mã xác thực" fieldActive="0" class="text-left cell-200">
+                        @("Mã xác thực".HtmlItemString(""))
+                    </th>
+                    <th fieldId="INVADDRESS" sorttype="T" fieldName="Loại" fieldActive="0" class="text-left cell-100">
+                        @("Loại".HtmlItemString(""))
+                    </th>                    
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+        <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+            <tbody id="table-tbodyIDXacThuc">
+                @{
+                    if (lstInvF_InventoryOutQR != null)
+                    {
+                        var idx = 0;
+                        foreach (var it in lstInvF_InventoryOutQR)
+                        {
+                            <tr class="trdata" idx="@idx" productCode="@(it.ProductCode == null ? "" : it.ProductCode)">        
+                                <input type="hidden" class="productqrcode" name="Lst_InvF_InventoryOutQR[@idx].ProductCode" value="@(it.ProductCode == null ? "" : it.ProductCode)" />
+                                <input type="hidden" class="productqrcode" name="Lst_InvF_InventoryOutQR[@idx].ProductName" value="@(it.mp_ProductName == null ? "" : it.mp_ProductName)" />
+                                <input type="hidden" class="productqrcode" name="Lst_InvF_InventoryOutQR[@idx].QRCode" value="@(it.QRCode == null ? "" : it.QRCode)" />
+                                <input type="hidden" class="productqrcode" name="Lst_InvF_InventoryOutQR[@idx].Type" value="==Type==" />
+                                <td class="text-center cell-50">
+                                    <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteXacThuc(this)"><i class="fas fa-trash-alt"></i></a>
+                                </td>
+                                <td fieldId="ProductCodeUser" sorttype="T" fieldName="Mã hàng hóa" fieldActive="0" class="text-left cell-100">
+                                    <input class="col-md-12 ProductCodeUser" readonly="readonly" value="@(it.mp_ProductCodeUser == null ? "" : it.mp_ProductCodeUser)" />
+                                </td>
+                                <td fieldId="ProductName" sorttype="T" fieldName="Tên hàng hóa (TV)" fieldActive="0" class="text-left cell-150">
+                                    <input class="col-md-12 ProductName" readonly="readonly" value="@(it.mp_ProductName == null ? "" : it.mp_ProductName)" />
+                                </td>
+                                <td fieldId="QRCode" sorttype="T" fieldName="Mã xác thực" fieldActive="0" class="text-left cell-200">
+                                    <input class="col-md-12 QRCode" readonly="readonly"  value="@(it.QRCode == null ? "" : it.QRCode)" />
+                                </td>
+                                <td fieldId="Type" sorttype="T" fieldName="Loại" fieldActive="0" class="text-left cell-100">
+                                    @*<input class="col-md-12 Type" readonly="readonly"value="@(it.QRType == null ? "" : it.QRType)" />*@
+                                    <select class="col-md-12 QRType" name="Lst_InvF_InventoryOutQR[@idx].QRType">
+                                        <option @(it.QRType.ToString() == "TEM" ? "selected" : "") value="TEM">Mã xác thực</option>
+                                        <option @(it.QRType.ToString() == "CARTON" ? "selected" : "") value="CARTON">Hộp</option>
+                                        <option @(it.QRType.ToString() == "BOX" ? "selected" : "") value="BOX">Thùng</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            idx++;
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<table hidden>
+    <tbody id="rowtemplateQR">
+        <tr class="trdata" idx="==idx==" productCode="==ProductCode==">
+            <input type="hidden" class="productqrcode" name="Lst_InvF_InventoryOutQR[==idx==].ProductCode" value="==ProductCode==" />
+            <input type="hidden" class="productqrcode" name="Lst_InvF_InventoryOutQR[==idx==].ProductName" value="==ProductName==" />
+            <input type="hidden" class="productqrcode" name="Lst_InvF_InventoryOutQR[==idx==].QRCode" value="==QRCode==" />
+            <input type="hidden" class="productqrcode" name="Lst_InvF_InventoryOutQR[==idx==].Type" value="==Type==" />
+            <td class="text-center cell-50">
+                <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteXacThuc(this)"><i class="fas fa-trash-alt"></i></a>
+            </td>
+            <td fieldId="ProductCodeUser" sorttype="T" fieldName="Mã hàng hóa" fieldActive="0" class="text-left cell-100">
+                <input class="col-md-12 ProductCodeUser" readonly="readonly" @*name="Lst_InvF_InventoryOutQR[==idx==].ProductCode"*@ value="==ProductCodeUser==" />
+            </td>
+            <td fieldId="ProductName" sorttype="T" fieldName="Tên hàng hóa (TV)" fieldActive="0" class="text-left cell-150">
+                <input class="col-md-12 ProductName" readonly="readonly" @*name="Lst_InvF_InventoryOutQR[==idx==].ProductName"*@ value="==ProductName==" />
+            </td>
+            <td fieldId="QRCode" sorttype="T" fieldName="Mã xác thực" fieldActive="0" class="text-left cell-200">
+                <input class="col-md-12 QRCode" readonly="readonly" name="Lst_InvF_InventoryOutQR[==idx==].QRCode" value="==QRCode==" />
+            </td>
+            <td fieldId="Type" sorttype="T" fieldName="Loại" fieldActive="0" class="text-left cell-100">               
+                <select class="col-md-12 QRType" name="Lst_InvF_InventoryOutQR[==idx==].QRType">
+                    <option value="TEM">Mã xác thực</option>
+                    <option value="CARTON">Hộp</option>
+                    <option value="BOX">Thùng</option>
+                </select>
+            </td>
+        </tr>
+    </tbody>
+</table>

@@ -1,0 +1,133 @@
+﻿@{
+    var userSate = Session.UserState;
+}
+<div id="sidebar" class="sidebar responsive ace-save-state">
+    <script type="text/javascript">
+        try {
+            ace.settings.loadState('sidebar');
+        } catch (e) { }
+    </script>
+
+    <ul class="nav nav-list">
+        @*@if (userSate != null && userSate.RptSv_Sys_User != null && userSate.RptSv_Sys_User.FlagSysAdmin.Equals("1"))*@
+        @if (CheckAccess("MENU_ADMIN_ROOT"))
+        {
+            if (CheckAccess("MENU_ADMIN_TAI_KHOAN"))
+            {
+        <li class="">
+            <a href="javascrip:void();" class="dropdown-toggle">
+                <img class="img-responsive img-inactive" src="~/Images/TaiKhoan.svg" />
+                <span class="menu-text">
+                    Tài khoản
+                </span>
+
+                <b class="arrow fa fa-angle-down"></b>
+            </a>
+            <b class="arrow"></b>
+            <ul class="submenu">
+                <li class="">
+                    @RenderSubMenuItem("MENU_ADMIN_QL_TK", "Quản lý tài khoản", "Index", "RptSv_Sys_User")
+                </li>
+            </ul>
+            @if (userSate != null && userSate.RptSv_Sys_User != null && userSate.RptSv_Sys_User.FlagSysAdmin.Equals("1"))
+            {
+                <ul class="submenu">
+                    <li class="">
+                        @RenderSubMenuItem("MENU_ADMIN_QL_NHOM_ND", "Quản lý nhóm người dùng", "Index", "RptSv_Sys_Group")
+                    </li>
+                </ul>
+            }
+            <ul class="submenu">
+                <li class="">
+                    @RenderSubMenuItem("MENU_ADMIN_GAN_NGUOI_DUNG_VAO_NHOM", "Gán người dùng vào nhóm", "Index", "RptSv_Sys_GroupOnlyAssign")
+                </li>
+            </ul>
+            @*<ul class="submenu">
+                <li class="">
+                    @RenderSubMenuItem("MENU_ADMIN_CUSTOMFIELD", "Customfield", "Index", "Invoice_CustomField")
+                </li>
+            </ul>*@
+            @*<ul class="submenu">
+                <li class="">
+                    @RenderSubMenuItem("MENU_ADMIN_BAO_CAO", "Báo cáo", "RptSv_Rpt_InvoiceSummary_01", "Report")
+                </li>
+            </ul>*@
+        </li>
+            }
+            if (CheckAccess("MENU_ADMIN_QL_DAI_LY"))
+            {
+                <li class="">
+                    <a href="javascrip:void();" class="dropdown-toggle">
+                        <img class="img-responsive img-inactive" src="~/Images/QlToChuc.svg" />
+                        <span class="menu-text">
+                            Quản lý đại lý
+                        </span>
+
+                        <b class="arrow fa fa-angle-down"></b>
+                    </a>
+                    <b class="arrow"></b>
+                    <ul class="submenu">
+                        <li class="">
+                            @RenderSubMenuItem("MENU_ADMIN_QL_DAI_LY", "Quản lý đại lý", "Index", "Mst_Dealer")
+                        </li>
+                    </ul>
+                </li>
+            }
+            if (CheckAccess("MENU_ADMIN_QL_KH"))
+            {
+                <li class="">
+                    <a href="javascrip:void();" class="dropdown-toggle">
+                        <img class="img-responsive img-inactive" src="~/Images/quanlytochuc.svg" />
+                        <span class="menu-text">
+                            Quản lý khách hàng
+                        </span>
+
+                        <b class="arrow fa fa-angle-down"></b>
+                    </a>
+                    <b class="arrow"></b>
+                    <ul class="submenu">
+                        <li class="">
+                            @RenderSubMenuItem("MENU_ADMIN_QL_KH", "Danh sách khách hàng", "Index", "Mst_NNT")
+                        </li>
+                    </ul>
+                </li>
+            }
+            if (CheckAccess("MENU_ADMIN_QL_CAC_DANH_MUC"))
+            {
+                <li class="">
+                    <a href="javascrip:void();" class="dropdown-toggle">
+                        <img class="img-responsive img-inactive" src="~/Images/QLHangHoa.svg" />
+                        <span class="menu-text">
+                            Các danh mục
+                        </span>
+
+                        <b class="arrow fa fa-angle-down"></b>
+                    </a>
+                    <b class="arrow"></b>
+                    <ul class="submenu">
+                        <li class="">
+                            @RenderSubMenuItem("MENU_ADMIN_QL_MODULE", "Quản lý Module", "Index", "Sys_Modules")
+                        </li>
+                        @*<li class="">
+                            @RenderSubMenuItem("MENU_ADMIN_QL_DON_HANG", "Quản lý Đơn hàng", "Index", "Mst_Order")
+                        </li>*@
+                        @*<li class="">
+                            @RenderSubMenuItem("MENU_ADMIN_QL_CQT", "Danh mục cơ quan thuế", "Index", "Mst_GovTaxID")
+                        </li>*@
+                        <li class="">
+                            @RenderSubMenuItem("MENU_ADMIN_QL_TINH_TP", "Danh mục Tỉnh/Thành phố", "Index", "Mst_Province")
+                        </li>
+                        <li class="">
+                            @RenderSubMenuItem("MENU_ADMIN_QL_QUAN_HUYEN", "Danh mục Quận/Huyện", "Index", "Mst_District")
+                        </li>
+                    </ul>
+                </li>
+            }
+        }
+    </ul><!-- /.nav-list -->
+
+    <div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse">
+        <i id="sidebar-toggle-icon" class="ace-icon fa fa-angle-double-left ace-save-state" data-icon1="ace-icon fa fa-angle-double-left" data-icon2="ace-icon fa fa-angle-double-right"></i>
+    </div>
+</div>
+

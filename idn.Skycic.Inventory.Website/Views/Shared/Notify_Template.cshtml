@@ -1,0 +1,808 @@
+﻿
+<div class="modal fade" id="Notifi" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 45%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title"><b>THÔNG BÁO HỆ THỐNG</b></h2>
+                <a href="javascript:;" onclick="closeModalPopupNotification()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" id="body-notifi" style="font-size: 15px;">
+                <div id="notification-data" style="width: 100%; float: left; padding-bottom: 15px;">
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn btn-nc-button-cancel" onclick="closeModalPopupNotification()" style="padding-left: 10px!important; padding-right: 10px!important; font-size: 16px; font-weight: 500; float: right;"> 
+                    Thoát
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/template" id="tmpl_notify_read_item">
+    <li class="row no-margin col-xs-12 layout-bot-top-10 notifi-box notify-box notifi-content read" liid="==id==">
+        <input type="hidden" name="Id" value="==id==" />
+        <input type="hidden" name="NetworkId" value="==networkid==" />
+        <input type="hidden" name="SolutionCode" value="==solutioncode==" />
+        <input type="hidden" name="TypeCode" value="==typecode==" />
+        <input type="hidden" name="SubType" value="==subtype==" />
+        <input type="hidden" name="UserId" value="==userid==" />
+        @*<input type="hidden" name="Detail" value="==detail==" />*@
+        <input type="hidden" name="Status" value="==status==" />
+        <input type="hidden" name="SendUserId" value="==senduserid==" />
+        <input type="hidden" name="CreateDTime" value="==createdtime==" />
+        <a href="javascript:;" onclick="ShowModalPopupNotifi(this)">
+            <div class="col-xs-2">
+                <div class="avatar-no">
+                    <img src="==pathimage==" alt="==solutioncode==" class="img-responsive" />
+                </div>
+            </div>
+            <div class="col-xs-9 detail-notifi">
+                <div class="content-title">
+                    ==detailshort==
+                </div>
+                <div class="time-notifi">
+                    ==time==
+                </div>
+            </div>
+
+        </a>
+        <div class="col-xs-1 read-button">
+            <span class="col-xs-1 no-padding button-alert-notifi" style="float: right;" data-toggle="tooltip" onclick="Notification_Change(this)" title="" data-original-title="Đánh dấu chưa đọc">
+
+            </span>
+        </div>
+    </li>
+</script>
+
+<script type="text/template" id="tmpl_notify_unread_item">
+    <li class="row no-margin col-xs-12 layout-bot-top-10 notifi-box notify-box notifi-content unread" liid="==id==">
+        <input type="hidden" name="Id" value="==id==" />
+        <input type="hidden" name="NetworkId" value="==networkid==" />
+        <input type="hidden" name="SolutionCode" value="==solutioncode==" />
+        <input type="hidden" name="TypeCode" value="==typecode==" />
+        <input type="hidden" name="SubType" value="==subtype==" />
+        <input type="hidden" name="UserId" value="==userid==" />
+        @*<input type="hidden" name="Detail" value="==detail==" />*@
+        <input type="hidden" name="Status" value="==status==" />
+        <input type="hidden" name="SendUserId" value="==senduserid==" />
+        <input type="hidden" name="CreateDTime" value="==createdtime==" />
+        <a href="javascript:;" onclick="ShowModalPopupNotifi(this)">
+            <div class="col-xs-2">
+                <div class="avatar-no">
+                    <img src="==pathimage==" alt="==solutioncode==" class="img-responsive" />
+                </div>
+            </div>
+            <div class="col-xs-9 detail-notifi">
+                <div class="content-title">
+                    ==detailshort==
+                </div>
+                <div class="time-notifi">
+                    ==time==
+                </div>
+            </div>
+        </a>
+        <div class="col-xs-1 read-button">
+            <span class="col-xs-1 no-padding button-alert-notifi" style="float: right;" data-toggle="tooltip" onclick="Notification_Change(this)" title="" data-original-title="Đánh dấu đã đọc">
+
+            </span>
+        </div>
+    </li>
+</script>
+
+<script type="text/template" id="tmpl_notify_item">
+    <li class="row no-margin col-xs-12 layout-bot-top-10 notifi-box notifi-content" style="border: 1px solid  #f8f8f8" data-id="" data-solutioncode="" data-status="" data-detail="">
+
+        <div class="col-2" style="padding: 0px;">
+            <div class="avatar-no">
+                <img src="==pathimage==" alt="==solutioncode==" class="img-responsive" />
+            </div>
+        </div>
+        <div class="col-10 detail-notifi" style="padding: 0px; position: relative;">
+            <div class="content-title" style=" @*line-height: 0.5;*@">
+                ==detailshort==
+            </div>
+            <div class="nt-actions" style="width: 100%">
+                @*<button onclick="window.takeNotifAction(this);" action="accept" class="accept">Đồng ý</button>
+                    <button onclick="window.takeNotifAction(this);" action="accept" class="accept">Hủy</button>*@
+            </div>
+            <div class="time-notifi">
+                ==time==
+            </div>
+            <span class="no-padding button-alert-notifi" style="float: right; position: absolute; top: 15px; right: 0px; width: 8px; height: 8px; display: none; @*border: 1px solid red;*@" data-toggle="tooltip" onclick="notificationChange(this);" title="" data-original-title="">
+
+            </span>
+        </div>
+
+    </li>
+</script>
+
+<script type="text/javascript">
+    function genNotifyItem(objNotify) {
+        //debugger;
+            var token = $('#form-notify input[name=__RequestVerificationToken]').val();
+
+            var dUtcOffset = 0.0;
+            dUtcOffset = objNotify.UtcOffset;
+            var dateCur = objNotify.DateTime;
+            var createDTime = commonUtils.dateTimeAddHours(objNotify.CreateDTime, dUtcOffset);
+            var convertcreateDTime = createDTime.formatDate('yyyy-MM-dd HH:mm:ss');
+            var timeAgo = commonUtils.getTimeAgo(convertcreateDTime, dateCur);
+            var status = commonUtils.returnValue(objNotify.Status);
+            var solutionCode = commonUtils.returnValue(objNotify.SolutionCode);
+            var pathimageinit = '/Images/SolutionImage/XXXIMAGESXXX.svg';
+            var pathimage = '';
+            if (!commonUtils.isNullOrEmpty(solutionCode)) {
+                pathimage = commonUtils.replaceAll(pathimageinit, 'XXXIMAGESXXX', solutionCode);
+            }
+            else {
+                pathimage = '/Images/no-image.png';
+            }
+
+            var data = {
+                id: commonUtils.returnValue(objNotify.Id),
+                //networkid: commonUtils.returnValue(objNotify.NetworkId),
+                solutioncode: solutionCode,
+                //typecode: commonUtils.returnValue(objNotify.TypeCode),
+                //subtype: commonUtils.returnValue(objNotify.SubType),
+                //userid: commonUtils.returnValue(objNotify.UserId),
+                //detail: commonUtils.returnValue(objNotify.Detail),
+                detailshort: commonUtils.returnValue(objNotify.DetailRemoveTagsHtml),
+                status: status,
+                //senduserid: commonUtils.returnValue(objNotify.SendUserId),
+                //createdtime: convertcreateDTime,
+                time: timeAgo,
+                pathimage: pathimage,
+                Params: objNotify.Params,
+        };
+        var attHtml = commonUtils.getHtmlFromTemplate($('#tmpl_notify_item'), data);
+
+            var $item = $(attHtml);
+            $item.attr('data-id', data.id);
+            $item.attr('data-solutioncode', data.solutioncode);
+            $item.attr('data-status', data.status);
+            //$item.attr('', data.id);
+            ///////
+            var $spanNotiFyChange = $item.find('span.button-alert-notifi');
+            if (data.status === '0') {
+                $item.addClass('unread');
+                if ($spanNotiFyChange !== undefined && $spanNotiFyChange !== null) {
+                    $spanNotiFyChange.addClass('button-alert-notifi-unread');
+                    $spanNotiFyChange.attr('data-original-title', 'Đánh dấu đã đọc');
+                }
+            }
+            else if (data.status == '1') {
+                $item.addClass('read');
+                if ($spanNotiFyChange !== undefined && $spanNotiFyChange !== null) {
+                    $spanNotiFyChange.addClass('button-alert-notifi-read');
+                    $spanNotiFyChange.attr('data-original-title', 'Đánh dấu chưa đọc');
+                }
+            }
+
+            ///////
+
+            var objInosNotification = {};
+            objInosNotification.Id = data.id;
+            objInosNotification.SolutionCode = data.solutioncode;
+            objInosNotification.Status = data.status;
+            var modelCur = commonUtils.returnJSONValue(objInosNotification);
+            $item.click(function () {
+				$.ajax({
+					type: 'post',
+					dataType:'json',
+					url: '@Url.Action("ViewItem", "Notification")',
+					data: {
+                        __RequestVerificationToken: token
+                        , model: modelCur
+                    },
+                    async: false,
+                    beforeSend: function () {
+
+                    }
+                }).done(function (objResult) {
+                    if (objResult.Success) {
+                        //debugger;
+                        if (data.status === '0') {
+                            var iCount = 0;
+                            var count = $('.notification-cd').text();
+                            if (commonUtils.isNullOrEmpty(count)) {
+                                count = '0';
+                            }
+                            iCount = commonUtils.parseInt(count);
+                            if (iCount > 0) {
+                                iCount = iCount - 1;
+                                $('.notification-cd').text(iCount);
+                                updateLi($item, '1');
+                            }
+                        }
+                        var objRT_InosNotification = objResult.InosNotification;
+                        if (objRT_InosNotification !== undefined && objRT_InosNotification !== null) {
+                            var notificationDetail = commonUtils.returnValue(objRT_InosNotification.Detail);
+                            $('#notification-data').html(notificationDetail);
+                            $('#Notifi').modal('show');
+                        }
+                    }
+                    else {
+                        var errorDetail = commonUtils.returnValue(objResult.ErrorDetail);
+                        if (!commonUtils.isNullOrEmpty(errorDetail)) {
+                            _showErrorMsg123('Lỗi', errorDetail);
+                        }
+                    }
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                }).always(function () {
+                });
+            });
+
+            ///////
+
+            if (data.Params !== null) {
+                if (data.Params.Buttons != null) {
+                    var $btncnt = $item.find('div.nt-actions').eq(0);
+                    for (var i = 0; i < data.Params.Buttons.length; ++i) {
+                        var btn = data.Params.Buttons[i];
+                        var $btn = $('<button onclick="takeNotifyAction(this);"/>').appendTo($btncnt);
+                        $btn.text(btn.Title);
+                        $btn.attr('action', btn.Action);
+                        if (btn.Css != null && btn.Css.length > 0) {
+                            $btn.addClass(btn.Css);
+                        }
+
+                    }
+                }
+                //else if (data.message != null && data.message.length > 0) {
+                //    $item.find('.nt-actions').eq(0).html(data.message);
+                //}
+                //else {
+                //    $item.find('.nt-actions').remove();
+                //}
+            }
+            else {
+                $item.find('.nt-actions').remove();
+            }
+
+            return $item;
+
+    }
+</script>
+
+<script type="text/javascript">
+    function takeNotifyAction(thiz) {
+        var evt = window.event || arguments.callee.caller.arguments[0];
+			evt.stopPropagation();
+			var $btn = $(thiz);
+			var action = $btn.attr('action');
+			var message = $btn.attr('msg');
+			var id = $btn.closest('li').attr('data-id');
+            var token = $('#form-notify input[name=__RequestVerificationToken]').val();
+			$.ajax({
+					type: 'post',
+					dataType:'json',
+					url: '@Url.Action("TakeAction", "Notification")',
+                    data: {
+                    __RequestVerificationToken: token,
+                        id: id,
+                        action: action
+                    },
+                success: function (resp) {
+                    //debugger;
+						if (resp.Success == true) {
+							$btn.closest('.nt-actions').html(resp.Message);
+							$btn.closest('li').removeClass('unread');
+
+						}
+						else alert(resp.Message);
+					}
+
+			});
+    }
+</script>
+
+<script type="text/javascript">
+    function notificationChange(thiz) {
+        var evt = window.event || arguments.callee.caller.arguments[0];
+            evt.stopPropagation();
+            var $li = $(thiz).parent().parent();
+            if ($li !== undefined && $li !== null) {
+                var id = commonUtils.returnValue($li.attr('data-id'));
+                var solutionCode = commonUtils.returnValue($li.attr('data-solutioncode'));
+                var status = commonUtils.returnValue($li.attr('data-status'));
+
+                var listInosNotification = [];
+                var objInosNotification = {};
+                objInosNotification.Id = id;
+                objInosNotification.SolutionCode = solutionCode;
+                if (status === '0') {
+                    objInosNotification.Status = '1';
+                }
+                else {
+                    objInosNotification.Status = '0';
+                }
+                listInosNotification.push(objInosNotification);
+                var modelCur = commonUtils.returnJSONValue(listInosNotification);
+                var token = $('#form-notify input[name=__RequestVerificationToken]').val();
+                var url = '@Url.Action("Notification_Change", "Notification")';
+                $.ajax({
+                    type: 'post',
+                    data: {
+                        __RequestVerificationToken: token
+                        , model: modelCur
+                    },
+                    url: url,
+                    dataType: 'json',
+                    async: false,
+                    beforeSend: function () {
+
+                    }
+                }).done(function (objResult) {
+                    if (objResult.Success) {
+                        var iCount = 0;
+                        var count = $('.notification-cd').text();
+                        if (commonUtils.isNullOrEmpty(count)) {
+                            count = '0';
+                        }
+                        iCount = commonUtils.parseInt(count);
+                        if (iCount >= 0) {
+                            var $ulNotify = undefined;
+                            var $ulNotifyIndex = undefined;
+                            if ($('#notification-list').length > 0) {
+                                $ulNotify = $('#notification-list');
+                            }
+                            if ($('#notification-list-index').length > 0) {
+                                $ulNotifyIndex = $('#notification-list-index');
+                            }
+                            if (objInosNotification.Status === '1') {
+                                iCount = iCount - 1;
+                                if (iCount < 0) {
+                                    iCount = 0;
+                                }
+                                $('.notification-cd').text(iCount);
+
+                                if ($ulNotify !== undefined && $ulNotify !== null) {
+                                    var $liNotify = $ulNotify.find('li[data-id="' + id + '"]');
+                                    if ($liNotify !== undefined && $liNotify !== null) {
+                                        updateLi($liNotify, '1');
+                                    }
+                                }
+
+                                if ($ulNotifyIndex !== undefined && $ulNotifyIndex !== null) {
+                                    var $liNotifyIndex = $ulNotifyIndex.find('li[data-id="' + id + '"]');
+                                    if ($liNotifyIndex !== undefined && $liNotifyIndex !== null) {
+                                        updateLi($liNotifyIndex, '1');
+                                    }
+                                }
+                            }
+                            else {
+                                iCount = iCount + 1;
+                                $('.notification-cd').text(iCount);
+
+                                if ($ulNotify !== undefined && $ulNotify !== null) {
+                                    var $liNotify = $ulNotify.find('li[data-id="' + id + '"]');
+                                    if ($liNotify !== undefined && $liNotify !== null) {
+                                        updateLi($liNotify, '0');
+                                    }
+                                }
+
+                                if ($ulNotifyIndex !== undefined && $ulNotifyIndex !== null) {
+                                    var $liNotifyIndex = $ulNotifyIndex.find('li[data-id="' + id + '"]');
+                                    if ($liNotifyIndex !== undefined && $liNotifyIndex !== null) {
+                                        updateLi($liNotifyIndex, '0');
+                                    }
+                                }
+
+                            }
+
+                        }
+
+                    }
+                    else {
+
+                        _showErrorMsg123('Lỗi', objResult.Detail);
+                    }
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    //failFunction(jqXHR, textStatus, errorThrown);
+                }).always(function () {
+                    //alwaysFunction();
+                });
+            }
+    }
+</script>
+
+<script type="text/javascript">
+    function notificationAllRead() {
+        var iCount = $('ul#notification-list li.unread').length;
+            if (iCount > 0) {
+                var listInosNotification = [];
+
+                var listLi = [];
+
+                $('ul#notification-list li.unread').each(function () {
+
+                    var liCur = $(this);
+                    var id = commonUtils.returnValue($(liCur).attr('data-id'));
+                    var solutionCode = commonUtils.returnValue($(liCur).attr('data-solutioncode'));
+                    var objInosNotification = {};
+                    objInosNotification.Id = id;
+                    objInosNotification.SolutionCode = solutionCode;
+                    objInosNotification.Status = '1';
+                    listInosNotification.push(objInosNotification);
+                    listLi.push($(liCur));
+                });
+
+                if (listInosNotification !== undefined && listInosNotification !== null) {
+                    var modelCur = commonUtils.returnJSONValue(listInosNotification);
+                    var token = $('#form-notify input[name=__RequestVerificationToken]').val();
+                    var url = '@Url.Action("Notification_Change", "Notification")';
+                    $.ajax({
+                        type: 'post',
+                        data: {
+                            __RequestVerificationToken: token
+                            , model: modelCur
+                        },
+                        url: url,
+                        dataType: 'json',
+                        async: false,
+                        beforeSend: function () {
+
+                        }
+                    }).done(function (objResult) {
+                        if (objResult.Success) {
+                            var iCount = 0;
+                            var count = $('.notification-cd').text();
+                            if (commonUtils.isNullOrEmpty(count)) {
+                                count = '0';
+                            }
+                            iCount = commonUtils.parseInt(count);
+                            if (iCount >= 0) {
+                                iCount = iCount - listLi.length;
+                                if (iCount < 0) {
+                                    iCount = 0;
+                                }
+                                $('.notification-cd').text(iCount);
+
+                                for (var i = 0; i < listLi.length; i++) {
+                                    var $li = listLi[i];
+
+                                    updateLi($li, '1');
+                                }
+
+                                // update cho mình hình index nếu có
+                                var $ulNotifyIndex = undefined;
+                                if ($('#notification-list-index').length > 0) {
+                                    $ulNotifyIndex = $('#notification-list-index');
+                                }
+                                if ($ulNotifyIndex !== undefined && $ulNotifyIndex !== null) {
+                                    for (var i = 0; i < listLi.length; i++) {
+                                        var idCur = commonUtils.returnValue($(listLi[i]).attr('data-id'));
+                                        var $liNotifyIndex = $ulNotifyIndex.find('li[data-id="' + idCur + '"]');
+                                        if ($liNotifyIndex !== undefined && $liNotifyIndex !== null) {
+                                            updateLi($liNotifyIndex, '1');
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                        else {
+
+                            _showErrorMsg123('Lỗi', objResult.Detail);
+                        }
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        //failFunction(jqXHR, textStatus, errorThrown);
+                    }).always(function () {
+                        //alwaysFunction();
+                    });
+                }
+
+            }
+    }
+</script>
+
+<script type="text/javascript">
+    function notificationAllReadIndex() {
+        var iCount = $('ul#notification-list-index li.unread').length;
+            if (iCount > 0) {
+                var listInosNotification = [];
+
+                var listLi = [];
+
+                $('ul#notification-list-index li.unread').each(function () {
+
+                    var liCur = $(this);
+                    var id = commonUtils.returnValue($(liCur).attr('data-id'));
+                    var solutionCode = commonUtils.returnValue($(liCur).attr('data-solutioncode'));
+                    var objInosNotification = {};
+                    objInosNotification.Id = id;
+                    objInosNotification.SolutionCode = solutionCode;
+                    objInosNotification.Status = '1';
+                    listInosNotification.push(objInosNotification);
+                    listLi.push(liCur);
+                });
+
+                if (listInosNotification !== undefined && listInosNotification !== null) {
+                    var modelCur = commonUtils.returnJSONValue(listInosNotification);
+                    var token = $('#form-notify input[name=__RequestVerificationToken]').val();
+                    var url = '@Url.Action("Notification_Change", "Notification")';
+                    $.ajax({
+                        type: 'post',
+                        data: {
+                            __RequestVerificationToken: token
+                            , model: modelCur
+                        },
+                        url: url,
+                        dataType: 'json',
+                        async: false,
+                        beforeSend: function () {
+
+                        }
+                    }).done(function (objResult) {
+                        if (objResult.Success) {
+                            var iCount = 0;
+                            var count = $('.notification-cd').text();
+                            if (commonUtils.isNullOrEmpty(count)) {
+                                count = '0';
+                            }
+                            iCount = commonUtils.parseInt(count);
+                            if (iCount > 0) {
+                                iCount = iCount - listLi.length;
+                                if (iCount <= 0) {
+                                    iCount = 0;
+                                }
+                                $('.notification-cd').text(iCount);
+
+                                for (var i = 0; i < listLi.length; i++) {
+                                    var $li = listLi[i];
+
+                                    updateLi($li, '1');
+
+                                }
+                                //debugger;
+                                // update cho popup notify
+                                var $ulNotify = undefined;
+                                if ($('#notification-list').length > 0) {
+                                    $ulNotify = $('#notification-list');
+                                }
+                                if ($ulNotify !== undefined && $ulNotify !== null) {
+                                    for (var i = 0; i < listLi.length; i++) {
+                                        var idCur = commonUtils.returnValue($(listLi[i]).attr('data-id'));
+                                        var $liNotify = $ulNotify.find('li[data-id="' + idCur + '"]');
+                                        if ($liNotify !== undefined && $liNotify !== null) {
+                                            updateLi($liNotify, '1');
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                        else {
+
+                            _showErrorMsg123('Lỗi', objResult.Detail);
+                        }
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        //failFunction(jqXHR, textStatus, errorThrown);
+                    }).always(function () {
+                        //alwaysFunction();
+                    });
+                }
+
+            }
+    }
+</script>
+
+<script type="text/javascript">
+    function updateLi($li, status) {
+        if ($li !== undefined && $li !== null) {
+            if (status === '1') {
+                $li.attr('data-status', '1');
+                if ($li.hasClass('unread')) {
+                    $li.removeClass('unread')
+                }
+                if (!$li.hasClass('read')) {
+                    $li.addClass('read')
+                }
+                var $span = $li.find('span.button-alert-notifi');
+                if ($span !== undefined && $span !== null) {
+                    $span.attr('data-original-title', 'Đánh dấu chưa đọc');
+                    if ($span.hasClass('button-alert-notifi-unread')) {
+                        $span.removeClass('button-alert-notifi-unread');
+                    }
+                    if (!$span.hasClass('button-alert-notifi-read')) {
+                        $span.addClass('button-alert-notifi-read');
+                    }
+                }
+            }
+            else if (status === '0') {
+                $li.attr('data-status', '0');
+                if ($li.hasClass('read')) {
+                    $li.removeClass('read')
+                }
+                if (!$li.hasClass('unread')) {
+                    $li.addClass('unread')
+                }
+                var $span = $li.find('span.button-alert-notifi');
+                if ($span !== undefined && $span !== null) {
+                    $span.attr('data-original-title', 'Đánh dấu đã đọc');
+                    if ($span.hasClass('button-alert-notifi-read')) {
+                        $span.removeClass('button-alert-notifi-read');
+                    }
+                    if (!$span.hasClass('button-alert-notifi-unread')) {
+                        $span.addClass('button-alert-notifi-unread');
+                    }
+                }
+            }
+        }
+    }
+
+    function closeModalPopupNotification() {
+        $('#notification-data').html('');
+        $('#Notifi').modal("hide");
+    }
+</script>
+
+
+
+<script type="text/javascript">
+    // Biến dùng kiểm tra nếu đang gửi ajax thì ko thực hiện gửi thêm
+    var is_busy = false;
+    // Biến lưu trữ trang hiện tại
+    var page = 0;
+    // Biến lưu trữ rạng thái phân trang
+    var stopped = false;
+
+    $(document).ready(function () {
+        $("#notification-list").scroll(function () {
+            var ipage = $('input#pagenotificationhd').val();
+            var pagenotification = commonUtils.parseInt(ipage);
+            var scrollTop = $(this).scrollTop();
+            var iHeight = parseInt(scrollTop);
+            var ulHeight = $(this).height();
+            //if (iHeight >= ulHeight)
+            //if (iHeight + 270 >= ulHeight) {
+			if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+                // Nếu đang gửi ajax thì ngưng
+                if (is_busy === true) {
+                    return false;
+                }
+
+                // Nếu hết dữ liệu thì ngưng
+                if (stopped === true) {
+                    return false;
+                }
+
+                // Thiết lập đang gửi ajax
+                is_busy = true;
+
+                // Tăng số trang lên 1
+                page++;
+                if (page >= pagenotification) {
+                    stopped = true;
+                    return false;
+                } else {
+                    //// Hiển thị loadding
+                    //$loadding.removeClass('hidden');
+
+                    var iCountLi = $('ul#notification-list li.notifi-content').length;
+                    var token = $('#form-notify input[name=__RequestVerificationToken]').val();
+                    var url = '@Url.Action("Search", "Notification")';
+                    //var pageCur = page - 1;
+                    $.ajax({
+                        type: 'post',
+                        data: {
+                            __RequestVerificationToken: token
+                            , page: page
+                            , totalitem: iCountLi
+                        },
+                        url: url,
+                        dataType: 'json',
+                        async: false,
+                        beforeSend: function () {
+                            //if ($("#show-loading").length > 0) {
+                            //    $("#show-loading").remove();
+                            //}
+                        }
+                    }).done(function (objResult) {
+                        doneFunctionSearch(objResult);
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        //failFunction(jqXHR, textStatus, errorThrown);
+                    }).always(function () {
+                        //alwaysFunction();
+                        is_busy = false;
+                    });
+                }
+
+
+                return false;
+
+            }
+        });
+    });
+
+    function doneFunctionSearch(objResult) {
+        if (objResult !== undefined && objResult !== null) {
+            if (objResult.Success) {
+                var dateCur = '';
+                //debugger;
+                if (!commonUtils.isNullOrEmpty(objResult.DateTime) && commonUtils.checkDate(objResult.DateTime)) {
+                    dateCur = commonUtils.returnValue(objResult.DateTime);
+                    var daterejult = new Date(dateCur);
+                    var month = daterejult.getMonth() + 1;
+                    strdateCur = daterejult.getFullYear() + "-" + month + "-" + daterejult.getDate() + " " + daterejult.getHours() + ":" + daterejult.getMinutes() + ":" + daterejult.getSeconds();
+                    dateCur = new Date(strdateCur);
+                }
+
+                var objInosNotificationResult = objResult.InosNotificationResult;
+
+                if (objInosNotificationResult !== undefined && objInosNotificationResult !== null) {
+
+                    if (commonUtils.checkElementExists('.notification-cd')) {
+                        iCount = objInosNotificationResult.UnreadCount;
+                        $('.notification-cd').text(iCount);
+                    }
+
+                    var listInosNotification = objInosNotificationResult.List;
+                    if (listInosNotification !== undefined && listInosNotification !== null && listInosNotification.length > 0) {
+                        $('#pagenotificationhd').val(commonUtils.parseInt(objInosNotificationResult.PageCount));
+
+                        var $ul = $('#notification-list');
+                        if ($ul !== undefined && $ul !== null) {
+                            var dUtcOffset = 0.0;
+                            var utcOffset = commonUtils.returnValueText('#UtcOffset');
+                            if (commonUtils.isNullOrEmpty(utcOffset)) {
+                                utcOffset = '0';
+                            }
+                            dUtcOffset = commonUtils.parseFloat(utcOffset);
+                            //debugger;
+
+                            for (var i = 0; i < listInosNotification.length; i++) {
+                                var objInosNotification = listInosNotification[i];
+                                objInosNotification.UtcOffset = dUtcOffset;
+                                objInosNotification.DateTime = dateCur;
+                                var $item = genNotifyItem(objInosNotification);
+                                $ul.append($item);
+                            }
+
+                        }
+
+                        $('[data-toggle="tooltip"]').tooltip();
+                    }
+                }
+
+            } else {
+                if (!commonUtils.isNullOrEmpty(objResult.Detail)) {
+                    _showErrorMsg123('Lỗi!', objResult.Detail);
+                }
+            }
+        }
+    }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

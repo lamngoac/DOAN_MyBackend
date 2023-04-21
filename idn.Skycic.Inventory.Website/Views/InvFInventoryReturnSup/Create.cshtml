@@ -1,0 +1,292 @@
+﻿@model RT_InvF_InventoryReturnSup
+
+@{
+    var Lst_Mst_Inventory = ViewBag.Lst_Mst_Inventory as List<Mst_Inventory>;
+    var Lst_Mst_InventoryType = ViewBag.Lst_Mst_InventoryType as List<Mst_InventoryType>;
+    var Lst_Mst_InventoryLevelType = ViewBag.Lst_Mst_InventoryLevelType as List<Mst_InventoryLevelType>;
+    var IF_InvReturnSupNo = ViewBag.IF_InvReturnSupNo == null ? "" : ViewBag.IF_InvReturnSupNo.ToString();
+
+    var lst_Mst_InvOutType = new List<Mst_InvOutType>();
+    if (ViewBag.Lst_Mst_InvOutType != null)
+    {
+        lst_Mst_InvOutType = ViewBag.Lst_Mst_InvOutType as List<Mst_InvOutType>;
+    }
+
+    var lstCustomer = new List<Mst_Customer>();
+    if (ViewBag.Lst_MstCustomer != null)
+    {
+        lstCustomer = ViewBag.Lst_MstCustomer as List<Mst_Customer>;
+    }
+
+    var lst_Mst_ProductUI = new List<Mst_ProductUI>();
+    if (ViewBag.Lst_Mst_ProductUI != null)
+    {
+        lst_Mst_ProductUI = ViewBag.Lst_Mst_ProductUI;
+    }
+
+    string viewType = "create";
+
+    var flagActive = "0";
+    var flagdisplaynone = "";
+    var userState = ViewBag.UserState as UserState;
+    if (userState.RT_Mst_Sys_Config != null && userState.RT_Mst_Sys_Config.Lst_Mst_Sys_Config != null && userState.RT_Mst_Sys_Config.Lst_Mst_Sys_Config.Count > 0)
+    {
+        foreach (var item in userState.RT_Mst_Sys_Config.Lst_Mst_Sys_Config)
+        {
+            if (item.SysConfigID.Equals("IF_InvReturnSup"))
+            {
+                flagActive = CUtils.StrValue(item.FlagActive);
+
+            }
+        }
+    }
+
+    if (flagActive.Equals("0"))
+    {
+        flagdisplaynone = "display-none";
+    }
+}
+@{
+    ViewBag.Title = "Tạo YC trả hàng NCC";
+}
+
+<style>
+    .margin-left-12 {
+        margin-left: 12% !important;
+    }
+</style>
+<script>
+    setAdminCurrentUrl('@Url.Action("Index", "InvFInventoryReturnSup")');
+</script>
+@*<script src="~/Content/assets/js/myjs/trahangNCC.js"></script>*@
+<script src="~/Scripts/mine/InvFInventoryReturnSup.js"></script>
+
+
+@section RenderButton {
+<div class="col-6 breadcrumb-menu">
+    <div class="form-group">
+        @RenderItemFormat("BTN_CREATE_INVFINVENTORYRETURNSUP", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnSave\" onclick=\"SaveData('0');\"><i class=\"fa fa-save\" aria-hidden=\"true\"></i> Lưu</a>", "", "")
+        @RenderItemFormat("BTN_CREATE_AND_NEW_INVFINVENTORYRETURNSUP", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnSave\" onclick=\"SaveData('1');\"><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i> Lưu và tạo mới</a>", "", "")
+    </div>
+</div>
+}
+
+
+
+@*<div class="mt-3">
+    <div class="col-12">
+        <div class="form-group" style="float: left">
+            @RenderItemFormat("BTN_CREATE_INVFINVENTORYRETURNSUP", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnSave\" onclick=\"SaveData('0');\"><i class=\"fa fa-save\" aria-hidden=\"true\"></i> Lưu</a>", "", "")
+            @RenderItemFormat("BTN_CREATE_AND_NEW_INVFINVENTORYRETURNSUP", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnSave\" onclick=\"SaveData('1');\"><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i> Lưu và tạo mới</a>", "", "")
+
+        </div>
+    </div>
+</div>
+<br />*@
+
+<div class="mt-3">
+    <div class="col-12">
+        @using (Html.BeginForm("Create", "InvFInventoryReturnSup", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+
+            <div class="col-12 row">
+                <div class="col-12 row">
+                    <aside class="col-md-4">
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="IF_InvOutNo">
+                                @("Số trả hàng NCC".HtmlItemString("IF_InvReturnSupNo"))
+                            </label>
+                            <div class="col-md-8">
+                                <input type="text" class="col-md-12 text-bold" name="IF_InvReturnSupNo" id="IF_InvReturnSupNo" readonly="readonly" value="@IF_InvReturnSupNo" />
+                            </div>
+                        </div>
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="InvCodeOut">
+                                @("Kho xuất".HtmlItemString("invf_inventoryout"))
+                                <span style="color: red "> *</span>
+                            </label>
+                            <div class="col-md-8">
+                                <span class="block input-icon input-icon-right">
+                                    <select id="InvCodeOut" name="InvCodeOut" showpopup-control-searchdata="#ShowPopupMstInventory" class="col-md-12 mstinventory">
+                                        <optgroup label="">
+                                            <option value="">--Chọn kho xuất--</option>
+                                            @if (Lst_Mst_Inventory != null && Lst_Mst_Inventory.Count > 0)
+                                            {
+                                                foreach (var item in Lst_Mst_Inventory)
+                                                {
+                                                    var invCode = CUtils.StrValue(item.InvCode);
+                                                    var invName = CUtils.StrValue(item.InvName);
+                                                    <option invBUPattern="@(item.InvBUPattern == null ? "" : item.InvBUPattern)" value="@MvcHtmlString.Create(invCode)">@MvcHtmlString.Create(invCode + " - " + invName)</option>
+                                                }
+                                            }
+                                            <option value="Search">Tìm kiếm</option>
+                                        </optgroup>
+                                        @*<option value="SEARCHDATA">@("Tìm kiếm".HtmlItemString("invf_inventoryout"))</option>*@
+                                    </select>
+                                </span>
+                            </div>
+                        </div>
+                    </aside>
+                    <aside class="col-md-4">
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="input1">
+                                @("Nhà cung cấp".HtmlItemString("customer_inventoryout"))
+                                <span style="color: red "> *</span>
+                            </label>
+                            <div class="col-md-8">
+                                <select class="col-md-12" id="CustomerCode" name="CustomerCode" onchange="ChangeCustomer(this);">
+                                    <option value="">--Chọn nhà cung cấp--</option>
+                                    @if (lstCustomer != null && lstCustomer.Count > 0)
+                                    {
+                                        foreach (var item in lstCustomer)
+                                        {
+                                            <option value="@item.CustomerCodeSys">@item.CustomerCode - @item.CustomerName</option>
+                                        }
+                                        <option value="Search">Tìm kiếm</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="IF_InvInNo">
+                                @("Số phiếu nhập".HtmlItemString("IF_InvInNo"))
+                            </label>
+                            <div class="col-md-8">
+                                <input type="text" @*onchange="FillCustomer(this);"*@ class="col-md-12" readonly="readonly" name="IF_InvInNo" id="IF_InvInNo" />
+
+                                
+                            </div>
+                        </div>
+                    </aside>
+                    <aside class="col-md-4 ">
+                        <div style="padding-left: 30px;margin-bottom: 9px;">
+                            <input type="checkbox" id="FlagTraTuPN" onchange="ChangeTraTuPN(this);" />
+                            <label>
+                                @("Trả từ phiếu nhập".HtmlItemString(""))
+                            </label>
+                        </div>
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="Remark">
+                                @("Nội dung trả hàng".HtmlItemString("remark"))
+                            </label>
+                            <div class="col-md-8">
+                                <textarea class="col-md-12" name="Remark" id="Remark" rows="2"></textarea>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+
+            <div class="position-relative nav-container-price" style="height: 37.5px">
+                <div class="nav-price">
+                    <div class="form-group">
+                        <label class="control-label" for="TotalValReturnSup">
+                            @("Tổng tiền hàng:".HtmlItemString("labelTotalValReturnSup"))
+                        </label>
+                        <div class="control-input">
+                            <input type="text" class="text-right TotalValReturnSup" readonly="readonly" name="TotalValReturnSup" id="TotalValReturnSup" />
+
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label" for="TotalValReturnSupDesc">
+                            @("Giảm giá:".HtmlItemString("labelTotalValReturnSupDesc"))
+                        </label>
+                        <div class="control-input">
+                            <input type="text" class="text-right TotalValReturnSupDesc" readonly="readonly" name="TotalValReturnSupDesc" id="TotalValReturnSupDesc" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="TotalValOutAfterDesc">
+                            @("Tổng tiền thanh toán:".HtmlItemString("labelTotalValReturnSupAfterDesc"))
+                        </label>
+                        <div class="control-input">
+                            <input type="text" class="text-right TotalValReturnSupAfterDesc" readonly="readonly" name="TotalValReturnSupAfterDesc" id="TotalValReturnSupAfterDesc" />
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+
+            <div class="col-12 row">
+                <div class="tab-content">
+                    <div id="ProductInformation" class="container-fluid padding-left-right-15 tab-pane active">
+                        @Html.Partial("Load_Table_InvF_InventoryReturnSup", new ViewDataDictionary() { { "lst_Mst_ProductUI", lst_Mst_ProductUI }, { "UserState", userState } })
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@*@Html.Partial("_TemplateLotAndSerial")*@
+@*@Html.Partial("LstProduct")*@
+@Html.Partial("_ModalShow", new ViewDataDictionary() { { "ListCustomer", lstCustomer } })
+@Html.Partial("~/Views/ModalCommon/_ModalShow.cshtml")
+@section Scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.select2-selection').select2();
+            $('#FlagIn_Out').select2({
+                minimumResultsForSearch: -1
+            });
+
+            $('select#InvCodeOut').select2().on('select2:close', function () { commonUtils.showPopup(this); });
+            $('select#CustomerCode').select2().on('select2:close', function () { commonUtils.showPopup(this); });
+            $('select#invinProductCode').select2().on('select2:close', function () { commonUtils.showPopup(this); });
+        format_Number();
+        });
+    </script>
+
+
+    <script type="text/javascript">
+        function SaveData(flagRedirect) {
+            debugger
+             var ajaxSettings = {};
+        ajaxSettings.Type = 'post';
+        ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Save", "InvFInventoryReturnSup")';
+            var objInvF_InventoryReturnSup = new InvFInventoryReturnSup();
+
+
+            objInvF_InventoryReturnSup.ActionType = "create";
+            objInvF_InventoryReturnSup.ajaxSettings = ajaxSettings;
+            objInvF_InventoryReturnSup.saveData(flagRedirect);
+            //objInvF_InventoryReturnSup.
+        }
+
+    </script>
+
+
+    <script type="text/javascript">
+        function format_Number(){
+            var tableName = 'InvF_InventoryReturnSup';
+            var totalValReturnSupFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValReturnSup');
+            var totalValReturnSupDescFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValReturnSupDesc');
+            var totalValReturnSupAfterDescFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValReturnSupAfterDesc');
+            $('#TotalValReturnSup').number(true, totalValReturnSupFormat);
+            $('#TotalValReturnSupDesc').number(true, totalValReturnSupDescFormat);
+            $('#TotalValReturnSupAfterDesc').number(true, totalValReturnSupAfterDescFormat);
+
+
+        }
+    </script>
+
+
+}
+
+
+@Html.Partial("Template", Model, new ViewDataDictionary()
+{
+       { "ViewType", viewType },
+       { "UserState", userState }
+})
+
+@Html.Partial("Template_Scripts", Model, new ViewDataDictionary()
+{
+        { "ViewType", viewType },
+})
+

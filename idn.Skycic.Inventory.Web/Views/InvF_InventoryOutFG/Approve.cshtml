@@ -1,0 +1,266 @@
+﻿@model InvF_InventoryOutFG
+@{
+    Layout = "~/Views/Shared/_LayoutQuantri.cshtml";
+    var title = "";
+    ViewBag.Title = title;
+    var today = ViewBag.Today as string;
+    var listDtl = new List<InvF_InventoryOutFGDtl>();
+}
+<script type="text/javascript">
+    var parents = new Array();
+    parents.push("@Url.Action("Index", "InvF_InventoryInFG")");
+    parents.push("");
+    var parentsText = new Array();
+    parentsText.push("@MvcHtmlString.Create("Quản lý kho thành phẩm")");
+    parentsText.push("@MvcHtmlString.Create(title)");
+    setAdminCurrentTag(parents, parentsText);
+</script>
+
+<div class="">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <div class="row">
+                        @using (Html.BeginForm("Approve", "InvF_InventoryInFG", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+
+                            <div class="col-xs-12">
+                                <div class="title">
+                                    <p class="">@MvcHtmlString.Create("DUYỆT PHIẾU XUẤT KHO")</p>
+                                </div>
+                            </div>
+                            <div class="col-xs-12" style="padding-top: 10px;">
+                                <aside class="col-xs-6">
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="IF_InvOutFGNo" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500">Số phiếu xuất <span style="color: red;">*</span></label>
+                                        <div class="col-xs-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="IF_InvOutFGNo" name="IF_InvOutFGNo" class="col-xs-11 IF_InvOutFGNo" value="@Model.IF_InvOutFGNo" autocomplete="off" readonly />
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="CreateDTime" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">Ngày tạo</label>
+                                        <div class="col-xs-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="CreateDTime" name="CreateDTime" class="col-xs-11 CreateDTime" value="@Model.CreateDTimeSv" autocomplete="off" readonly />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </aside>
+                                <aside class="col-xs-6">
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="IF_InvOutFGNo" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500">Người tạo</label>
+                                        <div class="col-xs-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="CreateBySv" name="CreateBySv" class="col-xs-11 CreateBySv" value="@Model.CreateBySv" autocomplete="off" readonly />
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="CreateDTime" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500">Loại phiếu xuất</label>
+                                        <div class="col-xs-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="FormOutType" name="FormOutType" class="col-xs-11 FormOutType" value="@Model.FormOutType" autocomplete="off" readonly />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </aside>
+                            </div>
+                            <div class="col-xs-12">
+                                <div class="panel-heading">
+                                    <div class="title">
+                                        <p class="">@MvcHtmlString.Create("DANH SÁCH SẢN PHẨM")</p>
+                                    </div>
+                                </div>
+                                @*<div class="panel-heading" style="background: #edf7fc;">
+                                        <h1 class="panel-title">
+                                            @MvcHtmlString.Create("Danh sách sản phẩm")
+                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                            @RenderItemFormat("BTN_PX_KHO_TP_IMPORT_EXCEL", "<a class=\"btn font-color mybtn-Button\" onclick=\"ShowPopupImportExcel()\" href=\"javascript:void(0);\" style=\"margin-left: 10px; \"><i class=\"ace-icon fa fa-upload bigger-120\"></i>Nhập Excel</a>", "", "")
+                                        </h1>
+                                    </div>*@
+                            </div>
+                            <div class="col-xs-12" style="padding-top: 15px;">
+                                <div class="col-xs-12">
+                                    <div class="scrollable-horizontal padding-left-0 padding-right-0 div-scrollable" data-size="3200" style="padding-top: 0!important;">
+                                        <div style="width: 100%; float: left;">
+                                            <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="center cell-50">
+                                                            <label class="pos-rel">
+                                                                <input type="checkbox" class="ace" onclick="CheckAll(this);" />
+                                                                <span class="lbl"></span>
+                                                            </label>
+                                                        </th>
+                                                        <th class="text-center cell-150">
+                                                            Mã sản phẩm
+                                                        </th>
+                                                        <th class="text-center cell-200">
+                                                            Tên sản phẩm
+                                                        </th>
+                                                        <th class="text-center cell-200">
+                                                            Số lượng
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                        <div class="scrollable" style="width: 100%; float: left;">
+                                            <table id="dynamic-table-tbody" class="table table-striped table-bordered table-hover table-tbody">
+                                                <tbody id="table-tbodyID">
+                                                    @*@Html.Partial("ImportExcel", Model.lstInvFInventoryOutFGDtls, new ViewDataDictionary() { { "IsEdit", "edit" }, { "Disabled", "disabled" } })*@
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="hr hr-18 hr-double dotted"></div>
+
+                            </div>
+
+                            <div class="col-xs-12" style="padding-top: 15px;">
+                                <div class="col-md-offset-3 col-md-9">
+
+
+                                    @RenderItemFormat("BTN_PX_KHO_TP_DUYET", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-left: 10px; padding-left: 15px!important; padding-right: 15px!important; \" onclick=\"SaveData();\"><i class=\"ace-icon fa fa-floppy-o bigger-110\"></i>Duyệt</a>", "", "")
+
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+<!-- Template -->
+
+
+<script type="text/javascript">
+    processAjaxForm($('#manageForm'), function (response) {
+        processAjaxFormResult(response);
+
+    });
+</script>
+
+@*Active Menu*@
+<script type="text/javascript">
+    setAdminCurrentUrl('@Url.Action("Update", "InvF_InventoryOutFG")');
+</script>
+@*Set focus*@
+<script type="text/javascript">
+    var _getForm = document.getElementById("manageForm");
+    _getForm.addEventListener('reset', function () {
+        document.getElementById("IF_InvOutFGNo").focus()
+    })
+</script>
+
+<script type="text/javascript">
+    function SaveData() {
+        debugger;
+        var rows = $("tbody#table-tbodyID tr.trdata").length;
+        if (rows > 0)
+        {
+            var check = CheckForm();
+            if (check)
+            {
+                var trArr = $('tbody#table-tbodyID tr.trdata').has('input[name="ckb"]:checked');
+                if (trArr !== null && trArr.length > 0)
+                {
+                    var tem = new Object();
+                    var IF_InvOutFGNo = $('#IF_InvOutFGNo').val();
+                    var createDTime = $('#CreateDTime').val();
+                    //var remark = $('#Remark').val();
+                    tem.IF_InvOutFGNo = IF_InvOutFGNo;
+                    tem.CreateDTime = createDTime;
+                    //tem.Remark = remark;
+                    var InvF_InventoryOutFGDtls = [];
+                    for (var i = 0; i < trArr.length; i++)
+                    {
+                        var trCur = trArr[i];
+                        if (trCur !== null && trCur !== undefined)
+                        {
+                            var idx = $(trCur).attr('idx');
+                            var temDtlCur = {};
+                            temDtlCur.PartCode = $(trCur).find('input[type="hidden"][name="ListInvF_InventoryOutFGDtl[' + idx + '].PartCode"]').val();
+                            temDtlCur.Qty = $(trCur).find('input[type="text"][name="ListInvF_InventoryOutFGDtl[' + idx + '].Qty"]').val();
+
+
+                            InvF_InventoryOutFGDtls.push(temDtlCur);
+                        }
+                    }
+                    tem.lstInvFInventoryOutFGDtls = InvF_InventoryOutFGDtls;
+
+                    //var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+                    var token = $('input[name=__RequestVerificationToken]').val();
+
+                    var modelCur = JSON.stringify(tem);
+                    var url = '@(Url.Action("Approved", "InvF_InventoryOutFG"))';
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        data: {
+                            __RequestVerificationToken: token
+                            , ifinvoutfgno: IF_InvOutFGNo
+                        },
+                        traditional: true,
+                        //contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.Success) {
+                                alert(data.Messages);
+                                window.location.href = "@Url.Action("Index", "InvF_InventoryOutFG")";
+                            } else {
+                                _showErrorMsg(data.Detail);
+                            }
+
+                        }, error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            if (textStatus == 'Unauthorized') {
+                                alert('custom message. Error: ' + errorThrown);
+                            }
+                        }
+                    });
+
+                }
+                else {
+                    alert('@MvcHtmlString.Create("Chưa chọn sản phẩm cho phiếu xuất kho!")');
+                    return false;
+                }
+            }
+
+        }
+        else
+        {
+            alert('@MvcHtmlString.Create("Lưới dữ liệu trống!")');
+            return false;
+        }
+
+    }
+
+    function CheckForm() {
+        var checkform = true;
+        @*if (!CheckIsNullOrEmpty('#IF_InvOutFGNo', 'has-error-fix', '@MvcHtmlString.Create("Số phiếu xuất không được trống!")'))
+        {
+            checkform = false;
+            return false;
+        }*@
+        return checkform;
+    }
+</script>
+
+
+
+
+
+
+

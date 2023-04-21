@@ -1,0 +1,528 @@
+﻿@{
+    var allSolutions = System.Web.HttpContext.Current.Session["AllSolutions"] as List<inos.common.Model.OrgSolution>;
+    var allSolutionsNotUsed = System.Web.HttpContext.Current.Session["AllSolutionsNotUsed"] as List<inos.common.Model.OrgSolution>;
+
+    if (allSolutions == null)
+    {
+        allSolutions = new List<inos.common.Model.OrgSolution>();
+    }
+    var velocaSolution = allSolutions.Where(x => x.SolutionCode.Equals("VELOCA")).FirstOrDefault();
+    var dmsPlusSolution = allSolutions.Where(x => x.SolutionCode.Equals("DMSPLUS")).FirstOrDefault();
+    var inventorySolution = allSolutions.Where(x => x.SolutionCode.Equals("INVENTORY")).FirstOrDefault();
+    var qcontractSolution = allSolutions.Where(x => x.SolutionCode.Equals("QCONTRACT")).FirstOrDefault();
+    var hddtSolution = allSolutions.Where(x => x.SolutionCode.Equals("HDDT")).FirstOrDefault();
+
+    var allSolutionsCur = new List<inos.common.Model.OrgSolution>();
+
+    allSolutionsCur.Add(new inos.common.Model.OrgSolution()
+    {
+        SolutionCode = "IDEALER"
+    });
+
+    if (velocaSolution != null)
+    {
+        allSolutionsCur.Add(velocaSolution);
+    }
+
+    if (dmsPlusSolution != null)
+    {
+        allSolutionsCur.Add(dmsPlusSolution);
+    }
+
+    if (inventorySolution != null)
+    {
+        allSolutionsCur.Add(inventorySolution);
+    }
+
+    if (qcontractSolution != null)
+    {
+        allSolutionsCur.Add(qcontractSolution);
+    }
+
+    if (hddtSolution != null)
+    {
+        allSolutionsCur.Add(hddtSolution);
+    }
+
+    allSolutionsCur.Add(new inos.common.Model.OrgSolution()
+    {
+        SolutionCode = "ACCOUNT"
+    });
+
+    var homeinosurl = System.Configuration.ConfigurationManager.AppSettings["HomeInosUrl"];
+    var IdealerSolutionLink = System.Configuration.ConfigurationManager.AppSettings["SOLUTION_IDEALER"];
+    var VelocaSolutionLink = System.Configuration.ConfigurationManager.AppSettings["SOLUTION_VELOCA"];
+    var DMSPlusSolutionLink = System.Configuration.ConfigurationManager.AppSettings["SOLUTION_DMSPLUS"];
+    var InventorySolutionLink = System.Configuration.ConfigurationManager.AppSettings["SOLUTION_INVENTORY"];
+    var QContractSolutionLink = System.Configuration.ConfigurationManager.AppSettings["SOLUTION_QCONTRACT"];
+    var HDDTSolutionLink = System.Configuration.ConfigurationManager.AppSettings["SOLUTION_HDDT"];
+    var AccountSolutionLink = System.Configuration.ConfigurationManager.AppSettings["SOLUTION_ACCOUNT"];
+}
+<link href="~/Content/Notify.css" rel="stylesheet" />
+<style>
+    ul.main-menu li {
+        position: relative;
+        margin-left: 10px;
+    }
+
+    ul.main-menu .dropdown-menu {
+        min-width: 250px;
+    }
+
+        ul.main-menu .dropdown-menu a {
+            color: #636363;
+            display: block;
+            line-height: 20px;
+        }
+
+    ul.main-menu .treeview.menu-open .treeview-menu {
+        transition: visibility 0.5s ease-out;
+        display: block;
+    }
+
+    ul.main-menu .treeview.menu-open i {
+        transform: rotate(-180deg);
+    }
+
+    ul.main-menu ul.dropdown-menu, ul.main-menu ul.dropdown-menu li {
+        padding: 0;
+        margin: 0;
+    }
+
+    ul.main-menu .dropdown-toggle::after {
+        display: none;
+    }
+
+    .dropdown-menu .treeview i {
+        float: right;
+        line-height: 20px;
+        transition: transform ease-in-out .3s,-webkit-transform ease-in-out .3s;
+    }
+
+    .main-menu li a {
+        font-family: 'SourceSansPro-Regular' !important;
+    }
+
+    .dropdown-menu.redirectweb.show {
+        display: flex;
+    }
+
+    .img-responsive-navbar {
+        width: 50%;
+        height: auto;
+    }
+
+    .dropdown-toggle.active {
+        background: #3FA177 !important;
+    }
+
+    nav.navbar .dropdown-menu li a:hover, nav.navbar .dropdown-menu li a.active {
+        border-radius: 3px;
+        color: #0B8952;
+        background: #CBEFDF !important;
+    }
+    .nav.navbar-nav li a.btn-yes {
+        text-align: center;
+        background-color: #098850 !important;
+        color: #fff !important;
+        height: 30px !important;
+        border-radius: 4px;
+        font-size: 13px !important;
+        height: 30px;
+        line-height: 20px !important;
+    }
+
+    #ShowPopupInfo a.btn-cancel {
+        text-align: center;
+        color: #fff !important;
+        height: 30px !important;
+        border-radius: 4px;
+        font-size: 13px !important;
+        height: 30px;
+        line-height: 20px !important;
+        border: 1px solid #848C89 !important;
+        background-color: #848C89 !important;
+    }
+
+    .nav.navbar-nav li a.close {
+        color: #000;
+        font-size: 32px !important;
+    }
+
+    .dropdown-menu.redirectweb.show {
+        display: flex;
+    }
+
+    .img-responsive-navbar {
+        width: auto;
+        height: 32px;
+    }
+
+    .solutioncur p {
+        margin: 0 auto;
+        line-height: 1.5em;
+        padding-top: 5px;
+        width: 100px;
+    }
+</style>
+<nav class="main-header navbar navbar-expand navbar-light color-header no-border-radius" style="max-height: 50px; position: fixed; width: 100%; border-bottom: 3px solid #E75E24">
+    <!-- Left navbar links -->
+    @*<ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" data-widget="pushmenu" href="#" style="padding: 3px 14px;"><i class="fas fa-bars"></i></a>
+            </li>
+        </ul>*@
+    <!--Logo-->
+    @*<a href="@homeinosurl" target="_blank">
+        <div class="navbar-brand no-padding">
+            <img style="height: 25px;margin: 0 15px;" src="~/Images/ic_home.svg" alt="Logo">
+        </div>
+    </a>*@
+    <a href="@Url.Action("Index","Dashboard")">
+        <div class="navbar-brand no-padding">
+            <img style="height: 25px;" src="~/images/qrbox.white.svg" alt="Logo">
+        </div>
+    </a>
+    <ul class="nav navbar-nav main-menu" style="font-weight: bold">
+        @if (CheckAccess("MENU_GIAO_DICH_KHO"))
+        {
+            <li>
+                <a href="javascrip:;" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
+                    <span class="menu-text menu-des">
+                        GIAO DỊCH KHO
+                    </span>
+                </a>
+                <ul class="dropdown-menu" data-widget="treeview">
+                    @RenderMainMenuItem("MNU_INVF_INVENTORYIN", "Nhập kho", "Index", "InvF_InventoryIn")
+                    @RenderMainMenuItem("MNU_INVF_INVENTORYOUT", "Xuất kho", "Index", "InvF_InventoryOut")
+                    @RenderMainMenuItem("MNU_INVF_INVENTORYRETURNSUP", "Trả hàng NCC", "Index", "InvFInventoryReturnSup")
+                    @RenderMainMenuItem("MNU_INVF_INVENTORYCUSRETURN", "Khách hàng trả hàng", "Index", "InvF_InventoryCusReturn")
+                </ul>
+            </li>
+        }
+        @if (CheckAccess("MENU_TOI_UU_KHO"))
+        {
+            <li>
+                <a href="javascrip:;" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
+                    <span class="menu-text menu-des">
+                        TỐI ƯU KHO
+                    </span>
+                </a>
+                <ul class="dropdown-menu" data-widget="treeview">
+                    @RenderMainMenuItem("MNU_INVF_MOVEORD", "Điều chuyển kho", "Index", "InvF_MoveOrd")
+                    @RenderMainMenuItem("MNU_INVF_INVAUDIT", "Kiểm kê", "Index", "InvFInvAudit")
+                </ul>
+            </li>
+        }
+        @if (CheckAccess("MENU_HANG_HOA"))
+        {
+            <li>
+                <a href="javascrip:;" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
+                    <span class="menu-text menu-des">
+                        HÀNG HÓA
+                    </span>
+                </a>
+                <ul class="dropdown-menu">
+                    @RenderMainMenuItem("MNU_MST_PRODUCT", "Hàng hóa", "Index", "Mst_Product")
+                    @RenderMainMenuItem("MENU_QL_NHOM_HAMG", "Nhóm hàng", "Index", "Mst_ProductGroupSub")
+                    @RenderMainMenuItem("MENU_QL_NHOM_HAMG", "Nhãn hiệu", "Index", "MstBrand")
+                </ul>
+            </li>
+        }
+        @if (CheckAccess("MENU_DOI_TAC"))
+        {
+            <li>
+                <a href="javascrip:;" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
+                    <span class="menu-text menu-des">
+                        ĐỐI TÁC
+                    </span>
+                </a>
+                <ul class="dropdown-menu">
+                    @RenderMainMenuItem("MNU_MST_CUSTOMER", "Khách hàng", "Index", "Mst_Customer")
+                    @RenderMainMenuItem("MENU_QL_VUNG_THI_TRUONG", "Vùng thị trường", "Index", "Mst_Area")
+                    @RenderMainMenuItem("MENU_QUAN_LY_NGUON_KHACH_HANG", "Nguồn khách hàng", "Index", "Mst_CustomerSource")
+                    @RenderMainMenuItem("MENU_QUAN_LY_NHOM_KHACH_HANG", "Nhóm khách hàng", "Index", "Mst_CustomerGroup")
+                </ul>
+            </li>
+        }
+        @if (CheckAccess("MENU_BAO_CAO"))
+        {
+            <li>
+                <a href="javascrip:;" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
+                    <span class="menu-text menu-des">
+                        BÁO CÁO
+                    </span>
+                </a>
+                <ul class="dropdown-menu">
+                    @RenderMainMenuItem("MNU_RPT_INV_INVENTORYBALANCE", "Báo cáo tồn kho", "Rpt_Inv_InventoryBalance", "Report")
+                    @RenderMainMenuItem("MNU_RPT_INV_INVENTORYBALANCE_EXTEND", "Báo cáo tồn kho mở rộng", "Rpt_Inv_InventoryBalance_Extend", "Report")
+                    @RenderMainMenuItem("MNU_RPT_INVF_WAREHOUSECARD", "Thẻ kho", "Rpt_InvF_WarehouseCard", "Report")
+                    @RenderMainMenuItem("MNU_RPT_INVENTORY_IN_OUT_INV", "Báo cáo nhập xuất tồn", "Rpt_Inventory_In_Out_Inv", "Report")
+                    @RenderMainMenuItem("MNU_RPT_SUMMARY_IN_OUT", "Báo cáo nhập xuất theo kỳ", "Rpt_Summary_In_Out", "Report")
+                    @RenderMainMenuItem("MNU_RPT_SUMMARY_QTYINVBYPERIOD", "Báo cáo tồn kho theo kỳ", "Rpt_Summary_QtyInvByPeriod", "Report")
+                    @RenderMainMenuItem("MNU_RPT_SUMMARY_INANDRETURNSUP", "Báo cáo nhập kho theo NCC", "Rpt_Summary_InAndReturnSup", "Report")
+                    @RenderMainMenuItem("MNU_RPT_SUMMARY_IN_PIVOT", "Báo cáo tổng hợp nhập", "Rpt_Summary_In_Pivot", "Report")
+                    @RenderMainMenuItem("MNU_RPT_SUMMARY_IN_OUT_SUP_PIVOT", "Báo cáo lịch sử giao dịch nhập xuất theo đối tác", "Rpt_Summary_In_Out_Sup_Pivot", "Report")
+                    @RenderMainMenuItem("MNU_RPT_INVBALLOT_MAXEXPIREDDATEBYINV", "Báo cáo hạn sử dụng hàng hóa", "Rpt_InvBalLot_MaxExpiredDateByInv", "Report")
+                    @RenderMainMenuItem("MNU_RPT_MAPDELIVERYORDER_BYINVFIOUT", "Bản đồ lệnh giao hàng", "Rpt_MapDeliveryOrder_ByInvFIOut", "Report")
+                    @RenderMainMenuItem("MNU_RPT_INV_INVENTORYBALANCE_STORAGETIME", "Báo cáo tuổi tồn kho", "Rpt_Inv_InventoryBalance_StorageTime", "Report")
+                    @RenderMainMenuItem("MNU_RPT_INV_INVENTORYBALANCE_MINIMUM", "Báo cáo chạm tồn tối thiểu", "Rpt_Inv_InventoryBalance_Minimum", "Report")
+                </ul>
+            </li>
+        }
+        @if (CheckAccess("MENU_QUAN_TRI"))
+        {
+            <li>
+                <a href="javascrip:;" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
+                    <span class="menu-text menu-des">
+                        QUẢN TRỊ
+                    </span>
+                </a>
+                <ul class="dropdown-menu" data-widget="treeview">
+                    @RenderMainMenuItem("MENU_QUAN_LY_KHO", "Quản lý kho", "Index", "Mst_Inventory")
+                    @RenderMainMenuItem("MENU_QUAN_LY_CAP_KHO", "Quản lý cấp kho", "Index", "Mst_InventoryLevelType")
+                    @RenderMainMenuItem("MENU_QUAN_LY_LOAI_KHO", "Quản lý loại kho", "Index", "Mst_InventoryType")
+                    @RenderMainMenuItem("MENU_QUAN_LY_LOAI_NHAP_KHO", "Quản lý loại nhập kho", "Index", "Mst_InvInType")
+                    @RenderMainMenuItem("MENU_QUAN_LY_LOAI_XUAT_KHO", "Quản lý loại xuất kho", "Index", "Mst_InvOutType")
+                    @RenderMainMenuItem("MENU_PHAN_QUYEN_KHO", "Phân quyền kho", "Index", "Mst_UserMapInventory")
+                    @*@RenderMainMenuItem("MENU_QL_VUNG_THI_TRUONG", "Quản lý vùng thị trường", "Index", "Mst_Area")*@
+                    @RenderMainMenuItem("MENU_MNG_PRODUCT_CUTSOMFIELD", "Thiết lập trường động hàng hoá", "Index", "Product_CustomField")
+                    <hr class="no-margin" />
+                    @RenderMainMenuItem("MENU_QUAN_LY_MAU_IN", "Quản lý mẫu in", "Index", "InvFTempPrint")
+                    <hr class="no-margin" />
+                    @RenderMainMenuItem("MENU_QUAN_LY_NGUOI_DUNG", "Quản lý người dùng", "Index", "Sys_User")
+                    @RenderMainMenuItem("MENU_QUAN_LY_NHOM_NGUOI_DUNG", "Quản nhóm người dùng", "Index", "Sys_Group")
+                    @RenderMainMenuItem("MENU_QUAN_LY_CHI_NHANH", "Quản lý chi nhánh", "Index", "Mst_Organization")
+                    <hr class="no-margin" />
+                    @RenderMainMenuItem("MENU_MNG_MAP_USERINNOTIFYTYPE", "Ma trận phân quyền thông báo", "Index", "Map_UserInNotifyType")
+                    @RenderMainMenuItem("MENU_QL_CAU_HINH_HIEN_THI_SO_THAP_PHAN", "Hiển thị số thập phân", "Index", "Mst_ColumnConfigGroup")
+                    @RenderMainMenuItem("MENU_CAU_HINH_HE_THONG", "Cấu hình hệ thống", "Index", "Mst_Sys_Config")
+                </ul>
+            </li>
+        }
+    </ul>
+    @*<script>
+            $('ul.main-menu .dropdown-menu').click(function (e) {
+                e.stopPropagation();
+            });
+            $('li.treeview').click(function () {
+                $(this).closest('.treeview').toggleClass('menu-open');
+            })
+        </script>*@
+
+    <!-- Right navbar links -->
+    <div class="collapse navbar-collapse right-navbar">
+        <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+                @using (Html.BeginForm("", "", FormMethod.Post, new { id = "form-notify" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="pagenotificationhd" name="pagenotificationhd" value="0" />
+                    <a href="javascript:;" class="icon globe-event dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-bell"></i>
+                        <span class="count notification-cd" id="globeventcount" style=""></span>
+                    </a>
+                    <div class="dropdown-menu event-home" style="min-width:400px;border-radius: 5px;">
+                        <div class="row col-12 no-margin no-padding eh-head">
+                            <div class="col-4">
+                                <a style="float: left;">Thông báo</a>
+                            </div>
+                            <div class="col-8">
+                                <a href="javascript:;" onclick="notificationAllRead();" class="" style="float: left;color:#098850!important;">
+                                    Đánh dấu tất cả đã đọc
+                                </a>
+                                <a href="@Url.Action("setting", "notification")" class="" style="float: right;color:#098850!important">Cài đặt</a>
+                            </div>
+                        </div>
+                        <div class="scrollbar-wrapper wrapper scrollbar-outer scrollbar-wrapper-notify" style="border: 1px solid  #f8f8f8">
+                            <ul id="notification-list" class="notification-list"></ul>
+                        </div>
+
+                        <div class="eh-foot">
+                            <center>
+                                <a href="@Url.Action("index", "notification")" style="color:#098850!important;">Xem tất cả</a>
+                            </center>
+                        </div>
+                    </div>
+                }
+            </li>
+            <li class="dropdown">
+                <a href="javascript:;" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true">
+                    <img src="@Url.Content("~/Images/ic_dots.svg")" />
+                </a>
+                <div class="row no-margin dropdown-menu pull-right redirectweb" style="width: 380px; ">
+                    @if (allSolutionsCur != null && allSolutionsCur.Count > 0)
+                    {
+                        foreach (var item in allSolutionsCur)
+                        {
+                            //var solutionimagenavbar = "/Images/no-image.png";
+                            //var solutionimageslidebar = "/Images/no-image.png";
+                            //var solutionname = "not defined";
+
+                            //LoadDataController.GetInfoSolutionCloud(item.SolutionCode, ref solutionname, ref solutionimageslidebar, ref solutionimagenavbar);
+
+                            if (item.SolutionCode.Equals("IDEALER"))
+                            {
+                                <div class="col-4 solutioncur" style="text-align: center;">
+                                    <a href="@IdealerSolutionLink" target="_blank" style="padding: 0 !important;" solutioncode="@item.SolutionCode">
+                                        <img class="img-responsive-navbar" src="~/Images/Dashboard/banxe.svg" />
+                                        <p style="margin: 0">Bán xe</p>
+                                    </a>
+                                </div>
+                            }
+                            else if (item.SolutionCode.Equals("VELOCA"))
+                            {
+                                <div class="col-4 solutioncur" style="text-align: center;">
+                                    <a href="@VelocaSolutionLink" target="_blank" style="padding: 0 !important;" solutioncode="@item.SolutionCode">
+                                        <img class="img-responsive-navbar" src="~/Images/Dashboard/dichvu.svg" />
+                                        <p style="margin: 0">Dịch vụ</p>
+                                    </a>
+                                </div>
+                            }
+                            else if (item.SolutionCode.Equals("DMSPLUS"))
+                            {
+                                <div class="col-4 solutioncur" style="text-align: center;">
+                                    <a href="@DMSPlusSolutionLink" target="_blank" style="padding: 0 !important;" solutioncode="@item.SolutionCode">
+                                        <img class="img-responsive-navbar" src="~/Images/Dashboard/banphutung.svg" />
+                                        <p style="margin: 0">Bán phụ tùng/phụ kiện</p>
+                                    </a>
+                                </div>
+                            }
+                            else if (item.SolutionCode.Equals("INVENTORY"))
+                            {
+                                <div class="col-4 solutioncur" style="text-align: center;">
+                                    <a href="@InventorySolutionLink" target="_blank" style="padding: 0 !important;" solutioncode="@item.SolutionCode">
+                                        <img class="img-responsive-navbar" src="~/Images/Dashboard/kho.svg" />
+                                        <p style="margin: 0">Kho</p>
+                                    </a>
+                                </div>
+                            }
+                            else if (item.SolutionCode.Equals("QCONTRACT"))
+                            {
+                                <div class="col-4 solutioncur" style="text-align: center;">
+                                    <a href="@QContractSolutionLink" target="_blank" style="padding: 0 !important;" solutioncode="@item.SolutionCode">
+                                        <img class="img-responsive-navbar" src="~/Images/Dashboard/hopdong.svg" />
+                                        <p style="margin: 0">Hợp đồng điện tử</p>
+                                    </a>
+                                </div>
+                            }
+                            else if (item.SolutionCode.Equals("HDDT"))
+                            {
+                                <div class="col-4 solutioncur" style="text-align: center;">
+                                    <a href= "@HDDTSolutionLink" target="_blank" style="padding: 0 !important;" solutioncode="@item.SolutionCode">
+                                        <img class="img-responsive-navbar" src="~/Images/Dashboard/hoadon.svg" />
+                                        <p style="margin: 0">Hóa đơn điện tử</p>
+                                    </a>
+                                </div>
+                            }
+                            else if (item.SolutionCode.Equals("ACCOUNT"))
+                            {
+                                <div class="col-4 solutioncur" style="text-align: center;">
+                                    <a href="@AccountSolutionLink" target="_blank" style="padding: 0 !important;" solutioncode="@item.SolutionCode">
+                                        <img class="img-responsive-navbar" src="~/Images/Dashboard/ketoan.svg" />
+                                        <p style="margin: 0">Kế toán</p>
+                                    </a>
+                                </div>
+                            }
+                        }
+                    }
+
+                    @*<div class="toggleclass col-12" style="height: 1px; background: #ddd; margin-bottom: 15px; display: none"></div>
+
+        @if (allSolutionsNotUsed != null && allSolutionsNotUsed.Count > 0)
+        {
+            foreach (var item in allSolutionsNotUsed.OrderBy(m => m.Name))
+            {
+                var solutionimagenavbar = "/Images/no-image.png";
+                var solutionimageslidebar = "/Images/no-image.png";
+                var solutionname = "not defined";
+
+                LoadDataController.GetInfoSolutionCloud(item.SolutionCode, ref solutionname, ref solutionimageslidebar, ref solutionimagenavbar);
+
+                <div class="toggleclass col-4 solutioncur" style="text-align: center; display: none">
+                    <a href="@item.Domain" target="_blank" style="padding: 0 !important;" solutioncode="@item.SolutionCode">
+                        <img class="img-responsive-navbar" src="@solutionimagenavbar" />
+                        <p style="margin: 0">@solutionname</p>
+                    </a>
+                </div>
+            }
+        }
+
+        <div class="col-12" style="height: 1px; background: #ddd"></div>
+        <div class="col-12" style="text-align: center">
+            <a id="showandhide" href="javascript:;" index="0">Xem thêm</a>
+        </div>*@
+                </div>
+            </li>
+            <li>
+                <b style="color: #fff; line-height: 28px;">|</b>
+            </li>
+            @*<li>
+                    <a href="javascript:;" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true">
+                        <i class="fas fa-user"></i>
+                        Sysadmin
+                    </a>
+                    <ul class="dropdown-menu profile-home pull-right">
+                        <li>
+                            <a class="alink" href="#"><i class="fa fa-cog" aria-hidden="true"></i> Thiết lập Tổ chức</a>
+                        </li>
+                        <li>
+                            <form action="" id="logoutForm" method="post">
+                                <a href="javascript:document.getElementById('logoutForm').submit()">
+                                    <i class="ace-icon fa fa-power-off"></i>&nbsp;
+                                    Đăng xuất
+                                </a>
+                            </form>
+                        </li>
+                    </ul>
+                </li>*@
+            @*@if (Request.IsAuthenticated)*@
+            @if (true)
+            {
+                <li class="light-blue dropdown-modal">
+                    @Html.Partial("_LoginPartial")
+                </li>
+            }
+        </ul>
+    </div>
+</nav>
+<!-- /.navbar -->
+@Html.Partial("Notify_Template")
+<script type="text/javascript">
+    $('ul.main-menu .dropdown-menu').click(function (e) {
+        e.stopPropagation();
+    });
+    $('li.treeview').click(function () {
+        $(this).closest('.treeview').toggleClass('menu-open');
+    });
+    function setAdminCurrentUrl(url) {
+        $('ul.main-menu .dropdown-menu a[href="' + url + '"]').each(function () {
+            var parent = $(this).closest('li').closest('ul');
+            if ($(parent).hasClass('treeview-menu')) {
+                //$(parent).closest('.treeview').toggleClass('menu-open');
+                $(this).closest('li').addClass('active');
+                $(parent).closest('li').closest('ul').closest('li').find('a.dropdown-toggle').addClass('active');
+            } else {
+                $(parent).closest('li').find('a.dropdown-toggle').addClass('active');
+            }
+        });
+    }
+
+    $('div.dropdown-menu #showandhide').on('click', function (event) {
+        //debugger
+        var idx = $(this).attr('index');
+        if (idx === '0') {
+            $(this).attr('index', '1');
+            $(this).text('Rút gọn');
+            $('.toggleclass').toggle();
+        }
+        else {
+            $(this).attr('index', '0');
+            $(this).text('Xem thêm');
+            $('.toggleclass').toggle();
+        }
+        // The event won't be propagated up to the document NODE and
+        // therefore delegated events won't be fired
+        event.stopPropagation();
+    });
+</script>

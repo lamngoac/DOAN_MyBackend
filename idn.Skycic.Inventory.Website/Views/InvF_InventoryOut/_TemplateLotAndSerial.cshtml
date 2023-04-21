@@ -1,0 +1,165 @@
+﻿@{
+    var lstInvF_InventoryOutInstLot = new List<InvF_InventoryOutInstLot>();
+    if (ViewBag.lstInvF_InventoryOutInstLot != null)
+    {
+        lstInvF_InventoryOutInstLot = ViewBag.lstInvF_InventoryOutInstLot as List<InvF_InventoryOutInstLot>;
+    }
+
+    var lstInvF_InventoryOutInstSerial = new List<InvF_InventoryOutInstSerial>();
+    if (ViewBag.lstInvF_InventoryOutInstSerial != null)
+    {
+        lstInvF_InventoryOutInstSerial = ViewBag.lstInvF_InventoryOutInstSerial as List<InvF_InventoryOutInstSerial>;
+    }
+
+    var lstInvF_InventoryOutDtl = new List<InvF_InventoryOutDtl>();
+    if (ViewBag.lstInvF_InventoryOutDtl != null)
+    {
+        lstInvF_InventoryOutDtl = ViewBag.lstInvF_InventoryOutDtl as List<InvF_InventoryOutDtl>;
+    }
+}
+<table>
+    <tbody id="table-detailLot">
+        @{
+            if (lstInvF_InventoryOutInstLot != null)
+            {
+                var idx = 0;
+                foreach (var it in lstInvF_InventoryOutInstLot)
+                {
+                    <tr class="data-item trdata" idx="@idx" productCode="@it.ProductCode" ProductLotNo="@it.ProductLotNo" InvCode="@it.InvCodeOutActual">
+                        <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].ProductCode" value="@it.ProductCode" />
+                        <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].ProductCodeRoot" value="@(it.ProductCodeRoot == null ? "" : it.ProductCodeRoot)" />
+                        <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].ProductLotNo" value="@(it.ProductLotNo == null ? "" : it.ProductLotNo)" />
+                        @*<input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].ProductionDate" value="@(it.ProductionDate == null ? "" : Convert.ToDateTime(it.ProductionDate)" />
+                            <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].ValDateExpired" value="@(it.ValDateExpired == null ? "" : Convert.ToDateTime(it.ValDateExpired) />*@
+                        <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].InvCodeOutActual" value="@(it.InvCodeOutActual == null ? "" : it.InvCodeOutActual)" />
+                        <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].Qty" value="@(it.Qty == null ? "0" : it.Qty)">
+                    </tr>
+                    idx++;
+                }
+            }
+        }
+    </tbody>
+</table>
+
+<table>
+    <tbody id="table-detailSerial">
+        @{
+            if (lstInvF_InventoryOutInstSerial != null)
+            {
+                var idx = 0;
+                foreach (var it in lstInvF_InventoryOutInstSerial)
+                {
+                    <tr class="data-item trdata" idx="@idx" productCode="@(it.ProductCode == null ? "" : it.ProductCode)" serialno="@(it.SerialNo == null ? "" : it.SerialNo)">
+                        <input type="hidden" name="Lst_InvF_InventoryOutSerialDtl[@idx].ProductCode" value="@(it.ProductCode == null ? "" : it.ProductCode)" />
+                        <input type="hidden" name="Lst_InvF_InventoryOutSerialDtl[@idx].ProductCodeRoot" value="@(it.ProductCodeRoot == null ? "" : it.ProductCodeRoot)" />
+                        <input type="hidden" name="Lst_InvF_InventoryOutSerialDtl[@idx].SerialNo" value="@(it.SerialNo == null ? "" : it.SerialNo)" />
+                        <input type="hidden" name="Lst_InvF_InventoryOutSerialDtl[@idx].InvCodeOutActual" value="@(it.InvCodeOutActual == null ? "" : it.InvCodeOutActual)" />
+                    </tr>
+
+                    idx++;
+                }
+            }
+        }
+    </tbody>
+</table>
+
+<table>
+    <tbody id="table-detailCombo">
+        @{
+            if (lstInvF_InventoryOutDtl != null)
+            {
+                var idx = 0;
+                foreach (var it in lstInvF_InventoryOutDtl)
+                {
+                    if (it.FlagLot.ToString() != "1" && it.FlagSerial.ToString() != "1")
+                    {
+                        <tr class="data-item trdata" idx="@idx" invcode="@(it.InvCodeOutActual == null ? "" : it.InvCodeOutActual)" productcoderoot="@(it.ProductCodeRoot == null ? "" : it.ProductCodeRoot)" productcode="@(it.ProductCode == null ? "" : it.ProductCode)">
+                            <input type="hidden" class="ProductCode" name="Lst_InvF_InventoryOutComboDtl[@idx].ProductCode" value="@(it.ProductCode == null ? "" : it.ProductCode)" />
+                            <input type="hidden" class="ProductCodeRoot" name="Lst_InvF_InventoryOutComboDtl[@idx].ProductCodeRoot" value="@(it.ProductCodeRoot == null ? "" : it.ProductCodeRoot)" />
+                            <input type="hidden" class="Qty" name="Lst_InvF_InventoryOutComboDtl[@idx].Qty" value="@(it.Qty == null ? "" : it.Qty)" />
+                            <input type="hidden" class="InvCodeOutActual" name="Lst_InvF_InventoryOutComboDtl[@idx].InvCodeOutActual" value="@(it.InvCodeOutActual == null ? "" : it.InvCodeOutActual)" />
+                            <input type="hidden" class="UnitCode" name="Lst_InvF_InventoryOutComboDtl[@idx].UnitCode" value="@(it.UnitCode == null ? "" : it.UnitCode)" />
+                            <input type="hidden" name="Lst_InvF_InventoryOutComboDtl[@idx].Remark" value="@(it.Remark == null ? "" : it.Remark)" />
+                        </tr>
+                    }
+                }
+                idx++;
+            }
+        }
+    </tbody>
+</table>
+
+
+
+<table hidden>
+    <tbody id="rowtemplateLoDetail">
+        <tr class="data-item trdata" idx="==idx==" productCode="==ProductCode==" ProductLotNo="==ProductLotNo==" InvCode="==InvCodeOutActual==">
+            <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[==idx==].ProductCode" value="==ProductCode==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[==idx==].ProductCodeRoot" value="==ProductCode==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[==idx==].ProductLotNo" value="==ProductLotNo==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[==idx==].ProductionDate" value="==ProductionDate==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[==idx==].ValDateExpired" value="==ValDateExpired==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[==idx==].InvCodeOutActual" value="==InvCodeOutActual==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[==idx==].Qty" value="==Qty==">
+        </tr>
+    </tbody>
+</table>
+
+
+<table hidden>
+    <tbody id="rowtemplateSerialDetail">
+        <tr class="data-item trdata" idx="==idx==" productCode="==ProductCode==" serialno="==SerialNo==">
+            <input type="hidden" name="Lst_InvF_InventoryOutSerialDtl[==idx==].ProductCode" value="==ProductCode==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutSerialDtl[==idx==].ProductCodeRoot" value="==ProductCode==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutSerialDtl[==idx==].SerialNo" value="==SerialNo==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutSerialDtl[==idx==].InvCodeOutActual" value="==InvCodeOutActual==" />
+        </tr>
+    </tbody>
+</table>
+
+<table hidden>
+    <tbody id="rowtemplateComboDetail">
+        <tr class="data-item trdata" idx="==idx==" productcode="==ProductCode==" productcoderoot="==ProductCodeRoot==" invcode="==InvCodeOutActual==">
+            <input type="hidden" name="Lst_InvF_InventoryOutComboDtl[==idx==].ProductCode" value="==ProductCode==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutComboDtl[==idx==].ProductCodeRoot" value="==ProductCodeRoot==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutComboDtl[==idx==].Qty" value="==Qty==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutComboDtl[==idx==].InvCodeOutActual" value="==InvCodeOutActual==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutComboDtl[==idx==].UnitCode" value="==UnitCode==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutComboDtl[==idx==].Remark" value="==Remark==" />
+        </tr>
+    </tbody>
+</table>
+
+<table hidden>
+    <tbody id="rowtemplateLo">
+        <tr class="data-item trdata" idx="==idx==" ProductLotNo="==ProductLotNo==" InvCode="==InvCode==">
+            <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[==idx==].ProductLotNo" value="==ProductLotNo==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[==idx==].ProductionDate" value="==ProductionDate==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[==idx==].ExpiredDate" value="==ExpiredDate==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[==idx==].QtyTotalOK" value="==QtyTotalOK==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[==idx==].InvCode" value="==InvCode==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[==idx==].FlagExist" value="0" />
+            <td fieldId="CONTROL" fieldActive="0" class="text-center cell-50 action-buttons">
+                <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteLo(this, '==ProductLotNo==');"><i class="fas fa-trash-alt"></i></a>
+            </td>
+            <td fieldActive="ProductLotNo" class="text-left cell-150">
+                ==ProductLotNo==
+            </td>
+            <td fieldId="ProductionDate" fieldActive="0" class="text-left cell-150">
+                ==ProductionDate==
+            </td>
+            <td fieldId="ExpiredDate" fieldActive="0" class="text-left cell-150">
+                ==ExpiredDate==
+            </td>
+            <td fieldId="QtyTotalOK" fieldActive="0" class="text-right cell-100">
+                ==QtyTotalOK==
+            </td>
+            <td fieldId="QtyOut" fieldActive="0" class="text-left cell-100">
+                <input class="qtyout col-md-12 text-right" value="==QtyTotalOK==" name="Lst_InvF_InventoryOutLotDtl[==idx==].Qty" onchange="ChangeQtyOut(this)">
+            </td>
+            <td fieldId="InvCode" fieldActive="0" class="text-left cell-150">
+                ==InvCode==
+            </td>
+        </tr>
+    </tbody>
+</table>

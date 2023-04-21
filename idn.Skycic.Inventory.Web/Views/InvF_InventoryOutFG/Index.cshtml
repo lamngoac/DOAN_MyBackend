@@ -1,0 +1,601 @@
+﻿@using System.Diagnostics;
+@using idn.Skycic.Inventory.Common.Models;
+@model PageInfo<InvF_InventoryOutFG>
+@{
+    Layout = "~/Views/Shared/CoreLayoutKho.cshtml";
+    ViewBag.Title = "QUẢN LÝ PHIẾU XUẤT KHO";
+
+    var fromdate = ViewBag.FromDate as string;
+    var apprfromdate = ViewBag.ApprFromDate as string;
+    var listPart = ViewBag.ListPart as List<Mst_Part>;
+    var startCount = 0;
+    var strStartCount = ViewBag.StartCount as string;
+    if (!CUtils.IsNullOrEmpty(strStartCount))
+    {
+        startCount = Convert.ToInt32(strStartCount);
+    }
+    var offset = ViewBag.Offset;
+
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+
+    var showtext = "";
+    if (Model.ItemCount > 0)
+    {
+        var recordstart = (Model.PageIndex) * Model.PageSize + 1;
+        var recordend = (Model.PageIndex + 1) * Model.PageSize;
+        if (recordend > Model.ItemCount)
+        {
+            recordend = Model.ItemCount;
+        }
+        showtext = recordstart + "-" + recordend + " trong số " + Model.ItemCount;
+    }
+}
+@*<script src="~/Scripts/mine/invoice.js"></script>
+<script src="~/Scripts/mine/download.js"></script>*@
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                @*<div class="title">
+                        <p style="vertical-align: bottom">@MvcHtmlString.Create(ViewBag.Title)</p>
+                    </div>*@
+                <div class="panel-body no-padding" id="panel-body" style="">
+                    <aside class="row no-margin">
+                        @using (Html.BeginForm("Index", "InvF_InventoryOutFG", FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <input hidden id="init" name="init" value="search" />
+
+                            <aside class="col-xs-12 box-shadow-tk layout-search layout-bot-top-16">
+                                <div class="col-xs-11 no-padding">
+                                    <div class="col-xs-3 no-padding">
+                                        <div class="form-group margin-bottom-9">
+                                            <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Số phiếu xuất")</label>
+                                            <div class="col-xs-12 col-sm-8">
+                                                <input type="text" name="ifinvoutfgno" id="ifinvoutfgno" class="col-xs-12" value="@MvcHtmlString.Create(Request["ifinvoutfgno"] == null ? "" : Request["ifinvoutfgno"])" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group margin-bottom-9">
+                                            <label for="SourceInvoiceCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã sản phẩm")</label>
+                                            <div class="col-xs-12 col-sm-8">
+                                                <span class="block input-icon input-icon-right">
+                                                    <select id="partcode" name="partcode" class="col-xs-12">
+                                                        @{
+                                                            var partcode = Request["partcode"] == null ? "" : Request["partcode"];
+                                                        }
+                                                        <option value="">Tất cả</option>
+                                                        @if (listPart != null && listPart.Count > 0)
+                                                        {
+                                                            foreach (var item in listPart)
+                                                            {
+                                                                <option value="@MvcHtmlString.Create(item.PartCode.ToString().Trim())" desc="@MvcHtmlString.Create(item.PartCode.ToString().Trim())" @(partcode.Equals(item.PartCode.ToString().Trim()) ? "selected" : "")>@MvcHtmlString.Create(item.PartCode.ToString().Trim())</option>
+                                                            }
+                                                        }
+                                                    </select>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-3 no-padding">
+                                        <div class="form-group margin-bottom-9">
+                                            <label for="" class="col-xs-4 col-sm-4 control-label font-weight-500">@MvcHtmlString.Create("Ngày tạo từ")</label>
+                                            <div class="col-xs-8 col-sm-8">
+                                                <div class="col-xs-12" style="padding-left: 0;padding-right: 17px;">
+                                                    <div class="input-group" id="dtfromdate">
+                                                        <input type="text" id="fromdate" name="fromdate" class="col-xs-12 cl-date fromdate" data-date-format="yyyy-mm-dd" value="@MvcHtmlString.Create(fromdate)" autocomplete="off" />
+                                                        <span class="input-group-addon">
+                                                            <i class="far fa-calendar-alt"></i>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group margin-bottom-9">
+
+                                            <label for="" class="col-xs-4 col-sm-4 control-label font-weight-500">@MvcHtmlString.Create("đến")</label>
+                                            <div class="col-xs-8 col-sm-8">
+                                                <div class="col-xs-12" style="padding-left: 0;padding-right: 17px;">
+                                                    <div class="input-group" id="dttodate">
+                                                        <input type="text" id="todate" name="todate" class="col-xs-12 cl-date todate" data-date-format="yyyy-mm-dd" value="@MvcHtmlString.Create(Request["todate"] == null ? "" : Request["todate"])" autocomplete="off" />
+                                                        <span class="input-group-addon">
+                                                            <i class="far fa-calendar-alt"></i>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-3 no-padding">
+                                        <div class="form-group margin-bottom-9">
+                                            <label for="apprfromdate" class="col-xs-4 col-sm-4 control-label font-weight-500">@MvcHtmlString.Create("Ngày duyệt từ")</label>
+                                            <div class="col-xs-8 col-sm-8">
+                                                <div class="col-xs-12" style="padding-left: 0;padding-right: 17px;">
+                                                    <div class="input-group" id="dtapprfromdate">
+                                                        <input type="text" id="apprfromdate" name="apprfromdate" class="col-xs-12 cl-date apprfromdate" data-date-format="yyyy-mm-dd" value="@MvcHtmlString.Create(apprfromdate)" autocomplete="off" />
+                                                        <span class="input-group-addon">
+                                                            <i class="far fa-calendar-alt"></i>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group margin-bottom-9">
+
+                                            <label for="apprtodate" class="col-xs-4 col-sm-4 control-label font-weight-500">@MvcHtmlString.Create("đến")</label>
+                                            <div class="col-xs-8 col-sm-8">
+                                                <div class="col-xs-12" style="padding-left: 0;padding-right: 17px;">
+                                                    <div class="input-group" id="dtapprtodate">
+                                                        <input type="text" id="apprtodate" name="apprtodate" class="col-xs-12 cl-date apprtodate" data-date-format="yyyy-mm-dd" value="@MvcHtmlString.Create(Request["apprtodate"] == null ? "" : Request["apprtodate"])" autocomplete="off" />
+                                                        <span class="input-group-addon">
+                                                            <i class="far fa-calendar-alt"></i>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-3 no-padding">
+                                        <div class="form-group margin-bottom-9">
+                                            @*<label for="SourceInvoiceCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Loại phiếu xuất")</label>
+                                                <div class="col-xs-12 col-sm-8">
+                                                    <span class="block input-icon input-icon-right">
+                                                        <select id="invfouttype" name="invfouttype" class="col-xs-12">
+                                                            @{
+                                                                var type = Request["invfouttype"] == null ? "" : Request["invfouttype"];
+                                                            }
+                                                            <option value=""></option>
+                                                            <option value="OUTTHUONGMAI" @(type == "OUTTHUONGMAI" ? "selected" : "")>Đại lý thương mại</option>
+                                                            <option value="OUTENDCUS" @(type == "OUTENDCUS" ? "selected" : "")>Nhà sản xuất</option>
+                                                        </select>
+                                                    </span>
+                                                </div>*@
+                                            <label for="FormOutType" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Loại phiếu xuất")</label>
+                                            <div class="col-xs-12 col-sm-8">
+                                                <span class="block input-icon input-icon-right">
+                                                    <select id="formouttype" name="formouttype" class="col-xs-12">
+                                                        @{
+                                                            var type = Request["formouttype"] == null ? "" : Request["formouttype"];
+                                                        }
+                                                        <option value="">Tất cả</option>
+                                                        <option value="KHONGMAVACH" @(type == "KHONGMAVACH" ? "selected" : "")>Không mã vạch</option>
+                                                        <option value="MAVACH" @(type == "MAVACH" ? "selected" : "")>Mã vạch</option>
+                                                    </select>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group margin-bottom-9">
+                                            <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500" style="padding-left: 0px;">@MvcHtmlString.Create("Trạng thái")</label>
+                                            <div class="col-xs-12 col-sm-8">
+                                                <span class="block input-icon input-icon-right">
+                                                    <select class="col-xs-12" id="status" name="status">
+                                                        @{
+                                                            var status = Request["status"] == null ? "" : Request["status"];
+                                                        }
+                                                        <option value="">Tất cả</option>
+                                                        <option value="PENDING" @(status == "PENDING" ? "selected" : "")>@MvcHtmlString.Create("Chờ duyệt")</option>
+                                                        <option value="APPROVE" @(status == "APPROVE" ? "selected" : "")>@MvcHtmlString.Create("Đã duyệt")</option>
+                                                    </select>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-xs-1 no-padding">
+                                    @RenderItemFormat("BTN_QL_PX_TK", "<a class=\"btn font-color mybtn-Button\" onclick=\"Search()\" href=\"javascript:void(0);\" style=\" \"><img class=\"img-button-search\" src='" + Url.Content("~/Images/search.svg") + "'></a>", "", "")
+                                </div>
+                            </aside>
+
+                            <div class="col-xs-12 layout-tk layout-bot-top-16">
+                                @RenderItemFormat("BTN_QL_PX_TAO_MOI", "<a class=\"btn btn-nc-button\" href=\"" + Url.Action("Create", "InvF_InventoryOutFG") + "\" style=\"font-size: 13px;margin-right: 5px; \"><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i> Tạo</a>", "", "")
+                                @RenderItemFormat("BTN_QL_PX_XUAT_EXCEL", "<a class=\"btn btn-nc-button \" onclick=\"Export()\" href=\"javascript:void(0);\" style=\"box-shadow: 0 2px 4px rgba(0,0,0,.2);margin-right: 5px;color:#057d5a\"><i class=\"fa fa-upload\" aria-hidden=\"true\"></i> Xuất Excel</a>", "", "")
+
+                                <span class="search-bar">
+                                    <input type="text" id="dynamic-table-thead-search" class="quicksearch dynamic-table-thead-search" name="search">
+                                    <input type="text" class="quicksearch1 dynamic-table-thead-search1" name="search" style="z-index: -1000; height: 0; padding: 0; margin: 0; border: 0">
+                                </span>
+                                @if (CheckAccess("BTN_QL_PX_TK"))
+                                {
+                                    @Html.Partial("Pagination", null, new ViewDataDictionary() { { "PageCur", MvcHtmlString.Create("1") }, { "recordcount", MvcHtmlString.Create(Model.PageSize.ToString()) }, { "ShowText", showtext }, { "ifinvoutfgno", Request["ifinvoutfgno"] }, { "partcode", Request["partcode"] }, { "fromdate", Request["fromdate"] }, { "todate", Request["todate"] }, { "status", Request["status"] }, { "formouttype", Request["formouttype"] }, { "invfouttype", Request["invfouttype"] } })
+                                }
+                                    <input type="hidden" value="@MvcHtmlString.Create(pageCur)" name="page" id="page" />
+                                </div>
+                            <input type="hidden" value="@MvcHtmlString.Create(Model.PageCount.ToString())" name="totalpage" id="totalpage" />
+                            @*<div class="col-xs-12 no-padding" style="margin-top: 15px;">
+                                    <div class="col-xs-5 no-padding">
+                                        Tổng số @Model.ItemCount kết quả trong @Model.PageCount trang
+                                    </div>
+                                    @if (Model != null && Model.DataList != null)
+                                    {
+                                        <div id="dynamic-table_paginate" class="dataTables_paginate paging_simple_numbers" style="">
+                                            @Html.PagerBootstrap((int)Model.PageSize, -1 + (int)Model.PageIndex, (int)Model.ItemCount, new { ifinvoutfgno = Request["ifinvoutfgno"], partcode = Request["partcode"], fromdate = Request["fromdate"], todate = Request["todate"], status = Request["status"], formouttype = Request["formouttype"], invfouttype = Request["invfouttype"], recordcount = Request["recordcount"], init = Request["init"] }, "<", ">", "<<", ">>")
+                                        </div>
+                                    }
+                                    @Html.Partial("RecordCount")
+                                </div>*@
+                        }
+                    </aside>
+                </div>
+                <div class="panel-body no-padding" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <div class="scrollable-horizontal padding-left-0 padding-right-0 div-scrollable" data-size="650" style="padding-top: 0!important;">
+                        <div style="width: 100%; float: left;">
+                            <table id="dynamic-table-thead" class="table table-striped table-bordered table-hover table-cus table-bottom-0 no-margin">
+                                <thead>
+                                    <tr class="trthead">
+                                        <th class="text-center cell-75">
+                                        </th>
+                                        <th class="cell-50">@MvcHtmlString.Create("TT")</th>
+                                        <th fieldid="IF_INVOUTFGNO" sorttype="T" class="cell-100">
+                                            @MvcHtmlString.Create("Số phiếu xuất")
+                                        </th>
+                                        <th fieldid="CREATEBY" sorttype="T" class="cell-100">
+                                            @MvcHtmlString.Create("Người nhập phiếu")
+                                        </th>
+                                        <th fieldid="CREATEDTIMEUTC" sorttype="D" class="cell-100">
+                                            @MvcHtmlString.Create("Ngày tạo phiếu")
+                                        </th>
+                                        <th fieldid="APPRDTIMEUTC" sorttype="D" class="cell-100">
+                                            @MvcHtmlString.Create("Ngày duyệt phiếu")
+                                        </th>
+                                        <th fieldid="FORMOUTTYPE" sorttype="T" class="cell-100">
+                                            @MvcHtmlString.Create("Loại phiếu xuất")
+                                        </th>
+                                        <th class="cell-75">
+                                            @MvcHtmlString.Create("Trạng thái")
+                                        </th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                            <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody">
+                                <tbody id="table-tbodyID">
+                                    @{
+                                        var idx = 0;
+                                    }
+                                    @if (Model.DataList != null && Model.DataList.Count > 0)
+                                    {
+                                        foreach (var item in Model.DataList)
+                                        {
+                                            var iindex = startCount + (idx + 1);
+                                            var createDTimeUTC = CUtils.ReturnDateTimeUtcToLocalTime(CUtils.StrValue(item.CreateDTimeUTC), Nonsense.DATE_TIME_FORMAT, offset);
+                                            var apprDTimeUTC = CUtils.ReturnDateTimeUtcToLocalTime(CUtils.StrValue(item.ApprDTimeUTC), Nonsense.DATE_TIME_FORMAT, offset);
+
+                                            <tr idx="@idx" class="data-item trdata">
+
+                                                <td class="text-center cell-75">
+                                                    <div class="action-buttons padding-top-2">
+
+                                                        @{
+                                                            var urlDetail = "";
+                                                            var urlUpdate = "";
+                                                            var urlApprove = "";
+                                                            urlDetail = Url.Action("Detail", "InvF_InventoryOutFG", new { ifinvoutfgno = item.IF_InvOutFGNo });
+                                                            urlUpdate = Url.Action("Update", "InvF_InventoryOutFG", new { ifinvoutfgno = item.IF_InvOutFGNo });
+                                                        }
+                                                        @RenderItemFormat("BTN_QL_PX_CHI_TIET", "<a class=\"icon-detail\" href=\'" + urlDetail + "\' title=\"Chi tiết\"><i class=\"far fa-eye\"></i></a>", "", "")
+                                                        @if (item.IF_InvOutFGStatus.ToString().Equals("PENDING"))
+                                                        {
+                                                            @RenderItemFormat("BTN_QL_PX_KHO_SUA", "<a class=\"icon-edit\" href=\'" + urlUpdate + "\' title=\"Sửa\"><i class=\"fas fa-pencil-alt\"></i></a>", "", "")
+                                                            @RenderItemFormat("BTN_QL_PX_KHO_DUYET", "<a href=\"javascript:;\" class=\"icon-approve\" title=\"Duyệt\" onclick=\"Approved('" + item.IF_InvOutFGNo + "')\"></a>", "", "")
+                                                            @RenderItemFormat("BTN_QL_PX_KHO_XOA", "<a href=\"javascript:;\" class=\"icon-delete\" title=\"Xóa\" onclick=\"Delete('" + item.IF_InvOutFGNo + "')\"><i class=\"fas fa-trash-alt\"></i></a>", "", "")
+                                                        }
+
+                                                    </div>
+                                                </td>
+                                                <td class="text-center cell-50">@iindex.ToString()</td>
+                                                <td fieldid="IF_INVOUTFGNO" sorttype="T" class="cell-100">@item.IF_InvOutFGNo</td>
+                                                <td fieldid="CREATEBY" sorttype="T" class="cell-100">@item.CreateBy</td>
+                                                <td fieldid="CREATEDTIMEUTC" sorttype="D" class="cell-100">@createDTimeUTC</td>
+                                                <td fieldid="APPRDTIMEUTC" sorttype="D" class="cell-100">@apprDTimeUTC</td>
+                                                <td fieldid="FORMOUTTYPE" sorttype="T" class="cell-100">
+                                                    @if (item.FormOutType.Equals("KHONGMAVACH"))
+                                                    {
+                                                        <span>Không mã vạch</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>Mã vạch</span>
+                                                    }
+                                                </td>
+                                                <td class="cell-75">
+                                                    @if (item.IF_InvOutFGStatus.ToString().Equals("PENDING"))
+                                                    {
+                                                        <span class="label label-sm label-warning">Chờ duyệt</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="label label-sm label-success">Đã duyệt</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                            idx++;
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+@*Export*@
+<script type="text/javascript">
+    @*function ExportTemplate()
+    {
+        var token = $('input[name=__RequestVerificationToken]').val();
+        var url = '@Url.Action("ExportTemplate", "InvF_InventoryOutFG")';
+        ExportExcelTemplate(url, token);
+    }
+    function Export()
+    {
+        var token = $('input[name=__RequestVerificationToken]').val();
+        var url = '@Url.Action("Export", "InvF_InventoryOutFG")';
+        var ifinvoutfgno = $('#ifinvoutfgno').val();
+        var partcode = $('#partcode').val();
+        var fromdate = $('#fromdate').val();
+        var todate = $('#todate').val();
+        var invfouttype = $('#invfouttype').val();
+        var status = $('#status').val();
+        $.ajax({
+            url: url,
+            data: {
+                __RequestVerificationToken: token
+                , ifinvoutfgno: ifinvoutfgno
+                , partcode: partcode
+                , fromdate: fromdate
+                , todate: todate
+                , invfouttype: invfouttype
+                , status: status
+            },
+            type: 'post',
+            dataType: 'JSON',
+            contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+            traditional: true,
+            beforeSend: function () {
+                //bodycur.addClass("my-loading");
+            },
+            success: function (data) {
+                try {
+                    var getData = data;
+                    if (getData.Success === false || getData.Success === 'false') {
+                        _showErrorMsg123("Lỗi",getData.Detail);
+                    } else {
+                        alert(getData.Title);
+                        if (getData.CheckSuccess === "1") {
+                            if (getData.strUrl !== null && getData.strUrl.length > 0) {
+                                window.location = getData.strUrl;
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.log(e.message);
+                }
+            },
+            complete: function (data) {
+                // Hide image container
+                //bodycur.removeClass("my-loading");
+            }
+        });
+        }*@
+</script>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/InvF_InventoryOutFG.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "InvF_InventoryOutFG")');
+        //processAjaxForm($('#manageForm'), function (response) {
+        //    processAjaxFormResult(response);
+        //});
+
+        @* Set focus *@
+        $(document).ready(function () {
+            $('#AgentCode').focus();
+        });
+
+        @* Scroll *@
+        $(document).ready(function () {
+            $('.scrollable-horizontal-esign').each(function () {
+                var $this = $(this);
+                $(this).ace_scroll(
+                    {
+                        horizontal: true,
+                        //styleClass: 'scroll-top',//show the scrollbars on top(default is bottom)
+                        size: $this.attr('data-size') || 6500,
+                        mouseWheelLock: true
+                    }
+                ).css({ 'padding-top': 0 });
+            });
+            $('.scrollable-horizontal-esignsendmail').each(function () {
+                var $this = $(this);
+                $(this).ace_scroll(
+                    {
+                        horizontal: true,
+                        //styleClass: 'scroll-top',//show the scrollbars on top(default is bottom)
+                        size: $this.attr('data-size') || 6500,
+                        mouseWheelLock: true
+                    }
+                ).css({ 'padding-top': 0 });
+            });
+        });
+
+        @* keypress *@
+        $(document).on('keypress', function (e) {
+            if (e.which == 13) {
+                Search();
+            }
+        });
+        $(document).ready(function () {
+            //datepicker plugin
+            $('#fromdate, #todate, #apprfromdate, #apprtodate').datepicker({
+                autoclose: true,
+                todayHighlight: true,
+                dateFormat: 'yy-mm-dd'
+
+            })
+                //show datepicker when clicking on the icon
+                .next().on(ace.click_event, function () {
+                    $(this).prev().focus();
+                });
+        });
+        function Search()
+        {
+            $('#manageForm').attr('action', '@Url.Action("Index", "InvF_InventoryOutFG")').submit();
+        }
+        var objInvF_InventoryOutFG = new InvF_InventoryOutFG();
+        function Delete(ifinvoutfgno) {
+            var objInvF_InventoryOutFG_Delete = {
+                IF_InvOutFGNo: ifinvoutfgno,
+            };
+
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Delete", "InvF_InventoryOutFG")';
+
+            objInvF_InventoryOutFG.Image_Message = "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO";
+            objInvF_InventoryOutFG.Confirm_Message = "Đồng ý xóa phiếu xuất '" + ifinvoutfgno + "' ?";
+            objInvF_InventoryOutFG.ajaxSettings = ajaxSettings;
+            objInvF_InventoryOutFG.deleteData(objInvF_InventoryOutFG_Delete);
+        }
+
+        var objCommonExcel = new CommonExcel();
+        var objVariablesInit = {
+            Id_FormMain: '',
+            Id_FormImportExcel: 'manageFormImportExcel',
+            Id_Modal: 'ImportExcelModal',
+            Id_FileInput: 'file',
+        };
+
+        var ajaxSettings_Excel = {};
+        ajaxSettings_Excel.Type = 'post';
+        ajaxSettings_Excel.DataType = 'json';
+
+        function ShowPopupImportExcel() {
+            ajaxSettings_Excel.Url = '@Url.Action("ShowPopupImportExcel", "Admin")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.variablesInit(objVariablesInit);
+            objCommonExcel.showPopupImportExcel();
+        }
+
+        function ImportFileExcel() {
+            ajaxSettings_Excel.Url = '@Url.Action("Import", "InvF_InventoryOutFG")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.variablesInit(objVariablesInit);
+            objCommonExcel.importFileExcel();
+        }
+
+        function ExportTemplate() {
+            ajaxSettings_Excel.Url = '@Url.Action("ExportTemplate", "InvF_InventoryOutFG")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.exportExcel();
+        }
+
+        function Export() {
+            ajaxSettings_Excel.Url = '@Url.Action("Export", "InvF_InventoryOutFG")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            var trArr = $('tbody#table-tbodyID tr.trdata');
+            if (trArr !== null && trArr.length > 0) {
+                var ifinvoutfgno = $("#ifinvoutfgno").val();
+                var formouttype = $("#formouttype").val();
+                var partcode = $("#partcode").val();
+                var fromdate = $("#fromdate").val();
+                var todate = $("#todate").val();
+                var invfouttype = $("#invfouttype").val();
+                var status = $("#status").val();
+                var apprfromdate = $('#apprfromdate').val();
+                var apprtodate = $('#apprtodate').val();
+
+                var ListSearchInput = [
+                    { Key: "ifinvoutfgno", Value: ifinvoutfgno },
+                    { Key: "formouttype", Value: formouttype },
+                    { Key: "partcode", Value: partcode },
+                    { Key: "fromdate", Value: fromdate },
+                    { Key: "todate", Value: todate },
+                    { Key: "invfouttype", Value: invfouttype },
+                    { Key: "status", Value: status },
+                    { Key: 'apprtodate', Value: apprtodate },
+                    { Key: 'apprfromdate', Value: apprfromdate },
+                ];
+                objCommonExcel.exportExcel(ListSearchInput);
+            }
+            else {
+                alert("Lưới dữ liệu trống!");
+                return false;
+            }
+        }
+
+        function Approved(ifinvoutfgno) {
+            var objInvF_InventoryOutFG_Approve = {
+                IF_InvOutFGNo: ifinvoutfgno,
+            };
+
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Approved", "InvF_InventoryOutFG")';
+
+            objInvF_InventoryOutFG.Image_Message = "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO";
+            objInvF_InventoryOutFG.Confirm_Message = "Đồng ý duyệt phiếu xuất '" + ifinvoutfgno + "' ?";
+            objInvF_InventoryOutFG.ajaxSettings = ajaxSettings;
+            objInvF_InventoryOutFG.approveData(objInvF_InventoryOutFG_Approve);
+        }
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            (function ($) {
+                var body = $('body');
+                body.on('keyup', '#dynamic-table-thead-search', function () {
+                    var datafilter = $(this).val();
+                    if (datafilter !== undefined && datafilter !== null && datafilter.toString().trim()) {
+                        datafilter = datafilter.toUpperCase().trim();
+                    }
+                    var rex = new RegExp($(this).val(), 'i');
+                    $('#table-tbodyID tr').hide();
+                    $('#table-tbodyID tr').filter(function () {
+                        debugger
+                        var dataOfRow = $(this).text();
+                        if (dataOfRow !== undefined && dataOfRow !== null && dataOfRow.toString().trim().length > 0) {
+                            dataOfRow = dataOfRow.toUpperCase().trim();
+                        }
+                        if (dataOfRow.toUpperCase().indexOf(datafilter) > -1) {
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }
+                    }).show();
+                });
+
+            }(jQuery));
+
+        });
+        var listColumns = {
+            //'STT': [],//['abc', 'def'],
+            'IF_INVOUTFGNO': [],//['ghi', 'klm'],
+            'CREATEBY': [],
+            'CREATEDTIMEUTC': [],
+            'APPRDTIMEUTC': [],
+            'FORMOUTTYPE': []
+        };
+        var options = {};
+        options.Columns = listColumns;
+        $('#dynamic-table-thead').table_Sortable(options);
+    </script>
+}

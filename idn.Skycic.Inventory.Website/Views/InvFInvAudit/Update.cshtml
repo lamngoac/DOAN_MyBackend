@@ -1,0 +1,170 @@
+﻿@model RT_InvF_InvAudit
+@{
+    var Lst_Mst_Inventory = ViewBag.Lst_Mst_Inventory as List<Mst_Inventory>;
+    var Lst_Mst_InventoryType = ViewBag.Lst_Mst_InventoryType as List<Mst_InventoryType>;
+    var Lst_Mst_InventoryLevelType = ViewBag.Lst_Mst_InventoryLevelType as List<Mst_InventoryLevelType>;
+    var IFInvAudNo = ViewBag.IFInvAudNo == null ? "" : ViewBag.IFInvAudNo.ToString();
+
+    var lst_Mst_InvOutType = new List<Mst_InvOutType>();
+    if (ViewBag.Lst_Mst_InvOutType != null)
+    {
+        lst_Mst_InvOutType = ViewBag.Lst_Mst_InvOutType as List<Mst_InvOutType>;
+    }
+
+    var lstCustomer = new List<Mst_Customer>();
+    if (ViewBag.Lst_MstCustomer != null)
+    {
+        lstCustomer = ViewBag.Lst_MstCustomer as List<Mst_Customer>;
+    }
+
+    var lst_Mst_ProductUI = new List<Mst_ProductUI>();
+    if (ViewBag.Lst_Mst_ProductUI != null)
+    {
+        lst_Mst_ProductUI = ViewBag.Lst_Mst_ProductUI;
+    }
+
+    var InvF_InvAudit = new InvF_InvAudit();
+    if (Model != null && Model.Lst_InvF_InvAudit != null && Model.Lst_InvF_InvAudit.Count != 0)
+    {
+        InvF_InvAudit = Model.Lst_InvF_InvAudit[0];
+    }
+    var iF_InvAuditStatus = CUtils.StrValue(InvF_InvAudit.IF_InvAuditStatus);
+    var lst_InvF_InvAuditDtl = new List<InvF_InvAuditDtl>();
+    var style = "";
+    if (Model.Lst_InvF_InvAuditDtl != null)
+    {
+        lst_InvF_InvAuditDtl = Model.Lst_InvF_InvAuditDtl;
+        if (Model.Lst_InvF_InvAuditDtl.Count > 0)
+        {
+            style = "disabled=\"disabled\"";
+        }
+    }
+}
+@{
+    ViewBag.Title = "Chi tiết phiếu kiểm kê";
+}
+<script src="~/Content/assets/js/myjs/invfinvaudit.js"></script>
+
+<div class="mt-3">
+    <div class="col-12">
+        @using (Html.BeginForm("Update", "InvFInvAudit", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+            <div class="col-12 row no-margin">
+                <div class="margin-bottom-9">
+                    @RenderItemFormat("BTN_INVFINVAUDIT_SAVE", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnSave\" onclick=\"SaveData('" + Url.Action("Save", "InvFInvAudit") + "', '0');\"><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i> Lưu</a>", "", "")
+                </div>
+            </div>
+            <div class="col-12 row">
+                <div class="col-12 row">
+                    <aside class="col-md-4">
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="IFInvAudNo">
+                                @("Số phiếu kiểm kê".HtmlItemString("ifinvaudno_invfinvaudit"))
+                            </label>
+                            <div class="col-md-8">
+                                <input type="text" class="col-md-12 text-bold" name="IFInvAudNo" id="IFInvAudNo" readonly="readonly" value="@(InvF_InvAudit.IF_InvAudNo == null ? "" : InvF_InvAudit.IF_InvAudNo)" />
+                            </div>
+                        </div>
+
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="IFInvAudNo">
+                                @("Ngày tạo".HtmlItemString("createdtime_invfinvaudit"))
+                            </label>
+                            <div class="col-md-8">
+                                <input type="text" class="col-md-12 text-bold" readonly="readonly" value="@(InvF_InvAudit.CreateDTimeUTC == null ? "" : Convert.ToDateTime(InvF_InvAudit.CreateDTimeUTC).ToString("yyyy-MM-dd"))" />
+                            </div>
+                        </div>
+                    </aside>
+                    <aside class="col-md-4">
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="InvCodeOut">
+                                @("Kho kiểm kê".HtmlItemString("invcode_invfinvaudit"))
+                                <span style="color: red "> *</span>
+                            </label>
+                            <div class="col-md-8">
+                                <span class="block input-icon input-icon-right">
+                                    <select @style showpopup-control-searchdata="#ShowPopupInvCodeAudit" class="col-md-12 mstinventory" onchange="ChangeInvCodeOut(this);" id="InvCodeAudit">
+                                        <optgroup label="">
+                                            <option value="">--Chọn kho kiểm kê--</option>
+                                            @if (Lst_Mst_Inventory != null && Lst_Mst_Inventory.Count > 0)
+                                            {
+                                                foreach (var item in Lst_Mst_Inventory)
+                                                {
+                                                    var invCode = CUtils.StrValue(item.InvCode);
+                                                    var invName = CUtils.StrValue(item.InvName);
+                                                    <option @(InvF_InvAudit.InvCodeAudit.Equals(item.InvCode) ? "selected" : "") invBUPattern="@(item.InvBUPattern == null ? "" : item.InvBUPattern)" value="@MvcHtmlString.Create(invCode)">@MvcHtmlString.Create(invName)</option>
+                                                }
+                                            }
+                                        </optgroup>
+                                    </select>
+                                </span>
+                            </div>
+                        </div>
+                    </aside>
+                    <aside class="col-md-4">
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-3" for="Remark">
+                                @("Ghi chú".HtmlItemString("remark_invfinvaudit"))
+                            </label>
+                            <div class="col-md-12">
+                                <textarea class="col-md-6" disabled name="Remark" id="Remark" rows="2">@(InvF_InvAudit.Remark == null ? "" : InvF_InvAudit.Remark.ToString())</textarea>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+
+                <div class="col-12 row">
+                    <aside class="col-md-4">
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4">
+                                @("Hàng hóa".HtmlItemString("productcode_invfinvaudit"))
+                            </label>
+                            <div class="col-md-8">
+                                <div class="col-12 form-group no-padding">
+                                    <input class="col-12" type="text" name="ProductCodeSearch" id="ProductCodeSearch" value="" autocomplete="off" placeholder="Quét mã vạch, mã hh, tên hh,serial, số xác thực, hoặc nhập để tìm kiếm" />
+                                    <input class="col-12 idn-hidden" type="text" name="ProductScan" id="ProductScan" value="" autocomplete="off" placeholder="Quét mã vạch, mã hh, tên hh,serial, số xác thực, hoặc nhập để tìm kiếm" />
+                                    <div class="product-list">
+                                        <ul class="no-padding no-margin"></ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+                    <aside class="col-md-4">
+                        <a href="javascript:void(0);" class="btn btn-nc-button" style="margin-left: 10px" id="btnScanProduct" onclick="ScanProduct();">@("Quét".HtmlItemString("productscan_inventoryout"))</a>
+                        <a href="javascript:void(0);" class="btn btn-nc-button" id="btnMore" onclick="AddMoreProduct()">Tất cả kho</a>
+                    </aside>
+                    
+            </div>
+        }
+    </div>
+        }
+</div>
+
+@Html.Partial("LstProduct", lst_InvF_InvAuditDtl, new ViewDataDictionary(){
+    { "viewonly", "0"},
+    { "IF_InvAuditStatus", InvF_InvAudit.IF_InvAuditStatus }
+})
+@Html.Partial("_TemplateHtml", new ViewDataDictionary(){
+    { "lstInvF_InvAuditInstLot", Model.Lst_InvF_InvAuditInstLot },
+    { "lstInvF_InvAuditInstSerial", Model.Lst_InvF_InvAuditInstSerial },
+    { "Lst_InvF_InvAuditDtl", lst_InvF_InvAuditDtl }
+})
+@Html.Partial("_CommonJs", new ViewDataDictionary() {
+    { "viewonly", "0" }
+})
+
+@section Scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            //$('.select2-selection').select2();
+            //$('#FlagIn_Out').select2({
+            //    minimumResultsForSearch: -1
+            //});
+            $("select#InvCodeAudit").select2();
+            $("select#ProductCode").select2();
+        });
+    </script>
+}

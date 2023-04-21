@@ -1,0 +1,78 @@
+﻿
+@model List<InvF_InventoryOutFGInstSerial>
+
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title text-center" id="exampleModalLabel">Danh sách Barcode </h3>
+            <a href="javascript:void();" onclick="CloseModalImportExcel()" class="close" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </a>
+        </div>
+        <div class="modal-body clearfix">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "manageFormImportExcel" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="clearfix"></div>
+                <aside class="col-xs-12 text-center">
+                    <div class="scrollable-horizontal padding-left-0 padding-right-0 div-scrollable" data-size="600" style="padding-top: 0!important;">
+                        <div style="width: 100%; float: left;">
+                            <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                                <thead>
+                                    <tr>
+                                        <th class="cell-50">@MvcHtmlString.Create("TT")</th>
+                                        <th class="cell-100">@MvcHtmlString.Create("Mã sản phẩm")</th>
+                                        <th class="cell-200">@MvcHtmlString.Create("BarCode")</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div class="scrollable" data-size="500" style="width: 100%; float: left;">
+                            <table id="dynamic-table-tbody" class="table table-striped table-bordered table-hover table-tbody">
+                                <tbody id="table-tbodyID">
+                                    @if (Model != null && Model.Count > 0)
+                                    {
+                                        var i = 1;
+                                        foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <input type="hidden" id="IF_InvInFGNo" name="IF_InvInFGNo" class="col-xs-11" value="@item.IF_InvOutFGNo" autocomplete="off">
+                                                <input type="hidden" id="PartCode" name="PartCode" class="col-xs-11" value="@item.PartCode" autocomplete="off">
+                                                <td class="text-center cell-50">@(i++)</td>
+                                                <td class="text-left cell-100">@MvcHtmlString.Create(item.PartCode.ToString())</td>
+                                                <td class="text-left cell-200">@MvcHtmlString.Create("https://inbrand.vn/tracuu?ProdID="+item.SerialNo.ToString())</td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </aside>
+            }
+
+        </div>
+
+    </div>
+</div>
+<script type="text/javascript">
+    @* Scroll *@
+
+    $('.scrollable').each(function () {
+        var $this = $(this);
+        $(this).ace_scroll({
+            //size: 500,
+            size: $this.attr('data-size') || 1000,
+            mouseWheelLock: true
+            //styleClass: 'scroll-left scroll-margin scroll-thin scroll-dark scroll-light no-track scroll-visible'
+        });
+    });
+
+    @* keypress *@
+    $(document).on('keypress', function (e) {
+        if (e.which == 13) {
+            Search();
+        }
+    });
+
+</script>

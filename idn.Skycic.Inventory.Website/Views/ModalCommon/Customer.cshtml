@@ -1,0 +1,167 @@
+﻿@model List<Mst_Customer>
+
+<div class="modal-dialog" style="width: 500px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel"><b>POPUP khách hàng</b></h2>
+            <a href="javascript:;" onclick="ClosePopupCustomer()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body" style="">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupCustomer" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="col-xs-12">
+                    <div class="form-group margin-bottom-5">
+                        <label for="ParentCode" class="col-xs-3 col-sm-2 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tìm khách hàng <span style=\"color: red\">*</span>")</label>
+                        <div class="col-xs-3 col-sm-4">
+                            <select id="Lo" style="width: 150px;" multiple>
+                                @{
+                                    foreach (var it in Model)
+                                    {
+                                        <option CustomerCode="@it.CustomerCode" CustomerName="@(it.CustomerName == null ? "" : it.CustomerName)" CustomerAddress=@(it.CustomerAddress == null ? "" : it.CustomerAddress) ContactName=@(it.ContactName == null ? "" : it.ContactName) CustomerPhoneNo="@(it.CustomerPhoneNo == null ? "" : it.CustomerPhoneNo)"> @it.CustomerCode - @it.CustomerName</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+                <div style="width: 100%; float: left;">
+                    <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                        <thead>
+                            <tr class="trthead">
+                                <th class="text-center cell-150">
+                                </th>
+                                <th fieldId="CustomerCode" sorttype="T" fieldName="Mã khách hàng" fieldActive="0" class="text-left cell-200">
+                                    @("Mã khách hàng".HtmlItemString("customercode"))
+                                </th>
+                                <th fieldId="CustomerName" sorttype="T" fieldName="Tên khách hàng" fieldActive="0" class="text-left cell-200">
+                                    @("Tên khách hàng".HtmlItemString("customername"))
+                                </th>
+                                <th fieldId="CustomerAddress" sorttype="T" fieldName="Địa chỉ" fieldActive="0" class="text-left cell-200">
+                                    @("Địa chỉ".HtmlItemString("customeraddress"))
+                                </th>
+                                <th fieldId="ContactName" sorttype="T" fieldName="Người liên hệ" fieldActive="0" class="text-left cell-300">
+                                    @("Người liên hệ".HtmlItemString("contactname"))
+                                </th>
+                                <th fieldId="CustomerPhoneNo" sorttype="T" fieldName="Điện thoại" fieldActive="0" class="text-left cell-200">
+                                    @("Điện thoại".HtmlItemString("customerphoneno"))
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                    <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                        <tbody id="table-tbodyID"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="SelectCustomer()" style="float: right;font-size: 13px;">Chọn</a>
+            <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="SaveCustomer()" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i>Lưu</a>
+        </div>
+    </div>
+</div>
+
+
+<table hidden>
+    <tbody id="rowtemplateCustomer">
+        <tr class="data-item trdata">
+            <td fieldId="CONTROL" fieldActive="0" class="text-center cell-150 action-buttons">
+                @*@{
+                            var urlDetail = "";
+                            urlDetail += Url.Action("Detail", "Mst_Inventory", new { invCode = item.InvCode });
+                            var urlUpdate = "";
+                            urlUpdate += Url.Action("Update", "Mst_Inventory", new { invCode = item.InvCode });
+                        }
+                        @RenderItemFormat("BTN_QL_KHO_CHI_TIET", "<a class=\"icon-detail\" href=\'" + urlDetail + "\' title=\"Chi tiết\"><i class=\"far fa-eye green\"></i></a>", "", "")
+                        @RenderItemFormat("BTN_QL_KHO_SUA", "<a class=\"icon-edit\" href=\'" + urlUpdate + "\' title=\"Sửa\"><i class=\"fas fa-pencil-alt\"></i></a>", "", "")
+                        @RenderItemFormat("BTN_QL_KHO_XOA", "<a href=\"javascript:;\" class=\"icon-delete\" title=\"Xóa\" onclick=\"Delete('" + item.InvCode.ToString() + "','" + item.InvName.ToString() + "')\"><i class=\"fas fa-trash-alt\"></i></a>", "", "")
+                    </td>*@
+                @*<a class="icon-delete" title="Xóa" onclick="DeleteCustomer(this);"><i class=\"fas fa-trash-alt\"></i></a>*@
+
+                <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteCustomer(this);"><i class="fas fa-trash-alt"></i></a>
+            </td>
+            <td fieldActive="CustomerCode" class="text-left cell-200">
+                ==CustomerCode==
+            </td>
+            <td fieldId="CustomerName" fieldActive="0" class="text-left cell-200">
+                ==CustomerName==
+            </td>
+            <td fieldId="CustomerAddress" fieldActive="0" class="text-left cell-200">
+                ==CustomerAddress==
+            </td>
+            <td fieldId="ContactName" fieldActive="0" class="text-left cell-300">
+                ==ContactName==
+            </td>           
+            <td fieldId="CustomerPhoneNo" fieldActive="0" class="text-left cell-200">
+                ==CustomerPhoneNo==
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<script>
+    $(function () {
+        $('select[id$="Customer"]').multiselect({
+            includeSelectAlCustomerption: false,
+            enableFiltering: true,
+            maxHeight: 200,
+            max_selected_options: 100
+        });
+
+        //$('#Customer').multiselect();
+    })
+
+    function SelectCustomer() {
+        debugger;
+        var length = $('#Customer').find("option:selected").length;
+        if (length == 0) {
+            alert("Không có lô nào được chọn");
+            return;
+        }
+        var lstCustomer = [];
+
+        for (var i = 0; i < length; i++) {
+            var Customer = new Object();
+            var optselect = $('#Customer').find("option:selected").eq(i);
+            Customer.CustomerCode = optselect.attr("CustomerCode");
+            Customer.CustomerName = optselect.attr("CustomerName");
+            Customer.CustomerAddress = optselect.attr("CustomerAddress");
+            Customer.ContactName = optselect.attr("ContactName");
+            Customer.CustomerPhoneNo = optselect.attr("CustomerPhoneNo");
+            lstCustomer.push(Customer);
+        }
+        var qtyCustomer = lstCustomer.length;
+        for (var i = 0; i < qtyCustomer; i++) {
+            var item = lstCustomer[i];
+            var strHtml = getHtmlFromTemplate($('#rowtemplateCustomer'), {
+                CustomerCode: item.CustomerCode,
+                CustomerName: item.CustomerName,
+                CustomerAddress: item.CustomerAddress,
+                ContactName: item.ContactName,
+                CustomerPhoneNo: item.CustomerPhoneNo
+                //idx: 999999
+            });
+            $('#table-tbodyID').append(strHtml);
+        }
+    }
+
+    function DeleteCustomer(thiz, maCustomer) {
+        bootbox.confirm("Đồng ý xóa lô " + maCustomer+"?", function (result) {
+                if (result) {
+                    var tr = $(thiz).parents('tr');
+                    if (tr != undefined) {
+                        tr.remove();
+                    }
+                }
+            });
+    }
+
+    function SaveCustomer() {
+
+    }
+</script>

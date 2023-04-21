@@ -1,0 +1,323 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - AdminLTE 3 | Dashboard</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!--Theme LTE CSS-->
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <!-- Tempusdominus Bbootstrap 4 -->
+    <link rel="stylesheet" href="@Url.Content("~/Core.Content/lte/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css")">
+    <!-- iCheck -->
+    <link rel="stylesheet" href="@Url.Content("~/Core.Content/lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css")">
+    <!-- JQVMap -->
+    <link rel="stylesheet" href="@Url.Content("~/Core.Content/lte/plugins/jqvmap/jqvmap.min.css")">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="@Url.Content("~/Core.Content/lte/dist/css/adminlte.min.css")">
+    <!-- overlayScrollbars -->
+    <link rel="stylesheet" href="@Url.Content("~/Core.Content/lte/plugins/overlayScrollbars/css/OverlayScrollbars.min.css")">
+    <!-- summernote -->
+    <link rel="stylesheet" href="@Url.Content("~/Core.Content/lte/plugins/summernote/summernote-bs4.css")">
+    <!--End Theme LTE CSS-->
+    <!-- Google Font: Source Sans Pro -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+
+
+    <!--StyleSheet-->
+    <link href="~/Content/Pivot/Css/jquery-ui.css" rel="stylesheet" />
+    <!--Bootstrap-->
+    <link rel="stylesheet" href="@Url.Content("~/Content/assets/css/bootstrap.min.css")" />
+    <!--Site-->
+    <link rel="stylesheet" href="@Url.Content("~/Core.Content/Core.Site.css")">
+    <!--Font awesome-->
+    <link rel="stylesheet" href="@Url.Content("~/Core.Content/font-awesome/5.11.2/css/all.min.css")" />
+
+    <!-- jQuery -->
+    <script src="@Url.Content("~/Core.Content/lte/plugins/jquery/jquery.min.js")"></script>
+    <!-- jQuery UI 1.11.4 -->
+    <script src="@Url.Content("~/Core.Content/lte/plugins/jquery-ui/jquery-ui.min.js")"></script>
+    <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+    <script>
+        $.widget.bridge('uibutton', $.ui.button)
+    </script>
+    <!--Them LTE JS-->
+    <!-- Bootstrap 4 -->
+    <script src="@Url.Content("~/Core.Content/lte/plugins/bootstrap/js/bootstrap.bundle.min.js")"></script>
+    <!-- ChartJS -->
+    <script src="@Url.Content("~/Core.Content/lte/plugins/chart.js/Chart.min.js")"></script>
+    <!-- Sparkline -->
+    <script src="@Url.Content("~/Core.Content/lte/plugins/sparklines/sparkline.js")"></script>
+    <!-- JQVMap -->
+    <script src="@Url.Content("~/Core.Content/lte/plugins/jqvmap/jquery.vmap.min.js")"></script>
+    <script src="@Url.Content("~/Core.Content/lte/plugins/jqvmap/maps/jquery.vmap.usa.js")"></script>
+    <!-- jQuery Knob Chart -->
+    <script src="@Url.Content("~/Core.Content/lte/plugins/jquery-knob/jquery.knob.min.js")"></script>
+    <!-- Tempusdominus Bootstrap 4 -->
+    <script src="@Url.Content("~/Core.Content/lte/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js")"></script>
+    <!-- Summernote -->
+    <script src="@Url.Content("~/Core.Content/lte/plugins/summernote/summernote-bs4.min.js")"></script>
+    <!-- overlayScrollbars -->
+    <script src="@Url.Content("~/Core.Content/lte/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js")"></script>
+    <!-- slimScroll -->
+    <script src="@Url.Content("~/Core.Content/lte/plugins/slimScroll/js/jquery.slimscroll.js")"></script>
+    <!-- AdminLTE App -->
+    <script src="@Url.Content("~/Core.Content/lte/dist/js/adminlte.js")"></script>
+    <!--End them LTE JS-->
+    <!-- AdminLTE for demo purposes -->
+    @*Show Error using jquery-ui.min.css, ace.min.css, jquery-ui.min.js, jquery.validate.min.js, jquery.form-2.68.js, ajaxform.js*@
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.validate.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/js/jquery.form-2.68.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/js/jquery.table.hpaging.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/js/ajaxform.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/js/CustomDataTable.js")"></script>
+    @*End Show Error*@
+
+    @Html.Partial("_loading")
+    <script type="text/javascript" src="@Url.Content("~/Scripts/js/jquery-library-1.0.7.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/js/CheckForm.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/js/CommonExcel.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/js/CommonUtils.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/assets/js/bootbox.js")"></script>
+    @* Ckfinder - Ckeditor *@
+    <script src="@Url.Content("~/Content/plugin/ckeditor/ckeditor.js")"></script>
+
+    <!-- Jquery-->
+    <script type="text/javascript" src="@Url.Content("~/Content/assets/js/jquery-2.1.4.min.js")"></script>
+    <script type="text/javascript">
+            window.jQuery || document.write("<script src='@Url.Content("~/Content/assets/js/jquery-2.1.4.min.js")'>" + "<" + "/script>");
+    </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/js/jquery-ui.min.js")"></script>
+    <!-- basic scripts -->
+    <script type="text/javascript">
+            if ('ontouchstart' in document.documentElement) document.write("<script src='@Url.Content("~/Content/assets/js/jquery.mobile.custom.min.js")'>" + "<" + "/script>");
+    </script>
+
+    @*Script*@
+    <script type="text/javascript" src="@Url.Content("~/Content/assets/js/bootstrap.min.js")"></script>
+
+    <!-- ace scripts -->
+    <script type="text/javascript" src="@Url.Content("~/Content/assets/js/ace-elements.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/assets/js/ace.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/assets/js/bootbox.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/js/jquery.number.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.bxslider.min.js")"></script>
+    @*Show Error using jquery-ui.min.css, ace.min.css, jquery-ui.min.js, jquery.validate.min.js, jquery.form-2.68.js, ajaxform.js*@
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.validate.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/js/jquery.form-2.68.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/js/jquery.table.hpaging.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/js/ajaxform.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/mine/KeepAlive.js")"></script>
+
+    <!--Nghi vấn-->
+    <!-- Daterange picker -->
+    <link rel="stylesheet" href="@Url.Content("~/Core.Content/lte/plugins/daterangepicker/daterangepicker.css")">
+
+    @RenderSection("StyleSheet", required: false)
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        @Html.Partial("CoreNavbar")
+        <!--Core_VerticalMenu-->
+        <!-- Main Sidebar Container -->
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <!-- Brand Logo -->
+            <a href="index3.html" class="brand-link color-header">
+                <img src="@Url.Content("~/Content/lte/dist/img/AdminLTELogo.png")" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
+                     style="opacity: .8">
+                <span class="brand-text font-weight-light">AdminLTE 3</span>
+            </a>
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Sidebar Menu -->
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                        <!-- Add icons to the links using the .nav-icon class
+                        with font-awesome or any other icon font library -->
+                        @*<li class="nav-item">
+                                <a href="pages/widgets.html" class="nav-link">
+                                    <i class="nav-icon fas fa-th"></i>
+                                    <p>
+                                        Widgets
+                                    </p>
+                                </a>
+                            </li>*@
+                        @if (CheckAccess("MENU_ROOT"))
+                        {
+
+                            if (CheckAccess("MENU_BAO_CAO"))
+                            {
+                                <li class="nav-item has-treeview">
+                                    <a href="#" class="nav-link">
+                                        <i class="fas fa-boxes"></i>
+                                        <p>
+                                            Báo cáo
+                                            <i class="fas fa-angle-left right"></i>
+                                            @*<span class="badge badge-info right">4</span>*@
+                                        </p>
+                                    </a>
+                                    <ul class="nav nav-treeview">
+                                        <li class="nav-item">
+                                            @RenderSubMenuItem("MENU_BAO_CAO_NHAP_KHO", "Báo cáo nhập kho", "RptInvF_InventoryInFGSum", "Reports")
+                                        </li>
+                                        <li class="nav-item">
+                                            @RenderSubMenuItem("MENU_BAO_CAO_XUAT_KHO", "Báo cáo xuất kho", "RptInvF_InventoryOutFGSum", "Reports")
+                                        </li>
+                                        <li class="nav-item">
+                                            @RenderSubMenuItem("MENU_BAO_CAO_TON_KHO", "Báo cáo tồn kho", "RptInv_BalanceSerial", "Reports")
+                                        </li>
+                                        <li class="nav-item">
+                                            @RenderSubMenuItem("MENU_BAO_CAO_XUAT_NHAP_TON", "Báo cáo xuất-nhập-tồn", "RptInv_InventoryBalanceMonth", "Reports")
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </nav>
+                <!-- /.sidebar-menu -->
+            </div>
+            <!-- /.sidebar -->
+        </aside>
+        <!--end Core_VerticalMenu-->
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <!-- /.content-header -->
+            <!-- Main content -->
+            <section class="content">
+                @RenderBody()
+                <!-- /.container-fluid -->
+                
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+        <footer class="main-footer"></footer>
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+        </aside>
+        <!-- /.control-sidebar -->
+    </div>
+    <div class="modal" role="dialog" id="modal_ChangePassword">
+        @Html.Partial("ChangePassword")
+    </div>
+    <div class="modal fade" id="Contact" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width: 45%; margin-top: 80px !important">
+            <div class="modal-content">
+                <div class="modal-header col-xs-12 col-md-12">
+                    @*<a href="javascript:void();" onclick="CloseModalImportExcel()" class="close" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </a>*@
+                    <h3 class="modal-title" id="exampleModalLabel">GIẢI PHÁP INBRAND</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="col-md-12 col-xs-12 pc no-padding">
+                        <div class="col-xs-12 col-md-12 no-padding">
+                            <span>Cung cấp bởi: <strong> CÔNG TY CỔ PHẦN QUỐC TẾ LONG QUANG</strong></span>
+                        </div>
+                        <div class="col-xs-12 col-md-12 no-padding">
+                            <span><img class="img_" src="~/Images/address.svg" alt="Map"> Tầng 19, 27 Huỳnh Thúc Kháng, P.Láng Hạ, Q.Đống Đa, TP.Hà Nội</span><br>
+                        </div>
+                        <div class="col-md-6 no-padding">
+                            <span><img class="img_" src="~/Images/support.svg" alt="Contact Center"> Contact Center: 024 7306 8889</span>
+                        </div>
+                        <div class="col-md-6 no-padding">
+                            <span><img class="img_" src="~/Images/hotline.svg" alt="hotline">    Hotline: 0962 46 44 66</span><br>
+                        </div>
+                        <div class="col-md-6 no-padding">
+                            <span><img class="img_" src="~/Images/email.svg" alt="email"> inbrand@inos.vn   </span>
+                        </div>
+                        <div class="col-md-6 no-padding">
+                            <span><img class="img_" src="~/Images/website.svg" alt="website">     www.inbrand.vn</span><br>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- ./wrapper -->
+    <script type="text/javascript" src="@Url.Content("~/Scripts/js/table-sortable-v3.js")"></script>
+    @*End Show Error*@
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (commonUtils.checkElementExists('#Profile')) {
+                $('#Profile').unbind('click').bind('click', function () {
+                    $('#modal_ChangePassword').modal({
+                        backdrop: false,
+                        keyboard: true
+                    });
+                });
+            }
+        });
+
+        function ClosePopupModelChangePassword() {
+            if (commonUtils.checkElementExists('#passold')) {
+                $('#passold').val('');
+            }
+            if (commonUtils.checkElementExists('#passnew')) {
+                $('#passnew').val('');
+            }
+            if (commonUtils.checkElementExists('#confpass')) {
+                $('#confpass').val('');
+            }
+            $('#modal_ChangePassword').modal("hide");
+            //$('#modal_ChangePassword').html('');
+        }
+
+    </script>
+    @*@Html.Partial("Footer")*@
+
+    <script src="@Url.Content("~/Scripts/js/ie10-viewport-bug-workaround.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/CustomSelect.js")"></script>
+    @*Chèn Scripts tại trang con nếu cần*@
+    @RenderSection("Scripts", required: false)
+    @*lan 2019_04-13*@
+    <script>
+        function escapeHtml(text) {
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function SelectBackground() {
+            $('#fileImageBackGround').click();
+        }
+
+        function SelectLogo() {
+            $('#fileImage').click();
+        }
+    </script>
+
+    @{
+        var isoverflowx = ViewBag.OverflowX;
+    }
+    @if (isoverflowx != true)
+    {
+        <script>
+            function putdatasize() {
+                //debugger
+                var bodyh = $('body').height();
+                var screenh = screen.height;
+
+                var width = $('.title').width();
+
+                //var width = 1325;
+                $('.scrollable-horizontal').attr('data-size', width);
+            }
+
+            putdatasize();
+
+        </script>
+    }
+</body>
+</html>

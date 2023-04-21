@@ -1,0 +1,476 @@
+﻿@{
+    var lstInvF_InvAuditInstLot = new List<InvF_InvAuditInstLot>();
+    if (ViewBag.lstInvF_InvAuditInstLot != null)
+    {
+        lstInvF_InvAuditInstLot = ViewBag.lstInvF_InvAuditInstLot as List<InvF_InvAuditInstLot>;
+    }
+
+    var lstInvF_InvAuditInstSerial = new List<InvF_InvAuditInstSerial>();
+    if (ViewBag.lstInvF_InvAuditInstSerial != null)
+    {
+        lstInvF_InvAuditInstSerial = ViewBag.lstInvF_InvAuditInstSerial as List<InvF_InvAuditInstSerial>;
+    }
+
+    var lst_InvF_InvAuditDtl = new List<InvF_InvAuditDtl>();
+    if (ViewBag.Lst_InvF_InvAuditDtl != null)
+    {
+        lst_InvF_InvAuditDtl = ViewBag.Lst_InvF_InvAuditDtl;
+    }
+    var lstMstProductGroup = ViewBag.ListMstProductGroup as List<Mst_ProductGroup>;
+    if (lstMstProductGroup == null)
+    {
+        lstMstProductGroup = new List<Mst_ProductGroup>();
+    }
+    var tmpl_selected = "==selected==";
+}
+<!-- Render Row LOT cache -->
+<table>
+    <tbody id="table-detailLot"></tbody>
+</table>
+<script>
+    let Lst_Data_LOTCache = [];
+    @{
+        if (lstInvF_InvAuditInstLot != null)
+        {
+            foreach (var it in lstInvF_InvAuditInstLot)
+            {
+                <text>
+                var objLOTCache = {
+                    ProductCode: '@(it.ProductCode == null ? "0" : it.ProductCode)',
+                    ProductLotNo: '@(it.ProductLotNo == null ? "0" : it.ProductLotNo)',
+                    ProductLotNoActual: '@(it.ProductLotNo == null ? "0" : it.ProductLotNo)',
+                    QtyInit: '@(it.QtyInit == null ? "0" : it.QtyInit)',
+                    QtyActual: '@(it.QtyActual == null ? "0" : it.QtyActual)',
+                    ProductionDate: '@(it.ProductionDate == null ? "" : it.ProductionDate)',
+                    ExpiredDate: '@(it.ExpiredDate == null ? "" : it.ExpiredDate)',
+                    FlagExist: '@it.FlagExist',
+                    InvCodeInit: '@(it.InvCodeInit == null ? "0" : it.InvCodeInit)',
+                    InvCodeActual: '@(it.InvCodeActual == null ? "0" : it.InvCodeActual)',
+                    InventoryAction: '@(it.InventoryAction == null ? "OUT" : it.InventoryAction)',
+                }
+                Lst_Data_LOTCache.push(objLOTCache);
+                </text>
+            }
+        }
+    }
+    $(document).ready(function () {
+        debugger;
+        @* Add danh sách serial vào Popup *@
+        if (Lst_Data_LOTCache !== undefined && Lst_Data_LOTCache !== null && Lst_Data_LOTCache.length > 0) {
+            for (var i = 0; i < Lst_Data_LOTCache.length; i++) {
+                renderRowLOTCache(Lst_Data_LOTCache[i]);
+            }
+        }
+    });
+</script>
+<script type="text/template" id="tmpl_RenderRowLOTCache">
+    <tr class="data-item trdata" rd="==rd==" idx="==idx==" productcode="==ProductCode==" invcodeinit="==InvCodeInit==" invcodeactual="==InvCodeActual==" productlotno="==ProductLotNo==">
+        <input type="hidden" class="==invcodeinitCss==" value="==InvCodeInit==" />
+        <input type="hidden" class="==invcodeactualCss==" value="==InvCodeActual==" />
+        <input type="hidden" class="==productcodeCss==" value="==ProductCode==" />
+        <input type="hidden" class="==productlotnoCss==" value="==ProductLotNo==" />
+        <input type="hidden" class="==productlotnottCss==" value="==ProductLotNo==" />
+        <input type="hidden" class="==qtyinitCss==" value="==QtyInit==" />
+        <input type="hidden" class="==qtyttCss==" value="==QtyActual==" />
+        <input type="hidden" class="==productiondateCss==" value="==ProductionDate==" />
+        <input type="hidden" class="==expireddateCss==" value="==ExpiredDate==" />
+        <input type="hidden" class="==flagexistCss==" value="==FlagExist==" />
+        <input type="hidden" class="==inventoryactionCss==" value="==InventoryAction==" />
+    </tr>
+</script>
+<!-- End Render Row LOT cache -->
+<!-- Cache Serial Rows -->
+<table>
+    <tbody id="table-detailSerial"></tbody>
+</table>
+<script>
+    let Lst_Data_SerialCache = [];
+    @{
+        if (lstInvF_InvAuditInstSerial != null)
+        {
+            foreach (var it in lstInvF_InvAuditInstSerial)
+            {
+                <text>
+                var objSerialCache = {
+                    ProductCode: '@it.ProductCode',
+                    SerialNo: '@it.SerialNo',
+                    SerialNoActual: '@it.SerialNo',
+                    FlagExist: '@it.FlagExist',
+                    InvCodeInit: '@it.InvCodeInit',
+                    InvCodeActual: '@it.InvCodeActual',
+                    InventoryAction: '@it.InventoryAction',
+                }
+                Lst_Data_SerialCache.push(objSerialCache);
+                </text>
+            }
+        }
+    }
+    $(document).ready(function () {
+        debugger;
+        @* Add danh sách serial vào Popup *@
+        if (Lst_Data_SerialCache !== undefined && Lst_Data_SerialCache !== null && Lst_Data_SerialCache.length > 0) {
+            for (var i = 0; i < Lst_Data_SerialCache.length; i++) {
+                renderRowSerialCache(Lst_Data_SerialCache[i]);
+            }
+        }
+    });
+</script>
+<script type="text/template" id="tmpl_RenderRowSerialCache">
+    <tr class="data-item trdata" rd="==rd==" idx="==idx==" productcode="==ProductCode==" invcodeinit="==InvCodeInit==" invcodeactual="==InvCodeActual==" serialno="==SerialNo==">
+        <input type="hidden" class="==invcodeinitCss==" value="==InvCodeInit==" />
+        <input type="hidden" class="==invcodeactualCss==" value="==InvCodeActual==" />
+        <input type="hidden" class="==productcodeCss==" value="==ProductCode==" />
+        <input type="hidden" class="==serialnoCss==" value="==SerialNo==" />
+        <input type="hidden" class="==serialnoactualCss==" value="==SerialNo==" />
+        <input type="hidden" class="==flagexistCss==" value="==FlagExist==" />
+        <input type="hidden" class="==inventoryactionCss==" value="==InventoryAction==" /> @* Mặc định là OUT @(it.InventoryAction == null ? "" : it.InventoryAction)*@
+    </tr>
+</script>
+<!-- End Cache Serial Rows -->
+<!-- #region Render Row Product Not Serial Not Lot -->
+<table>
+    <tbody id="table-detailCombo">
+        
+    </tbody>
+</table>
+<script>
+    let Lst_Data_ProductNomalCache = [];
+    @{
+        if (lst_InvF_InvAuditDtl != null)
+        {
+            foreach (var it in lst_InvF_InvAuditDtl)
+            {
+                <text>
+                var objProductCache = {
+                    ProductCode: '@it.ProductCode',
+                    mp_ProductCodeBase: '@it.mp_ProductCodeBase',
+                    QtyInit: '@it.QtyInit',
+                    InvCodeActual: '@it.InvCodeActual',
+                    UnitCode: '@it.UnitCode',
+                    Remark: '@it.Remark',
+                    InvCodeInit: '@it.InvCodeInit',
+                }
+                Lst_Data_ProductNomalCache.push(objProductCache);
+                </text>
+            }
+        }
+    }
+    $(document).ready(function () {
+        debugger;
+        @* Add danh sách hàng thường vào Popup *@
+        if (Lst_Data_ProductNomalCache !== undefined && Lst_Data_ProductNomalCache !== null && Lst_Data_ProductNomalCache.length > 0) {
+            for (var i = 0; i < Lst_Data_ProductNomalCache.length; i++) {
+                renderRowProductNomalCache(Lst_Data_ProductNomalCache[i]);
+            }
+        }
+    });
+</script>
+<script type="text/template" id="tmplRowProductNomalCache">
+    <tr class="data-item trdata" rd="==rd==" idx="==idx==" productcodebase="==mp_ProductCodeBase==" productcode="==ProductCode==" invcode="==InvCodeActual==">
+        <input type="hidden" class="==productCodeCss==" value="==ProductCode==" />
+        <input type="hidden" class="==qtyInitCss==" value="==QtyInit==" />
+        <input type="hidden" class="==invCodeActualCss==" value="==InvCodeActual==" />
+        <input type="hidden" class="==invCodeInitCss==" value="==InvCodeInit==" />
+        <input type="hidden" class="==unitCodeCss==" value="==UnitCode==" />
+        <input type="hidden" class="==remarkCss==" value="==Remark==" />
+    </tr>
+</script>
+<!-- #endregion -->
+
+<table hidden>
+    <tbody id="rowtemplateLoDetail">
+        <tr class="data-item trdata" idx="==idx==" productCode="==ProductCode==" InvCodeActual="==InvCodeOutActual==" ProductLotNo="==ProductLotNo==">
+            <input type="hidden" name="Lst_InvF_InvAuditInstLot[==idx==].InvCodeInit" value="==InvCodeOutActual==" />
+            <input type="hidden" name="Lst_InvF_InvAuditInstLot[==idx==].InvCodeActual" value="==InvCodeOutActual==" />
+            <input type="hidden" name="Lst_InvF_InvAuditInstLot[==idx==].ProductCode" value="==ProductCode==" />
+            <input type="hidden" name="Lst_InvF_InvAuditInstLot[==idx==].ProductLotNo" value="==ProductLotNo==" />
+            <input type="hidden" name="Lst_InvF_InvAuditInstLot[==idx==].QtyInit" value="==QtyTotalOK==">
+            <input type="hidden" name="Lst_InvF_InvAuditInstLot[==idx==].QtyActual" value="==QtyActual==">
+            <input type="hidden" name="Lst_InvF_InvAuditInstLot[==idx==].ProductionDate" value="==ProductionDate==" />
+            <input type="hidden" name="Lst_InvF_InvAuditInstLot[==idx==].ExpiredDate" value="==ExpiredDate==" />
+            <input type="hidden" name="Lst_InvF_InvAuditInstLot[==idx==].FlagExist" value="0" />
+            <input type="hidden" name="Lst_InvF_InvAuditInstLot[==idx==].InventoryAction" value="==InventoryAction==" />
+        </tr>
+    </tbody>
+</table>
+
+
+<table hidden>
+    <tbody id="rowtemplateSerialDetail">
+        <tr class="data-item trdata" rd="==rd==" idx="==idx==" productCode="==ProductCode==" invcodeactual="==InvCodeOutActual==" serialno="==SerialNo==">
+            <input type="hidden" class="==invcodeinitCss==" value="==InvCodeOutActual==" />
+            <input type="hidden" class="==invcodeactualCss==" value="==InvCodeOutActual==" />
+            <input type="hidden" class="==productcodeCss==" value="==ProductCode==" />
+            <input type="hidden" class="==serialnoCss==" value="==SerialNo==" />
+            <input type="hidden" class="==flagexistCss==" value="==FlagExist==" />
+            <input type="hidden" class="==inventoryactionCss==" value="==InventoryAction==" />
+        </tr>
+    </tbody>
+</table>
+
+<table hidden>
+    <tbody id="rowtemplateComboDetail">
+        <tr class="data-item trdata" rd="==rd==" idx="==idx==" invcode="==InvCodeOutActual==" productcode="==ProductCode==" productcoderoot="==ProductCodeRoot==">
+            <input type="hidden" class="==productcodeCss==" value="==ProductCode==" />
+            <input type="hidden" class="==productcoderootCss==" value="==ProductCodeRoot==" />
+            <input type="hidden" class="==qtyCss==" value="==Qty==" />
+            <input type="hidden" class="==qtyinitCss==" value="==QtyInit==" />
+            <input type="hidden" class="==invcodeoutactualCss==" value="==InvCodeOutActual==" />
+            <input type="hidden" class="==invcodeinitCss==" value="==InvCodeInit==" />
+            <input type="hidden" class="==unitcodeCss==" value="==UnitCode==" />
+            <input type="hidden" class="==remarkCss==" value="==Remark==" />
+            <input type="hidden" class="==inventoryactionCss==" value="==InventoryAction==" />
+        </tr>
+    </tbody>
+</table>
+
+<!-- Modal -->
+<div class="modal fade" id="ShowPopupLo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+<div class="modal fade" id="ShowPopupSerial" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+<div class="modal fade" id="ShowPopupCombo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+<div class="modal fade" id="ShowPopupTonKho" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+<div class="modal fade" id="ShowPopupProductSearch" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 1000px; max-width: 1000px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Tìm kiếm hàng hoá</b></h2>
+                <a href="javascript:;" onclick="ClosePopupProductSearch()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupAdd" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="layout-search">
+                        <div class="col-12 row no-margin">
+                            <div class="col-5">
+                                <div class="form-group margin-bottom-9">
+                                    <label class="control-label col-md-4">Hàng hóa</label>
+                                    <div class="col-md-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="ProductName" name="ProductName" class="col-12 ProductName" value="" autocomplete="off" required placeholder="Nhập mã hoặc tên hàng hoá" />
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-5">
+                                <div class="form-group margin-bottom-9">
+                                    <label class="control-label col-md-4">Nhóm hàng hóa</label>
+                                    <div class="col-md-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <select class="ProductGroup col-12 select2" multiple>
+                                                <optgroup>
+                                                    @if (lstMstProductGroup != null && lstMstProductGroup.Count > 0)
+                                                    {
+                                                        foreach (var item in lstMstProductGroup)
+                                                        {
+                                                            <option value="@MvcHtmlString.Create(CUtils.StrValue(item.ProductGrpCode))">
+                                                                @MvcHtmlString.Create(CUtils.StrValue(item.ProductGrpName))
+                                                            </option>
+                                                        }
+                                                    }
+                                                </optgroup>
+                                            </select>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="form-group margin-bottom-9">
+                                    <a class="btn btn-nc-button" onclick="SearchProduct()" href="javascript:void(0);" style="">
+                                        <img class="img-button-search" src="@Url.Content("~/Images/search.svg")">
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 no-padding" id="List_Product_Data">
+
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="addProductItemsFromModal()" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Chọn</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Modal -->
+<!-- Template add row product -->
+<script type="text/template" id="rowtemplateProduct">
+    <tr class="trdata" rd="==rd==" idx="==idx==" productcodeuser="==ProductCodeUser==" productcode="==ProductCode==" productname="==ProductName==" productcodebase="==ProductCodeBase==" flagCombo="==FlagCombo==" flaglot="==FlagLot==" flagserial="==FlagSerial==">
+        <td class="text-center cell-50">
+            <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteProduct(this)"><i class="fas fa-trash-alt"></i></a>
+            <div class="products-list">
+            </div>
+        </td>
+        <td class="text-center cell-50 stt">
+            ==idx==
+        </td>
+        <td class="text-left cell-220">
+            <span class="==productcodeuserCss==">==ProductCodeUser==</span>
+            <input type="hidden" class="col-md-9 ==productcodeCss==" value="==ProductCode==" />
+            <input type="hidden" class="col-md-9 ==productcodeuserCss==" value="==ProductCodeUser==" />
+            <input type="hidden" class="col-md-9 ==productcodebaseCss==" value="==ProductCodeBase==" />
+            <input type="hidden" class="col-md-9 ==productnameCss==" value="==ProductName==" />
+            <input type="hidden" class="col-md-9 ==invcodeinitCss==" value="" />
+            <input type="hidden" class="col-md-9 ==valconvertCss==" value="==ValConvert==" />
+            <input type="hidden" class="col-md-9 ==flaglotCss==" value="==FlagLot==" />
+            <input type="hidden" class="col-md-9 ==flagserialCss==" value="==FlagSerial==" />
+            <input type="hidden" class="col-md-9 ==flagcomboCss==" value="==FlagCombo==" />
+            <span class="serial-lot-text"></span>
+        </td>
+        <td class="text-left cell-200">
+            <span class="==productnameCss==">==ProductName==</span>
+        </td>
+        <td class="text-left cell-100">
+            <select class="select2 col-12 no-border unitcode ==select2Css==" onchange="ChangeProduct(this)" initdata="==ProductCode==" ischange="0">
+                <optgroup></optgroup>
+                <option></option>
+            </select>
+        </td>
+        <td class="text-right cell-100">
+            <input readonly="readonly" value="==QtyTotalOK==" class="col-md-12 text-right ==qtytotalokCss==" />
+        </td>
+        <td class="text-left cell-150">
+            <input readonly="readonly" class="col-md-11 ==invcodeCss==" value="" />
+            <span class="==showpopupCss=="></span>
+        </td>
+    </tr>
+</script>
+<!-- End Template add row product -->
+<script type="text/template" id="templateShowTonKho">
+    <a href="javascript:;" title="Chọn vị trí" onclick="ShowTonKhoKK(this)">
+        <i class="fa fa-caret-down" style="line-height:24px"></i>
+    </a>
+</script>
+<!-- vị trí nhập -->
+<script type="text/template" id="templateListInvCodeIn">
+    <a href="javascript:;" title="Chọn vị trí" onclick="ShowInvOut(this,'==viewonly==')">
+        <i class="fa fa-caret-down" style="line-height:24px"></i>
+    </a>
+</script>
+<!-- Thêm link với Hàng serial -->
+<script type="text/template" id="templateLinkSerial">
+    <a href="javascript:;" title="Chi tiết Serial" onclick="ShowSerial(this)">(Serial)</a>
+</script>
+<!-- Thêm link với Hàng Lot -->
+<script type="text/template" id="templateLinkLot">
+    <a href="javascript:;" title="Chi tiết Lô" onclick="ShowLo(this)">(Lô)</a>
+</script>
+<script type="text/template" id="templateLinkLotKK">
+    <a href="javascript:;" title="Chi tiết Lô" onclick="ShowLoKK(this)">(Lô)</a>
+</script>
+<!-- Thêm link với Hàng Combo -->
+<script type="text/template" id="templateLinkCombo">
+    <a href="javascript:;" title="Chi tiết Combo" onclick="ShowCombo(this)">(Combo)</a>
+</script>
+<script type="text/ng-template" id="rowtemplateProductAddDaKiem">
+    <tr class="trdata" rd="==rd==" idx="==idx==" productcode="==ProductCode==" productname="==ProductName==" productcodeuser="==ProductCodeUser==" flagcombo="==FlagCombo==" flaglot="==FlagLot==" flagserial="==FlagSerial==" productcodebase="==ProductCodeBase==" valconvert="==ValConvert==">
+        <td class="text-center cell-50">
+            <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteProduct(this)"><i class="fas fa-trash-alt"></i></a>
+            <div class="products-list">
+            </div>
+        </td>
+        <td class="text-center cell-50">
+            <input type="checkbox" class="check checkProduct cl-check idn-checkbox" name="ckb" id="check-box-==rd==" />
+            <label for="check-box-==rd=="><span></span></label>
+        </td>
+        <td class="text-center cell-50 stt">
+            ==idx==
+        </td>
+        <td class="cell-220">
+            <span class="text-red ==productcodeuserCss==">==ProductCodeUser==</span>
+            <input type="hidden" class="==productcodeCss==" value="==ProductCode==" />
+            <input type="hidden" class="==productcodeuserCss==" value="==ProductCodeUser==" />
+            <input type="hidden" class="==productcodebaseCss==" value="==ProductCodeBase==" />
+            <input type="hidden" class="==productnameCss==" value="==ProductName==" />
+            <input type="hidden" class="==invcodeinitCss==" value="==InvCodeInit==" />
+            <input type="hidden" class="==flagexistCss==" value="0" />
+            <input type="hidden" class="==productcodeCss==" value="==ProductCode==" />
+            <input type="hidden" class="==flaglotCss==" value="==FlagLot==" />
+            <input type="hidden" class="==flagserialCss==" value="==FlagSerial==" />
+            <input type="hidden" class="==flagauditCss==" value="==FlagAudit==" />
+            <input type="hidden" class="==valconvertCss==" value="==ValConvert==" />
+            <span class="serial-lot-text"></span>
+        </td>
+        <td class="cell-200">
+            <span class="col-md-12 ==productnameCss==">==ProductName==</span>
+        </td>
+        <td class="text-left cell-100">
+            <select class="==unitcodeCss== ==select2Css== col-md-12" onchange="ChangeProduct(this)" initdata="==ProductCode==" ischange="0">
+                <optgroup></optgroup>
+            </select>
+        </td>
+        <td class="cell-100">
+            <input readonly="readonly" value="==QtyTotalOK==" class="col-md-12 text-right ==qtytotalokCss==" />
+        </td>
+        <td class="cell-100">
+            <input onchange="ChangeQtyActual(this);" value="" class="col-md-11 text-right ==qtyactualCss==" />
+            <span class="==showpopupCss=="></span>
+        </td>
+        <td class="cell-100">
+            <input readonly="readonly" value="0.0" class="col-md-12 text-right ==qtyremainCss==" />
+        </td>
+        <td class="cell-100">
+            <input readonly="readonly" class="col-md-12 text-left ==invcodeCss==" value="==InvCode==" />
+        </td>
+        <td class="cell-100">
+            <input readonly="readonly" class="col-md-12 text-left ==statusCss==" value="Chưa kiểm" />
+        </td>
+    </tr>
+</script>
+<!-- Danh sách hàng base -->
+<script type="text/template" id="tmpl_products_list">
+    <div class="result display-none" productcode="==ProductCode==">
+        <input type="hidden" class="ProductCodeRoot" value="==ProductCodeRoot==" />
+        <input type="hidden" class="ProductCodeBase" value="==ProductCodeBase==" />
+        <input type="hidden" class="ProductCode" value="==ProductCode==" />
+        <input type="hidden" class="ProductCodeUser" value="==ProductCodeUser==" />
+        <input type="hidden" class="ProductName" value="==ProductName==" />
+        <input type="hidden" class="ProductType" value="==ProductType==" />
+        <input type="hidden" class="FlagSerial" value="==FlagSerial==" />
+        <input type="hidden" class="FlagLot" value="==FlagLot==" />
+        <input type="hidden" class="FlagCombo" value="==FlagCombo==" />
+        <input type="hidden" class="ValConvert" value="==ValConvert==" />
+        <input type="hidden" class="UnitCode" value="==UnitCode==" />
+        <input type="hidden" class="QtyTotalOK" value="==QtyTotalOK==" />
+        <input type="hidden" class="Remark" value="==Remark==" />
+    </div>
+</script>
+
+<script type="text/template" id="tmpl_options">
+    <option value="==UnitCode==" @MvcHtmlString.Create(tmpl_selected) productcode="==ProductCode==">==UnitCode==</option>
+</script>
+
+<!-- Template đã kiểm kê -->
+<script type="text/template" id="tableSerialKiemKe">
+    <tr class="data-item trdata" rd="==rd==" idx="==idx==" productcode="==ProductCode==" invcodeinit="==InvCodeInit==" invcodeactual="==InvCodeActual==" serialno="==SerialNo==">
+        <input type="hidden" class="==invcodeinitCss==" value="==InvCodeInit==" />
+        <input type="hidden" class="==invcodeactualCss==" value="==InvCodeActual==" />
+        <input type="hidden" class="==productcodeCss==" value="==ProductCode==" />
+        <input type="hidden" class="==serialnoCss==" value="==SerialNo==" />
+        <input type="hidden" class="==serialnoactualCss==" value="==SerialNoActual==" />
+        <input type="hidden" class="==flagexistCss==" value="==FlagExist==" />
+        <input type="hidden" class="==inventoryactionCss==" value="==InventoryAction==" />
+    </tr>
+</script>
+
+
+<!-- Template popup Serial -->
+<script type="text/template" id="tmplPopupSerial">
+    <tr class="data-item trdata" rd="==rd==" idx="==idx==" productcode="==ProductCode==">
+        <input type="hidden" class="==serialnoCss==" value="==SerialNo==" />
+        <input type="hidden" class="==invcodeCss==" value="==InvCode==" />
+        <td class="stt text-center cell-50">==idx==</td>
+        <td class="text-left cell-200 ==serialnoCss==">
+            ==SerialNo==
+        </td>
+        <td class="text-left cell-200 ==invcode==">
+            ==InvCode==
+        </td>
+    </tr>
+</script>
+
+<script>
+    $(".select2.ProductGroup").select2();
+</script>

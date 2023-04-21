@@ -1,0 +1,797 @@
+﻿@model PageInfo<InvF_InvAudit>
+@{
+    ViewBag.Title = "Quản lý phiếu kiểm kê";
+    var userState = ViewBag.UserState as UserState;
+    var init = CUtils.StrValue(ViewBag.init);
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+    var recordCount = CUtils.StrValue(ViewBag.RecordCount);
+    var totalPage = "0";
+    if (Model != null)
+    {
+        totalPage = CUtils.StrValue(Model.PageCount);
+    }
+    var showtext = "";
+    if (Model.ItemCount > 0)
+    {
+        var recordstart = (Model.PageIndex) * Model.PageSize + 1;
+        var recordend = (Model.PageIndex + 1) * Model.PageSize;
+        if (recordend > Model.ItemCount)
+        {
+            recordend = Model.ItemCount;
+        }
+        showtext = recordstart + "-" + recordend + " trong số " + Model.ItemCount;
+    }
+    var Lst_Mst_Inventory = ViewBag.Lst_Mst_Inventory as List<Mst_Inventory>;
+    var Lst_Mst_InventoryType = ViewBag.Lst_Mst_InventoryType as List<Mst_InventoryType>;
+    var Lst_Mst_InventoryLevelType = ViewBag.Lst_Mst_InventoryLevelType as List<Mst_InventoryLevelType>;
+    var lst_Mst_InvOutType = new List<Mst_InvOutType>();
+    var listMst_NNT = ViewBag.ListMst_NNT as List<Mst_NNT>;
+    if (ViewBag.Lst_Mst_InvOutType != null)
+    {
+        lst_Mst_InvOutType = ViewBag.Lst_Mst_InvOutType as List<Mst_InvOutType>;
+    }
+    var lstCustomer = new List<Mst_Customer>();
+    if (ViewBag.Lst_MstCustomer != null)
+    {
+        lstCustomer = ViewBag.Lst_MstCustomer as List<Mst_Customer>;
+    }
+
+    var viewid = string.Format("{0}_{1}_{2}_{3}", CUtils.StrValue(userState.SysUser.UserCode), CUtils.StrValue(ViewBag.SolutionCodeSignature), CUtils.StrValue(userState.Mst_NNT.OrgID), "InvF_InvAudit_Mng");
+}
+
+<div class="mt-3">
+    <div class="col-12">
+        @using (Html.BeginForm("Index", "InvF_InventoryOut", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+            <input type="hidden" id="viewid" name="viewid" value="@MvcHtmlString.Create(viewid)" />
+            <input hidden id="init" name="init" value="search" />
+            <div class="col-12 row">
+                <div class="col-11 col-sm-11 row">
+                    <div class="col-sm-4 no-padding">
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="IF_InvAudNo">
+                                @("Số phiếu kiểm kê".HtmlItemString("IF_InvAudNo"))
+                            </label>
+                            <div class="col-md-8">
+                                <input type="text" class="col-md-12 text-bold" name="IF_InvAudNo" id="IF_InvAudNo" value="@(Request["IF_InvAudNo"] == null ? "" : Request["IF_InvAudNo"])" />
+                            </div>
+                        </div>
+
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="">
+                                @("Ngày tạo từ".HtmlItemString("createdatefrom"))
+                            </label>
+                            <div class="col-sm-8 row date-input-group no-margin">
+                                <div class="col-fix-5">
+                                    <div class="input-group" id="dtfromDate">
+                                        <input type="text" id="createdtimefrom" name="createdtimefrom" class="col-9 cl-date EffDateStart hasDatepicker" data-date-format="yyyy-mm-dd" value="@(Request["createdtimefrom"] == null ? "" : Request["createdtimefrom"])" autocomplete="off">
+                                        <span class="input-group-addon col-3">
+                                            <i class="far fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <label class="control-label col-fix-2 text-center" for="">
+                                    @("~".HtmlItemString("createdateto"))
+                                </label>
+                                <div class="col-fix-5">
+                                    <div class="input-group" id="dttoDate">
+                                        <input type="text" id="createdtimeto" name="createdtimeto" class="col-9 cl-date hasDatepicker" data-date-format="yyyy-mm-dd" value="@(Request["createdtimeto"] == null ? "" : Request["createdtimeto"])" autocomplete="off">
+                                        <span class="input-group-addon col-3">
+                                            <i class="far fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 no-padding">
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="InvCodeAudit">
+                                @("Kho kiểm kê".HtmlItemString("invf_inventoryout"))
+                            </label>
+                            <div class="col-md-8">
+                                <span class="block input-icon input-icon-right">
+                                    <select id="InvCodeAudit" name="InvCodeAudit" showpopup-control-searchdata="#ShowPopupInvCodeAudit" class="col-md-12">
+                                        <optgroup label="">
+                                            <option value="">--Chọn kho kiểm kê--</option>
+                                            @if (Lst_Mst_Inventory != null && Lst_Mst_Inventory.Count > 0)
+                                            {
+                                                var invcodeout = Request["InvCodeAudit"] == null ? "" : Request["InvCodeAudit"];
+                                                foreach (var item in Lst_Mst_Inventory)
+                                                {
+                                                    var invCode = CUtils.StrValue(item.InvCode);
+                                                    var invName = CUtils.StrValue(item.InvName);
+                                                    <option @(invcodeout.Equals(item.InvCode) ? "selected" : "") invBUPattern="@(item.InvBUPattern == null ? "" : item.InvBUPattern)" value="@MvcHtmlString.Create(invCode)">@MvcHtmlString.Create(invName)</option>
+                                                }
+                                            }
+                                        </optgroup>
+                                        @*<option value="SEARCHDATA">@("Tìm kiếm".HtmlItemString("invf_inventoryout"))</option>*@
+                                    </select>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="">
+                                @("Ngày duyệt từ".HtmlItemString("approvedatefrom"))
+                            </label>
+                            <div class="col-sm-8 row date-input-group no-margin">
+                                <div class="col-fix-5">
+                                    <div class="input-group form-group" id="dtApprfromDate">
+                                        <input type="text" id="approvedtimefrom" name="approvedtimefrom" class="col-9 cl-date EffDateStart hasDatepicker" data-date-format="yyyy-mm-dd" value="@(Request["approvedtimefrom"] == null ? "" : Request["approvedtimefrom"])" autocomplete="off">
+                                        <span class="input-group-addon col-3">
+                                            <i class="far fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <label class="control-label col-fix-2 text-center" for="">
+                                    @("~".HtmlItemString("approvedateto"))
+                                </label>
+                                <div class="col-fix-5">
+                                    <div class="input-group form-group" id="dtApprtoDate">
+                                        <input type="text" id="approvedtimeto" name="approvedtimeto" class="col-9 cl-date hasDatepicker" data-date-format="yyyy-mm-dd" value="@(Request["approvedateto"] == null ? "" : Request["approvedateto"])" autocomplete="off">
+                                        <span class="input-group-addon col-3">
+                                            <i class="far fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 no-padding">
+                        <div class="row form-group margin-bottom-9">
+                            <label for="ProductCode" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Hàng hóa".HtmlItemString("invf_inventoryin"))</label>
+                            <div class="col-12 col-sm-8">
+                                <span class="block input-icon input-icon-right">
+                                    <input type="text" id="ProductCodeSearch" name="ProductCodeSearch" class="col-12 ProductCodeSearch" value="" autocomplete="off" onclick="checkClear(this)" onblur="checkClear(this)" />
+                                    <input type="hidden" id="ProductCode" name="ProductCode" class="col-12 ProductCode" value="" autocomplete="off" />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row form-group margin-bottom-9">
+                            <label for="OrgID" class="col-12 col-md-4 control-label no-padding-right font-weight-500 ">@("Chi nhánh".HtmlItemString("invf_inventoryin"))</label>
+                            <div class="col-12 col-md-8">
+                                <span class="block input-icon input-icon-right selection--multiple">
+                                    <select class="select2-selection" name="OrgID" id="OrgID">
+                                        <optgroup label="">
+                                            <option value="">--Chọn chi nhánh--</option>
+                                            @{
+                                                if (listMst_NNT != null && listMst_NNT.Count > 0)
+                                                {
+                                                    foreach (var it in listMst_NNT)
+                                                    {
+                                                        <option value="@it.OrgID">@it.NNTFullName</option>
+                                                    }
+                                                }
+                                            }
+                                        </optgroup>
+                                        @*<option value="">&nbsp;</option>*@
+                                    </select>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-1">
+                    <div class="form-group margin-bottom-9">
+                        <div class="form-group" style="">
+                            @{ var imgSearch = Url.Content("~/Images/search.svg");}
+                            @RenderItemFormat("", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\"  onclick=\"SearchData();\"><img class=\"img-button-search\" src=" + imgSearch + "></a>", "", "")
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 no-padding margin-top-5">
+                    <div class="col-sm-11">
+                        <div class="form-group no-margin">
+                            <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 no-margin" style="max-width: 12.5%; padding-top: 0; padding-right: 15px!important;">@("Trạng thái".HtmlItemString("invf_inventoryin"))</label>
+                            <div class="row no-margin checkbox-list">
+                                
+                                <div class="checkbox-item">
+                                    <input type="checkbox" class="cl-check idn-checkbox" name="chk-pending" id="chk-pending" />
+                                    <label for="chk-pending">
+                                        <span></span>
+                                    </label>
+                                    <span class="span-title-check">Mới tạo</span>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" class="cl-check idn-checkbox" name="chk-approved" id="chk-approved" />
+                                    <label for="chk-approved">
+                                        <span></span>
+                                    </label>
+                                    <span class="span-title-check">Đã duyệt</span>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" class="cl-check idn-checkbox" name="chk-finished" id="chk-finished" />
+                                    <label for="chk-finished">
+                                        <span></span>
+                                    </label>
+                                    <span class="span-title-check">Kết thúc</span>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" class="cl-check idn-checkbox" name="chk-canceled" id="chk-canceled" />
+                                    <label for="chk-canceled">
+                                        <span></span>
+                                    </label>
+                                    <span class="span-title-check">Đã huỷ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<div class="row no-margin">
+    <div class="col-sm-12">
+        <div id="BindDataInvFInvAudit" class="conten-table">
+            @Html.Partial("BindDataInvF_InvAudit", Model, new ViewDataDictionary() { { "init", MvcHtmlString.Create(init) }, { "PageCur", MvcHtmlString.Create(pageCur) }, { "RecordCount", MvcHtmlString.Create(recordCount) }, { "UserState", userState } })
+        </div>
+    </div>
+</div>
+
+
+<script>
+    setAdminCurrentUrl('@Url.Action("Index", "InvFInvAudit")');
+</script>
+<script src="~/Content/assets/js/bootbox.js"></script>
+<script src="@Url.Content("~/Scripts/print.min.js")"></script>
+<script src="~/Scripts/mine/InvF_Audit.js"></script>
+<script>
+    $(function () {
+        $('#createdtimefrom, #createdtimeto, #approvedtimefrom, #approvedtimeto').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            dateFormat: 'yy-mm-dd'
+        })
+            ////show datepicker when clicking on the icon
+            .next().on('click', function () {
+                $(this).prev().focus();
+            });
+    });
+
+    $("select#InvCodeAudit").select2();
+    $("select#OrgID").select2();
+</script>
+<!-- Search -->
+<script>
+
+    function SearchData() {
+        debugger
+        var if_InvAudNo = commonUtils.returnValueText('#IF_InvAudNo');
+        var createdtimefrom = commonUtils.returnValueText('#createdtimefrom');
+        var createdtimeto = commonUtils.returnValueText('#createdtimeto');
+        var invCodeAudit = commonUtils.returnValueText('#InvCodeAudit');
+        var approvedtimefrom = commonUtils.returnValueText('#approvedtimefrom');
+        var approvedtimeto = commonUtils.returnValueText('#approvedtimeto');
+        var productCode = commonUtils.returnValueText('#ProductCode');
+        var orgID = commonUtils.returnValueText('#OrgID');
+        var chkPending = commonUtils.returnValueCheckBox('#chk-pending');
+        var chkApproved = commonUtils.returnValueCheckBox('#chk-approved');
+        var chkCanceled = commonUtils.returnValueCheckBox('#chk-canceled');
+        var chkFinished = commonUtils.returnValueCheckBox('#chk-finished');
+        var recordcount = commonUtils.returnValueText('#recordcount');
+        var pagecur = commonUtils.returnValueText('#page');
+
+        var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+        var url = '@Url.Action("DoSearch", "InvFInvAudit")';
+        $.ajax({
+            type: "post",
+            data:
+            {
+                __RequestVerificationToken: token,
+                if_InvAudNo: if_InvAudNo,
+                createdtimefrom: createdtimefrom,
+                createdtimeto: createdtimeto,
+                invCodeAudit: invCodeAudit,
+                approvedtimefrom: approvedtimefrom,
+                approvedtimeto: approvedtimeto,
+                productcode: productCode,
+                orgID: orgID,
+                chkPending: chkPending,
+                chkApproved: chkApproved,
+                chkCanceled: chkCanceled,
+                chkFinished: chkFinished,
+                page: pagecur,
+                recordcount: recordcount,
+            },
+            url: url,
+            dataType: 'json',
+            beforeSend: function () { }
+        }).done(function (result) {
+            //debugger;
+            if (result.Success) {
+                $('#BindDataInvFInvAudit').html('');
+                $('#BindDataInvFInvAudit').html(result.Html);
+                initDefault();
+                //tablesort();
+                readCookies("InvF_InvAudit");
+                $('.dropdown-menu').on('click', function (event) {
+                    event.stopPropagation();
+                });
+                //Disabled_previous_Next();
+                $('.numberic').number(true, 2);
+            }
+            else {
+                if (!commonUtils.isNullOrEmpty(result.Detail)) {
+                    showErrorDialog(result.Detail);
+                }
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+
+        }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+            //alert("complete");
+        });
+    }
+</script>
+<!-- Duyệt phiếu -->
+<script>
+    function Approve() {
+        debugger
+        var objInvF_InvAudit = new InvF_InvAudit();
+        var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+        ajaxSettings.Url = '@Url.Action("Approve", "InvFInvAudit")';
+        objInvF_InvAudit.ajaxSettings = ajaxSettings;
+        objInvF_InvAudit.approveData();
+    }
+</script>
+<!-- Duyệt phiếu sau kiểm kê -->
+<script>
+    function Finish() {
+        debugger
+        var objInvF_InvAudit = new InvF_InvAudit();
+        var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+        ajaxSettings.Url = '@Url.Action("Finish", "InvFInvAudit")';
+        objInvF_InvAudit.ajaxSettings = ajaxSettings;
+        objInvF_InvAudit.finishData();
+    }
+</script>
+<!-- Hủy phiếu -->
+<script>
+    function Cancel() {
+        debugger
+        var objInvF_InvAudit = new InvF_InvAudit();
+        var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+        ajaxSettings.Url = '@Url.Action("Cancel", "InvFInvAudit")';
+        objInvF_InvAudit.ajaxSettings = ajaxSettings;
+        objInvF_InvAudit.cancelData();
+    }
+</script>
+<!-- Xóa multi -->
+<script>
+    function DeleteMulti() {
+        debugger
+        var objInvF_InvAudit = new InvF_InvAudit();
+        var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+        ajaxSettings.Url = '@Url.Action("DeleteMulti", "InvFInvAudit")';
+        objInvF_InvAudit.ajaxSettings = ajaxSettings;
+        objInvF_InvAudit.deleteMulti();
+    }
+</script>
+<!-- Xuất excel -->
+<script>
+    @*function Export() {
+        debugger
+        var objInvF_InvAudit = new InvF_InvAudit();
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+        ajaxSettings.Url = '@Url.Action("Export", "InvFInvAudit")';
+        objInvF_InvAudit.ajaxSettings = ajaxSettings;
+        objInvF_InvAudit.Export();
+    }*@
+
+
+    function Export() {
+        var objCommonExcel = new CommonExcel();
+        var objVariablesInit = {
+            Id_FormMain: '',
+            Id_FormImportExcel: 'manageFormImportExcel',
+            Id_Modal: 'ImportExcelModal',
+            Id_FileInput: 'file',
+        };
+
+        var ajaxSettings_Excel = {};
+        ajaxSettings_Excel.Type = 'post';
+        ajaxSettings_Excel.DataType = 'json';
+
+       ajaxSettings_Excel.Url = '@Url.Action("Export1", "InvFInvAudit")';
+
+
+        var if_InvAudNo = commonUtils.returnValueText('#IF_InvAudNo');
+        var createdtimefrom = commonUtils.returnValueText('#createdtimefrom');
+        var createdtimeto = commonUtils.returnValueText('#createdtimeto');
+        var invCodeAudit = commonUtils.returnValueText('#InvCodeAudit');
+        var approvedtimefrom = commonUtils.returnValueText('#approvedtimefrom');
+        var approvedtimeto = commonUtils.returnValueText('#approvedtimeto');
+        var productCode = commonUtils.returnValueText('#ProductCode');
+        var orgID = commonUtils.returnValueText('#OrgID');
+        var chkPending = commonUtils.returnValueCheckBox('#chk-pending');
+        var chkApproved = commonUtils.returnValueCheckBox('#chk-approved');
+        var chkCanceled = commonUtils.returnValueCheckBox('#chk-canceled');
+        var chkFinished = commonUtils.returnValueCheckBox('#chk-finished');
+
+
+
+        var listParams = [
+            { "Key": 'if_InvAudNo', "Value": if_InvAudNo },
+            { "Key": 'createdtimefrom', "Value": createdtimefrom },
+            { "Key": 'createdtimeto', "Value": createdtimeto },
+            { "Key": 'invCodeAudit', "Value": invCodeAudit },
+            { "Key": 'approvedtimefrom', "Value": approvedtimefrom },
+            { "Key": 'approvedtimeto', "Value": approvedtimeto },
+            { "Key": 'productCode', "Value": productCode },
+            { "Key": 'orgID', "Value": orgID },
+            { "Key": 'chkPending', "Value": chkPending },
+            { "Key": 'chkApproved', "Value": chkApproved },
+            { "Key": 'chkCanceled', "Value": chkCanceled },
+            { "Key": 'chkFinished', "Value": chkFinished },
+        ];
+        objCommonExcel.ajaxSettingsInit();
+        objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+        objCommonExcel.exportExcel(listParams);
+
+
+    }
+</script>
+<!-- Thực hiện -->
+<script>
+    function Action() {
+        debugger
+        var objInvF_InvAudit = new InvF_InvAudit();
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+        ajaxSettings.Url = '@Url.Action("Action", "InvFInvAudit")';
+        objInvF_InvAudit.ajaxSettings = ajaxSettings;
+        objInvF_InvAudit.Action();
+    }
+</script>
+<!-- Vào view detail -->
+<script>
+    function Detail(urlDetail) {
+        window.location.href = urlDetail;
+    }
+</script>
+<!-- In phiếu -->
+<script>
+        function Print() {
+            var checkedItem = $('#table-tbodyID').find('input.check:checked');
+            if (checkedItem.length == 0) {
+                alert("Chưa chọn phiếu kiểm kê cần in!");
+                return false;
+            }
+            if (checkedItem > 1) {
+                alert("Chỉ chọn 1 phiếu kiểm kê.");
+                return;
+            }
+            var IF_InvAudNo = '';
+            $(checkedItem).each(function () {
+                IF_InvAudNo = $(this).attr('IF_InvAudNo');
+                return false;
+            });
+            let Url = '@Url.Action("PrintTemp", "InvFInvAudit")';
+
+            $.ajax({
+                type: "post",
+                data:
+                {
+                    IF_InvAudNo: IF_InvAudNo
+                },
+                url: Url,
+                dataType: 'json',
+                beforeSend: function () { }
+            }).done(function (result) {
+                if (result.Success) {
+                    if (result.LinkPDF !== undefined || result.LinkPDF !== '') {
+                        printPdf(result.LinkPDF);
+                    }
+                    else {
+                        alert('Không lấy được dữ liệu mẫu in');
+                    }
+                }
+                else {
+                    if (result.Messages !== undefined && result.Messages.length > 0) {
+                        alert(result.Messages[0]);
+                    }
+                    if (!commonUtils.isNullOrEmpty(result.Detail)) {
+                        showErrorDialog(result.Detail);
+                    }
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+
+            }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+                //alert("complete");
+            });
+        }
+
+        function printPdf(linkPdf) {
+            printJS({
+                printable: linkPdf,
+                type: 'pdf',
+                showModal: true,
+                //onPrintDialogClose: () => console.log('The print dialog was closed'),
+                //onPdfOpen: () => console.log('Pdf was opened in a new tab due to an incompatible browser')
+            })
+        }
+</script>
+<!-- Search autocomplete Hàng hóa -->
+<script>
+
+
+    function checkClear(thiz) {
+        debugger
+        var productnamecur = $(thiz).val();
+
+        if (commonUtils.isNullOrEmpty(productnamecur)) {
+            $("#ProductCode").val('');
+        }
+    }
+
+    $(document).ready(function () {
+        debugger
+        //checkClear();
+
+        $('#ProductCodeSearch').autocomplete({
+            source: function (request, response) {
+                debugger
+                var keyword = request.term;
+                if (!commonUtils.isNullOrEmpty(keyword)) {
+                    if (keyword.toString().trim().length > 0) {
+                        var url = '@Url.Action("SearchProductOnKeyup", "InvFInvAudit")';
+                        var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+                        $.ajax({
+                            url: url,
+                            type: 'post',
+                            data: {
+                                productCode: keyword,
+                                __RequestVerificationToken: token
+                            },
+                            cache: false,
+                            dataType: 'json',
+                            async: false,
+                            success: function (objResult) {
+                                debugger
+                                var listItems = [];
+                                if (objResult.Success) {
+                                    //debugger;
+                                    listItems = $.map(objResult.Data, function (data, id) {
+                                        return data;
+                                    });
+                                    response(listItems);
+                                    //var options = "";
+                                    //options += `<li id="search-product">
+                                    //                <a href="javascript:;" onclick="ShowPopupProductSearch();">Tìm kiếm thêm</a>
+                                    //            </li>`;
+                                    //$('ul#ui-id-1').append(options);
+                                }
+                                else {
+                                    if (!commonUtils.isNullOrEmpty(objResult.Messages)) {
+                                        commonUtils.showAlert(objResult.Messages[0]);
+                                    }
+                                    if (!commonUtils.isNullOrEmpty(objResult.Detail)) {
+                                        _showErrorMsg123('Lỗi!', objResult.Detail);
+                                    }
+                                }
+                            },
+                            error: function (xmlHttpRequest, textStatus, errorThrown) {
+                                console.log('some error occured', textStatus, errorThrown);
+                            }
+                        });
+                    }
+                   
+                }
+                else {
+                    $("#ProductCode").val('');
+                    $("#ProductCodeSearch").val('');
+                }
+            },
+            minLength: 1,
+            select: function (event, ui) {
+                debugger;
+                var itemSelect = ui.item;
+                $("#ProductCode").val(itemSelect.ProductCode);
+                $("#ProductCodeSearch").val(itemSelect.ProductName);
+                return false;
+            }
+        }).autocomplete("instance")._renderItem = function (ul, item) {
+            //debugger;
+            var taga = $("<a>")
+                .attr('href', 'javascript:;')
+                .attr('ProductCode', item.ProductCode)
+                .attr('ProductName', item.ProductName)
+                .attr('ProductCodeBase', item.ProductCodeBase)
+                .attr('ProductCodeUser', item.ProductCodeUser)
+                .attr('UnitCode', item.UnitCode)
+                .text(item.ProductCodeUser + ' - ' + item.ProductName + ' (' + item.UnitCode + ')');
+
+            var li = $("<li>")
+                .append(taga)
+                .appendTo(ul);
+            return li;
+        };
+    });
+</script>
+<!-- #region table sort -->
+<script>
+    var initDefault = function () {
+        $('#dynamic-table-thead').idnTable({
+            searchTextbox: '#dynamic-table-thead-search', columnToggleButton: '#togglecolumn',
+            cookieId: '#viewid',
+        });
+    };
+    var initCustom = function () {
+        var tb = $('#dynamic-table-thead').idnTable();
+
+        $('#dynamic-table-thead-search').keyup(function () {
+            var kw = $(this).val();
+            tb.search(kw);
+        });
+
+        //tb.showColumns(['STT'], false);
+        //tb.reload();
+        var colList = tb.getAllColumns();
+        $('#togglecolumn').html('');
+
+        for (var i = 0; i < colList.length; ++i) {
+
+            var col = colList[i];
+            var fieldid = col.id;
+            var title = col.name;
+
+            if (title !== undefined && title !== null && title.toString().trim().length > 0) {
+                title = title.toString().trim();
+            } else {
+                title = '';
+            }
+
+            var fieldactive = col.show;
+
+            //B2: Sinh popup tùy chỉnh các cột trong bảng #dynamic-table-thead
+            var $input = $('<input>');
+            $input.attr('type', 'checkbox');
+            $input.attr('name', fieldid);
+
+            if (fieldactive === true) { //Nếu trạng thái bằng 0 cho hiện cột và checked ô input tương ứng
+                $input.attr('checked', 'checked');
+
+            }
+
+            var $spaninput = $('<span>');
+            $spaninput.append($input);
+            $spaninput.css('margin-right', '10px');
+
+            var $spantext = $('<span>');
+            $spantext.text(title);
+
+            var $li = $('<li>');
+            $li.css('line-height', '19px');
+            $li.css('margin-bottom', '18px');
+            $li.append($spaninput);
+            $li.append($spantext);
+
+            $('#togglecolumn').append($li);
+
+            $input.click(function () {
+                if ($(this).is(':checked')) {
+                    tb.showColumns([$(this).attr('name')], false);
+                }
+                else {
+                    tb.hideColumns([$(this).attr('name')], false);
+                }
+            });
+        }
+    };
+    $(document).ready(function () {
+        initDefault();
+        //initCustom();
+    });
+    $(document).ready(function () {
+        (function ($) {
+            var body = $('body');
+            body.on('keyup', '#dynamic-table-thead-search', function () {
+                var datafilter = $(this).val();
+                if (datafilter !== undefined && datafilter !== null && datafilter.toString().trim()) {
+                    datafilter = datafilter.toUpperCase().trim();
+                }
+                var rex = new RegExp($(this).val(), 'i');
+                $('#table-tbodyID tr').hide();
+                $('#table-tbodyID tr').filter(function () {
+                    //debugger
+                    var dataOfRow = $(this).text();
+                    if (dataOfRow !== undefined && dataOfRow !== null && dataOfRow.toString().trim().length > 0) {
+                        dataOfRow = dataOfRow.toUpperCase().trim();
+                    }
+                    if (dataOfRow.toUpperCase().indexOf(datafilter) > -1) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }).show();
+            });
+
+        }(jQuery));
+
+    });
+    $(document).ready(function () {
+        //debugger;
+        var viewId = commonUtils.returnValueText('#viewid');
+        if (!commonUtils.isNullOrEmpty(viewId)) {
+            var cookie = commonUtils.getCookie(viewId);
+            if (commonUtils.isNullOrEmpty(cookie)) {
+                var cookieValue = 'CONTROL|STT|IF_INVAUDNO|INVCODEAUDIT|CREATEDTIMEUTC|CREATEBY|REMARK|IF_INVAUDITSTATUS|APPRDTIMEUTC|APPRBY';
+                commonUtils.setCookie(viewId, cookieValue, 10);
+            }
+        }
+        initDefault();
+
+        //initCustom();
+
+
+
+    });
+</script>
+<!-- #endregion -->
+<!-- #region cookies -->
+<script>
+    document.addEventListener('DOMContentLoaded',
+        function () {
+            //debugger;
+            readCookies("InvF_InvAudit");
+            var checkboxs = document.querySelectorAll('#togglecolumn.ulshowdata input[type="checkbox"]');
+            for (let checkbox of checkboxs) {
+                checkbox.addEventListener('change', setCookie)
+            }
+        });
+    function saveSelectedToCookie() {
+        //debugger;
+        setCookie("InvF_InvAudit",
+            {
+                path: '/',
+                expires: 10
+            });
+    }
+    function setCookie(name, options = {}) {
+        //debugger;
+        var checkboxs = document.querySelectorAll('#togglecolumn.ulshowdata input[type="checkbox"]');
+        var value = new Object();
+        for (const ckb of checkboxs) {
+            value[ckb.name] = ckb.checked === true ? "0" : "1";
+        }
+        let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(JSON.stringify(value));
+
+        if (options.expires instanceof Date) {
+            options.expires = options.expires.toUTCString();
+        }
+
+        for (let optionKey in options) {
+            updatedCookie += "; " + optionKey;
+            let optionValue = options[optionKey];
+            if (optionValue !== true) {
+                updatedCookie += "=" + optionValue;
+            }
+        }
+        document.cookie = updatedCookie;
+    }
+    function readCookies(name) {
+        //debugger;
+        var result = document.cookie.match(new RegExp(name + '=([^;]+)'));
+        result && (result = JSON.parse(decodeURIComponent(result[1])));
+        if (result != null && result != undefined) {
+            for (const key in result) {
+                $('#dynamic-table-thead').find('th[fieldid="' + key + '"]').attr('fieldactive', result[key]);
+            }
+        }
+    }
+</script>
+<!-- #endregion -->

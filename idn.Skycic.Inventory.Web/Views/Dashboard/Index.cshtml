@@ -1,0 +1,108 @@
+﻿@model List<Rpt_InvoiceForDashboard>
+@{
+    ViewBag.Title = "Home Page";
+    Layout = "~/Views/Shared/CoreLayout.cshtml";
+}
+<style type="text/css">
+    .sidebar-mini.sidebar-collapse .content-wrapper, .sidebar-mini.sidebar-collapse .main-footer, .sidebar-mini.sidebar-collapse .main-header {
+        margin-left: 0 !important;
+    }
+</style>
+<div class="clearfix"></div>
+<div class="no-margin">
+    <div class="" style="background: url(/images/Dashboard.png) no-repeat; background-size:cover;height:620px;background-repeat: no-repeat;background-position: center center;">
+        <div class="row no-margin title-dashboard" style="padding:20px">
+            <div class="col-xs-4 no-padding">
+                <img class="img-responsive" style="display: inline-block" src="@Url.Content("~/images/dashboard.svg")" />
+                <span>DASHBOARD</span>
+            </div>
+            <div class="col-xs-8 no-padding">
+                <span style="float: right">NGÀY: @ViewBag.Today | Mã tố chức: @ViewBag.MST</span>
+                <img class="img-responsive" style="display: inline-block; float: right" src="@Url.Content("~/images/Dashboard/small-calendar.png")" />
+            </div>
+        </div>
+        <div class="row no-margin" style="padding: 100px 270px;">
+
+            <div class="col-xs-12 no-padding" style="margin-bottom: 20px;">
+                @if (CheckAccess("MENU_ROOT"))
+                {
+                    if (CheckAccess("MENU_IN_TEM"))
+                    {
+                        <div class="col-xs-4">
+                            <a href="@Url.Action("Index", "Temp_PrintTemp")">
+                                <div class="col-xs-12 icon-dashboard">
+                                    <img class="img-responsive" src="@Url.Content("~/images/Dashboard/InTem.svg")" />
+                                    <h3>In tem</h3>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                    if (CheckAccess("MENU_KHO"))
+                    {
+                        <div class="col-xs-4">
+                            <a href="@Url.Action("Index", "Mst_Inventory")">
+                                <div class="col-xs-12 icon-dashboard">
+                                    <img class="img-responsive" src="@Url.Content("~/images/Dashboard/kho.svg")" />
+                                    <h3>Kho</h3>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                    if (CheckAccess("MENU_BAO_CAO"))
+                    {
+                        <div class="col-xs-4">
+                            <a href="@Url.Action("RptInvF_InventoryInFGSum", "Reports")">
+                                <div class="col-xs-12 icon-dashboard">
+                                    <img class="img-responsive" src="@Url.Content("~/images/Dashboard/baocao.svg")" />
+                                    <h3>Báo cáo</h3>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                }
+            </div>
+
+            <div class="col-xs-12 no-padding">
+                @if (CheckAccess("MENU_ROOT"))
+                {
+                    if (CheckAccess("MENU_QUAN_TRI"))
+                    {
+                        <div class="col-xs-4">
+                        <a href="@Url.Action("Index", "Mst_Part")">
+                            <div class="col-xs-12 icon-dashboard">
+                                <img class="img-responsive" src="@Url.Content("~/images/Dashboard/quantri.svg")" />
+                                <h3>Quản trị</h3>
+                            </div>
+                        </a>
+                    </div>
+                    }
+                    if (CheckAccess("MENU_MUA_LICENSE"))
+                    {
+                    <div class="col-xs-4">
+                        <a href="@Url.Action("Index", "License")">
+                            <div class="col-xs-12 icon-dashboard">
+                                <img class="img-responsive" src="@Url.Content("~/images/Dashboard/License.svg")" />
+                                <h3>License</h3>
+                            </div>
+                        </a>
+                    </div>
+                    }
+                    <div class="col-xs-4">
+                        <a href="#">
+                            <div class="col-xs-12 icon-dashboard">
+                                <img class="img-responsive" src="@Url.Content("~/images/Dashboard/huongdan.svg")" />
+                                <h3>Hướng dẫn</h3>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+
+        </div>
+
+    </div>
+
+    </div>
+
+
+

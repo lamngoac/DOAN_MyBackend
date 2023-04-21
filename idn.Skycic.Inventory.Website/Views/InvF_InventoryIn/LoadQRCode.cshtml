@@ -1,0 +1,56 @@
+﻿@model List<InvF_InventoryInQR>
+@{
+    var iF_InvInStatus = CUtils.StrValue(ViewBag.IF_InvInStatus);
+    var strDisabled = "";
+    var strDisplay = "";
+    if (!string.IsNullOrEmpty(iF_InvInStatus) && iF_InvInStatus != "PENDING")
+    {
+        strDisabled = "disabled";
+        strDisplay = "display:none";
+    }
+}
+
+@if (Model != null && Model.Count > 0)
+{
+    var idx = 0;
+    foreach (var item in Model)
+    {
+        <tr class="trdata" idx="@idx" productCode="@item.ProductCode">
+            <input type="hidden" class="productqrcode" name="Lst_InvF_InventoryInQR[@idx].ProductCode" value="@item.ProductCode" />
+            <input type="hidden" class="productqrcode" name="Lst_InvF_InventoryInQR[@idx].ProductName" value="@item.mp_Productname" />
+            <input type="hidden" class="productqrcode" name="Lst_InvF_InventoryInQR[@idx].QRCode" value="@item.QRCode" />
+            <input type="hidden" class="productqrcode" name="Lst_InvF_InventoryInQR[@idx].NetworkID" value="@item.NetworkID" />
+            <td class="text-center cell-50">
+                <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteXacThuc(this)" style="@strDisplay"><i class="fas fa-trash-alt"></i></a>
+            </td>
+            <td fieldId="IDX" sorttype="T" fieldName="STT" fieldActive="0" class="text-center cell-50 stt">@(idx + 1)</td>
+            <td fieldId="ProductCodeUser" sorttype="T" fieldName="Mã hàng hóa" fieldActive="0" class="text-left cell-100">
+                <input class="col-md-12 ProductCode" readonly="readonly" name="Lst_InvF_InventoryInQR[@idx].ProductCodeUser" value="@item.mp_ProductCodeUser" />
+            </td>
+            <td fieldId="ProductName" sorttype="T" fieldName="Tên hàng hóa" fieldActive="0" class="text-left cell-200">
+                <input class="col-md-12 ProductName" readonly="readonly" name="Lst_InvF_InventoryInQR[@idx].ProductName" value="@item.mp_Productname" />
+            </td>
+            <td fieldId="QRCode" sorttype="T" fieldName="Mã xác thực" fieldActive="0" class="text-left cell-100">
+                <input class="col-md-12 QRCode" name="Lst_InvF_InventoryInQR[@idx].QRCode" value="@item.QRCode" onkeyup="splitQRCode(this)" @strDisabled/>
+            </td>
+            <td fieldId="BoxNo" sorttype="T" fieldName="Mã hộp" fieldActive="0" class="text-left cell-100">
+                <input class="col-md-12 BoxNo" name="Lst_InvF_InventoryInQR[@idx].BoxNo" value="@item.BoxNo" onkeyup="splitQRCode(this)" @strDisabled/>
+            </td>
+            <td fieldId="CanNo" sorttype="T" fieldName="Mã thùng" fieldActive="0" class="text-left cell-100">
+                <input class="col-md-12 CanNo" name="Lst_InvF_InventoryInQR[@idx].CanNo" value="@item.CanNo" onkeyup="splitQRCode(this)" @strDisabled/>
+            </td>
+            <td fieldId="ProductLotNo" sorttype="T" fieldName="Lô sản xuất" fieldActive="0" class="text-left cell-100">
+                <input class="col-md-12 ProductLotNo" name="Lst_InvF_InventoryInQR[@idx].ProductLotNo" value="@item.ProductLotNo" @strDisabled/>
+            </td>
+            <td fieldId="ShiftInCode" sorttype="T" fieldName="Ca sản xuất" fieldActive="0" class="text-left cell-100">
+                <input class="col-md-12 ShiftInCode" name="Lst_InvF_InventoryInQR[@idx].ShiftInCode" value="@item.ShiftInCode" @strDisabled/>
+            </td>
+            <td fieldId="UserKCS" sorttype="T" fieldName="KCS" fieldActive="0" class="text-left cell-100">
+                <input class="col-md-12 UserKCS" name="Lst_InvF_InventoryInQR[@idx].UserKCS" value="@item.UserKCS" @strDisabled/>
+            </td>
+        </tr>
+
+        idx++;
+    }
+}
+

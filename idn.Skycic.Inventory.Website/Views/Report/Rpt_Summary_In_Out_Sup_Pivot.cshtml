@@ -1,0 +1,581 @@
+﻿@{
+
+    ViewBag.Title = "Báo cáo lịch sử giao dịch nhập xuất theo đối tác";
+    var List_Mst_InventoryInOut = ViewBag.List_Mst_InventoryInOut as List<Mst_Inventory>;
+    var List_Mst_ProductGroup = ViewBag.Lst_Mst_ProductGroup as List<Mst_ProductGroup>;
+    var List_Mst_Customer = ViewBag.Lst_Mst_Customer as List<Mst_Customer>;
+    
+}
+<script>
+    setAdminCurrentUrl('@Url.Action("Rpt_Summary_In_Out_Sup_Pivot", "Report")');
+</script>
+<style>
+    a[target="_blank"] {
+        display: none;
+    }
+
+    .selection--multiple:before {
+        display: inline-block;
+        font-style: normal;
+        font-variant: normal;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        content: "\f0d7";
+        position: absolute;
+        top: 15%;
+        left: 90%;
+        color: #787878;
+        font-size: 16px;
+        z-index: 9;
+    }
+
+    #myInput {
+        border: 1px solid #d5d5d5;
+    }
+</style>
+
+<div class="row no-margin">
+    <div class="col-sm-12">
+        <aside class="row no-margin">
+            @using (Html.BeginForm("Rpt_Summary_In_Pivot", "Report", FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <input hidden id="init" name="init" value="search" />
+                <div class="row layout-search layout-bot-top-16">
+                    <div class="col-10 row no-margin">
+
+                        <div class="col-4 row no-margin">
+                            <div class="row form-group margin-bottom-9">
+                                <label for="ApprDTimeUTCFrom" class="col-12 col-sm-2 control-label no-padding-right font-weight-500 ">@("Thời gian".HtmlItemString("inventory"))<span style="color: red;">*</span></label>
+                                <div class="col-sm-10 row date-input-group no-margin">
+                                    <div class="row col-5 no-margin">
+                                        <div class="col-12 no-padding">
+                                            <div class="input-group form-group" id="dtdatefrom" style="width: 105%;">
+                                                <input type="text" id="ApprDTimeUTCFrom" name="ApprDTimeUTCFrom" class="col-9 cl-date ApprDTimeUTCFrom hasDatepicker" data-date-format="yyyy-mm-dd" value="" autocomplete="off">
+                                                <span class="input-group-addon col-3">
+                                                    <i class="far fa-calendar-alt"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <label for="ApprDTimeUTCTo" class="col-2 control-label no-padding-right font-weight-500 text-center">@("đến".HtmlItemString("inventory")) <span style="color: red;"> *</span></label>
+                                    <div class="row col-5 no-margin">
+                                        <div class="col-12 no-padding">
+                                            <div class="input-group form-group" id="dtdateto" style="width: 105%; margin-left: -5%;">
+                                                <input type="text" id="ApprDTimeUTCTo" name="ApprDTimeUTCTo" class="col-9 cl-date ApprDTimeUTCTo hasDatepicker" data-date-format="yyyy-mm-dd" value="" autocomplete="off">
+                                                <span class="input-group-addon col-3">
+                                                    <i class="far fa-calendar-alt"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row form-group margin-bottom-9">
+                                <label for="CustomerCodeSys" class="col-12 col-sm-2 control-label no-padding-right font-weight-500 ">@("Đối tác".HtmlItemString("inventory")) @*<span style="color: red;">*</span>*@</label>
+                                <div class="col-12 col-sm-10">
+                                    <div class="col-12">
+                                        <span class="block input-icon input-icon-right selection--multiple">
+                                            <select class="select2-selection--multiple col-10" name="CustomerCodeSys" id="CustomerCodeSys" multiple="multiple">
+                                                @{
+                                                    if (List_Mst_Customer != null && List_Mst_Customer.Count > 0)
+                                                    {
+                                                        foreach (var cus in List_Mst_Customer)
+                                                        {
+                                                            <option value="@cus.CustomerCodeSys">@cus.CustomerName</option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-4 row no-margin">
+                            <div class="form-group row no-margin">
+                                <div class="row form-group margin-bottom-9">
+                                    <label for="ProductGroupCode" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Nhóm hàng".HtmlItemString("inventory"))</label>
+                                    <div class="col-12 col-sm-9">
+                                        <span class="block input-icon input-icon-right selection--multiple">
+                                            <select class="select2-selection--multiple col-12" name="ProductGroupCode" id="ProductGroupCode" multiple="multiple">
+                                                @{
+                                                    if (List_Mst_ProductGroup != null && List_Mst_ProductGroup.Count > 0)
+                                                    {
+                                                        foreach (var grp in List_Mst_ProductGroup)
+                                                        {
+                                                            <option value="@grp.ProductGrpCode">@grp.ProductGrpName</option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row form-group margin-bottom-9">
+                                <label for="IF_MONo" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Hàng hoá".HtmlItemString("inventory"))</label>
+                                <div class="col-12 col-sm-9 form-group">
+                                    <span class="block input-icon input-icon-right col-12 no-padding">
+                                        <input class="col-12" id="myInput" type="text" name="myInput" onkeyup="Autocompletesearch()" placeholder="@("Nhập mã, tên để tìm kiếm".HtmlItemString("report"))">
+                                        <input type="hidden" id="ProductCodeUser" name="ProductCodeUser" class="col-12 ProductCodeUser" value="" autocomplete="off" required />
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-4 row no-margin">
+                            <div class="row form-group margin-bottom-9">
+                                <label for="InvCode" class="col-12 col-sm-2 control-label no-padding-right font-weight-500 ">@("Kho".HtmlItemString("inventory")) @*<span style="color: red;">*</span>*@</label>
+                                <div class="col-12 col-sm-10">
+                                    <div class="col-12">
+                                        <span class="block input-icon input-icon-right selection--multiple">
+                                            <select class="select2-selection--multiple col-10" name="InvCode" id="InvCode" multiple="multiple">
+                                                @{
+                                                    if (List_Mst_InventoryInOut != null && List_Mst_InventoryInOut.Count > 0)
+                                                    {
+                                                        foreach (var inv in List_Mst_InventoryInOut)
+                                                        {
+                                                            <option value="@inv.InvCode">@inv.InvName</option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2 row no-margin">
+                        <div class="form-group margin-bottom-9">
+                            <div class="row no-margin">
+                                <span class="block input-icon input-icon-right">
+                                    <a class="btn btn-nc-button" onclick="SearchData()" href="javascript:void(0);" style=""><img class="img-button-search" src="@Url.Content("~/Images/search.svg")"></a>
+                                </span>
+                                <a class="btn btn-nc-button" href="javascript:;" onclick="Export()" style=""><i class="far fa-file-excel" aria-hidden="true"></i> Xuất Excel</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </aside>
+        <div class="row no-margin">
+            <div class="col-sm-12 no-padding">
+                <div id="samplePivotTable" style="overflow-x: scroll"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    
+    $(function () {
+        $('#ApprDTimeUTCFrom , #ApprDTimeUTCTo').datepicker({
+            autoclose: true,
+            format: 'yyyy-mm-dd'
+        })
+            ////show datepicker when clicking on the icon
+            .next().on('click', function () {
+                $(this).prev().focus();
+            });
+    });
+</script>
+
+<!-- Search -->
+<script>
+        
+        $(document).ready(function () {
+            $('.select2-selection--multiple').select2({
+                minimumResultsForSearch: -1
+            });
+            $('.dropdown-menu').on('click', function (event) {
+                // The event won't be propagated up to the document NODE and
+                // therefore delegated events won't be fired
+                event.stopPropagation();
+            });
+        })
+        function SearchData() {
+            var productCodeUser = commonUtils.returnValueText('#ProductCodeUser');
+            var productGrpCode = $('#ProductGroupCode').val();
+            var invCode = $('#InvCode').val();
+            var customerCodeSys = $('#CustomerCodeSys').val();
+            var apprDTimeUTCFrom = commonUtils.returnValueText('#ApprDTimeUTCFrom');
+            var apprDTimeUTCTo = commonUtils.returnValueText('#ApprDTimeUTCTo');
+            //if (invCode == undefined || invCode.length == 0) {
+            //    alert('Chưa chọn kho');
+            //    $('#InvCode').focus();
+            //    return false;
+            //}
+            if (apprDTimeUTCFrom == undefined || apprDTimeUTCFrom.length == 0) {
+                $('#ApprDTimeUTCFrom').focus();
+                alert('Chưa chọn thời gian từ');
+                return false;
+            }
+            if (apprDTimeUTCTo == undefined || apprDTimeUTCTo.length == 0) {
+                $('#ApprDTimeUTCTo').focus();
+                alert('Chưa chọn thời gian đến');
+                return false;
+            }
+            var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+            var url = '@Url.Action("DoSearch_Rpt_Summary_In_Out_Sup_Pivot", "Report")';
+            $.ajax({
+            type: "post",
+            data: {
+                __RequestVerificationToken: token,
+                invcode: invCode,
+                productcodeuser: productCodeUser,
+                apprDTimeUTCFrom: apprDTimeUTCFrom,
+                apprDTimeUTCTo: apprDTimeUTCTo,
+                productgrpcode: productGrpCode,
+                customercodesys: customerCodeSys
+            },
+            url: url,
+            dataType: 'json',
+                beforeSend: function () { }
+            }).done(function (result) {
+                if (result.Success) {
+
+                    let data = result.Data;
+                    if (data != null) {
+                        var JSONData = [
+                            {
+                                "DocNo": {
+                                    type: "string",
+                                    caption: "Số phiếu"
+                                },
+                                "ApprDateUTC": {
+                                    type: "string",
+                                    caption: "Ngày giao dịch"
+                                },
+                                "ProductCodeUser": {
+                                    type: "string",
+                                    caption: "Mã hàng hóa"
+                                },
+                                "ProductName": {
+                                    type: "string",
+                                    caption: "Tên hàng hóa"
+                                },
+                                "UnitCode": {
+                                    type: "string",
+                                    caption: "Đơn vị"
+                                },                                
+                                "CustomerName": {
+                                    type: "string",
+                                    caption: "Đối tác"
+                                },                                
+                                "Qty": {
+                                    type: "number",
+                                    caption: "Số lượng"
+                                },
+                                "InvName": {
+                                    type: "string",
+                                    caption: "Kho"
+                                },
+                                "InventoryActionDesc": {
+                                    type: "string",
+                                    caption: "Loại"
+                                },
+                                "InvInTypeName": {
+                                    type: "string",
+                                    caption: "Loại nhập kho"
+                                },
+                                "InvOutTypeName": {
+                                    type: "string",
+                                    caption: "Loại xuất kho"
+                                },
+                                "AreaName": {
+                                    type: "string",
+                                    caption: "Khu vực"
+                                },
+                                "ProvinceName": {
+                                    type: "string",
+                                    caption: "Tỉnh"
+                                },
+                            },
+                        ];
+                        if (data != null && data.length > 0) {
+                            var idx = JSONData.length;
+                            for (var i = 0; i < data.length; i++) {
+                                JSONData[idx + i] = data[i];
+                            }
+                        }
+                        var pivot = new WebDataRocks({
+                            container: "#samplePivotTable",
+                            toolbar: true,
+                            beforetoolbarcreated: customizeToolbar,
+                            height: 600,
+                            report: {
+                                formats: [
+                                    {
+                                        name: "",
+                                        thousandsSeparator: ",",
+                                        decimalPlaces: 0,
+                                        //currencySymbol: "$",
+                                        textAlign: "right",
+                                        ///textAlign: "left"
+                                    }
+                                ],
+                                dataSource: {
+                                    data: JSONData
+                                },
+                                options: {
+                                    grid: {
+                                        type: "classic"
+                                    }
+                                },
+                                slice: {
+                                    "reportFilters": [
+                                        {
+                                            "uniqueName": "DocNo"
+                                        },
+                                        {
+                                            "uniqueName": "ApprDateUTC"
+                                        },
+                                        {
+                                            "uniqueName": "InvName"
+                                        },
+                                        {
+                                            "uniqueName": "InvInTypeName"
+                                        },
+                                        {
+                                            "uniqueName": "InvOutTypeName"
+                                        },
+                                        {
+                                            "uniqueName": "AreaName"
+                                        },
+                                        {
+                                            "uniqueName": "ProvinceName"
+                                        },
+                                    ],
+                                    "rows": [
+                                        {
+                                            "uniqueName": "ProductCodeUser"
+                                        },
+                                        {
+                                            "uniqueName": "ProductName"
+                                        },
+                                        {
+                                            "uniqueName": "UnitCode"
+                                        }
+                                    ],
+                                    "columns": [
+                                        {
+                                            "uniqueName": "InventoryActionDesc"
+                                        },
+                                        {
+                                            "uniqueName": "CustomerName"
+                                        }
+                                    ],
+                                    "measures": [
+                                        {
+                                            "uniqueName": "Qty",
+                                            "aggregation": "sum",
+                                            "format": "currency"
+                                        },
+                                    ],
+                                },
+                            },
+                        });
+
+                        webdatarocks.expandAllData();
+                    }
+
+                } else {
+                    if (!commonUtils.isNullOrEmpty(result.Detail)) {
+                        showErrorDialog(result.Detail);
+                    }
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+
+            }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+                //alert("complete");
+            });
+    }
+
+    function customizeToolbar(toolbar) {
+        var tabs = toolbar.getTabs(); // get all tabs from the toolbar
+        toolbar.getTabs = function () {
+            delete tabs[0]; // delete the first tab
+            delete tabs[1];
+            delete tabs[2];
+            delete tabs[3];
+            return tabs;
+        }
+    }
+</script>
+<!-- Excel -->
+<script>
+    function Export() {
+
+        if ($('#samplePivotTable').html() === "") {
+            alert("Chưa có dữ liệu cần xuất excel.");
+            return;
+        }
+        exportData('excel');
+    }
+
+    function exportData(type) {
+        webdatarocks.exportTo(
+            type,
+            {
+                filename: "BC lịch sử GD nhập xuất theo đối tác",
+                excelSheetName: "Rpt_Summary_In_Out_Sup_Pivot"
+            },
+            function () {
+                console.log("Export process is finished");
+            }
+        );
+    }
+</script>
+
+<script type="text/javascript">
+        function Autocompletesearch() {
+            function autocomplete(inp, arrr) {
+                var currentFocus;
+                var a, b, i, c, val = inp.value;
+                    closeAllLists();
+                    if (!val) { return false; }
+                    currentFocus = -1;
+                    a = document.createElement("DIV");
+                    a.setAttribute("id", inp.id + "autocomplete-list");
+                    a.setAttribute("class", "autocomplete-items row col-12 no-padding");
+                    inp.parentNode.appendChild(a);
+                for (i = 0; i < arrr.length; i++) {
+                        /* kiểm tra xem mục có bắt đầu bằng các chữ cái giống như giá trị trường văn bản không: */
+                    let productCur = arrr[i];
+                    if (productCur.ProductName.toUpperCase().includes(val.toUpperCase())) {
+                            /* tạo thành phần DIV cho từng thành phần phù hợp: */
+                            b = document.createElement("DIV");
+                            b.setAttribute("class", "col-12 autocomplete-itemssmall");
+                            /* làm cho các chữ cái phù hợp in đậm: */
+                        b.innerHTML = "<span>" + productCur.ProductName + "</span>";
+                            //b.innerHTML += arrr[i].ProducName;
+                            /* chèn trường đầu vào sẽ giữ giá trị của mục mảng hiện tại: */
+                        b.innerHTML += "<input type='hidden' value='" + productCur.ProductCode + "'>";
+                            /* thực thi chức năng khi ai đó nhấp vào giá trị mục (phần tử DIV): */
+                            b.addEventListener("click", function (e) {
+                                /* chèn giá trị cho trường văn bản tự động hoàn thành: */
+                                inp.value = productCur.ProductName;
+                                GetProduct(productCur.ProductCode);
+                                closeAllLists();
+                            });
+                            a.appendChild(b);
+                        }
+
+                    }
+                    /* thực thi một chức năng nhấn một phím trên bàn phím: */
+                inp.addEventListener("keydown", function (e) {
+                    var x = document.getElementById(inp.id + "autocomplete-list");
+                    if (x) x = x.getElementsByTagName("div");
+                    if (e.keyCode == 40) {
+                        /* Nếu nhấn phím mũi tên DOWN, hãy tăng biến Focus hiện tại: */
+                        currentFocus++;
+                        /* và làm cho mục hiện tại rõ hơn: */
+                        addActive(x);
+                    } else if (e.keyCode == 38) {
+                        currentFocus--;
+                        addActive(x);
+                    } else if (e.keyCode == 13) {
+                        e.preventDefault();
+                        if (currentFocus > -1) {
+                            if (x) x[currentFocus].click();
+                        }
+                    }
+                });
+                document.addEventListener("click", function (e) {
+                    closeAllLists(e.target);
+                });
+                function addActive(x) {
+                    if (!x) return false;
+                    removeActive(x);
+                    if (currentFocus >= x.length) currentFocus = 0;
+                    if (currentFocus < 0) currentFocus = (x.length - 1);
+                    x[currentFocus].classList.add("autocomplete-active");
+                }
+                function removeActive(x) {
+                    for (var i = 0; i < x.length; i++) {
+                        x[i].classList.remove("autocomplete-active");
+                    }
+                }
+                function closeAllLists(elmnt) {
+                    var x = document.getElementsByClassName("autocomplete-items");
+                    for (var i = 0; i < x.length; i++) {
+                        if (elmnt != x[i] && elmnt != inp) {
+                            x[i].parentNode.removeChild(x[i]);
+                        }
+                    }
+                }
+            }
+            function GetProduct(prdid) {
+            let url = '@Url.Action("GetProductExactly", "Report")';
+                $.ajax({
+                    url: url,
+                    type: 'post',
+                    data: {
+                        prdid: prdid
+                        //__RequestVerificationToken: token
+                    },
+                    cache: false,
+                    dataType: 'json',
+                    traditional: true,
+                    //contentType: "application/json; charset=utf-8",
+                    //success: function (data) {
+                    //    $(".GetBom").html(data);
+
+                    //}
+                    success: function (data) {
+                        if (data.Data !== undefined) {
+                            var dataPrd = data.Data;
+
+                            $("#ProductCodeUser").val(dataPrd.ProductCodeUser);                            
+                            $("#myInput").val(dataPrd.ProductCodeUser + ' - ' + dataPrd.ProductName);
+                        }
+                        else {
+                            //$('.GetPrd').append('');
+                        }
+                    }
+
+                });
+            }
+            var x = document.getElementById("myInput");
+            Getkeyup(x.value);
+            function Getkeyup(prdid) {
+                if (prdid.length < 2) {
+                    $("#ProductCodeUser").val('');
+                    return;
+                }
+
+                var url = '@Url.Action("SearchProduct", "Report")';
+                $.ajax({
+                    url: url,
+                    type: 'post',
+                    data: {
+                        prdid: prdid,
+                    },
+                    cache: false,
+                    dataType: 'json',
+                    traditional: true,
+                    success: function (data) {
+                        var arr = [];
+                        if (data.length >0) {
+                            for (var i = 0; i < data.length; i++) {
+                                let prd = {};
+                                prd.ProductCode = data[i].ProductCode;
+                                prd.ProductName = data[i].ProductCodeUser + ' - ' + data[i].ProductName;
+
+                                arr.push(prd);
+                            }
+                        }
+                        
+                        autocomplete(document.getElementById("myInput"), arr);
+                    }
+                });
+
+            }
+        }
+</script>

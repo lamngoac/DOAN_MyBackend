@@ -1,0 +1,130 @@
+﻿@model PageInfo<Mst_ColumnConfigGroup>
+@{
+    var init = CUtils.StrValue(ViewBag.init);
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+    var recordCount = CUtils.StrValue(ViewBag.RecordCount);
+    var totalPage = "0";
+    var showtext = "";
+    if (Model != null)
+    {
+        totalPage = CUtils.StrValue(Model.PageCount);
+    }
+    var offset = 7;
+
+    if (Model.ItemCount > 0)
+    {
+        totalPage = CUtils.StrValue(Model.PageCount);
+        var recordstart = (Model.PageIndex) * Model.PageSize + 1;
+        var recordend = (Model.PageIndex + 1) * Model.PageSize;
+        if (recordend > Model.ItemCount)
+        {
+            recordend = Model.ItemCount;
+        }
+        showtext = recordstart + "-" + recordend + " trong số " + Model.ItemCount;
+    }
+}
+
+
+<input type="hidden" id="page" value="@ViewBag.PageCur" />
+<input type="hidden" id="totalpage" value="@Model.PageCount" />
+
+
+<div class="layout-bot-top-16" style="">
+    <div class="row">
+        <div class="col-6">
+
+        </div>
+        <div class="col-6">
+            @Html.Partial("Pagination", null, new ViewDataDictionary() { { "PageCur", MvcHtmlString.Create(pageCur) }, { "RecordCount", MvcHtmlString.Create(recordCount) }, { "ShowText", showtext } })
+        </div>
+    </div>
+</div>
+
+<div class="panel-body no-padding" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+    <aside class="col-12 layout-table no-padding">
+        @Html.AntiForgeryToken()
+        <div class="scrollable-horizontal padding-left-0 padding-right-0" style="padding-top: 0!important;">
+            <div style="width: 100%; float: left;">
+                <table id="dynamic-table-thead" idn-datatable-id="dynamic-table-thead-tbody" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                    <thead>
+                        <tr class="trthead" filterroot="" bfilter="0">
+                            <th fieldId="CONTROL" fieldName="CONTROL" fieldActive="0" class="text-center cell-100">
+                            </th>
+                            <th fieldId="COLUMNCONFIGGRPCODE" fieldName="Mã nhóm" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-200">
+                                @*ColumnConfigGrpCode*@
+                                @("Mã nhóm".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="COLUMNGRPNAME" fieldName="Tên nhóm" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-150">
+                                @* ColumnGrpName *@
+                                @("Tên nhóm".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="COLUMNGRPFORMAT" fieldName="Số chữ số phần thập phân" fieldActive="0" idn-data-type="N" idn-data-sort="1" idn-data-filter="1" class="text-left cell-150">
+                                @* ColumnGrpFormat *@
+                                @("Số chữ số phần thập phân".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="COLUMNGRPDESC" fieldName="Mô tả" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-150">
+                                @* ColumnGrpDesc *@
+                                @("Mô tả".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="FLAGACTIVE" fieldName="Trạng thái" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-100">
+                                @* FlagActive *@
+                                @("Trạng thái".HtmlItemString("customer"))
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                    <tbody id="table-tbodyID">
+                        @if (Model != null && Model.DataList != null && Model.DataList.Count > 0)
+                        {
+                            var i = 1;
+                            foreach (var item in Model.DataList)
+                            {
+                                <tr idx="@(i)" class="data-item trdata">
+                                    <input type="hidden" name="ListMst_ColumnConfigGroup[@i].ColumnConfigGrpCode" value="@item.ColumnConfigGrpCode" />
+
+                                    <td fieldId="CONTROL" class="text-center cell-100">
+                                        <div class="action-buttons padding-top-2">
+                                            @{
+                                                var urlDetail = Url.Action("Detail", "Mst_ColumnConfigGroup", new { columnConfigGrpCode = item.ColumnConfigGrpCode });
+                                                var urlUpdate = Url.Action("Update", "Mst_ColumnConfigGroup", new { columnConfigGrpCode = item.ColumnConfigGrpCode });
+                                            }
+
+                                            @RenderItemFormat("BTN_QL_CAU_HINH_HIEN_THI_SO_THAP_PHAN_SUA", "<a class=\"icon-edit\" href=\'" + urlUpdate + "\' title=\"Sửa\"><i class=\"fas fa-pencil-alt\"></i></a>", "", "")
+                                        </div>
+                                    </td>
+                                    <td fieldId="COLUMNCONFIGGRPCODE" class="text-left cell-200">
+                                        @CUtils.StrValue(item.ColumnConfigGrpCode)
+                                    </td>
+                                    <td fieldId="COLUMNGRPNAME" class="text-left cell-150">
+                                        @CUtils.StrValue(item.ColumnGrpName)
+                                    </td>
+                                    <td fieldId="COLUMNGRPFORMAT" class="text-right cell-150">
+                                        @CUtils.StrValue(item.ColumnGrpFormat)
+                                    </td>
+                                    <td fieldId="COLUMNGRPDESC" class="text-left cell-150">
+                                        @CUtils.StrValue(item.ColumnGrpDesc)
+                                    </td>
+                                    <td fieldId="FLAGACTIVE" class="text-left cell-100">
+                                        @{
+                                            if (item.FlagActive.Equals("1"))
+                                            {
+                                                <div class="status approve text-center">Active</div>
+                                            }
+                                            else if (item.FlagActive.Equals("0"))
+                                            {
+                                                <div class="status cancel text-center">InActive</div>
+                                            }
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </aside>
+</div>

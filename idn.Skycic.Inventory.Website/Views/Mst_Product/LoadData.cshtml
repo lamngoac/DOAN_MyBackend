@@ -1,0 +1,453 @@
+﻿@model List<Mst_ProductUI>
+@{
+    var idx = ViewBag.Idx as string;
+}
+
+@if (Model != null && Model.Count > 0)
+{
+    var productCodeLast = Model[0].LstPrdBase.Last().ProductCode;
+    var i = 0;
+    //var level2 = new List<Mst_Product>();
+    foreach (var item in Model[0].LstPrdBase)
+    {
+        var classcss = "";
+        if (item.ProductCode.Equals(productCodeLast))
+        {
+            classcss = "last-child-product";
+        }
+
+
+        var level2 = new List<Mst_Product>();
+
+        if (Model[0].LstPrdLeve2 != null && Model[0].LstPrdLeve2.Count > 0)
+        {
+
+
+
+            level2 = Model[0].LstPrdLeve2.Where(it => !CUtils.IsNullOrEmpty(it.ProductCodeBase) && it.ProductCodeBase.Equals(item.ProductCodeBase) && it.ProductLevelSys.Equals("L2PRD")).ToList();
+        }
+
+        var listAttribute = new List<Prd_Attribute>();
+
+        if (Model[0].LstAttributeBase != null && Model[0].LstAttributeBase.Count > 0)
+        {
+            listAttribute = Model[0].LstAttributeBase.Where(x => x.ProductCode.Equals(item.ProductCode)).ToList();
+        }
+
+        var listAttributeLevel2 = new List<Prd_Attribute>();
+        if (Model[0].LstAttributeLevel2 != null && Model[0].LstAttributeLevel2.Count > 0)
+        {
+            listAttributeLevel2 = Model[0].LstAttributeLevel2.Where(x => x.ProductCode.Equals(item.ProductCode)).ToList();
+        }
+        var attr = "";
+        var attrLevel2 = "";
+
+        if (item.ProductCode.Equals(item.ProductCodeRoot))
+        {
+            item.ProductDelType = Client_DelProductLevelSys.RootBasePrd;
+        }
+        else
+        {
+            item.ProductDelType = Client_DelProductLevelSys.BasePrd;
+        }
+        <tr idx="@MvcHtmlString.Create(idx + "." + i)" id="unit_@item.ProductCode" class="data-item trdata child-show trChild-@item.ProductCodeRoot Base_@item.ProductCode @classcss" data-root="trChild-@item.ProductCodeRoot" ondblclick="location.href='@Url.Action("Update", "Mst_Product", new { prcode = item.ProductCode, prbscode = item.ProductCodeBase, prroot = item.ProductCodeRoot, prlv = item.ProductLevelSys })'" style="border-left: 2px solid #70B095; border-right: 2px solid #70B095">
+            <input type="hidden" name="ListProduct[@(idx + "." + i)].ProductCode" value="@item.ProductCode" />
+            <input type="hidden" name="ListProduct[@(idx + "." + i)].ProductCodeUser" value="@item.ProductCodeUser" />
+            <input type="hidden" name="ListProduct[@(idx + "." + i)].ProductType" value="@item.ProductType" />
+            <input type="hidden" name="ListProduct[@(idx + "." + i)].ProductGrpCode" value="@item.ProductGrpCode" />
+            <input type="hidden" name="ListProduct[@(idx + "." + i)].BrandCode" value="@item.BrandCode" id="BrandCode" />
+            <input type="hidden" name="ListProduct[@(idx + "." + i)].ProductLevelSys" value="@item.ProductLevelSys" />
+            <input type="hidden" name="ListProduct[@(idx + "." + i)].ProductDelType" value="@item.ProductDelType" />
+            <input type="hidden" name="ListProduct[@(idx + "." + i)].ProductCodeBase" value="@item.ProductCodeBase" />
+            <input type="hidden" name="ListProduct[@(idx + "." + i)].ProductCodeRoot" value="@item.ProductCodeRoot" />
+            <input type="hidden" name="ListProduct[@(idx + "." + i)].OrgID" value="@item.OrgID" />
+            <input type="hidden" name="ListProduct[@(idx + "." + i)].NetworkID" value="@item.NetworkID" />
+            <input type="hidden" name="ListProduct[@(idx + "." + i)].ProductName" value="@item.ProductName" />
+            <input type="hidden" name="ListProduct[@(idx + "." + i)].QtyEffSt" value="@item.QtyEffSt" />
+            <input type="hidden" name="ListProduct[@(idx + "." + i)].UPBuy" value="@item.UPBuy" />
+            <input type="hidden" name="ListProduct[@(idx + "." + i)].UPSell" value="@item.UPSell" />
+            <input type="hidden" name="ListProduct[@i].FlagActive" value="@item.FlagActive" />
+
+            <td fieldId="CONTROL" fieldActive="0" class="text-center cell-50"></td>
+            <td fieldId="STT" fieldActive="0" class="text-center cell-50" style="">
+                <input type="checkbox" class="cl-check" onclick="CheckBoxBase(this);" name="ckb" />
+            </td>
+            <td fieldId="PRODUCTCODEUSER" fieldActive="0" id="CodeUser_@item.ProductCode" class="text-left cell-200">
+                @item.ProductCodeUser
+            </td>
+            <td fieldId="PRODUCTNAME" fieldActive="0" id="Name_@item.ProductCode" class="text-left cell-250">
+                @*@if (listAttribute != null && listAttribute.Count > 0)
+                    {
+                        foreach (var itAtt in listAttribute)
+                        {
+                            attr += "-" + itAtt.AttributeValue;
+                        }
+                    }*@
+                @(item.ProductName)
+            </td>
+            <td fieldId="PRODUCTTYPE" fieldActive="1" id="Type_@item.ProductCode" class="text-left cell-100">
+                @item.mpt_ProductTypeName
+            </td>
+            <td fieldId="PRODUCTGRPCODE" fieldActive="0" id="GrpCode_@item.ProductCode" class="text-left cell-100">
+                @item.mpg_ProductGrpName
+            </td>
+            <td fieldId="BRANDCODE" fieldActive="0" id="Brand_@item.ProductCode" class="text-left cell-100">
+                @item.mb_BrandName
+            </td>
+            @if (level2.Count > 0)
+            {
+                <td fieldId="UNITNAME" fieldActive="0" class="text-left cell-100 dropdown">
+
+                    <select class="listproductbase" id="Unitchange-@item.ProductCode" onchange="ChangUnit('@item.ProductCode')">
+                        <optgroup label="">
+                            <option value="@item.ProductCode">@item.UnitCode</option>
+                            @foreach (var unitlevel2 in level2)
+                            {
+                                <option value="@unitlevel2.ProductCode">@unitlevel2.UnitCode</option>
+                            }
+                        </optgroup>
+                        <option value="ADDDATA">@("".HtmlItemString("product"))</option>
+                    </select>
+                </td>
+            }
+            else
+            {
+                <td fieldId="UNITNAME" fieldActive="0" class="text-left cell-100 dropdown">@item.UnitCode</td>
+            }
+            <td fieldId="FLAGBUY" fieldActive="0" class="text-center cell-75" id="FlagBuy_@item.ProductCode">
+                @if (!CUtils.IsNullOrEmpty(item.FlagBuy))
+                {
+                    if (item.FlagBuy.Equals("1"))
+                    {
+                        <span class="label label-sm label-success">Có</span>
+                    }
+                    else
+                    {
+
+                        <span class="label label-sm label-success">Không</span>
+                    }
+                }
+            </td>
+            <td fieldId="FLAGSELL" fieldActive="0" class="text-center cell-75" id="FlagSell_@item.ProductCode">
+                @if (!CUtils.IsNullOrEmpty(item.FlagSell))
+                {
+                    if (item.FlagSell.Equals("1"))
+                    {
+                        <span class="label label-sm label-success">Có</span>
+                    }
+                    else
+                    {
+
+                        <span class="label label-sm label-success">Không</span>
+                    }
+                }
+            </td>
+            <td fieldId="UPBUY" fieldActive="0" class="text-right cell-130 mn-upbuy" id="UPBuy_@item.ProductCode">
+                @item.UPBuy
+            </td>
+            <td fieldId="UPSELL" fieldActive="0" class="text-right cell-130 mn-upsell" id="UPSell_@item.ProductCode">
+                @item.UPSell
+            </td>
+            <td fieldId="FLAGACTIVE" fieldActive="0" class="text-center cell-130">
+                @if (!CUtils.IsNullOrEmpty(item.FlagActive))
+                {
+                    if (item.FlagActive.Equals("1"))
+                    {
+                        <div class="status approve">Đang kinh doanh</div>
+                    }
+                    else
+                    {
+                        <div class="status cancel">Ngừng kinh doanh</div>
+                    }
+                }
+            </td>
+
+
+            <td fieldId="PRODUCTBARCODE" fieldActive="1" class="text-left cell-130 idn-hidden">
+                @item.ProductBarCode
+            </td>
+
+            <td fieldId="PRODUCTCODEROOT" fieldActive="1" class="text-left cell-130 idn-hidden">
+                @item.ProductCodeRoot
+            </td>
+
+            <td fieldId="PRODUCTNAMEEN" fieldActive="1" class="text-left cell-130 idn-hidden">
+                @item.ProductNameEN
+            </td>
+
+            <td fieldId="BRANDCODE" fieldActive="1" class="text-left cell-130 idn-hidden">
+                @item.BrandCode
+            </td>
+
+            <td fieldId="PRODUCTYGRPCODE" fieldActive="1" class="text-left cell-130 idn-hidden">
+                @item.ProductGrpCode
+            </td>
+
+            <td fieldId="FLAGSERIAL" fieldName="QL Serial" fieldActive="1" class="text-left cell-130 idn-hidden">
+                @if (!CUtils.IsNullOrEmpty(item.FlagSerial))
+                {
+                    if (item.FlagSerial.Equals("1"))
+                    {
+                        <span class="label label-sm label-success">Có</span>
+                    }
+                    else
+                    {
+
+                        <span class="label label-sm label-success">Không</span>
+                    }
+                }
+            </td>
+            <td fieldId="FLAGLOT" fieldActive="1" class="text-left cell-130 idn-hidden">
+                @if (!CUtils.IsNullOrEmpty(item.FlagLot))
+                {
+                    if (item.FlagLot.Equals("1"))
+                    {
+                        <span class="label label-sm label-success">Có</span>
+                    }
+                    else
+                    {
+
+                        <span class="label label-sm label-success">Không</span>
+                    }
+                }
+            </td>
+
+            <td fieldId="UNITCODE" fieldActive="1" class="text-left cell-130 idn-hidden">
+                @item.UnitCode
+            </td>
+            <td fieldId="PRODUCTSTD" fieldActive="1" class="text-left cell-130 idn-hidden">
+                @item.ProductStd
+            </td>
+
+            <td fieldId="PRODUCTEXPIRY" fieldActive="1" class="text-left cell-130 idn-hidden">
+                @item.ProductExpiry
+            </td>
+
+            <td fieldId="PRODUCTORIGIN" fieldActive="1" class="text-left cell-130 idn-hidden">
+                @item.ProductOrigin
+            </td>
+            <td fieldId="PRODUCTQUYCACH" fieldActive="1" class="text-left cell-130 idn-hidden">
+                @item.ProductQuyCach
+            </td>
+
+            <td fieldId="QTYMINST" fieldActive="1" class="text-left cell-130 idn-hidden">
+                @item.QtyMinSt
+            </td>
+            <td fieldId="QTYEFFST" fieldActive="1" class="text-left cell-130 idn-hidden">
+                @item.QtyEffSt
+            </td>
+            <td fieldId="QTYMAXST" fieldActive="1" class="text-left cell-130 idn-hidden">
+                @item.QtyMaxSt
+            </td>
+
+        </tr>
+
+        i++;
+        if (level2 != null && level2.Count > 0)
+        {
+            foreach (var Level2 in level2)
+            {
+                <tr idx="@MvcHtmlString.Create(idx + "." + i)" id="unit_@Level2.ProductCode" class="data-item GetBom trdata child-show trChild-@Level2.ProductCodeRoot Base_@item.ProductCode " data-root="trChild-@Level2.ProductCodeRoot" ondblclick="location.href='@Url.Action("Update", "Mst_Product", new { prcode = Level2.ProductCode, prbscode = Level2.ProductCodeBase, prroot = Level2.ProductCodeRoot, prlv = Level2.ProductLevelSys })'" style="display:none; border-left: 2px solid #70B095; border-right: 2px solid #70B095">
+                    <input type="hidden" name="ListProduct[@(idx + "." + i)].ProductCode" value="@Level2.ProductCode" />
+                    <input type="hidden" name="ListProduct[@(idx + "." + i)].ProductCodeUser" value="@Level2.ProductCodeUser" />
+                    <input type="hidden" name="ListProduct[@(idx + "." + i)].ProductType" value="@Level2.ProductType" />
+                    <input type="hidden" name="ListProduct[@(idx + "." + i)].ProductGrpCode" value="@Level2.ProductGrpCode" />
+                    <input type="hidden" name="ListProduct[@(idx + "." + i)].BrandCode" value="@Level2.BrandCode" id="BrandCode" />
+                    <input type="hidden" name="ListProduct[@(idx + "." + i)].ProductLevelSys" value="@Level2.ProductLevelSys" />
+                    <input type="hidden" name="ListProduct[@(idx + "." + i)].ProductDelType" value="@Level2.ProductLevelSys" />
+                    <input type="hidden" name="ListProduct[@(idx + "." + i)].ProductCodeBase" value="@Level2.ProductCodeBase" />
+                    <input type="hidden" name="ListProduct[@(idx + "." + i)].ProductCodeRoot" value="@Level2.ProductCodeRoot" />
+                    <input type="hidden" name="ListProduct[@(idx + "." + i)].OrgID" value="@Level2.OrgID" />
+                    <input type="hidden" name="ListProduct[@(idx + "." + i)].NetworkID" value="@Level2.NetworkID" />
+                    <input type="hidden" name="ListProduct[@(idx + "." + i)].ProductName" value="@Level2.ProductName" />
+                    <input type="hidden" name="ListProduct[@(idx + "." + i)].QtyEffSt" value="@Level2.QtyEffSt" />
+                    <input type="hidden" name="ListProduct[@(idx + "." + i)].UPBuy" value="@Level2.UPBuy" />
+                    <input type="hidden" name="ListProduct[@(idx + "." + i)].UPSell" value="@Level2.UPSell" />
+                    <input type="hidden" name="ListProduct[@i].FlagActive" value="@Level2.FlagActive" />
+
+                    <td fieldId="CONTROL" fieldActive="0" class="text-center cell-50"></td>
+                    <td fieldId="STT" fieldActive="0" class="text-center cell-50" style="">
+                        <input type="checkbox" class="cl-check" onclick="CheckBoxBase(this);" name="ckb" />
+                    </td>
+                    <td fieldId="PRODUCTCODEUSER" fieldActive="0" class="text-left cell-200">
+                        @Level2.ProductCodeUser
+                    </td>
+                    <td fieldId="PRODUCTNAME" fieldActive="0" class="text-left cell-250">
+                        @*@if (listAttributeLevel2 != null && listAttributeLevel2.Count > 0)
+                            {
+                                foreach (var itAtt in listAttributeLevel2)
+                                {
+                                    attrLevel2 += "-" + itAtt.AttributeValue;
+                                }
+                            }*@
+                        @(Level2.ProductName)
+                    </td>
+                    <td fieldId="PRODUCTTYPE" fieldActive="1" class="text-left cell-100">
+                        @Level2.mpt_ProductTypeName
+                    </td>
+                    <td fieldId="PRODUCTGRPCODE" fieldActive="0" class="text-left cell-100">
+                        @Level2.mpg_ProductGrpName
+                    </td>
+                    <td fieldId="BRANDCODE" fieldActive="0" class="text-left cell-100">
+                        @Level2.mb_BrandName
+                    </td>
+                    <td fieldId="UNITNAME" fieldActive="0" class="text-left cell-100 dropdown">
+                        <select class="listproductbase" id="Unitchange-@Level2.ProductCode" onchange="ChangUnit('@Level2.ProductCode')">
+                            <optgroup label="">
+                                <option value="@item.ProductCode">@item.UnitCode</option>
+                                @foreach (var unitlevel2 in level2)
+                                {
+                                    <option value="@unitlevel2.ProductCode">@unitlevel2.UnitCode</option>
+                                }
+                            </optgroup>
+                            <option value="ADDDATA">@("".HtmlItemString("product"))</option>
+                        </select>
+                    </td>
+                    <td fieldId="FLAGBUY" fieldActive="0" class="text-center cell-75">
+                        @if (!CUtils.IsNullOrEmpty(Level2.FlagBuy))
+                        {
+                            if (Level2.FlagBuy.Equals("1"))
+                            {
+                                <span class="label label-sm label-success">Có</span>
+                            }
+                            else
+                            {
+
+                                <span class="label label-sm label-success">Không</span>
+                            }
+                        }
+                    </td>
+                    <td fieldId="FLAGSELL" fieldActive="0" class="text-center cell-75">
+                        @if (!CUtils.IsNullOrEmpty(Level2.FlagBuy))
+                        {
+                            if (Level2.FlagSell.Equals("1"))
+                            {
+                                <span class="label label-sm label-success">Có</span>
+                            }
+                            else
+                            {
+
+                                <span class="label label-sm label-success">Không</span>
+                            }
+                        }
+                    </td>
+                    <td fieldId="UPBUY" fieldActive="0" class="text-right cell-130 mn-upbuy">
+                        @Level2.UPBuy
+                    </td>
+                    <td fieldId="UPSELL" fieldActive="0" class="text-right cell-130 mn-upsell">
+                        @Level2.UPSell
+                    </td>
+                    <td fieldId="FLAGACTIVE" fieldActive="0" class="text-center cell-130">
+                        @if (!CUtils.IsNullOrEmpty(Level2.FlagActive))
+                        {
+                            if (Level2.FlagActive.Equals("1"))
+                            {
+                                <div class="status approve">Đang kinh doanh</div>
+                            }
+                            else
+                            {
+                                <div class="status cancel">Ngừng kinh doanh</div>
+                            }
+                        }
+                    </td>
+
+
+                    <td fieldId="PRODUCTBARCODE" fieldActive="1" class="text-left cell-130 idn-hidden">
+                        @Level2.ProductBarCode
+                    </td>
+
+                    <td fieldId="PRODUCTCODEROOT" fieldActive="1" class="text-left cell-130 idn-hidden">
+                        @Level2.ProductCodeRoot
+                    </td>
+
+                    <td fieldId="PRODUCTNAMEEN" fieldActive="1" class="text-left cell-130 idn-hidden">
+                        @Level2.ProductNameEN
+                    </td>
+
+                    <td fieldId="BRANDCODE" fieldActive="1" class="text-left cell-130 idn-hidden">
+                        @Level2.BrandCode
+                    </td>
+
+                    <td fieldId="PRODUCTYGRPCODE" fieldActive="1" class="text-left cell-130 idn-hidden">
+                        @Level2.ProductGrpCode
+                    </td>
+
+                    <td fieldId="FLAGSERIAL" fieldName="QL Serial" fieldActive="1" class="text-left cell-130 idn-hidden">
+                        @if (!CUtils.IsNullOrEmpty(Level2.FlagSerial))
+                        {
+                            if (Level2.FlagSerial.Equals("1"))
+                            {
+                                <span class="label label-sm label-success">Có</span>
+                            }
+                            else
+                            {
+
+                                <span class="label label-sm label-success">Không</span>
+                            }
+                        }
+                    </td>
+                    <td fieldId="FLAGLOT" fieldActive="1" class="text-left cell-130 idn-hidden">
+                        @if (!CUtils.IsNullOrEmpty(Level2.FlagLot))
+                        {
+                            if (Level2.FlagLot.Equals("1"))
+                            {
+                                <span class="label label-sm label-success">Có</span>
+                            }
+                            else
+                            {
+
+                                <span class="label label-sm label-success">Không</span>
+                            }
+                        }
+                    </td>
+
+                    <td fieldId="UNITCODE" fieldActive="1" class="text-left cell-130 idn-hidden">
+                        @Level2.UnitCode
+                    </td>
+                    <td fieldId="PRODUCTSTD" fieldActive="1" class="text-left cell-130 idn-hidden">
+                        @Level2.ProductStd
+                    </td>
+
+                    <td fieldId="PRODUCTEXPIRY" fieldActive="1" class="text-left cell-130 idn-hidden">
+                        @Level2.ProductExpiry
+                    </td>
+
+                    <td fieldId="PRODUCTORIGIN" fieldActive="1" class="text-left cell-130 idn-hidden">
+                        @Level2.ProductOrigin
+                    </td>
+                    <td fieldId="PRODUCTQUYCACH" fieldActive="1" class="text-left cell-130 idn-hidden">
+                        @Level2.ProductQuyCach
+                    </td>
+
+                    <td fieldId="QTYMINST" fieldActive="1" class="text-left cell-130 idn-hidden">
+                        @Level2.QtyMinSt
+                    </td>
+                    <td fieldId="QTYEFFST" fieldActive="1" class="text-left cell-130 idn-hidden">
+                        @Level2.QtyEffSt
+                    </td>
+                    <td fieldId="QTYMAXST" fieldActive="1" class="text-left cell-130 idn-hidden">
+                        @Level2.QtyMaxSt
+                    </td>
+                </tr>
+
+            }
+        }
+    }
+}
+
+<script>
+    $('.listproductbase').select2({
+        minimumResultsForSearch: -1
+    });
+    //$('.numberic').number(true, 2);
+
+
+
+    var tableName = 'Mst_Product';
+    var upBuyFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'UPBuy');
+    var upSellFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'UPSell');
+
+
+    $('.mn-upbuy').number(true, upBuyFormat);
+    $('.mn-upsell').number(true, upSellFormat);
+</script>

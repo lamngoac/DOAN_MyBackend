@@ -1,0 +1,618 @@
+﻿@model List<Inv_InventoryBalance>
+@{
+    var ProductCodeTonKho = ViewBag.ProductCode == null ? "" : ViewBag.ProductCode;
+    var ProductCodeBase = ViewBag.ProductCodeBase == null ? "" : ViewBag.ProductCodeBase;
+    var flagAudit = CUtils.StrValue(ViewBag.FlagAudit);
+    if (CUtils.IsNullOrEmpty(flagAudit))
+    {
+        flagAudit = "0";
+    }
+    var Lst_InvF_InvAuditDtl = new List<InvF_InvAuditDtl>();
+    if (ViewBag.Lst_InvF_InvAuditDtl != null)
+    {
+        Lst_InvF_InvAuditDtl = ViewBag.Lst_InvF_InvAuditDtl as List<InvF_InvAuditDtl>;
+        Lst_InvF_InvAuditDtl = Lst_InvF_InvAuditDtl.Where(x => x.ProductCode.Equals(ProductCodeTonKho)).ToList();
+    }
+    var ProductCodeUser = ViewBag.ProductCodeUser == null ? "" : ViewBag.ProductCodeUser;
+    var ProductName = ViewBag.ProductName == null ? "" : ViewBag.ProductName;
+    var Lst_Mst_Inventory = ViewBag.Lst_Mst_Inventory as List<Mst_Inventory>;
+
+    var iF_InvAuditStatus = "";
+    var disable = "";
+    var disabled = "";
+    var disableQty = "disabled-fix";
+    var hiddenElement = "";
+    if (ViewBag.IF_InvAuditStatus != null)
+    {
+        iF_InvAuditStatus = ViewBag.IF_InvAuditStatus;
+        if (iF_InvAuditStatus == "APPROVE")
+        {
+            disable = "disabled-fix";
+            disabled = "disabled";
+            if (flagAudit.Equals("0"))
+            {
+                disableQty = "";
+                disabled = "";
+                disable = "";
+            }
+            else
+            {
+                hiddenElement = "idn-hidden";
+            }
+        }
+    }
+}
+<div class="modal-dialog" style="max-width: 700px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel"><b>Chi tiết vị trí</b></h2>
+            <a href="javascript:;" onclick="ClosePopupShowTonKho()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body" style="">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupVTNhap" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group margin-bottom-9">
+                    <div class="col-10 col-sm-8">
+                        <span class="block input-icon input-icon-right">
+                            @*<label>Mã hàng hóa: </label>
+                                <label type="text" id="ProductCodeTonKho" name="ProductCodeTonKho" style="font-weight: bold" class="col-6" readonly="readonly">@ProductCodeTonKho</label>*@
+                            <span class="block input-icon input-icon-right">
+                                <label>Mã hàng hóa: @ProductCodeUser - @ProductName</label>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-xs-12">
+                    <input hidden id="mdLo_ProductCode" value="@(ViewBag.ProductCode == null ? "" : ViewBag.ProductCode)" />
+                    <input type="hidden" id="ProductCode_Popup" value="@MvcHtmlString.Create(CUtils.StrValue(ViewBag.ProductCode))" />
+                    <input type="hidden" id="ProductCodeBase_Popup" value="@MvcHtmlString.Create(CUtils.StrValue(ViewBag.ProductCodeBase))" />
+                    @if (iF_InvAuditStatus != "APPROVE")
+                    {
+                        <div class="form-group margin-bottom-5">
+                            <div class="col-xs-3 col-sm-4">
+                                <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="ShowAddProduct()" style="font-size: 13px;">Thêm mới</a>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="col-12 margin-bottom-9">
+                    <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+                        <div style="width: 100%; float: left;">
+                            <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                                <thead>
+                                    <tr class="trthead">
+                                        <th class="cell-50 cl-action">&nbsp;</th>
+                                        <th colspan="2" class="cell-200 text-center">
+                                            Tồn kho
+                                        </th>
+                                        <th colspan="2" class="cell-200 text-center">
+                                            Thực tế
+                                        </th>
+                                    </tr>
+                                    <tr class="trthead">
+                                        <th class="cell-50 cl-action">&nbsp;</th>
+                                        <th fieldId="QtyTotalOk" sorttype="T" fieldName="Số phiếu xuất" fieldActive="0" class="text-left cell-100">
+                                            Số lượng
+                                        </th>
+                                        <th fieldId="InvOut" fieldName="InvOut" fieldActive="0" class="text-center cell-100">
+                                            Vị trí
+                                        </th>
+                                        <th fieldId="QtyTotalOk_TT" sorttype="T" fieldName="Số phiếu xuất" fieldActive="0" class="text-left cell-100">
+                                            Số lượng
+                                        </th>
+                                        <th fieldId="InvOut_TT" fieldName="InvOut" fieldActive="0" class="text-center cell-100">
+                                            Vị trí
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                        <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                            <tbody id="table-tbodyIDTonKho"></tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="modal-footer">
+            <a href="javascript:void(0);" class="btn btn-nc-button @hiddenElement" style="margin-left: 10px" id="btnSaveViTri" onclick="SaveViTri('@ProductCodeTonKho');">Lưu</a>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function SaveViTri(productcode) {
+        let listToastr = [];
+        $('#table-detailCombo').find('tr.trdata[productcode="' + productcode + '"]').remove();
+
+        if (productcode == "") {
+            objToastr = {
+                ToastrType: 'error',
+                ToastrMessage: 'Không tồn tại hàng hóa trong lưới!'
+            };
+            listToastr.push(objToastr);
+        }
+        var trDetailproduct = $("#table-tbodyID tr.trdata[productcode=" + productcode + "]");
+        var idxDtl = 0;
+        if (trDetailproduct.length == 0) {
+            objToastr = {
+                ToastrType: 'error',
+                ToastrMessage: 'Không tồn tại hàng hóa trong lưới!'
+            };
+            listToastr.push(objToastr);
+        }
+
+        if (listToastr.length > 0) {
+            commonUtils.showToastr(listToastr);
+            return false;
+        }
+
+        idxDtl = trDetailproduct.attr('idx');
+        var rd = trDetailproduct.attr('rd');
+        var check = true;
+        var arrayInvCode = [];
+        var lstVitri = "";
+        var sumqtyActual = 0;
+        $("#table-tbodyIDTonKho tr.trdata").each(function () {
+            debugger;
+            var tr = $(this);
+            var rdTonKho = tr.attr('rd');
+            var flagrow = tr.attr('flagrow');
+            var strqtytotalok = tr.find('input.qtytotalok-' + rdTonKho).val();
+            var strInvCode = tr.find('select.selectinvcode-' + rdTonKho).val();
+
+            var strqtyActual = tr.find('input.qtyactual-' + rdTonKho).val();
+            var strInvCodeActual = tr.find('select.selectinvcodeactual-' + rdTonKho).val();
+
+            if (arrayInvCode.includes(strInvCodeActual) == false) {
+                if (strInvCodeActual != "") {
+                    arrayInvCode.push(strInvCodeActual);
+                    if (lstVitri == "") {
+                        lstVitri += strInvCodeActual
+                    }
+                    else {
+                        lstVitri += ", " + strInvCodeActual
+                    }
+                }
+                else {
+                    arrayInvCode.push(strInvCode);
+                    if (lstVitri == "") {
+                        lstVitri += strInvCode
+                    }
+                    else {
+                        lstVitri += ", " + strInvCode
+                    }
+                }
+            }
+            var qtytotalok = parseFloat(strqtytotalok);
+            var qtyActual = 0.0;
+            if ($.isNumeric(strqtyActual) == true) {
+                qtyActual = parseFloat(strqtyActual);
+
+            }
+
+            if (check == false) return;
+            sumqtyActual += qtyActual;
+
+            var strUnitCode = trDetailproduct.find('select.unitcode-' + rd).val();
+            if (strUnitCode == undefined || strUnitCode == "") {
+                strUnitCode = trDetailproduct.find('select.unitcode-' + rd).val();
+            }
+            var InventoryAction = "";
+            if (strqtytotalok == strqtyActual && strInvCode != strInvCodeActual) {
+                InventoryAction = "MOVE";
+            }
+            else if (strqtyActual == "" || strInvCodeActual == "") {
+                InventoryAction = "OUT";
+                strInvCodeActual = strInvCode;
+                strqtyActual = strqtytotalok;
+            }
+            else if (strInvCode == strInvCodeActual) {
+                if (strqtytotalok != strqtyActual) {
+                    var qtyActual = parseFloat(strqtyActual);
+                    if (qtyActual > qtytotalok) {
+                        InventoryAction = "IN";
+                    }
+                    else {
+                        InventoryAction = "OUT";
+                    }
+                }
+                else {
+                    InventoryAction = "NORMAL";
+                }
+            }
+            var date = new Date();
+            var randomCur = date.getTime();
+            var randHex = commonUtils.randHex(12);
+            randomCur = randomCur + randHex;
+
+            var productcodeCss = "productcode-" + randomCur;
+            var productcoderootcss = "productcoderoot-" + randomCur;
+            var qtyCss = "qty-" + randomCur;
+            var qtyinitCss = "qtyinit-" + randomCur;
+            var invcodeoutactualCss = "invcodeoutactual-" + randomCur;
+            var invcodeinitCss = "invcodeinit-" + randomCur;
+            var unitcodeCss = "unitcode-" + randomCur;
+            var remarkCss = "remark-" + randomCur;
+            var inventoryactionCss = "inventoryaction-" + randomCur;
+
+            var extData = {
+                productcodeCss: productcodeCss,
+                productcoderootcss: productcoderootcss,
+                qtyCss: qtyCss,
+                qtyinitCss: qtyinitCss,
+                invcodeoutactualCss: invcodeoutactualCss,
+                invcodeinitCss: invcodeinitCss,
+                unitcodeCss: unitcodeCss,
+                remarkCss: remarkCss,
+                inventoryactionCss: inventoryactionCss,
+                rd: randomCur,
+                idx: 99999,
+            };
+
+            // Gom chung vào bảng table-detailCombo
+            var strHtml = commonUtils.getHtmlFromTemplate($('#rowtemplateComboDetail'), {
+                ProductCodeRoot: productcode,
+                ProductCode: productcode,
+                UnitCode: strUnitCode,
+                Remark: "",
+                InvCodeInit: strInvCode,
+                InvCodeOutActual: strInvCodeActual,
+                Qty: strqtyActual,
+                QtyInit: strqtytotalok, // Tồn kho
+                InventoryAction: InventoryAction,
+                idx: 999999
+            }, extData);
+
+
+            // Các vị trí không giống nhau
+            var lenItem = $('#table-detailCombo tr.trdata').length;
+            if (lenItem == 0) {
+                $('#table-detailCombo').append(strHtml);
+            }
+            else {
+                var trLo_Old = $('#table-detailCombo').find('tr[productcode="' + productcode + '"][invcode="' + strInvCode + '"]').eq(0);
+                if (trLo_Old.length != 0) {
+                    trLo_Old.replaceWith(strHtml);
+                }
+                else {
+                    $('#table-detailCombo').append(strHtml);
+                }
+            }
+
+            // Lưu cache
+            if ($('#tbodyCacheProducts').length > 0) {
+                debugger;
+                var $oldItem = $('#tbodyCacheProducts').find('tr[productcode="' + commonUtils.returnValueText('#ProductCode_Popup') + '"][productcodebase="' + commonUtils.returnValueText('#ProductCodeBase_Popup') + '"][rd="' + rd + '"]');
+                
+                if ($oldItem !== undefined && $oldItem !== null && $oldItem.length > 0) {
+                    var rdC = $oldItem.attr("rd");
+                    $oldItem.find('input.qtyactual-' + rdC).val(strqtyActual);
+                    $oldItem.find('input.invcodeactual-' + rdC).val(strInvCodeActual);
+                    if (flagrow === '1') {
+                        $oldItem.find('input.qtytotalok-' + rdC).val(strqtytotalok);
+                        $oldItem.find('input.invcode-' + rdC).val(strInvCode);
+                    }
+                }
+                else {
+                    var dateCache = new Date();
+                    var randomCurCache = dateCache.getTime();
+                    var randHexCache = commonUtils.randHex(12);
+                    randomCurCache = randomCurCache + randHexCache;
+
+                    var productcodeCss = "productcode-" + randomCurCache;
+                    var productcodebaseCss = "productcodebase-" + randomCurCache;
+                    var qtytotalokCss = "qtytotalok-" + randomCurCache;
+                    var invcodeCss = "invcode-" + randomCurCache;
+                    var qtyactualCss = "qtyactual-" + randomCurCache;
+                    var invcodeactualCss = "invcodeactual-" + randomCurCache;
+                    var flagrowCss = "flagrow-" + randomCurCache;
+
+                    var extDataCache = {
+                        productcodeCss: productcodeCss,
+                        productcodebaseCss: productcodebaseCss,
+                        qtytotalokCss: qtytotalokCss,
+                        invcodeCss: invcodeCss,
+                        qtyactualCss: qtyactualCss,
+                        invcodeactualCss: invcodeactualCss,
+                        flagrowCss: flagrowCss,
+                        rd: randomCurCache,
+                        idx: 99999,
+                    };
+                    var $item = $(commonUtils.getHtmlFromTemplate($('#tmpl_cache_products'),
+                        {
+                            ProductCode: commonUtils.returnValueText('#ProductCode_Popup'),
+                            ProductCodeBase: commonUtils.returnValueText('#ProductCodeBase_Popup'),
+                            QtyTotalOK: strqtytotalok,
+                            InvCode: strInvCode,
+                            QtyActual: strqtyActual,
+                            InvCodeActual: strInvCodeActual,
+                            FlagRow: flagrow,
+                            idx: 9999,
+                            rd: randomCurCache
+                        }, extDataCache));
+                    $item.appendTo($('#tbodyCacheProducts'));
+
+                    //format số
+                    var tableName = 'InvF_InvAudit';
+                    var qtyokformat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'QtyTotalOK');
+                    $('.' + qtytotalokCss).number(true, qtyokformat);
+
+                    var qtyactualformat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'QtyActual');
+                    $('.' + qtyactualCss).number(true, qtyactualformat);
+
+                }
+
+                commonUtils.updateTableTrNotShowIdx($('#tbodyCacheProducts tr.trdata'), true);
+            }
+
+        });
+        updateTableTrIdx($('#table-detailCombo tr'), false);
+
+
+
+
+        if (check == false) return;
+        debugger;
+        // Tìm hàng hóa và gán lại
+        var ipActual = trDetailproduct.find('input.qtyactual-' + rd);
+        ipActual.val(sumqtyActual);
+        trDetailproduct.find('input.invcode-' + rd).val(lstVitri);
+
+        // Gán lại nếu không thuộc xuất kho
+        trDetailproduct.find('input.invcode-' + rd).val(lstVitri);
+        //
+        ChangeQtyActual(ipActual);
+        TongSoLuongTon();
+        ClosePopupShowTonKho();
+    }
+</script>
+
+<script type="text/template" id="tmpl_add_products">
+    @{
+        var invCodeInit = "";
+        var invNameInit = "";
+        if (Lst_Mst_Inventory != null && Lst_Mst_Inventory.Count > 0)
+        {
+            invCodeInit = CUtils.StrValue(Lst_Mst_Inventory[0].InvCode);
+            invNameInit = CUtils.StrValue(Lst_Mst_Inventory[0].InvName);
+        }
+        //invcode="==invcode=="
+    }
+    <tr class="data-item trdata" idx="==idx==" invcode="@MvcHtmlString.Create(invCodeInit)" flagrow="1" rd="==rd==">
+        <td class="cell-50 text-center">
+            <a href="javascript:;" class="icon-delete" title="Xóa" onclick="$(this).closest('tr').remove(); commonUtils.updateTableTrNotShowIdx($('#table-tbodyIDTonKho tr.trdata'), true);">
+                <i class="fas fa-trash-alt"></i>
+            </a>
+        </td>
+        <td class="text-left cell-100">
+            <input readonly="readonly" class="QtyOut col-md-12 text-right ==qtytotalokCss==" value="==qtytotalok==" />
+        </td>
+        <td class="text-center cell-100 disabled-fix">
+            <select class="col-md-12 ==selectinvcodeCss==">
+                <optgroup label="">
+                    @if (Lst_Mst_Inventory != null && Lst_Mst_Inventory.Count > 0)
+                    {
+                        foreach (var item in Lst_Mst_Inventory)
+                        {
+                            var invCode = CUtils.StrValue(item.InvCode);
+                            var invName = CUtils.StrValue(item.InvName);
+                            <option invBUPattern="@(item.InvBUPattern == null ? "" : item.InvBUPattern)" desc="@MvcHtmlString.Create(invName)" value="@MvcHtmlString.Create(invCode)" @(invCode.Equals(invCodeInit) ? "selected" : "")>@MvcHtmlString.Create(invName)</option>
+                        }
+                    }
+                </optgroup>
+            </select>
+        </td>
+
+        <td class="text-left cell-100">
+            <input class="QtyOut col-md-12 text-right ==qtyactualCss==" value="==qtyactual==" />
+        </td>
+        <td class="text-center cell-100">
+            <select class="col-md-12 ==selectinvcodeactualCss==" onchange="InvCodeActual_Change(this)">
+                <optgroup label="">
+                    @if (Lst_Mst_Inventory != null && Lst_Mst_Inventory.Count > 0)
+                    {
+                        foreach (var item in Lst_Mst_Inventory)
+                        {
+                            var invCode = CUtils.StrValue(item.InvCode);
+                            var invName = CUtils.StrValue(item.InvName);
+                            <option invBUPattern="@(item.InvBUPattern == null ? "" : item.InvBUPattern)" desc="@MvcHtmlString.Create(invName)" value="@MvcHtmlString.Create(invCode)" @(invCode.Equals(invCodeInit) ? "selected" : "")>@MvcHtmlString.Create(invName)</option>
+                        }
+                    }
+                </optgroup>
+            </select>
+        </td>
+    </tr>
+</script>
+
+<script type="text/template" id="tmpl_add_products_none">
+    <tr class="data-item trdata" idx="==idx==" invcode="==invcode==" flagrow="0" rd="==rd==">
+        <td class="cell-50 text-center">&nbsp;</td>
+        <td class="text-left cell-100">
+            <input readonly="readonly" class="col-md-12 text-right ==qtytotalokCss==" value="==QtyTotalOK==" />
+        </td>
+        <td class="text-center cell-100">
+            <select class="col-md-12 ==selectinvcodeCss==">
+                <optgroup label="">
+                    @if (Lst_Mst_Inventory != null && Lst_Mst_Inventory.Count > 0)
+                    {
+                        foreach (var item in Lst_Mst_Inventory)
+                        {
+                            var invCode = CUtils.StrValue(item.InvCode);
+                            var invName = CUtils.StrValue(item.InvName);
+                            <option invBUPattern="@(item.InvBUPattern == null ? "" : item.InvBUPattern)" value="@MvcHtmlString.Create(invCode)">@MvcHtmlString.Create(invName)</option>
+                        }
+                    }
+                </optgroup>
+            </select>
+        </td>
+
+        <td class="text-left cell-100">
+            <input class="col-md-12 text-right ==qtyactualCss==" value="==QtyActual==" />
+        </td>
+        <td class="text-center cell-100">
+            <select class="col-md-12 ==selectinvcodeactualCss==">
+                <optgroup label="">
+                    @if (Lst_Mst_Inventory != null && Lst_Mst_Inventory.Count > 0)
+                    {
+                        foreach (var item in Lst_Mst_Inventory)
+                        {
+                            var invCode = CUtils.StrValue(item.InvCode);
+                            var invName = CUtils.StrValue(item.InvName);
+                            <option invBUPattern="@(item.InvBUPattern == null ? "" : item.InvBUPattern)" value="@MvcHtmlString.Create(invCode)">@MvcHtmlString.Create(invName)</option>
+                        }
+                    }
+                </optgroup>
+            </select>
+
+        </td>
+    </tr>
+</script>
+
+<script type="text/template" id="tmplAddRowTonKhoThucTe">
+    <tr class="data-item trdata" rd="==rd==" idx="==idx==" invcode="==InvCode==" flagrow="0">
+        <td class="cell-50 cl-action">&nbsp;</td>
+        <td class="text-left cell-100">
+            <input readonly="readonly" class="QtyOut col-md-12 text-right ==qtytotalokCss==" value="==QtyTotalOK==" />
+        </td>
+        <td class="text-center cell-100 disabled-fix">
+            <select class="col-md-12 ==selectinvcodeCss==">
+                <optgroup label=""></optgroup>
+            </select>
+        </td>
+
+        <td class="text-left cell-100">
+            <input class="QtyOut col-md-12 text-right ==qtyactualCss==" @disabled value="==QtyActual==" />
+        </td>
+        <td class="text-center cell-100">
+            <select class="col-md-12 ==selectinvcodeactualCss==" @disabled>
+                <optgroup label=""></optgroup>
+            </select>
+        </td>
+    </tr>
+</script>
+
+<script type="text/javascript">
+    function InvCodeActual_Change(thiz) {
+        var invCodeActual = $(thiz).val();
+        var invName = '';
+
+        if (!commonUtils.isNullOrEmpty(invCodeActual)) {
+            var $option = $(this).find('option:selected');
+            if ($option !== undefined && $option !== null) {
+                invName = $option.attr('desc');
+            }
+            var $tr = $(thiz).parent().parent();
+            if ($tr !== undefined && $tr !== null) {
+                var idx = $tr.attr('idx');
+                var $select = $tr.find('select.InvCode');
+                if ($select !== undefined && $select !== null) {
+                    var $optgroup = $select.find('optgroup');
+                    if ($optgroup !== undefined && $optgroup !== null) {
+                        var $option = $optgroup.find('option[value="' + invCodeActual + '"]');
+                        $option.attr('selected', true);
+                    }
+                }
+                //$tr.find('input[name="DtlTonKho[' + idx + '].InvCode"]').val(invName);
+                $tr.attr('invcode', invCodeActual);
+            }
+        }
+    }
+
+    function ShowAddProduct() {
+        var date = new Date();
+        var randomCur = date.getTime();
+        var randHex = commonUtils.randHex(12);
+        randomCur = randomCur + randHex;
+        
+        var selectinvcodeCss = "selectinvcode-" + randomCur;
+        var qtyactualCss = "qtyactual-" + randomCur;
+        var qtytotalokCss = "qtytotalok-" + randomCur;
+        var selectinvcodeactualCss = "selectinvcodeactual-" + randomCur;
+
+        var exData = {
+            selectinvcodeCss: selectinvcodeCss,
+            qtyactualCss: qtyactualCss,
+            qtytotalokCss: qtytotalokCss,
+            selectinvcodeactualCss: selectinvcodeactualCss,
+            idx: 9999,
+            rd: randomCur,
+        };
+        var $item = $(commonUtils.getHtmlFromTemplate($('#tmpl_add_products'),
+            {
+                qtytotalok: 0,
+                invcode: '',
+                qtyactual: 0,
+            },
+            exData
+        ));
+        $item.appendTo($('#table-tbodyIDTonKho'));
+        commonUtils.updateTableTrNotShowIdx($('#table-tbodyIDTonKho tr.trdata'), true);
+
+    }
+</script>
+
+<script>
+    var Lst_Data = [];
+    @{
+        if (Model != null && Model.Count != 0)
+        {
+            foreach (var it in Model)
+            {
+                var invCode = CUtils.StrValue(it.InvCode);
+                var invCodeActual = "";
+                var qtyActual = "0.0";
+
+                if (flagAudit == "1")
+                {
+                    var itAuditDtl = Lst_InvF_InvAuditDtl.Where(x => x.InvCodeInit.Equals(it.InvCode)).FirstOrDefault();
+                    if (itAuditDtl != null)
+                    {
+                        invCodeActual = itAuditDtl.InvCodeActual.ToString();
+                        qtyActual = itAuditDtl.QtyActual.ToString();
+                    }
+                }
+                else
+                {
+                    invCodeActual = it.InvCode.ToString();
+                    qtyActual = it.QtyTotalOK.ToString();
+                }
+                var qtytotalok = it.QtyTotalOK == null ? "0" : it.QtyTotalOK;
+
+
+                <text>
+                var objRow = {
+                    InvCode: '@invCode',
+                    QtyActual: '@qtyActual',
+                    InvCodeActual: '@invCodeActual',
+                    QtyTotalOK: '@qtytotalok',
+                    FlagExist: '0',
+                }
+                Lst_Data.push(objRow);
+            </text>
+                }
+            }
+        }
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+            var listInvCode = JSON.parse('@Html.Raw(Json.Encode(Lst_Mst_Inventory))');
+            if (Lst_Data !== undefined && Lst_Data !== null && Lst_Data.length > 0) {
+                for (var i = 0; i < Lst_Data.length; i++) {
+                    renderRowTonKhoThucTe(Lst_Data[i], listInvCode);
+                }
+
+                $('th.cl-action').addClass('display-none');
+                $('td.cl-action').addClass('display-none');
+            }
+        });
+</script>
+
+

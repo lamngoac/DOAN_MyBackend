@@ -1,0 +1,346 @@
+﻿@model RT_Mst_Product
+@{
+    var objMst_Product = new Mst_Product();
+    if (Model != null && Model.Lst_Mst_Product != null && Model.Lst_Mst_Product.Count > 0)
+    {
+        objMst_Product = Model.Lst_Mst_Product[0];
+    }
+
+    const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
+    var objectProperties = typeof(Mst_Product).GetProperties(flags);
+
+    var listProduct_CustomField = ViewBag.ListProduct_CustomField as List<Product_CustomField>;
+}
+<link rel="stylesheet" href="~/Content/datetimepicker/css/bootstrap-datetimepicker.min.css" />
+<div class="panel-body " id="panel-body">
+    <aside class="col-12">
+        <div class="col-12 row layout-search">
+            <div class="col-4 no-padding">
+                <div class="form-group margin-bottom-9">
+                    <label for="ProductNameEN" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Tên tiếng anh".HtmlItemString("product"))</label>
+                    <div class="col-12 col-sm-8">
+                        <span class="block input-icon input-icon-right">
+                            <input type="text" id="ProductNameEN" name="ProductNameEN" class="col-12 ProductNameEN" onkeyup="locdau(this);" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.ProductNameEN))" autocomplete="off" required />
+                        </span>
+                    </div>
+
+                </div>
+                <div class="form-group margin-bottom-9">
+                    <label for="ProductStd" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Tiêu chuẩn".HtmlItemString("product"))</label>
+                    <div class="col-12 col-sm-8">
+                        <span class="block input-icon input-icon-right">
+                            <input type="text" id="ProductStd" name="ProductStd" class="col-12 ProductStd " value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.ProductStd))" autocomplete="off" required />
+                        </span>
+                    </div>
+
+                </div>
+                <div class="form-group margin-bottom-9">
+                    <label for="ProductOrigin" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Xuất xứ".HtmlItemString("product"))</label>
+                    <div class="col-12 col-sm-8">
+                        <span class="block input-icon input-icon-right">
+                            <input type="text" id="ProductOrigin" name="ProductOrigin" class="col-12 ProductOrigin " value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.ProductOrigin))" autocomplete="off" required />
+                        </span>
+                    </div>
+
+                </div>
+                <div class="form-group margin-bottom-9">
+                    <div class="col-4"></div>
+                    <div class="row no-margin col-8 col-sm-8 cl-flags">
+                        <div class="row no-margin chk" style="margin-right: 15px !important;">
+                            @{
+                                var checkFlagSerial = "";
+                                if (CUtils.StrValue(objMst_Product.FlagSerial) != null && CUtils.StrValue(objMst_Product.FlagSerial).Equals("1"))
+                                {
+                                    checkFlagSerial = "checked";
+                                }
+                                else
+                                {
+                                    checkFlagSerial = "";
+                                }
+                            }
+                            <input type="checkbox" value="" id="FlagSerial" class="cl-check" onclick="CheckBoxFlagSerial();" name="FlagSerial" @checkFlagSerial />
+                            <div class="span-title-check">@("Quản lý Serial".HtmlItemString("product"))</div>
+                        </div>
+                        <div class="row no-margin chk">
+                            @{
+                                var checkFlagLot = "";
+                                if (CUtils.StrValue(objMst_Product.FlagLot) != null && CUtils.StrValue(objMst_Product.FlagLot).Equals("1"))
+                                {
+                                    checkFlagLot = "checked";
+                                }
+                                else
+                                {
+                                    checkFlagLot = "";
+                                }
+                            }
+                            <input type="checkbox" value="" id="FlagLot" onclick="CheckBoxFlagLot();" class="cl-check" name="FlagLot" @checkFlagLot />
+                            <div class="span-title-check">@("Quản lý LOT".HtmlItemString("product"))</div>
+                        </div>
+
+                    </div>
+                </div>
+                @if (listProduct_CustomField != null && listProduct_CustomField.Count > 0)
+                {
+                    var lstName = new List<int>();
+                    foreach (var it in listProduct_CustomField)
+                    {
+                        var ProductCustomFieldCode = it.ProductCustomFieldCode.ToString().Replace("CustomField", "");
+                        lstName.Add(Convert.ToInt32(ProductCustomFieldCode));
+                    }
+                    lstName.Sort();
+
+                    foreach (var it in lstName)
+                    {
+                        var productCustomFieldCode = "CustomField" + it;
+                        var itProperties = objectProperties.Where(x => x.Name.ToString() == productCustomFieldCode).FirstOrDefault();
+                        var itSpecCustomField = listProduct_CustomField.Where(x => x.ProductCustomFieldCode.ToString() == productCustomFieldCode).FirstOrDefault();
+                        if (itProperties != null)
+                        {
+                            var valueCur = itProperties.GetValue(objMst_Product);
+                            if (!CUtils.IsNullOrEmpty(valueCur))
+                            {
+                                valueCur = valueCur.ToString().Trim();
+                            }
+                            else
+                            {
+                                valueCur = "";
+                            }
+                            var specCustomFieldName = itSpecCustomField == null ? "" : itSpecCustomField.ProductCustomFieldName.ToString().Trim();
+                            var dbPhysicalType = itSpecCustomField == null ? "" : itSpecCustomField.DBPhysicalType.ToString().Trim();
+
+                            <div class="form-group margin-bottom-9">
+                                <label for="@MvcHtmlString.Create(productCustomFieldCode)" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create(specCustomFieldName)</label>
+
+
+                                @if (dbPhysicalType.Equals("TEXT") || dbPhysicalType.Equals("IMAGE"))
+                                {
+                                    <div class="col-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="@MvcHtmlString.Create(productCustomFieldCode)" name="@MvcHtmlString.Create(productCustomFieldCode)" class="col-12 @MvcHtmlString.Create(productCustomFieldCode)" value="@MvcHtmlString.Create(CUtils.StrValue(valueCur))" autocomplete="off" />
+                                        </span>
+                                    </div>
+                                }
+                                else if (dbPhysicalType.Equals("DATE"))
+                                {
+                                    <div class="col-12 col-sm-8 row date-input-group no-margin">
+                                        <div class="input-group">
+                                            <input type="text" id="@MvcHtmlString.Create(productCustomFieldCode)" name="dateField" class="col-10 cl-date dateField hasDatepicker" data-date-format="yyyy-mm-dd" value="@MvcHtmlString.Create(CUtils.StrValue(valueCur))" autocomplete="off">
+                                            <span class="input-group-addon col-2">
+                                                <i class="far fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                }
+                                else if (dbPhysicalType.Equals("DATETIME"))
+                                {
+                                    <div class="col-12 col-sm-8 row date-input-group no-margin">
+                                        <div class="input-group">
+                                            <input type="text" id="@MvcHtmlString.Create(productCustomFieldCode)" name="dateTimeField" class="col-10 cl-date dateTimeField hasDatepicker" data-date-format="yyyy-mm-dd" value="@MvcHtmlString.Create(CUtils.StrValue(valueCur))" autocomplete="off">
+                                            <span class="input-group-addon col-2">
+                                                <i class="far fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                }
+
+                                else if (dbPhysicalType.Equals("NUMBER"))
+                                {
+                                    <div class="col-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="@MvcHtmlString.Create(productCustomFieldCode)" name="@MvcHtmlString.Create(productCustomFieldCode)" class="col-12 @MvcHtmlString.Create(productCustomFieldCode) fieldNumber text-right" value="@MvcHtmlString.Create(CUtils.StrValue(valueCur))" onkeyup="checkIsNumber(this)" />
+                                        </span>
+                                    </div>
+                                }
+
+                            </div>
+                        }
+                    }
+                }
+            </div>
+            <div class="col-4 no-padding">
+                @*<div class="form-group margin-bottom-9">
+                        <label for="ProductOrigin" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Xuất xứ".HtmlItemString("product"))</label>
+                        <div class="col-12 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <input type="text" id="ProductOrigin" name="ProductOrigin" class="col-12 ProductOrigin " value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.ProductOrigin))" autocomplete="off" required />
+                            </span>
+                        </div>
+
+                    </div>*@
+                <div class="form-group margin-bottom-9">
+                    <label for="ProductExpiry" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Hạn sử dụng".HtmlItemString("product"))</label>
+                    <div class="col-12 col-sm-8">
+                        <span class="block input-icon input-icon-right">
+                            <input type="text" id="ProductExpiry" name="ProductExpiry" class="col-12 ProductExpiry " value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.ProductExpiry))" autocomplete="off" required />
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="form-group margin-bottom-9">
+                    <label for="ProductQuyCach" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Quy cách".HtmlItemString("product")) </label>
+                    <div class="col-12 col-sm-8">
+                        <span class="block input-icon input-icon-right">
+                            <input type="text" id="ProductQuyCach" name="ProductQuyCach" class="col-12 ProductQuyCach " value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.ProductQuyCach))" autocomplete="off" required />
+                        </span>
+                    </div>
+
+                </div>
+                <div class="form-group margin-bottom-9">
+                    <label for="ProductMnfUrl" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@( "Link quy trình XS".HtmlItemString("product"))</label>
+                    <div class="col-12 col-sm-8">
+                        <span class="block input-icon input-icon-right">
+                            <input type="text" id="ProductMnfUrl" name="ProductMnfUrl" class="col-12 ProductMnfUrl " value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.ProductMnfUrl))" autocomplete="off" required />
+                        </span>
+                    </div>
+
+                </div>
+
+
+            </div>
+            <div class="col-4 no-padding">
+                @*<div class="form-group margin-bottom-9">
+                        <label for="ProductQuyCach" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Quy cách".HtmlItemString("product")) </label>
+                        <div class="col-12 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <input type="text" id="ProductQuyCach" name="ProductQuyCach" class="col-12 ProductQuyCach " value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.ProductQuyCach))" autocomplete="off" required />
+                            </span>
+                        </div>
+
+                    </div>
+                    <div class="form-group margin-bottom-9">
+                        <label for="ProductMnfUrl" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@( "Link quy trình XS".HtmlItemString("product"))</label>
+                        <div class="col-12 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <input type="text" id="ProductMnfUrl" name="ProductMnfUrl" class="col-12 ProductMnfUrl " value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.ProductMnfUrl))" autocomplete="off" required />
+                            </span>
+                        </div>
+
+                    </div>*@
+                <div class="form-group margin-bottom-9">
+                    <label for="Remark" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Mô tả".HtmlItemString("product"))</label>
+                    <div class="col-12 col-sm-8">
+                        <span class="block input-icon input-icon-right">
+                            <textarea type="text" id="Remark1" name="Remark1" class="col-12 Remark1" rows="5" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.Remark))" autocomplete="off">@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.Remark))</textarea>
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        <div class="col-xs-12 layout-bot-top-16">
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#Home">@("Chi tiết sản phẩm".HtmlItemString("product"))</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#Menu1">@("Hướng dẫn sử dụng".HtmlItemString("product"))</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#Menu2">@("Bản vẽ".HtmlItemString("product"))</a>
+                </li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div id="Home" class="container-fluid padding-left-right-15 tab-pane active">
+                    <div class="form-group margin-bottom-9" style="display: block;">
+                        <label for="ProductIntro" class="col-xs-12 col-sm-12 control-label no-padding-right font-weight-500    "></label>
+                        <div class="col-xs-12 col-sm-12">
+                            <span class="block input-icon input-icon-right">
+
+                                <textarea id="ProductIntro" name="ProductIntro" class="col-xs-11 ProductIntro" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.ProductIntro))" cols="50" rows="3" autocomplete="off">@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.ProductIntro))</textarea>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div id="Menu1" class="container-fluid padding-left-right-15 tab-pane">
+                    <div class="form-group margin-bottom-9" style="display: block;">
+                        <label for="ProductUserGuide" class="col-xs-12 col-sm-12 control-label no-padding-right font-weight-500 "> </label>
+                        <div class="col-xs-12 col-sm-12">
+                            <span class="block input-icon input-icon-right">
+
+                                <textarea cols="50" rows="3" id="ProductUserGuide" name="ProductUserGuide" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.ProductUserGuide))" class="col-xs-11 ProductUserGuide">@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.ProductUserGuide))</textarea>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div id="Menu2" class="container-fluid padding-left-right-15 tab-pane">
+                    <div class="form-group margin-bottom-9" style="display: block;">
+                        <label for="ProductDrawing" class="col-xs-12 col-sm-12 control-label no-padding-right font-weight-500    "></label>
+                        <div class="col-xs-12 col-sm-12">
+                            <span class="block input-icon input-icon-right">
+                                <textarea typeof="text" cols="50" rows="3" id="ProductDrawing" name="ProductDrawing" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.ProductDrawing))" class="col-xs-11 ProductDrawing">@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.ProductDrawing))</textarea>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+</div>
+<script src="~/Content/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $(function () {
+            $('.dateField').datepicker({
+                autoclose: true,
+                todayHighlight: true,
+                dateFormat: 'yy-mm-dd'
+            })
+                ////show datepicker when clicking on the icon
+                .next().on('click', function () {
+                    $(this).prev().focus();
+                });
+        });
+
+
+        //$(function () {
+        //    $('#dateTimeField').datepicker({
+        //        autoclose: true,
+        //        todayHighlight: true,
+        //        format: 'yyyy-mm-dd HH:ii:ss',
+        //    })
+        //        ////show datepicker when clicking on the icon
+        //        .next().on('click', function () {
+        //            $(this).prev().focus();
+        //        });
+        //});
+
+        $(function () {
+            $('.dateTimeField').datetimepicker({
+                autoclose: true,
+                fontAwesome: 'Font Awesome 5 Free',
+                format: 'yyyy-mm-dd HH:ii:ss',// HH:ii:ss- định dạng giờ phút giây, P: AM,PM
+
+                minView: 1, //chỉ chọn ngày và giờ (phút sẽ theo phút của máy client)
+                keepOpen: false,
+            });
+        });
+        debugger
+
+        //$('.fieldNumber').number(true, 2);
+
+
+
+    });
+</script>
+<script type="text/javascript">
+    function checkIsNumber(thiz) {
+        debugger
+        var listError = [];
+        var value = $(thiz).val();
+        if (isNaN(value)) {
+            var objToastr = {
+                ToastrType: 'error',
+                ToastrMessage: 'Chỉ được nhập số!'
+            };
+            listError.push(objToastr);
+            commonUtils.showToastr(listError);
+            $('.fieldNumber').val('');
+        }
+    }
+</script>

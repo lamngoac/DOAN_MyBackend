@@ -1,0 +1,324 @@
+﻿@model PageInfo<InvF_InventoryIn>
+@{
+    var userState = ViewBag.UserState as UserState;
+    var init = CUtils.StrValue(ViewBag.init);
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+    var recordCount = CUtils.StrValue(ViewBag.RecordCount);
+    var totalPage = "0";
+    if (Model != null)
+    {
+        totalPage = CUtils.StrValue(Model.PageCount);
+    }
+
+    var showtext = "";
+    if (Model.ItemCount > 0)
+    {
+        var recordstart = (Model.PageIndex) * Model.PageSize + 1;
+        var recordend = (Model.PageIndex + 1) * Model.PageSize;
+        if (recordend > Model.ItemCount)
+        {
+            recordend = Model.ItemCount;
+        }
+        showtext = recordstart + "-" + recordend + " trong số " + Model.ItemCount;
+    }
+}
+
+
+<input type="hidden" id="page" value="@ViewBag.PageCur" />
+<input type="hidden" id="totalpage" value="@Model.PageCount" />
+
+<div class="col-xs-12 layout-bot-top-16" style="">
+    <div class="row">
+        <div class="col-6">
+            @{
+                var urlCreate = Url.Action("Create", "InvF_InventoryIn");
+            }
+            @RenderItemFormat("BTN_INVF_INVENTORYIN_CREATE", " <a class=\"btn btn-nc-button\" href=\"" + urlCreate + "\"><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i> Tạo mới</a>")
+            @RenderItemFormat("BTN_INVF_INVENTORYIN_APPROVE", " <a class=\"btn btn-nc-button\" onclick=\"Approve()\" href=\"javascript:;\"><i class=\"fa fa-check-circle\" aria-hidden=\"true\"></i> Duyệt</a>")
+            @RenderItemFormat("BTN_INVF_INVENTORYIN_CANCEL", " <a class=\"btn btn-nc-button\" onclick=\"Cancel()\" href=\"javascript:;\"><i class=\"fas fa-ban\" aria-hidden=\"true\"></i> Huỷ</a>")
+            @RenderItemFormat("BTN_INVF_INVENTORYIN_DELETE", " <a class=\"btn btn-nc-button\" onclick=\"Delete()\" href=\"javascript:;\"><i class=\"fas fa-trash\" aria-hidden=\"true\"></i> Xóa</a>")
+            @if (CheckAccess("BTN_INVF_INVENTORYIN_EXPORTEXCEL") || CheckAccess("BTN_INVF_INVENTORYIN_PRINT") || CheckAccess("BTN_INVF_INVENTORYIN_PRINT_TEM") || CheckAccess("BTN_INVF_INVENTORYIN_SEND_MAIL"))
+            {
+                <a class="btn font-color btn-nc-button" data-toggle="dropdown" aria-expanded="false" style="font-size: 13px; position: relative;"><i class="fas fa-ellipsis-h"></i></a>
+                <ul class="dropdown-menu dropdown-action" role="menu" style="">
+                    @if (CheckAccess("BTN_INVF_INVENTORYIN_EXPORTEXCEL"))
+                    {
+                        <li style="padding: 5px">
+                            <a class="row no-margin col-12 no-padding" onclick="Export('@Url.Action("Export", "InvF_InventoryOut")')" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" aria-hidden="true"></i> &nbsp; Xuất Excel</a>
+                        </li>
+                    }
+                    @if (CheckAccess("BTN_INVF_INVENTORYIN_PRINT"))
+                    {
+                        <li style="padding: 5px">
+                            <a class="row no-margin col-12 no-padding" onclick="Print()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-print" aria-hidden="true"></i> &nbsp; In phiếu</a>
+                        </li>
+                    }
+                    @*@if (CheckAccess("BTN_INVF_INVENTORYIN_PRINT_TEM"))
+                    {
+                        <li style="padding: 5px">
+                            <a class="row no-margin col-12 no-padding" onclick="SendEmail()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-envelope-open-text" aria-hidden="true"></i> &nbsp; Gửi email</a>
+                        </li>
+                    }
+                    @if (CheckAccess("BTN_INVF_INVENTORYIN_SEND_MAIL"))
+                    {
+                        <li style="padding: 5px">
+                            <a class="row no-margin col-12 no-padding" onclick="PrintTemp()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-print" aria-hidden="true"></i> &nbsp; In tem mã</a>
+                        </li>
+                    }*@
+                </ul>
+            }
+
+            <span class="search-bar" style="margin-left:5px;margin-top:3px;">
+                <input type="text" id="dynamic-table-thead-search" class="quicksearch txtSearchObj" name="search">
+                <input type="text" class="quicksearch1 txtSearchObj1" name="search" style="z-index: -1000; height: 0; padding: 0; margin: 0; border: 0">
+            </span>
+        </div>
+        <div class="col-6">
+            @Html.Partial("Pagination", null, new ViewDataDictionary() { { "PageCur", MvcHtmlString.Create(pageCur) }, { "RecordCount", MvcHtmlString.Create(recordCount) }, { "ShowText", showtext } })
+        </div>
+    </div>
+</div>
+
+<div class="panel-body no-padding" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+    <aside class="col-xs-12 layout-table no-padding">
+        @Html.AntiForgeryToken()
+        <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+            <div style="width: 100%; float: left;">
+                <table id="dynamic-table-thead" idn-datatable-id="dynamic-table-thead-tbody" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                    <thead class="thead-selectdata">
+                        <tr class="trthead" filterroot="" bfilter="0">
+                            <th fieldId="CONTROL" fieldName="CONTROL" fieldActive="0" class="text-center cell-50">
+                                <input type="checkbox" class="cl-check idn-checkbox" onclick="CheckAll(this);" name="check-box-all" id="check-box-all" />
+                                <label for="check-box-all"><span></span></label>
+                            </th>
+                            <th fieldId="STT" fieldName="STT" fieldActive="0" class="text-center cell-50">
+                                @("STT".HtmlItemString("invf_inventoryin"))
+                            </th>
+                            <th fieldId="IF_INVINNO" fieldName="Số phiếu nhập" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-150">
+                                @("Số phiếu nhập".HtmlItemString("invf_inventoryin"))
+                            </th>
+                            <th fieldId="APPRDTIMEUTC" fieldName="Thời gian nhập" fieldActive="0" idn-data-type="D" idn-data-sort="1" idn-data-filter="1" class="text-left cell-150">
+                                @("Thời gian nhập".HtmlItemString("invf_inventoryin"))
+                            </th>
+                            <th fieldId="INVCODEIN" fieldName="Kho nhập" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-150">
+                                @("Kho nhập".HtmlItemString("invf_inventoryin"))
+                            </th>
+                            <th fieldId="CUSTOMERCODE" fieldName="Nhà cung cấp" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-200">
+                                @("Nhà cung cấp".HtmlItemString("invf_inventoryin"))
+                            </th>
+                            <th fieldId="TOTALVALINAFTERDESC" fieldName="Tổng tiền" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-200 idn-hidden">
+                                @("Tổng tiền".HtmlItemString("invf_inventoryin"))
+                            </th>
+                            <th fieldId="IF_INVINSTATUS" fieldName="Trạng thái" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-100">
+                                @("Trạng thái".HtmlItemString("invf_inventoryin"))
+                            </th>
+                            <th fieldId="REMARK" fieldName="Nội dung nhập" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-200 idn-hidden">
+                                @("Nội dung nhập".HtmlItemString("invf_inventoryin"))
+                            </th>
+                            <th fieldId="INVOICENO" fieldName="Số hóa đơn" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-100 idn-hidden">
+                                @("Số hóa đơn".HtmlItemString("invf_inventoryin"))
+                            </th>
+                            <th fieldId="CREATEDTIMEUTC" fieldName="Thời gian tạo" fieldActive="1" idn-data-type="D" idn-data-sort="1" idn-data-filter="1" class="text-left cell-150 idn-hidden">
+                                @("Thời gian tạo".HtmlItemString("invf_inventoryin"))
+                            </th>
+                            <th fieldId="INVINTYPE" fieldName="Loại phiếu nhập" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-150 idn-hidden">
+                                @("Loại phiếu nhập".HtmlItemString("invf_inventoryin"))
+                            </th>
+                            <th fieldId="USERDELIVER" fieldName="Người giao hàng" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-150 idn-hidden">
+                                @("Người giao hàng".HtmlItemString("invf_inventoryin"))
+                            </th>
+                            <th fieldId="REFNO" fieldName="RefNo" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-150 idn-hidden">
+                                @("RefNo".HtmlItemString("invf_inventoryin"))
+                            </th>
+                            <th fieldId="REFTYPE" fieldName="RefType" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-150 idn-hidden">
+                                @("RefType".HtmlItemString("invf_inventoryin"))
+                            </th>
+                            <th fieldId="FLAGQR" fieldName="Cờ FlagQR" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-150 idn-hidden">
+                                @("Cờ FlagQR".HtmlItemString("invf_inventoryin"))
+                            </th>
+                            <th fieldId="INVFCFINCODE01" fieldName="Số hợp đồng" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-150 idn-hidden">
+                                @("Số hợp đồng".HtmlItemString("invf_inventoryin"))
+                            </th>
+                            <th fieldId="INVFCFINCODE02" fieldName="Số Container" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-150 idn-hidden">
+                                @("Số Container".HtmlItemString("invf_inventoryin"))
+                            </th>
+                            <th fieldId="INVFCFINCODE03" fieldName="Biển số xe" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-150 idn-hidden">
+                                @("Biển số xe".HtmlItemString("invf_inventoryin"))
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                    <tbody id="table-tbodyID">
+                        @if (Model != null && Model.DataList != null && Model.DataList.Count > 0)
+                        {
+                            var i = 0;
+                            int stt = Convert.ToInt32(pageCur) * Convert.ToInt32(recordCount) + 1;
+                            foreach (var item in Model.DataList)
+                            {
+                                var createDTimeUTC = CUtils.StrValue(item.CreateDTimeUTC);
+                                if (!CUtils.IsNullOrEmpty(createDTimeUTC))
+                                {
+                                    createDTimeUTC = CUtils.ReturnDateTimeUtcToLocalTime(createDTimeUTC, Nonsense.DATE_TIME_FORMAT, userState.UtcOffset);
+                                }
+                        <tr idx="@(i)" class="data-item trdata" ondblclick="location.href='@Url.Action("Detail", "InvF_InventoryIn", new { if_invinno = item.IF_InvInNo })'">
+                            <input type="hidden" name="IF_InvInNo" value="@item.IF_InvInNo" />
+                            <input type="hidden" name="IF_InvInStatus" value="@item.IF_InvInStatus" />
+                            <input type="hidden" name="Remark" value="@item.Remark" />
+                            <td fieldId="CONTROL" class="text-center cell-50">
+                                <input type="checkbox" class="cl-check idn-checkbox" name="ckb" id="check-box-@i" onclick="checkBox_PopupSelectData(this, $('.thead-selectdata'), $('#table-tbodyID'));" />
+                                <label for="check-box-@i"><span></span></label>
+                            </td>
+                            <td fieldId="STT" fieldActive="0" class="text-left cell-50 text-center">
+                                @stt
+                            </td>
+                            <td fieldId="IF_INVINNO" fieldActive="0" class="text-left cell-150">
+                                @item.IF_InvInNo
+                            </td>
+                            <td fieldId="APPRDTIMEUTC" fieldActive="0" class="text-left cell-150">
+                                @(CUtils.IsNullOrEmpty(item.ApprDTimeUTC) ? "" : Convert.ToDateTime(item.ApprDTimeUTC).ToString("yyyy-MM-dd"))
+                            </td>
+                            <td fieldId="INVCODEIN" fieldActive="0" class="text-left cell-150">
+                                @item.InvCodeIn
+                            </td>
+                            <td fieldId="CUSTOMERCODE" fieldActive="0" class="text-left cell-200">
+                                @item.mct_CustomerName
+                            </td>
+                            <td fieldId="TOTALVALINAFTERDESC" fieldActive="1" class="text-left numberic valTotalValInAfterDesc cell-200 idn-hidden">
+                                @item.TotalValInAfterDesc
+                            </td>
+                            <td fieldId="IF_INVINSTATUS" fieldActive="0" class="text-left cell-100">
+                                @item.IF_InvInStatus
+                            </td>
+                            <td fieldId="REMARK" fieldActive="1" class="text-left cell-200 idn-hidden">
+                                @item.Remark
+                            </td>
+                            <td fieldId="INVOICENO" fieldActive="1" class="text-left cell-100 idn-hidden">
+                                @item.InvoiceNo
+                            </td>
+                            <td fieldId="CREATEDTIMEUTC" fieldActive="1" class="text-left cell-150 idn-hidden">
+                                @MvcHtmlString.Create(createDTimeUTC)
+                            </td>
+                            <td fieldId="INVINTYPE" fieldActive="1" class="text-left cell-150 idn-hidden">
+                                @item.InvInType
+                            </td>
+                            <td fieldId="USERDELIVER" fieldActive="1" class="text-left cell-150 idn-hidden">
+                                @item.UserDeliver
+                            </td>
+                            <td fieldId="REFNO" fieldActive="1" class="text-left cell-150 idn-hidden">
+                                @item.RefNo
+                            </td>
+                            <td fieldId="REFTYPE" fieldActive="1" class="text-left cell-150 idn-hidden">
+                                @item.RefType
+                            </td>
+                            <td fieldId="FLAGQR" fieldActive="1" class="text-left cell-150 idn-hidden">
+                                @item.FlagQR
+                            </td>
+                            <td fieldId="INVFCFINCODE01" fieldActive="1" class="text-left cell-150 idn-hidden">
+                                @item.InvFCFInCode01
+                            </td>
+                            <td fieldId="INVFCFINCODE02" fieldActive="1" class="text-left cell-150 idn-hidden">
+                                @item.InvFCFInCode02
+                            </td>
+                            <td fieldId="INVFCFINCODE03" fieldActive="1" class="text-left cell-150 idn-hidden">
+                                @item.InvFCFInCode03
+                            </td>
+                        </tr>
+                                stt++;
+                                i++;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </aside>
+</div>
+
+<!-- Sort Table -->
+<script>
+    $(document).ready(function () {
+        //tablesort();
+        $('.scrollable-horizontal').hScroll();
+    });
+
+    //function tablesort() {
+    //    var listColumns = {
+    //        'IF_INVINNO': [],
+    //        'APPRDTIMEUTC': [],
+    //        'INVCODEIN': [],
+    //        'CUSTOMERCODE': [],
+    //        'TOTALVALINAFTERDESC': [],
+    //        'IF_INVINSTATUS': [],
+    //        'REMARK': [],
+    //        'INVOICENO': [],
+    //        'CREATEDTIMEUTC': [],
+    //        'INVINTYPE': [],
+    //        'USERDELIVER': [],
+    //        'ORDERNO': [],
+    //        'FLAGQR': [],
+    //        'INVFCFINCODE01': [],
+    //        'INVFCFINCODE02': [],
+    //        'INVFCFINCODE03': [],            
+    //    };
+    //    var options = {};
+    //    options.Columns = listColumns;
+    //    $('#dynamic-table-thead').table_Sortable(options);
+    //}
+</script>
+<!-- Check all rows-->
+<script>
+    function CheckAll(thiz) {
+        debugger;
+        let trArr = $('#table-tbodyID');
+        if (trArr !== null && trArr.length > 0) {
+            for (var i = 0; i < trArr.length; i++) {
+                var trCur = trArr[i];
+                if (trCur !== null && trCur !== undefined) {
+                    var inputCkb = $(trCur).find('input[type="checkbox"]');
+                    var check = false;
+                    if ($(thiz).is(":checked")) {
+                        check = true;
+                    }
+                    $(inputCkb).prop("checked", check);
+                }
+            }
+        }
+    }
+</script>
+<script>
+    function checkBox_PopupSelectData(thiz, $thead, $tbody) {
+        debugger;
+        var c_all = false;
+        if ($(thiz).is(":checked")) {
+            c_all = true;
+        }
+        if (!c_all) {
+            var $inputCheckBox_CheckAll = $thead.find('input.idn-checkbox');
+            if ($inputCheckBox_CheckAll !== undefined && $inputCheckBox_CheckAll !== null) {
+                $inputCheckBox_CheckAll.prop("checked", c_all);
+            }
+        }
+        else {
+            var rows = $tbody.find('tr.trdata').length;
+            if (rows > 0) {
+                var trArr = $tbody.find('tr.trdata').has('input[type=checkbox]:checked');
+                if (trArr !== null) {
+                    var trLength = trArr.length;
+                    if (trLength === rows) {
+                        $thead.find('input.idn-checkbox').prop("checked", c_all);
+                    }
+                    else {
+                        $thead.find('input.idn-checkbox').prop("checked", !c_all);
+                    }
+                }
+                else {
+                    $thead.find('input.idn-checkbox').prop("checked", !c_all);
+                }
+            }
+        }
+    }
+</script>
+

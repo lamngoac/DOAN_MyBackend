@@ -1,0 +1,2133 @@
+﻿@using idn.Skycic.Inventory.Common.Models.ProductCentrer
+@model RT_Mst_Product
+@{
+    var listUnitCode = ViewBag.ListUnitCode as List<Mst_Product>;
+    var list_Mst_ProductType = ViewBag.List_Mst_ProductType as List<Mst_ProductType>;
+    var list_Mst_ProductGroupUI = ViewBag.List_Mst_ProductGroupUI as List<Mst_ProductGroupExt>;
+    var list_Mst_Brand = ViewBag.List_Mst_Brand as List<Mst_Brand>;
+    var list_Prd_DynamicField = ViewBag.List_Prd_DynamicField as List<Prd_DynamicField>;
+    var list_Mst_Attribute = ViewBag.List_Mst_Attribute as List<Mst_Attribute>;
+    var list_Mst_ProductImage = ViewBag.List_Mst_ProductImage as List<Mst_ProductImages>;
+    var list_Mst_ProductFiles = ViewBag.List_Mst_ProductFiles as List<Mst_ProductFiles>;
+
+    var customDataDict = new Dictionary<string, object>();
+    if (Model.Lst_Mst_Product != null && Model.Lst_Mst_Product.Count > 0)
+    {
+        customDataDict = Model.Lst_Mst_Product[0].CustomDataDict;
+    }
+
+    var objMst_Product = new Mst_Product();
+    var listMst_Product = new List<Mst_Product>();
+
+
+    var listPrd_Attribute = new List<Prd_Attribute>();
+    var listMst_ProductFiles = new List<Mst_ProductFiles>();
+    var listMst_ProductImages = new List<Mst_ProductImages>();
+    if (Model != null)
+    {
+        if (Model.Lst_Mst_Product != null && Model.Lst_Mst_Product.Count > 0)
+        {
+            objMst_Product = Model.Lst_Mst_Product[0];
+            listMst_Product = Model.Lst_Mst_Product;
+        }
+        if (Model.Lst_Prd_Attribute != null && Model.Lst_Prd_Attribute.Count > 0)
+        {
+            listPrd_Attribute = Model.Lst_Prd_Attribute.Where(x => x.ProductCode.Equals(Model.Lst_Mst_Product[0].ProductCode)).ToList();
+        }
+        if (Model.Lst_Mst_ProductFiles != null && Model.Lst_Mst_ProductFiles.Count > 0)
+        {
+            listMst_ProductFiles = Model.Lst_Mst_ProductFiles;
+        }
+        //if (Model.Lst_Mst_ProductImages != null && Model.Lst_Mst_ProductImages.Count > 0)
+        //{
+        //    listMst_ProductImages = Model.Lst_Mst_ProductImages;
+        //}
+    }
+    var unitCodeBase = "";
+
+    if (list_Mst_ProductImage != null && list_Mst_ProductImage.Count > 0)
+    {
+        listMst_ProductImages = list_Mst_ProductImage;
+    }
+    if (list_Mst_ProductFiles != null && list_Mst_ProductFiles.Count > 0)
+    {
+        listMst_ProductFiles = list_Mst_ProductFiles;
+    }
+    var productType = CUtils.StrValue(objMst_Product.ProductType);
+    var productCode = CUtils.StrValue(objMst_Product.ProductCode);
+    var productCodeBase = CUtils.StrValue(objMst_Product.ProductCodeBase);
+    var productCodeRoot = CUtils.StrValue(objMst_Product.ProductCodeRoot);
+    var networkID = CUtils.StrValue(objMst_Product.NetworkID);
+    var orgID = CUtils.StrValue(objMst_Product.OrgID);
+    var productLevelSys = CUtils.StrValue(objMst_Product.ProductLevelSys);
+
+    if (productLevelSys.Equals(Client_ProductLevelSys.L2Prd))
+    {
+        if (ViewBag.UnitCodeBase != null)
+        {
+            unitCodeBase = ViewBag.UnitCodeBase as string;
+        }
+    }
+    else if (!CUtils.IsNullOrEmpty(objMst_Product.UnitCode))
+    {
+        unitCodeBase = objMst_Product.UnitCode.ToString();
+    }
+    var list_Mst_VATRate = ViewBag.List_Mst_VATRate as List<Mst_VATRate>;
+}
+
+
+@section StyleSheet{
+    <style>
+        .labelinput {
+            background: url(/Images/edit.svg) no-repeat right;
+        }
+    </style>
+}
+<script src="~/Content/assets/js/bootbox.js"></script>
+<style>
+    .labelinput {
+        background: url(/Images/edit.svg) no-repeat right;
+    }
+
+    .data-item {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+        .data-item td {
+            padding: 5px 5px;
+        }
+
+    .margin-bottom-5 {
+        margin-bottom: 5px !important;
+    }
+</style>
+
+<div id="lstImageProduct">
+    @if (listMst_ProductImages != null && listMst_ProductImages.Count > 0)
+    {
+        var i = 1;
+        foreach (var item in listMst_ProductImages)
+        {
+            <input type="hidden" name="LstImage[@i]" value="@item.ProductImageName" />
+            @*<img src="@Url.Content("~/"+item.ProductImagePath)" data-name="@item.ProductImageName"/>*@
+            i++;
+        }
+    }
+</div>
+
+<!--Open Thông tin chung-->
+<div id="prdct_generalinfo" class="row no-margin">
+    <div class="col-7" style="">
+        <div class="row no-margin">
+            <div class="col-6" style="">
+                @{
+                    var disPrdCode = "";
+                    if (productLevelSys.Equals(Client_ProductLevelSys.L2Prd))
+                    {
+                        disPrdCode = "disabled-fix";
+                    }
+                }
+                <div class="form-group margin-bottom-9">
+                    <label for="" class="col-4 control-label no-padding-right font-weight-500 ">@("Loại hàng".HtmlItemString("product"))<span style="color: red "> *</span></label>
+                    <div class="col-8">
+                        <select id="ProductType" name="ProductType" onchange="ProductType_Change(this)" class="disabled-fix col-12">
+                            @if (list_Mst_ProductType != null && list_Mst_ProductType.Count > 0)
+                            {
+                                foreach (var item in list_Mst_ProductType)
+                                {
+                                    var productTypeCur = CUtils.StrValue(item.ProductType);
+                                    var productTypeNameCur = CUtils.StrValue(item.ProductTypeName);
+                                    <option value="@MvcHtmlString.Create(productTypeCur)" @(productTypeCur.Equals(productType) ? "selected" : "")>@MvcHtmlString.Create(productTypeNameCur)</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group margin-bottom-9">
+                    <label for="" class="col-4 control-label no-padding-right font-weight-500 ">@("Mã hàng".HtmlItemString("product"))<span style="color: red "> *</span></label>
+                    <div class="col-8">
+                        <input type="hidden" name="OrgID" id="OrgID" value="@MvcHtmlString.Create(orgID)" />
+                        <input type="hidden" name="NetworkID" id="NetworkID" value="@MvcHtmlString.Create(networkID)" />
+                        <input type="hidden" name="ProductCode" id="ProductCode" value="@MvcHtmlString.Create(productCode)" />
+                        <input type="hidden" name="ProductCodeBase" id="ProductCodeBase" value="@MvcHtmlString.Create(productCodeBase)" />
+                        <input type="hidden" name="ProductCodeRoot" id="ProductCodeRoot" value="@MvcHtmlString.Create(productCodeRoot)" />
+                        <input type="hidden" name="ProductLevelSys" id="ProductLevelSys" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.ProductLevelSys))" />
+                        <input type="hidden" name="FlagActive" id="FlagActive" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.FlagActive))" />
+
+                        <input type="text" name="ProductCodeUser" id="ProductCodeUser" class="col-12 " onchange="ProductCodeUser_OnChange(this);" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.ProductCodeUser))">
+                    </div>
+                </div>
+                <div class="form-group margin-bottom-9">
+                    <label for="" class="col-4 control-label no-padding-right font-weight-500 ">@("Bar code".HtmlItemString("product"))</label>
+                    <div class="col-8">
+                        <input type="text" name="ProductBarCode" id="ProductBarCode" class="col-12" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.ProductBarCode))">
+                    </div>
+                </div>
+                <div class="form-group margin-bottom-9">
+                    <label for="" class="col-4 control-label no-padding-right font-weight-500 ">@("Tên hàng".HtmlItemString("product"))<span style="color: red "> *</span></label>
+                    <div class="col-8">
+                        <input type="text" name="ProductName" id="ProductName" class="col-12" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.ProductName))">
+                    </div>
+                </div>
+                <div class="form-group margin-bottom-9">
+                    <label for="" class="col-4 control-label no-padding-right font-weight-500 ">@("Nhóm hàng".HtmlItemString("product"))<span style="color: red"> *</span></label>
+                    <div class="col-8">
+                        <span class="block input-icon input-icon-right @disPrdCode">
+                            <select id="ProductGrpCode" name="ProductGrpCode" showpopup-control-adddata="#ShowPopupAddProductGrp" class="col-12" required>
+                                <optgroup label="">
+                                    @if (list_Mst_ProductGroupUI != null && list_Mst_ProductGroupUI.Count > 0)
+                                    {
+                                        var productGrpCode = CUtils.StrValue(objMst_Product.ProductGrpCode);
+                                        foreach (var item in list_Mst_ProductGroupUI)
+                                        {
+                                            var productGrpCodeCur = CUtils.StrValue(item.ProductGrpCode);
+                                            var productGrpNameCur = CUtils.StrValue(item.ProductGrpName);
+                                            var productGrpLevelCur = CUtils.StrValue(item.ProductGrpLevel);
+                                            var hlevelTitle = CUtils.StrValue(item.HlevelTitle);
+
+                                            <option value="@MvcHtmlString.Create(productGrpCodeCur)" product-grp-level="@MvcHtmlString.Create(productGrpLevelCur)" @(productGrpCodeCur.Equals(productGrpCode) ? "selected" : "")>@MvcHtmlString.Create(hlevelTitle + "-" + item.OrgID)</option>
+                                        }
+                                    }
+                                </optgroup>
+                                <option value="ADDDATA">@("Thêm".HtmlItemString("product"))</option>
+                            </select>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group margin-bottom-9">
+                    <label for="" class="col-4 control-label no-padding-right font-weight-500 ">@("Mã Brand".HtmlItemString("product"))</label>
+                    <div class="col-8">
+                        <span class="block input-icon input-icon-right @disPrdCode">
+                            <select id="BrandCode" name="BrandCode" showpopup-control-adddata="#ShowPopupAddBrand" class="col-12">
+                                <optgroup label="">
+                                    <option></option>
+                                    @if (list_Mst_Brand != null && list_Mst_Brand.Count > 0)
+                                    {
+                                        var brandCode = CUtils.StrValue(objMst_Product.BrandCode);
+                                        foreach (var item in list_Mst_Brand)
+                                        {
+                                            var brandCodeCur = CUtils.StrValue(item.BrandCode);
+                                            var brandNameCur = CUtils.StrValue(item.BrandName);
+                                            <option value="@MvcHtmlString.Create(brandCodeCur)" @(brandCodeCur.Equals(brandCode) ? "selected" : "")>@MvcHtmlString.Create(brandNameCur)</option>
+                                        }
+                                    }
+                                </optgroup>
+                                <option value="ADDDATA">@("Thêm".HtmlItemString("product"))</option>
+                            </select>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group margin-bottom-9">
+                    <label for="" class="col-5 control-label no-padding-right font-weight-500 ">@("Giá mua".HtmlItemString("product"))</label>
+                    <div class="col-7">
+                        <input type="text" name="UPBuy" id="UPBuy" class="col-12 text-right UPBuy" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.UPBuy))">
+                    </div>
+                </div>
+                <div class="form-group margin-bottom-9">
+                    <label for="" class="col-5 control-label no-padding-right font-weight-500 ">@("Giá bán".HtmlItemString("product"))</label>
+                    <div class="col-7">
+                        <input type="text" name="UPSell" id="UPSell" class="col-12 text-right UPSell" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.UPSell))">
+                    </div>
+                </div>
+                <div class="form-group margin-bottom-9">
+                    <label for="" class="col-5 control-label no-padding-right font-weight-500 ">@("Thuế VAT".HtmlItemString("product"))</label>
+                    <div class="col-7">
+                        <select id="VATRateCode" name="VATRateCode" class="col-12 VATRateCode">
+                            <optgroup label="">
+                                @if (list_Mst_VATRate != null && list_Mst_VATRate.Count > 0)
+                                {
+                                    foreach (var item in list_Mst_VATRate.Where(x => x.FlagActive.Equals("1")))
+                                    {
+                                        var vatRateCodeCur = CUtils.StrValue(item.VATRateCode);
+                                        var vatRateCur = CUtils.StrValue(item.VATRate);
+                                        var vatRateDes = CUtils.StrValue(item.VATDesc);
+                                        <option value="@MvcHtmlString.Create(vatRateCodeCur)" @(item.VATRateCode.Equals(CUtils.StrValue(objMst_Product.VATRateCode)) ? "selected" : "")>@MvcHtmlString.Create(vatRateDes)</option>
+                                    }
+                                }
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+                <div id="div-QtyMinSt" class="form-group margin-bottom-9 div-QtyMinSt">
+                    <label for="" class="col-5 control-label no-padding-right font-weight-500 ">@("Tồn kho nhỏ nhất".HtmlItemString("product"))</label>
+                    <div class="col-7">
+                        <input type="text" name="QtyMinSt" id="QtyMinSt" class="col-12 text-right QtyMinSt" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.QtyMinSt))">
+                    </div>
+                </div>
+                <div id="div-QtyEffSt" class="form-group margin-bottom-9 div-QtyEffSt">
+                    <label for="" class="col-5 control-label no-padding-right font-weight-500 ">@("Tồn kho tối ưu".HtmlItemString("product"))</label>
+                    <div class="col-7">
+                        <input type="text" name="QtyEffSt" id="QtyEffSt" class="col-12 text-right QtyEffSt" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.QtyEffSt))">
+                    </div>
+                </div>
+                <div id="div-QtyMaxSt" class="form-group margin-bottom-9 div-QtyMaxSt">
+                    <label for="" class="col-5 control-label no-padding-right font-weight-500 ">@("Tồn kho tối đa".HtmlItemString("product"))</label>
+                    <div class="col-7">
+                        <input type="text" name="QtyMaxSt" id="QtyMaxSt" class="col-12 text-right QtyMaxSt" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Product.QtyMaxSt))">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row no-margin">
+            <div class="col-12 no-padding">
+                <div class="form-group margin-bottom-9">
+                    <label for="" class="col-2 control-label no-padding-right font-weight-500 ">@("Ghi chú".HtmlItemString("product"))</label>
+                    <div class="col-10">
+                        @{
+                            var remark = CUtils.StrValue(objMst_Product.Remark);
+                        }
+                        <textarea name="Remark" id="Remark" class="col-12">@MvcHtmlString.Create(remark)</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row no-margin">
+            <div class="col-12 no-padding">
+                <div class="form-group margin-bottom-9">
+                    <label for="" class="col-2 control-label no-padding-right font-weight-500 ">@("File đính kèm".HtmlItemString("product"))</label>
+                    <div class="col-1" style="">
+                        <span class="block input-icon input-icon-right">
+                            <a href="javascript:void(0);" id="selectedFile" class=""><i class="fas fa-paperclip" style="line-height: 30px"></i></a>
+                            <input type="file" name="fileInput" id="fileInput" class="uploadfile @disPrdCode" inputid="thumbimage" onchange="setFileCom(this);" style="display: none;" />
+                        </span>
+                    </div>
+                    <div class="col-9">
+                        <div style="width: 100%; float: left;">
+                            <table class="padding-left-right-25">
+                                <tbody id="tbody-CrCt_FileUpload">
+                                    @if (listMst_ProductFiles != null && listMst_ProductFiles.Count > 0)
+                                    {
+                                        var idx = 0;
+                                        foreach (var item in listMst_ProductFiles)
+                                        {
+                                            <tr class="data-item trdata" idx="@idx" productfilename="@item.ProductFileName" productfiletype="==productfiletype==">
+                                                <input type="hidden" name="Lst_CrCt_FileUpload[@idx].ProductFileName" value="@item.ProductFileName" />
+                                                <input type="hidden" name="Lst_CrCt_FileUpload[@idx].ProductFilePath" value="@item.ProductFilePath" />
+                                                <input type="hidden" name="Lst_CrCt_FileUpload[@idx].ProductFileType" value="==productfiletype==" />
+                                                <input type="hidden" name="Lst_CrCt_FileUpload[@idx].FlagFilePath" value="1" />
+                                                <td>
+                                                    <a download='@item.ProductFileName' href="@item.ProductFilePath" target="_blank"><span><i class="==classtypefile=="></i></span><span> @item.ProductFileName </span></a>
+                                                </td>
+                                                <td>
+                                                    <span style="padding-left: 10px">
+                                                        <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteFile(this)"><i class="fas fa-times"></i></a>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-5">
+        <div class="slideshow-container">
+            <!-- Full-width images with number and caption text -->
+            @if (listMst_ProductImages != null && listMst_ProductImages.Count > 0)
+            {
+                var idx = 0;
+                for (int i = 0; i < listMst_ProductImages.Count; i++)
+                {
+                    <div class="mySlides fade">
+                        <img id="img-@i" src="@listMst_ProductImages[i].ProductImagePath">
+                    </div>
+                }
+                for (int j = listMst_ProductImages.Count; j < 5; j++)
+                {
+
+                    <div class="mySlides fade">
+                        <img id="img-@j" src="https://www.vietravel.com/Images/no-image-available.jpg" flagPath="0">
+                    </div>
+                }
+            }
+            else
+            {
+                for (int j = 0; j < 5; j++)
+                {
+
+                    <div class="mySlides fade">
+                        <img id="img-@j" src="https://www.vietravel.com/Images/no-image-available.jpg" flagPath="0">
+                    </div>
+                }
+            }
+            @*<div class="mySlides fade">
+                    <img id="img-1" src="https://www.vietravel.com/Images/no-image-available.jpg">
+                </div>
+                <div class="mySlides fade">
+                    <img id="img-2" src="https://www.vietravel.com/Images/no-image-available.jpg">
+                </div>
+                <div class="mySlides fade">
+                    <img id="img-3" src="https://www.vietravel.com/Images/no-image-available.jpg">
+                </div>
+                <div class="mySlides fade">
+                    <img id="img-4" src="https://www.vietravel.com/Images/no-image-available.jpg">
+                </div>
+                <div class="mySlides fade">
+                    <img id="img-5" src="https://www.vietravel.com/Images/no-image-available.jpg">
+                </div>*@
+
+            <!-- Next and previous buttons -->
+            <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+            <a class="next" onclick="plusSlides(1)">&#10095;</a>
+        </div>
+        <div class="list-images-slide" style="text-align:center;padding-top: 10px;">
+            @if (listMst_ProductImages != null && listMst_ProductImages.Count > 0)
+            {
+                for (int i = 0; i < listMst_ProductImages.Count; i++)
+                {
+                    <div class="thumbnail">
+                        <span class="change-img">
+                            <span class="change">
+                                <i class="fas fa-camera"></i>
+                            </span>
+                            <span class="delete">
+                                <i class="fas fa-times"></i>
+                            </span>
+                        </span>
+                        <input id="inp-thumbnail-@i" type='file' hidden>
+                        <img id="img-thumbnail-@i" data-idx="@i" data-image-name="@listMst_ProductImages[0].ProductImageName" src="@Url.Content(listMst_ProductImages[i].ProductImagePath.ToString())" flagPath="1" style="width: 100%" onclick="currentImage(this);">
+                    </div>
+                }
+                for (int j = listMst_ProductImages.Count; j < 5; j++)
+                {
+                    <div class="thumbnail">
+                        <span class="change-img">
+                            <span class="change">
+                                <i class="fas fa-camera"></i>
+                            </span>
+                            <span class="delete">
+                                <i class="fas fa-times"></i>
+                            </span>
+                        </span>
+                        <input id="inp-thumbnail-@j" type='file' hidden>
+                        <img id="img-thumbnail-@j" src="https://www.vietravel.com/Images/no-image-available.jpg" flagPath="0">
+                    </div>
+                }
+            }
+            else
+            {
+                for (int j = 0; j < 5; j++)
+                {
+                    <div class="thumbnail">
+                        <span class="change-img">
+                            <span class="change">
+                                <i class="fas fa-camera"></i>
+                            </span>
+                            <span class="delete">
+                                <i class="fas fa-times"></i>
+                            </span>
+                        </span>
+                        <input id="inp-thumbnail-@j" type='file' hidden>
+                        <img id="img-thumbnail-@j" src="https://www.vietravel.com/Images/no-image-available.jpg" flagPath="0">
+                    </div>
+                }
+            }
+
+        </div>
+        <div class="product-images" hidden>
+            @if (listMst_ProductImages != null)
+            {
+                var idx = 0;
+                for (int i = 0; i < listMst_ProductImages.Count; i++)
+                {
+                    <input type="text" name="productImage-@i" id="productImage-@i" value="@listMst_ProductImages[i].ProductImagePath" data-value="" hidden />
+                }
+                for (int j = listMst_ProductImages.Count; j < 5; j++)
+                {
+                    <input type="text" name="productImage-@j" id="productImage-@j" value="" data-value="" hidden />
+                }
+            }
+            else
+            {
+                for (int j = 0; j < 5; j++)
+                {
+                    <input type="text" name="productImage-@j" id="productImage-@j" value="" data-value="" hidden />
+                }
+            }
+        </div>
+    </div>
+</div>
+<!--Close Thông tin chung-->
+<!---->
+<!--Open Thông tin bổ sung-->
+<div id="prdct_additionalinfo" class="row no-margin">
+    <div class="col-12">
+        <div class="title-toggle">
+            <span>@("Thông tin bổ sung".HtmlItemString("product"))</span>
+            <img class="showdetail" style="width: 20px" src="/Images/Hide.svg" value="1">
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="row no-margin" style="padding: 15px 0">
+            <table id="table-information" class="table-product col-7">
+                <tbody id="tbody-information">
+                    @if (customDataDict != null && customDataDict.Count > 0)
+                    {
+                        var idx = 0;
+                        foreach (var it in customDataDict)
+                        {
+                            <tr class="trdata" idx="@idx">
+                                <td class="cell-50 td-event-delete">
+                                    <a href="javascript:;" onclick="DeleteRow_Information(this)" title="Xóa">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </td>
+                                <td class="td-select">
+                                    <div class="form-group no-margin div-select-information">
+                                        <!--Note: Đang fix cứng datatype: 1, controltype: 1-->
+                                        <select class="col-10 select-information" select-value="@it.Key" select-datatype="1" select-controltype="1">
+                                            <optgroup label="">
+                                                <option opt="null">--Lựa chọn--</option>
+                                                @if (list_Prd_DynamicField != null && list_Prd_DynamicField.Count > 0)
+                                                {
+                                                    var codecur = it.Key;
+                                                    if (list_Prd_DynamicField[0].ParamTypes != null && list_Prd_DynamicField[0].ParamTypes.Count > 0)
+                                                    {
+                                                        foreach (var item in list_Prd_DynamicField[0].ParamTypes)
+                                                        {
+                                                            <option opt="null" value="@item.Code" @(codecur.Equals(item.Code.ToString().Trim()) ? "selected" : "")>@item.Title</option>
+                                                        }
+                                                    }
+                                                }
+                                            </optgroup>
+                                            <option value="ADDDATA">@("".HtmlItemString("product"))</option>
+                                        </select>
+                                        <a class="btn btn-nc-button btn-add-or-edit" onclick="ShowPopup_Edit_Information(this)" title="Sửa thông tin">
+                                            <i class="fas fa-pencil-alt"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                                <td class="td-input-text">
+                                    <div class="form-group no-margin div-input-text">
+                                        <div class="bootstrap-tagsinput">
+                                            <input type="text" class="col-12 value-information" placeholder="Enter an input and press Enter" value="@it.Value">
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            idx++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (!productLevelSys.Equals(Client_ProductLevelSys.L2Prd))
+        {
+            <a href="javascript: void(0); " class="btn font-color mybtn-Button-2" style="padding-left: 15px!important; padding-right: 15px!important;" onclick="AddRow_Information()">@("Thêm thông tin".HtmlItemString("product"))</a>
+        }
+
+    </div>
+</div>
+<!--Close Thông tin bổ sung-->
+<!---->
+<!--Open Thuộc tính-->
+<div id="prdct_properties" class="row no-margin">
+    <div class="col-12">
+        <div class="title-toggle">
+            <span>@("Thuộc tính".HtmlItemString("product"))</span>
+            <img class="showdetail" style="width: 20px" src="/Images/Hide.svg" value="1">
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="row no-margin" style="padding: 15px 0">
+            <table id="table-attribute" class="table-product col-7">
+                <tbody id="tbody-attribute">
+                    @if (listPrd_Attribute != null && listPrd_Attribute.Count > 0)
+                    {
+                        var idx = 0;
+                        foreach (var item in listPrd_Attribute)
+                        {
+                            <tr class="trdata trold" idx="@idx" tr-new="0">
+                                @if (productLevelSys.Equals(Client_ProductLevelSys.RootPrd))
+                                {
+                                    <td class="cell-50 td-event-delete"><a href="javascript:;" onclick="ShowPopupDeleteAttribute(this)" title="Xóa"><i class="fas fa-trash-alt"></i></a></td>
+                                }
+                                <td class="td-select">
+                                    <div class="form-group no-margin div-select-attribute">
+                                        @{
+                                            var disable = "";
+                                            if (productLevelSys.Equals(Client_ProductLevelSys.RootPrd) || productLevelSys.Equals(Client_ProductLevelSys.BasePrd))
+                                            {
+                                                disable = "";
+                                            }
+                                            else
+                                            {
+                                                disable = "disabled";
+                                            }
+                                        }
+                                        <select class="col-10 select-attribute " @disable>
+                                            <optgroup label="">
+                                                <option opt="null" value="" disabled="@disable">--Lựa chọn--</option>
+                                                @if (list_Mst_Attribute != null && list_Mst_Attribute.Count > 0)
+                                                {
+                                                    var attributeCode = CUtils.StrValue(item.AttributeCode);
+                                                    foreach (var it in list_Mst_Attribute)
+                                                    {
+                                                        var attributeCodeCur = CUtils.StrValue(it.AttributeCode);
+                                                        var attributeNameCur = CUtils.StrValue(it.AttributeName);
+                                                        <option value="@MvcHtmlString.Create(attributeCodeCur)" desc="@MvcHtmlString.Create(attributeNameCur)" @(attributeCodeCur.Equals(attributeCode) ? "selected" : "")>@MvcHtmlString.Create(attributeNameCur)</option>
+                                                    }
+                                                }
+                                            </optgroup>
+                                            <option value="ADDDATA">@("".HtmlItemString("product"))</option>
+                                        </select>
+                                        <a class="btn btn-nc-button btn-add-or-edit @disable" title="Sửa thuộc tính" onclick="ShowPopupUpdateAttribute('@item.AttributeCode','@item.AttributeCode')"><i class="fas fa-pencil-alt"></i></a>
+                                    </div>
+                                </td>
+                                <td class="td-input-text">
+                                    <div class="form-group no-margin div-input-text">
+                                        @{
+                                            var disableInput = "";
+                                            if (productLevelSys.Equals(Client_ProductLevelSys.RootPrd) || productLevelSys.Equals(Client_ProductLevelSys.BasePrd))
+                                            {
+                                                disableInput = "";
+                                            }
+                                            else
+                                            {
+                                                disableInput = "disabled-fix";
+                                            }
+                                        }
+                                        <input type="text" class="col-12 value-attribute @disableInput" placeholder="Enter an input and press Enter" value="@MvcHtmlString.Create(CUtils.StrValue(item.AttributeValue))">
+                                    </div>
+                                </td>
+                            </tr>
+                            idx++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (productLevelSys.Equals(Client_ProductLevelSys.RootPrd))
+        {
+            <a href="javascript: void(0); " class="btn font-color mybtn-Button-2" style="padding-left: 15px!important; padding-right: 15px!important;" onclick="AddRow_Attribute()">@("Add Attribute".HtmlItemString("product"))</a>
+        }
+    </div>
+</div>
+<!--Close Thuộc tính-->
+<!---->
+<!--Open Đơn vị tính-->
+<div id="prdct_unit" class="row no-margin">
+    <div class="col-12">
+        <div class="title-toggle">
+            <span>@("Đơn vị".HtmlItemString("product"))</span>
+            <img class="showdetail" style="width: 20px" src="/Images/Hide.svg" value="1">
+        </div>
+    </div>
+    <div class="col-12">
+        @{
+            var disabled = "";
+            if (productLevelSys.Equals(Client_ProductLevelSys.L2Prd))
+            {
+                disabled = "disabled-fix";
+            }
+        }
+        <div class="row no-margin" style="padding: 15px 0">
+            <table id="table-unit-root" class="table-product col-7">
+                <tbody id="tbody-unit-root">
+                    <tr class="trdata unitcode-root">
+                        <td>@("Đơn vị cơ bản".HtmlItemString("product"))</td>
+                        <td>
+                            <div class="form-group no-margin">
+                                <input type="text" name="Unit_Root" id="Unit_Root" edit="0" onchange="UnitName_Root_Change(this);" onblur="UnitName_Root_Blur(this);" class="col-12 @disabled" placeholder="Nhập đơn vị" value="@MvcHtmlString.Create(CUtils.StrValue(unitCodeBase))">
+                            </div>
+                        </td>
+                        <td>
+                            @{
+                                var checkFlagSell = "";
+                                var flagSell = CUtils.StrValue(objMst_Product.FlagSell);
+                                if (flagSell.Equals("1"))
+                                {
+                                    checkFlagSell = "checked";
+                                }
+
+                            }
+                            <input type="checkbox" id="FlagSell_Root" name="FlagSell_Root" @checkFlagSell onchange="FlagSell_Root_Change(this);" value="@flagSell" />
+                            <span class="">@("Cờ được bán".HtmlItemString("product"))</span>
+                        </td>
+                        <td>
+                            @{
+                                var checkFlagBuy = "";
+                                var flagBuy = CUtils.StrValue(objMst_Product.FlagBuy);
+                                if (flagBuy.Equals("1"))
+                                {
+                                    checkFlagBuy = "checked";
+                                }
+
+                            }
+                            <input type="checkbox" id="FlagBuy_Root" name="FlagBuy_Root" @checkFlagBuy class="" onchange="FlagBuy_Root_Change(this);" value="@flagBuy" />
+                            <span class="">@("Cờ được mua".HtmlItemString("product"))</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row no-margin" style="padding: 15px 0">
+            @{
+                var theadcss = "display-none";
+                if (listUnitCode != null && listUnitCode.Count > 0)
+                {
+                    theadcss = "";
+                }
+            }
+            @if (productLevelSys.Equals(Client_ProductLevelSys.L2Prd))
+            {
+                <input type="hidden" name="l2prd-valconvert" id="l2prd-valconvert" value="@CUtils.StrValue(objMst_Product.ValConvert)" />
+            }
+
+            <table id="table-unit" class="table-unit col-9">
+                <thead class="@theadcss">
+                    <tr>
+                        <th></th>
+                        <th class="text-center">@("Tên đơn vị".HtmlItemString("product"))</th>
+                        <th class="text-center">@("SL quy đổi".HtmlItemString("product"))</th>
+                        <th class="text-center">@("Giá mua".HtmlItemString("product"))</th>
+                        <th class="text-center">@("Giá bán".HtmlItemString("product"))</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-unit">
+                    @{
+                        var displayInput = "";
+                        if (productLevelSys.Equals(Client_ProductLevelSys.L2Prd))
+                        {
+                            displayInput = "disabled-fix";
+                        }
+                    }
+                    @if (listUnitCode != null && listUnitCode.Count > 0)
+                    {
+                        var idx = 0;
+                        foreach (var item in listUnitCode)
+                        {
+                            var checkFlagSell_Sub = "";
+                            var flagSell_Sub = CUtils.StrValue(item.FlagSell);
+                            if (flagSell_Sub.Equals("1"))
+                            {
+                                checkFlagSell_Sub = "checked";
+                            }
+                            var checkFlagBuy_Sub = "";
+                            var flagBuy_Sub = CUtils.StrValue(objMst_Product.FlagBuy);
+                            if (flagBuy_Sub.Equals("1"))
+                            {
+                                checkFlagBuy_Sub = "checked";
+                            }
+                            <tr class="trdata trold" id="@idx" idx="@idx">
+
+                                <td class="cell-50 td-event-delete">
+                                    @if (productLevelSys.Equals(Client_ProductLevelSys.RootPrd) || productLevelSys.Equals(Client_ProductLevelSys.BasePrd))
+                                    {
+                                        <a href="javascript:;" onclick="ShowPopupDeleteUnit(this)" title="@("Delete".HtmlItemString("product"))"><i class="fas fa-trash-alt"></i></a>
+                                    }
+                                </td>
+                                <td class="td-unit-name">
+                                    <div class="form-group no-margin div-unit-name">
+                                        <input type="hidden" name="ListUnitCode[@idx].ProductCode" value="@MvcHtmlString.Create(CUtils.StrValue(item.ProductCode))" />
+                                        <input type="hidden" name="ListUnitCode[@idx].ProductCodeBase" value="@MvcHtmlString.Create(CUtils.StrValue(item.ProductCodeBase))" />
+                                        <input type="hidden" name="ListUnitCode[@idx].ProductCodeRoot" value="@MvcHtmlString.Create(CUtils.StrValue(item.ProductCodeRoot))" />
+                                        <input type="hidden" name="ListUnitCode[@idx].ProductLevelSys" value="@MvcHtmlString.Create(CUtils.StrValue(item.ProductLevelSys))" />
+                                        <input type="text" class="col-12 input-unit-name @displayInput" edit="0" value="@MvcHtmlString.Create(CUtils.StrValue(item.UnitCode))">
+                                    </div>
+                                </td>
+                                <td class="td-ex-qty">
+                                    <div class="form-group no-margin div-ex-qty">
+                                        <input type="text" class="col-12 text-right input-ex-qty disabled-fix @disabled" edit="0" value="@MvcHtmlString.Create(CUtils.StrValue(item.ValConvert))">
+                                    </div>
+                                </td>
+                                <td class="td-buy-price">
+                                    <div class="form-group no-margin div-buy-price">
+                                        <input type="text" class="col-12 text-right input-buy-price" edit="0" value="@MvcHtmlString.Create(CUtils.StrValue(item.UPBuy))">
+                                    </div>
+                                </td>
+                                <td class="td-sell-price">
+                                    <div class="form-group no-margin div-sell-price">
+                                        <input type="text" class="col-12 text-right input-sell-price" edit="0" value="@MvcHtmlString.Create(CUtils.StrValue(item.UPSell))">
+                                    </div>
+                                </td>
+                                <td class="td-can-be-sold">
+                                    <input type="checkbox" class="input-can-be-sold" @checkFlagSell_Sub><span class=""> Can be sold</span>
+                                </td>
+                                <td class="td-can-be-purchased">
+                                    <input type="checkbox" class="input-can-be-purchased" @checkFlagBuy_Sub><span class=""> Can be purchased</span>
+                                </td>
+                            </tr>
+                            idx++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (productLevelSys.Equals(Client_ProductLevelSys.RootPrd) || productLevelSys.Equals(Client_ProductLevelSys.BasePrd))
+        {
+            if (!productType.Equals("COMBO"))
+            {
+                <a href="javascript: void(0); " class="btn font-color mybtn-Button-2 btn-Add-Unit" style="padding-left: 15px!important; padding-right: 15px!important;" onclick="AddRow_Unit()">@("Thêm đơn vị".HtmlItemString("product"))</a>
+            }
+
+        }
+    </div>
+</div>
+<!--Close Đơn vị tính-->
+<!---->
+<!--Open Danh sách hàng hóa cùng loại-->
+<div id="prdct_samekind" class="row no-margin">
+    <div class="col-12">
+        <div class="title-toggle">
+            <span>@("Danh sách hàng hóa cùng loại".HtmlItemString("product"))</span>
+            <img class="showdetail" style="width: 20px" src="/Images/Hide.svg" value="1">
+        </div>
+    </div>
+    <div class="col-12">
+        <div id="divListOfTheSameTypeItems" tb="" class="row no-margin" style="padding: 15px 0">
+            @{
+                var theadcss1 = "display-none";
+                if (listMst_Product != null && listMst_Product.Count > 0)
+                {
+                    theadcss1 = "";
+                }
+            }
+
+            <table class="table-products col-12">
+                <thead class="@theadcss1">
+                    <tr>
+                        <th></th>
+                        <th class="text-center">@("Hàng hóa".HtmlItemString("product"))</th>
+                        <th class="text-center">@("Mã hàng".HtmlItemString("product"))</th>
+                        <th class="text-center">@("Mã vạch".HtmlItemString("product"))</th>
+                        <th class="text-center">@("Đơn vị".HtmlItemString("product"))</th>
+                        <th class="text-center">@("Giá mua".HtmlItemString("product"))</th>
+                        <th class="text-center">@("Giá bán".HtmlItemString("product"))</th>
+                    </tr>
+                </thead>
+                <tbody class="tbody-products">
+                    @{
+                        var displayInput1 = "";
+                        if (productLevelSys.Equals(Client_ProductLevelSys.L2Prd))
+                        {
+                            displayInput1 = "disabled-fix";
+                        }
+                    }
+                    @if (listMst_Product != null && listMst_Product.Count > 0)
+                    {
+                        var idx = 0;
+                        foreach (var item in listMst_Product)
+                        {
+                            var checkFlagSell_Sub = "";
+                            var flagSell_Sub = CUtils.StrValue(item.FlagSell);
+                            if (flagSell_Sub.Equals("1"))
+                            {
+                                checkFlagSell_Sub = "checked";
+                            }
+
+                            var checkFlagBuy_Sub = "";
+                            var flagBuy_Sub = CUtils.StrValue(objMst_Product.FlagBuy);
+                            if (flagBuy_Sub.Equals("1"))
+                            {
+                                checkFlagBuy_Sub = "checked";
+                            }
+
+
+                            <tr class="trdata" idx="@idx" status="old">
+                                <td class="cell-50 ">
+                                    @if (productLevelSys.Equals(Client_ProductLevelSys.RootPrd) || productLevelSys.Equals(Client_ProductLevelSys.BasePrd))
+                                    {
+                                        <a href="javascript:;" onclick="deleteRow_Product(this)" title="@("Delete".HtmlItemString("product"))"><i class="fas fa-trash-alt"></i></a>
+                                    }
+                                </td>
+                                <td class="td-product-name">
+                                    <div class="form-group no-margin div-product-name">
+                                        <input type="text" name="List_Mst_Product[@idx].ProductName" class="col-12 input-product-name" value="@CUtils.StrValue(item.ProductName)" />
+
+                                    </div>
+                                </td>
+                                <td class="td-product-code-user">
+                                    <div class="form-group no-margin div-product-code-user">
+                                        @{
+                                            var iidx = 0;
+                                            foreach (var attr in listPrd_Attribute)
+                                            {
+                                                <input type="hidden" name="List_Mst_Product[@iidx].AttributeSub" class="col-12 input-attribute-sub" iidx="@iidx" value="@attr.AttributeCode" data="@attr.AttributeValue" />
+                                                iidx++;
+                                            }
+                                        }
+
+                                        <input type="text" name="List_Mst_Product[@idx].ProductCodeUser" class="col-12 input-product-code-user" value="@item.ProductCodeUser" placeholder="Mã hàng tự động" />
+                                        <input type="hidden" name="List_Mst_Product[@idx].ValConvert" class="col-12 input-val-convert" value="@item.ValConvert" />
+                                        <input type="hidden" name="List_Mst_Product[@idx].CanBeSold" class="col-12 input-can-be-sold" value="@item.FlagSell" />
+                                        <input type="hidden" name="List_Mst_Product[@idx].CanBePurchased" class="col-12 input-can-be-purchased" value="@item.FlagBuy" />
+
+                                    </div>
+                                </td>
+                                <td class="td-product-bar-code">
+                                    <div class="form-group no-margin div-product-bar-code">
+                                        <input type="text" name="List_Mst_Product[@idx].ProductBarCode" class="col-12 input-product-bar-code" value="@item.ProductBarCode" />
+                                    </div>
+                                </td>
+                                <td class="td-unit-code">
+                                    <div form-group no-margin div-unit-code>
+                                        <input type="text" name="List_Mst_Product[@idx].UnitCode" class="col-12 disabled-fix input-unit-code" value="@item.UnitCode" />
+                                    </div>
+                                </td>
+                                <td class="td-upbuy">
+                                    <div class="form-group no-margin div-upbuy">
+                                        <input type="text" name="List_Mst_Product[@idx].UPBuy" class="col-12 text-right input-upbuy" value="@item.UPBuy" />
+                                    </div>
+                                </td>
+                                <td class="td-upsell">
+                                    <div class="form-group no-margin div-upsell">
+                                        <input type="text" name="List_Mst_Product[@idx].UPSell" class="col-12 text-right input-upsell" value="@item.UPSell" />
+                                    </div>
+                                </td>
+                            </tr>
+                            idx++;
+                        }
+                    }
+                </tbody>
+
+
+            </table>
+        </div>
+    </div>
+</div>
+<!--Close Danh sách hàng hóa cùng loại-->
+@*Danh sách file*@
+<table style="display: none;">
+    <tbody id="rowtemplateFileUpload">
+        <tr class="data-item trdata" idx="==idx==" productfilename="==productfilename==" productfiletype="==productfiletype==">
+            <input type="hidden" name="Lst_CrCt_FileUpload[==idx==].ProductFileName" value="==productfilename==" />
+            <input type="hidden" name="Lst_CrCt_FileUpload[==idx==].ProductFilePath" value="==productfilepath==" />
+            <input type="hidden" name="Lst_CrCt_FileUpload[==idx==].ProductFileType" value="==productfiletype==" />
+            <input type="hidden" name="Lst_CrCt_FileUpload[==idx==].FlagFilePath" value="0" />
+            <td>
+                <a download='==productfilename==' href="==productfilepath==" target="_blank"><span><i class="==classtypefile=="></i></span><span> ==productfilename==</span></a>
+            </td>
+            <td>
+                <span style="padding-left: 10px">
+                    <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteFile(this)"><i class="fas fa-times"></i></a>
+                </span>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function () {
+        $('#thuoctinh').select2();
+
+        $('#thuoctinh').on("select2:selecting", function (e) {
+            alert("abc");
+        });
+
+
+
+
+        var tableName = 'Mst_Product';
+        var upSellFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'UPSell');
+        var upBuyFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'UPBuy');
+
+        $('.input-upbuy').number(true, upBuyFormat);
+        $('.input-upsell').number(true, upSellFormat);
+    });
+
+    function ShowPopupAddAttribute() {
+        $('#ShowPopupAddAttribute').modal({
+            backdrop: false,
+            keyboard: true,
+        });
+        $('#ParentCode').select2();
+        $('#ShowPopupAddAttribute').modal('show');
+    }
+
+    function ClosePopupAddAttribute() {
+        $('#ShowPopupAddAttribute').modal('hide');
+    }
+
+    //function AddAttribute() {
+    //    debugger
+    //    var prodCode = commonUtils.returnValue($('#ProdCode').val());
+    //    var parentCode = commonUtils.returnValue($('#ParentCode').val());
+    //    if (!commonUtils.isNullOrEmpty(prodCode)) {
+    //        //add dữ liệu
+    //        var id = prodCode.replace(/\s/g, '');
+    //        var padding = "";
+    //        var level = parseInt($('#ParentCode').find(':selected').attr('level'));
+    //        if (level === 2) {
+    //            alert("Hệ thống chỉ hỗ trợ 3 cấp");
+    //            return false;
+    //        }
+
+    //        if (!commonUtils.isNullOrEmpty(parentCode)) {
+    //            debugger
+    //            if (level === 0) {
+    //                padding = "-";
+    //                $('#thuoctinh, #ParentCode').append('<option id="' + id + '" value="' + prodCode + '">' + padding + prodCode + '</option>')
+    //            }
+    //            else if (level === 1) {
+    //                padding = "--";
+    //                $('#thuoctinh, #ParentCode').find('option[prodcode=' + parentCode + ']').after('<option id="' + id + '" value="' + prodCode + '">' + padding + prodCode + '</option>');
+    //            }
+
+
+    //        }
+    //        else {
+    //            $('#thuoctinh, #ParentCode').append('<option id="' + id + '" value="' + prodCode + '">' + prodCode + '</option>')
+    //        }
+
+    //        //Bỏ selected ở tất cả
+    //        $('#thuoctinh').find('option').removeAttr('selected');
+    //        //Gắn selected ở option mới thêm
+    //        $('#thuoctinh').find('option[id=' + id + ']').attr('selected', 'selected')
+    //        //Reset select2
+    //        $('#thuoctinh').select2();
+    //        //reset ô #ProdCode
+    //        $('#ProdCode').val('');
+    //        //Đóng popup
+    //        ClosePopupAddAttribute();
+    //        //CheckProduct();
+    //    }
+    //}
+</script>
+
+<script>
+    updateList = function () {
+        debugger
+        var input = document.getElementById('customFile');
+        var output = document.getElementById('fileList');
+        var children = "";
+        for (var i = 0; i < input.files.length; ++i) {
+            children += '<li>' + input.files.item(i).name + '</li>';
+        }
+        output.innerHTML = '<ul>' + children + '</ul>';
+    }
+</script>
+
+@* File upload *@
+<script type="text/javascript">
+    var maxImageWidth = 800,
+        totalFiles = 0,
+        currentTotalFiles = 0,
+        fileTypeError = false,
+        fileSizeError = false,
+        ListImages = [],
+        ListFiles = [],
+        ImgId = 0,
+        FileId = 0;
+    $(document).ready(function () {
+        $("#selectedFile").bind('click', function () {
+            $('#fileInput').click();
+            //$('#fileInput').val('');
+        });
+    });
+    document.getElementById("selectedFile").addEventListener('change', setFileCom, false);
+    function setFileCom(event) {
+        //
+        var listFiles = event.files;
+        totalFiles = listFiles.length;
+        currentTotalFiles = 0;
+        fileTypeError = false;
+        fileSizeError = false;
+        if (totalFiles > 0) {
+            for (var i = 0; i < listFiles.length; i++) {
+                if (FileId > 0) {
+                    FileId = (FileId + 1);
+                } else {
+                    FileId = (FileId + i);
+                }
+                var file = listFiles[i];
+                var name = file.name;
+                if (!name.match(/(?:doc|docx|xls|xlsx|ppt|pptx|pdf|gif|jpg|jpeg|png|bmp|rar|zip|7z)$/)) {
+                    alert("File upload phải thuộc các định dạng sau: \" doc | docx | xls | xlsx | pptx | pdf | gif | jpg | jpeg | png | rar | zip | 7z \"!");
+                    return false;
+                } else {
+                    renderFileInfo(file, FileId);
+                }
+
+            }
+        }
+        $('#fileInput').val('');
+    }
+    function renderFileInfo(file, id) {
+        var name = file.name;
+        var size = file.size;
+        var type = file.type;
+        var fileReader = new FileReader();
+
+        fileReader.onload = function (event) {
+            var base64 = event.target.result;
+            var objFile = new Object();
+            objFile.Id = id;
+            objFile.Name = name;
+            objFile.Size = size;
+            objFile.Type = type;
+            objFile.Src = base64;
+            objFile.Status = 'N';
+            var strHtml = commonUtils.getHtmlFromTemplate($('#rowtemplateFileUpload'), {
+                productfilename: name
+                , productfilepath: objFile.Src
+                , productfiletype: type
+                , productfiledesc: ''
+                , idx: 999999
+            });
+
+            var oldItem = $('#tbody-CrCt_FileUpload').find('tr[productfilename="' + name + '"]');
+            if (oldItem != undefined && oldItem.length > 0) {
+                var strMess = "File: " + name + " đã tồn tại!";
+                alert(strMess);
+            }
+            else {
+                $('#tbody-CrCt_FileUpload').append(strHtml);
+                commonUtils.updateTableTrNotShowIdx($('#tbody-CrCt_FileUpload tr'), true);
+            }
+            ListFiles.push(objFile);
+        }
+
+        fileReader.readAsDataURL(file);
+    }
+    function DeleteFile(thiz) {
+
+        if (thiz !== undefined && thiz !== null) {
+            var trCur = $(thiz).parent().parent().parent();
+            var idx = $(trCur).attr('idx');
+            var productfilename = trCur.attr('productfilename');
+            var productfilepath = trCur.find('input[type="hidden"][name="Lst_CrCt_FileUpload[' + idx + '].ProductFilePath"]').val();
+            var productfiletype = trCur.find('input[type="hidden"][name="Lst_CrCt_FileUpload[' + idx + '].ProductFileType"]').val();
+            bootbox.confirm({
+                title: "Thông báo!",
+                message: "Đồng ý xóa tệp tin đính kèm: '" + productfilename + "' ?",
+                buttons: {
+                    'cancel': {
+                        label: 'Cancel',
+                        className: 'btn mybtn-Button btnButton'
+                    },
+                    'confirm': {
+                        label: 'OK',
+                        className: 'btn mybtn-Button btnButton'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        trCur.remove();
+                        commonUtils.updateTableTrNotShowIdx($('#tbody-CrCt_FileUpload tr'), true);
+                    }
+                }
+            });
+        }
+        else {
+            alert("Chưa chọn bản ghi cần xóa!");
+            return;
+        }
+    }
+</script>
+
+<!-- Modal -->
+<!--Model Add Information-->
+<div class="modal fade" id="ShowPopupAddInformation" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Thêm thông tin</b></h2>
+                <a href="javascript:;" onclick="ClosePopupAddInformation()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupAddInformation" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group margin-bottom-5 display-none">
+                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã <span style=\"color: red\">*</span>")</label>
+                        <div class="col-xs-12 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <input type="text" id="InformationCode" name="InformationCode" class="col-11 text-right InformationCode" value="" autocomplete="off" required />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group margin-bottom-5">
+                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên <span style=\"color: red\">*</span>")</label>
+                        <div class="col-xs-12 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <input type="text" id="InformationTitle" name="InformationTitle" class="col-11 text-right InformationTitle" onblur="getvalue()" value="" autocomplete="off" required />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group margin-bottom-5 display-none">
+                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("ControlType")</label>
+                        <div class="col-12 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <select id="InformationControlType" name="InformationControlType" class="InformationControlType col-11">
+                                    <option value="0">Default</option>
+                                    <option value="1">TextBox</option>
+                                    <option value="3">Select</option>
+                                </select>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group margin-bottom-5 display-none">
+                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("PrdDynamicFieldDataTypes")</label>
+                        <div class="col-12 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <select id="InformationPrdDynamicFieldDataTypes" name="InformationPrdDynamicFieldDataTypes" class="InformationPrdDynamicFieldDataTypes col-11">
+                                    <option value="1">String</option>
+                                    <option value="2">Int</option>
+                                    <option value="3">Double</option>
+                                    <option value="4">Bool</option>
+                                    <option value="5">DateTime</option>
+                                    <option value="6">Date</option>
+                                </select>
+                            </span>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="AddInformation()" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Thêm</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Model Update Information-->
+<div class="modal fade" id="ShowPopupUpdateInformation" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Sửa thông tin</b></h2>
+                <a href="javascript:;" onclick="ClosePopupUpdateInformation()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupAddInformation" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group margin-bottom-5">
+                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên thông tin <span style=\"color: red\">*</span>")</label>
+                        <div class="col-xs-12 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <input type="text" id="InformationCode" name="InformationCode" class="col-xs-11 text-right InformationCode" value="" hidden />
+                                <input type="text" id="InformationTitle" name="InformationTitle" class="col-xs-11 text-right InformationTitle" value="" required />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group margin-bottom-5 display-none">
+                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("ControlType")</label>
+                        <div class="col-12 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <select id="InformationControlType" name="InformationControlType" class="InformationControlType col-11">
+                                    <option value="0">Default</option>
+                                    <option value="1">TextBox</option>
+                                    <option value="3">Select</option>
+                                </select>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group margin-bottom-5 display-none">
+                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("PrdDynamicFieldDataTypes")</label>
+                        <div class="col-12 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <select id="InformationPrdDynamicFieldDataTypes" name="InformationPrdDynamicFieldDataTypes" class="InformationPrdDynamicFieldDataTypes col-11">
+                                    <option value="1">String</option>
+                                    <option value="2">Int</option>
+                                    <option value="3">Double</option>
+                                    <option value="4">Bool</option>
+                                    <option value="5">DateTime</option>
+                                    <option value="6">Date</option>
+                                </select>
+                            </span>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="UpdateInformation()" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Cập nhật</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Model Add Attribute-->
+<div class="modal fade" id="ShowPopupAddAttribute" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Thêm thuộc tính</b></h2>
+                <a href="javascript:;" onclick="ClosePopupAddAttribute()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupAddAttribute" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group margin-bottom-5">
+                        <label for="ProdCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên thuộc tính <span style=\"color: red\">*</span>")</label>
+                        <div class="col-xs-12 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <input type="text" id="AttributeName" name="AttributeName" class="col-xs-11 text-right AttributeName" value="" autocomplete="off" required />
+                            </span>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <a class="btn font-color mybtn-Button" href="javascript:void(0);" id="AddAttribute" onclick="AddAttribute()" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Thêm</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Model Update Attribute-->
+<div class="modal fade" id="ShowPopupUpdateAttribute" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Sửa thuộc tính</b></h2>
+                <a href="javascript:;" onclick="ClosePopupUpdateAttribute()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupAddAttribute" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group margin-bottom-5">
+                        <label for="ProdCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên thuộc tính <span style=\"color: red\">*</span>")</label>
+                        <div class="col-xs-12 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <input type="text" id="AttributeCode" name="AttributeCode" class="col-xs-11 text-right AttributeCode" value="" hidden />
+                                <input type="text" id="AttributeName" name="AttributeName" class="col-xs-11 text-right AttributeName" value="" required />
+                            </span>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="UpdateAttribute()" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Cập nhật</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Model Add ProductGroup-->
+<div class="modal fade" id="ShowPopupAddProductGrp" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Thêm nhóm hàng</b></h2>
+                <a href="javascript:;" onclick="ClosePopupAddProductGrp()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupAddAttribute" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group margin-bottom-5">
+                        <label for="ProdCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên nhóm hàng <span style=\"color: red\">*</span>")</label>
+                        <div class="col-xs-12 col-sm-5">
+                            <span class="block input-icon input-icon-right">
+                                <input type="text" id="ProductGrpName" name="ProductGrpName" class="col-12 text-right BrandName" value="" autocomplete="off" required />
+                            </span>
+                        </div>
+
+                    </div>
+                    <div class="form-group margin-bottom-5">
+                        <label for="ProductGrpCodeParent" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Nhóm hàng cha <span style=\"color: red\">*</span>")</label>
+                        <div class="col-xs-12 col-sm-5">
+                            <select id="ProductGrpCodeParent" name="ProductGrpCodeParent" class="col-12" required="">
+                                @if (list_Mst_ProductGroupUI != null && list_Mst_ProductGroupUI.Count > 0)
+                                {
+                                    foreach (var item in list_Mst_ProductGroupUI)
+                                    {
+                                        var productGrpCode = CUtils.StrValue(item.ProductGrpCode);
+                                        var productGrpLevel = CUtils.StrValue(item.ProductGrpLevel);
+                                        var hlevelTitle = CUtils.StrValue(item.HlevelTitle);
+                                        @*<option value="@item.ProductGrpCode">@item.ProductGrpName</option>*@
+                                        <option value="@MvcHtmlString.Create(productGrpCode)" product-grp-level="@MvcHtmlString.Create(productGrpLevel)">@MvcHtmlString.Create(hlevelTitle)</option>
+                                    }
+                                })
+                            </select>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <a class="btn font-color mybtn-Button" id="AddProductGrp" onclick="AddProductGrp()" href="javascript:void(0);" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Thêm</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Model Add Brand-->
+<div class="modal fade" id="ShowPopupAddBrand" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Thêm nhãn hiệu</b></h2>
+                <a href="javascript:;" onclick="ClosePopupAddBrand()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupAddBrand" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group margin-bottom-5">
+                        <label for="ProdCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên nhãn hiệu <span style=\"color: red\">*</span>")</label>
+                        <div class="col-xs-12 col-sm-5">
+                            <span class="block input-icon input-icon-right">
+                                <input type="text" id="BrandName" name="BrandName" class="col-12 text-right BrandName" value="" autocomplete="off" required />
+                            </span>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <a class="btn font-color mybtn-Button" id="AddBrand" onclick="AddBrand()" href="javascript:void(0);" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Thêm</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Model Delete Unit-->
+<div class="modal fade" id="ShowPopupDeleteUnit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Xóa đơn vị</b></h2>
+                <a href="javascript:;" onclick="ClosePopupDeleteUnit()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupDeleteUnit" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group margin-bottom-5">
+                        <label for="" class="col-xs-12 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Bạn có chắc chắn muốn xóa đơn vị của hàng hóa này?")</label>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <a class="btn font-color mybtn-Button" id="DeleteUnit" onclick="DeleteRow_Unit_Update(this)" href="javascript:void(0);" style="float: right;font-size: 13px;"><i class="fas fa-check icon-checked" aria-hidden="true"></i> Đồng ý</a>
+                <a class="btn btn-cancel" id="Cancel" onclick="ClosePopupDeleteUnit()" href="javascript:void(0);" style="float: right;font-size: 13px;"><i class="fas fa-ban" aria-hidden="true"></i> Bỏ qua</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--Model Delete Attribute on User Interface-->
+<div class="modal fade" id="ShowPopupDeleteAttribute" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Xóa thuộc tính</b></h2>
+                <a href="javascript:;" onclick="ClosePopupDeleteAttribute()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupDeleteAttribute" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group margin-bottom-5">
+                        <label for="" class="col-xs-12 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Bạn có chắc chắn muốn xóa thuộc tính của hàng hóa này?")</label>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <a class="btn font-color mybtn-Button" id="DeleteAttribute" onclick="DeleteRow_Attribute_Update(this)" href="javascript:void(0);" style="float: right;font-size: 13px;"><i class="fas fa-check icon-checked" aria-hidden="true"></i> Đồng ý</a>
+                <a class="btn btn-cancel" id="Cancel" onclick="ClosePopupDeleteAttribute()" href="javascript:void(0);" style="float: right;font-size: 13px;"><i class="fas fa-ban" aria-hidden="true"></i> Bỏ qua</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Model Warning-->
+<div class="modal fade" id="ShowPopupWarning" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Mã hàng</b></h2>
+                <a href="javascript:;" onclick="ClosePopupWarning()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupWarning" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group margin-bottom-5">
+                        <label for="" class="col-xs-12 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã hàng chứa ký tự đặc biệt, bạn chắc chắn muốn lưu?")</label>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <a class="btn font-color mybtn-Button" id="Confirm" onclick="onConfirm(this)" href="javascript:void(0);" style="float: right;font-size: 13px;"><i class="fas fa-check icon-checked" aria-hidden="true"></i> Đồng ý</a>
+                <a class="btn btn-cancel" id="Cancel" onclick="ClosePopupWarning()" href="javascript:void(0);" style="float: right;font-size: 13px;"><i class="fas fa-ban" aria-hidden="true"></i> Bỏ qua</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Script popup thông tin thêm-->
+<script>
+    function getvalue() {
+        debugger
+        var value = commonUtils.returnValueText('#ShowPopupAddInformation #InformationTitle');
+        var gen = commonUtils.genCode(value);
+        $('#ShowPopupAddInformation #InformationCode').val(gen);
+    }
+
+    function ShowPopup_Edit_Information(thiz) {
+        var code = $(thiz).siblings('select.select-information').attr('select-value');
+        var title = $(thiz).siblings('select.select-information').find('option[value = "' + code + '"]').text();
+        var controltype = $(thiz).siblings('select.select-information').attr('select-controltype');
+        var datatype = $(thiz).siblings('select.select-information').attr('select-datatype');
+        // Show popup update information
+        debugger
+        ShowPopupUpdateInformation(code, title, controltype, datatype);
+    }
+
+    function ShowPopupAddInformation(idx) {
+
+        $('#ShowPopupAddInformation #InformationCode').attr('idx', idx);
+        $('#ShowPopupAddInformation').modal({
+            backdrop: false,
+            keyboard: true,
+        });
+        $('#ShowPopupAddInformation').modal('show');
+    }
+
+    function ShowPopupUpdateInformation(code, title, controlType, dataType) {
+        debugger
+        $('#ShowPopupUpdateInformation #InformationCode').val(code);
+        $('#ShowPopupUpdateInformation #InformationTitle').val(title);
+        $('#ShowPopupUpdateInformation #InformationControlType').find('option[value="' + controlType + '"]').attr('selected', 'selected');
+        $('#ShowPopupUpdateInformation #InformationPrdDynamicFieldDataTypes').find('option[value="' + dataType + '"]').attr('selected', 'selected');
+        $('#ShowPopupUpdateInformation').modal({
+            backdrop: false,
+            keyboard: true,
+        });
+        $('#ShowPopupUpdateInformation').modal('show');;
+    }
+
+    function ClosePopupUpdateInformation() {
+        $('#ShowPopupUpdateInformation').modal('hide');
+        $('#ShowPopupUpdateInformation').on('hidden.bs.modal', function () {
+            $('#ShowPopupUpdateInformation form')[0].reset();
+        });
+    }
+
+    function ClosePopupAddInformation() {
+        $('#ShowPopupAddInformation').modal('hide');
+        $('#ShowPopupAddInformation').on('hidden.bs.modal', function () {
+            $(this).find('#manageFormShowPopupAddInformation').trigger('reset');
+        });
+    }
+
+    function AddInformation() {
+        var code = commonUtils.returnValue($('#InformationCode').val());
+        var title = commonUtils.returnValue($('#InformationTitle').val());
+        var controlType = commonUtils.returnValue($('#InformationControlType').val());
+        var dataType = commonUtils.returnValue($('#InformationPrdDynamicFieldDataTypes').val());
+
+        var tem = {};
+        tem.Code = code;
+        tem.Title = title;
+        tem.ControlType = controlType;
+        tem.DataType = dataType;
+
+        var modelcur = commonUtils.returnJSONValue(tem);
+
+        $.ajax({
+            url: '@Url.Action("Prd_DynamicField_Create", "Mst_Product")',
+            type: 'POST',
+            //contentType: 'json',
+            data: {
+                model: modelcur
+            },
+            success: function (data) {
+                ClosePopupAddInformation();
+                ListDataInformation.push({ Code: code, Title: title });
+                $('.select-information').each(function () {
+
+                    let selected = commonUtils.returnValue($('#InformationCode').attr('idx')) === $(this).closest('tr.trdata').attr('idx') ? 'selected' : '';
+                    $(this).append('<option value="' + code + ' " ' + selected + '>' + title + '</option>');
+                    $(this).select2();
+                })
+
+                var $divSelectInformation = $('.select-information').closest('tr.trdata[idx="' + commonUtils.returnValue($('#InformationCode').attr('idx')) + '"]')
+                var $aEditAttr = $divSelectInformation.find('a.btn-add-or-edit');
+                $aEditAttr.empty();
+                $aEditAttr.attr('title', 'Sửa thông tin');
+                $aEditAttr.off('click');
+                $aEditAttr.on('click', function (e) {
+                    var attributeCode = $($aEditAttr).siblings('select.select-information').attr('select-value');
+                    var attributeName = $($aEditAttr).siblings('select.select-information').find('option[value = "' + code + '"]').text();
+                    // Show popup update attribute
+                    ShowPopupUpdateInformation(attributeCode, attributeName);
+                });
+                var $iEditAttr = $('<i>');
+                $iEditAttr.attr('class', 'fas fa-pencil-alt');
+                $aEditAttr.append($iEditAttr);
+            }
+        })
+    }
+
+    function UpdateInformation() {
+        var code = commonUtils.returnValue($('#ShowPopupUpdateInformation #InformationCode').val());
+        var title = commonUtils.returnValue($('#ShowPopupUpdateInformation #InformationTitle').val());
+        var controlType = commonUtils.returnValue($('#ShowPopupUpdateInformation #InformationControlType').val());
+        var dataType = commonUtils.returnValue($('#ShowPopupUpdateInformation #InformationPrdDynamicFieldDataTypes').val());
+
+        var tem = {};
+        tem.Code = code;
+        tem.Title = title;
+        tem.ControlType = controlType;
+        tem.DataType = dataType;
+
+        var modelcur = commonUtils.returnJSONValue(tem);
+        $.ajax({
+            url: '@Url.Action("Prd_DynamicField_Update", "Mst_Product")',
+            type: 'POST',
+            //contentType: 'json',
+            data: {
+                model: modelcur
+            },
+            success: function (data) {
+                debugger
+                ClosePopupUpdateInformation();
+                ListDataInformation.find(element => element.Code === code).Title = title;
+                $('.select-information').each(function () {
+                    $(this).find('option[value="' + code + '"]').text(title) ;
+                    $(this).select2();
+                })
+            }
+        })
+    }
+</script>
+
+<!-- Script them thong tin popup-->
+<script>
+    $(document).ready(function () {
+        $('.select-information').select2();
+        $('select#BrandCode').select2().on('select2:close', function () { commonUtils.showPopup(this); });
+        $('select#ProductGrpCode').select2().on('select2:close', function () { commonUtils.showPopup(this); });
+    })
+
+	function ShowPopupAddAttribute() {
+        $('#ShowPopupAddAttribute').modal({
+            backdrop: false,
+            keyboard: true,
+        });
+        $('#ShowPopupAddAttribute').modal('show');
+    }
+
+	function ClosePopupAddAttribute() {
+        $('#ShowPopupAddAttribute').modal('hide');
+        $('#ShowPopupAddAttribute').on('hidden.bs.modal', function () {
+            $('#ShowPopupAddAttribute form')[0].reset();
+        });
+    }
+    function ShowPopupUpdateAttribute(attributeCode, attributeName) {
+        debugger;
+        var attr = $('.div-select-attribute').find('option[value="' + attributeCode + '"]');
+        var attrName = $(attr).attr('desc');
+        $('#ShowPopupUpdateAttribute #AttributeCode').val(attributeCode);
+        $('#ShowPopupUpdateAttribute #AttributeName').val(attrName);
+        $('#ShowPopupUpdateAttribute').modal({
+            backdrop: false,
+            keyboard: true,
+        });
+        $('#ShowPopupUpdateAttribute').modal('show');;
+    }
+
+    function ClosePopupUpdateAttribute() {
+        $('#ShowPopupUpdateAttribute').modal('hide');
+        $('#ShowPopupUpdateAttribute').on('hidden.bs.modal', function () {
+            $('#ShowPopupUpdateAttribute form')[0].reset();
+        });
+    }
+
+    function ShowPopupWarning(flagRedirect) {
+        $('#Confirm').attr('data-flag', flagRedirect);
+        $('#ShowPopupWarning').modal({
+            backdrop: false,
+            keyboard: true,
+        });
+        $('#ShowPopupWarning').modal('show');
+    }
+
+    function ClosePopupWarning() {
+        $('#ShowPopupWarning').modal('hide');
+        $('#ShowPopupWarning').on('hidden.bs.modal', function () {
+            $(this).find('#manageFormShowPopupWarning').trigger('reset');
+        });
+    }
+    function onConfirm(thiz) {
+        var flag = $(thiz).attr('data-flag');
+        SaveData(flag);
+    }
+    function AddAttribute() {
+        var listError = [];
+        var attributename = commonUtils.returnValue($('#AttributeName').val());
+        listError = commonUtils.checkElementAddListError(listError, '#AttributeName', 'has-error-fix', 'Tên thuộc tính không được chứa ký tự đặc biệt!', attributename);
+        if (listError !== undefined && listError !== null && listError.length > 0) {
+            commonUtils.showToastr(listError);
+            return false;
+        } else {
+
+        $.ajax({
+            url: '@Url.Action("Mst_Attribute_Create", "Mst_Product")',
+            type: 'POST',
+            //contentType: 'json',
+            data: { attributename: attributename },
+            success: function (data) {
+                ClosePopupAddAttribute();
+                if (data.Data != null) {
+                    ListDataAttribute.push({ AttributeCode: data.Data.AttributeCode, AttributeName: data.Data.AttributeName });
+                    $('.select-attribute').each(function () {
+                        let selected = commonUtils.returnValue($('#AttributeName').attr('idx')) === $(this).closest('tr.trdata').attr('idx') ? 'selected' : '';
+                        $(this).append('<option value="' + data.Data.AttributeCode + ' " ' + selected + '>' + data.Data.AttributeName + '</option>');
+                        $(this).select2();
+                    });
+                    //debugger
+                    var $divSelectAttribute = $('.select-attribute').closest('tr.trdata[idx="' + commonUtils.returnValue($('#AttributeName').attr('idx')) + '"]')
+                    var $aEditAttr = $divSelectAttribute.find('a.btn-add-or-edit');
+                    $aEditAttr.empty();
+                    $aEditAttr.attr('title', 'Sửa thuộc tính');
+                    $aEditAttr.off('click');
+                    $aEditAttr.on('click', function (e) {
+                        var attributeCode = $($aEditAttr).siblings('select.select-attribute').attr('select-value');
+                        var attributeName = $($aEditAttr).siblings('select.select-attribute').find('option[value = "' + attributeCode + '"]').text();
+                        // Show popup update attribute
+                        ShowPopupUpdateAttribute(attributeCode, attributeName);
+                    });
+                    var $iEditAttr = $('<i>');
+                    $iEditAttr.attr('class', 'fas fa-pencil-alt');
+                    $aEditAttr.append($iEditAttr);
+                }
+            }
+        })
+        }
+    }
+
+    function UpdateAttribute() {
+        var attributeCode = commonUtils.returnValue($('#AttributeCode').val());
+        var attributeName = commonUtils.returnValue($('#ShowPopupUpdateAttribute #AttributeName').val());
+        $.ajax({
+            url: '@Url.Action("Mst_Attribute_Update", "Mst_Product")',
+            type: 'POST',
+            //contentType: 'json',
+            data: {
+                attributename: attributeName,
+                attributecode: attributeCode
+            },
+            success: function (data) {
+                ClosePopupUpdateAttribute();
+                ListDataAttribute.find(element => element.AttributeCode === attributeCode).AttributeName = attributeName;
+                $('.select-attribute').each(function () {
+                    $(this).find('option[value="' + attributeCode + '"]').text(attributeName) ;
+                    $(this).select2();
+                })
+            }
+        })
+    }
+
+    @*document.getElementById('AddAttribute').onclick = function () {
+        var attributename = commonUtils.returnValue($('#AttributeName').val());
+        $.ajax({
+            url: '@Url.Action("Mst_Attribute_Create", "Mst_Product")',
+            type: 'POST',
+            contentType: 'json',
+            data: { attributename: attributename },
+            success: function (data) {
+                ClosePopupAddAttribute();
+                debugger
+                $('.select-attribute').each(function () {
+                    $(this).append('<option value="' + attributename + '" selected>' + attributename + '</option>');
+                    $(this).select2();
+                })
+            }
+        })
+    }*@
+
+    function ShowPopupAddBrand() {
+        $('#ShowPopupAddBrand').modal({
+            backdrop: false,
+            keyboard: true,
+        });
+        $('#ShowPopupAddBrand').modal('show');
+    }
+
+    function ClosePopupAddBrand() {
+        $('#ShowPopupAddBrand').modal('hide');
+        $('#ShowPopupAddBrand').on('hidden.bs.modal', function () {
+            $('#ShowPopupAddBrand form')[0].reset();
+        });
+    }
+
+    function AddBrand() {
+        var brandname = commonUtils.returnValue($('#BrandName').val());
+        $.ajax({
+            url: '@Url.Action("Mst_Brand_Create", "Mst_Product")',
+            type: 'POST',
+            //contentType: 'json',
+            data: { brandname: brandname },
+            success: function (data) {
+                ClosePopupAddBrand();
+                $('select#BrandCode').each(function () {
+                    $(this).find('optgroup').append('<option value="' + brandname + '" selected>' + brandname + '</option>');
+                    $(this).select2().on('select2:close', function () { commonUtils.showPopup(this); });
+                })
+            }
+        })
+    }
+    @*document.getElementById('AddBrand').onclick = function () {
+        debugger
+        var brandname = commonUtils.returnValue($('#BrandName').val());
+        $.ajax({
+            url: '@Url.Action("Mst_Brand_Create", "Mst_Product")',
+            type: 'POST',
+            //contentType: 'json',
+            data: { brandname: brandname },
+            success: function (data) {
+                ClosePopupAddBrand();
+                $('select#BrandCode').each(function () {
+                    $(this).append('<option value="' + brandname + '" selected>' + brandname + '</option>');
+                    $(this).select2();
+                })
+            }
+        })
+    }*@
+
+    function ShowPopupAddProductGrp() {
+        $('#ShowPopupAddProductGrp').modal({
+            backdrop: false,
+            keyboard: true,
+        });
+        $('#ShowPopupAddProductGrp').modal('show');
+    }
+
+    function ClosePopupAddProductGrp() {
+        $('#ShowPopupAddProductGrp').modal('hide');
+        $('#ShowPopupAddProductGrp').on('hidden.bs.modal', function () {
+            $('#ShowPopupAddProductGrp form')[0].reset();
+        });
+    }
+
+    function DeleteRow_Information(thiz) {
+        var tr = $(thiz).parent().parent();
+        if (tr !== undefined && tr !== null) {
+            $(tr).remove();
+        }
+    }
+
+    @*document.getElementById('AddProductGrp').onclick = function () {
+        debugger
+        var productGrpName = commonUtils.returnValue($('#ProductGrpName').val());
+        var productGrpCodeParent = commonUtils.returnValue($('#ProductGrpCodeParent').val());
+        $.ajax({
+            url: '@Url.Action("Mst_ProductGrp_Create", "Mst_Product")',
+            type: 'POST',
+            //contentType: 'json',
+            data: {
+                productGrpName: productGrpName,
+                productGrpCodeParent: productGrpCodeParent
+            },
+            success: function (data) {
+                ClosePopupAddProductGrp();
+                debugger
+                $('select#ProductGrpCode').each(function () {
+                    $(this).append('<option value="' + productGrpName + '" selected>' + productGrpName + '</option>');
+                    $(this).select2();
+                })
+            }
+        })
+    }*@
+
+    function AddProductGrp() {
+        var productGrpName = commonUtils.returnValue($('#ProductGrpName').val());
+        var productGrpCodeParent = commonUtils.returnValue($('#ProductGrpCodeParent').val());
+        var productGrpNameUI = productGrpName;
+        var productGrpLevel = 1 + Number($('#ProductGrpCodeParent option:selected').attr('product-grp-level'));
+        for (let i = 1; i <= productGrpLevel; i++) {
+            productGrpNameUI = '&emsp;' + productGrpNameUI;
+        }
+        $.ajax({
+            url: '@Url.Action("Mst_ProductGrp_Create", "Mst_Product")',
+            type: 'POST',
+            //contentType: 'json',
+            data: {
+                productGrpName: productGrpName,
+                productGrpCodeParent: productGrpCodeParent
+            },
+            success: function (data) {
+                ClosePopupAddProductGrp();
+                debugger
+                $('select#ProductGrpCode').each(function () {
+                    $(this).find('optgroup').find('option[value="' + productGrpCodeParent + '"]').after('<option value="' + productGrpName + '" selected>' + productGrpNameUI + '</option>');
+                    //$(this).select2().on('select2:close', function () { commonUtils.showPopup(this); });
+                    //$(this).val('');
+                    $(this).trigger('change');
+                })
+            }
+        })
+    }
+    function ShowPopupDeleteUnit(thiz) {
+        debugger
+        var thiz = $(thiz);
+        var idx = thiz.closest('tr.trdata').attr('idx');
+        var prdCode = thiz.parent().siblings('.td-unit-name').find('input[name="ListUnitCode[' + idx + '].ProductCode"]').val();
+        var prdCodeRoot = thiz.parent().siblings('.td-unit-name').find('input[name="ListUnitCode[' + idx + '].ProductCodeRoot"]').val();
+        var prdCodeBase = thiz.parent().siblings('.td-unit-name').find('input[name="ListUnitCode[' + idx + '].ProductCodeBase"]').val();
+        var prdLevelSys = thiz.parent().siblings('.td-unit-name').find('input[name="ListUnitCode[' + idx + '].ProductLevelSys"]').val();
+
+        $('#DeleteUnit').attr('product-code', prdCode);
+        $('#DeleteUnit').attr('product-code-root', prdCodeRoot);
+        $('#DeleteUnit').attr('product-code-base', prdCodeBase);
+        $('#DeleteUnit').attr('product-level', prdLevelSys);
+
+        $('#ShowPopupDeleteUnit').modal({
+            backdrop: false,
+            keyboard: true,
+        });
+        $('#ShowPopupDeleteUnit').modal('show');
+    }
+
+    function ClosePopupDeleteUnit() {
+        $('#ShowPopupDeleteUnit').modal('hide');
+        $('#ShowPopupDeleteUnit').on('hidden.bs.modal', function () {
+            $('#ShowPopupDeleteUnit form')[0].reset();
+        });
+    }
+    function ShowPopupDeleteAttribute(thiz) {
+        debugger;
+        var thiz = $(thiz);
+        var tr = thiz.closest('tr.trdata');
+        var idx = $(tr).attr('idx');
+
+        var select = $(tr).find('td.td-select select.select-attribute');
+        var op = $(select).find(":selected");
+        var productCode = commonUtils.returnValueText('#ProductCode');
+
+        var attributeCode = commonUtils.returnValue($(select).val());
+        var attributeName = '';
+        if (op !== undefined) {
+            attributeName = commonUtils.returnValue(op.attr('desc'));
+        }
+
+        $('#DeleteAttribute').attr('idx', idx);
+        $('#DeleteAttribute').attr('attrCode', attributeCode);
+        $('#DeleteAttribute').attr('attrName', attributeName);
+        $('#DeleteAttribute').attr('productCode', productCode);
+
+        $('#ShowPopupDeleteAttribute').modal({
+            backdrop: false,
+            keyboard: true,
+        });
+        $('#ShowPopupDeleteAttribute').modal('show');
+    }
+
+    function ClosePopupDeleteAttribute() {
+        $('#ShowPopupDeleteAttribute').modal('hide');
+        $('#ShowPopupDeleteAttribute').on('hidden.bs.modal', function () {
+            $('#ShowPopupDeleteAttribute form')[0].reset();
+        });
+    }
+</script>
+
+<!-- Script for Slide-->
+<script>
+    $(document).ready(function () {
+        var listInputs = $('.product-images').find('input[hidden]');
+        for (let i = 0; i < listInputs.length; i++) {
+            var idx = $(listInputs[i]).attr('name').slice(-1);
+            if ($(listInputs[i]).prop("defaultValue")) {
+                $('span.change-img')[idx].classList.add('change-bar')
+            }
+        }
+    })
+</script>
+<script>
+    const changeProductImgs = document.getElementsByClassName('change');
+    const deleteProductImgs = document.getElementsByClassName('delete');
+    for (let i = 0; i < changeProductImgs.length; i++) {
+        changeProductImgs[i].addEventListener('click', () => {
+            changeImage(i);
+            if (!e) var e = window.event;
+            e.cancelBubble = true;
+            if (e.stopPropagation) e.stopPropagation();
+        });
+    }
+    for (let i = 0; i < deleteProductImgs.length; i++) {
+        deleteProductImgs[i].addEventListener('click', () => {
+            deleteImage(i);
+            if (!e) var e = window.event;
+            e.cancelBubble = true;
+            if (e.stopPropagation) e.stopPropagation();
+        });
+    }
+    function changeImage(i) {
+        const input = document.getElementById(`inp-thumbnail-${i}`);
+        thumbnailHandle(i, input, { value: false });
+    }
+
+    function deleteImage(i) {
+        const imgSlide = document.getElementById(`img-${i}`);
+        const imgThumb = document.getElementById(`img-thumbnail-${i}`);
+        const productImage = document.getElementById(`productImage-${i}`);
+        imgSlide.src = imgThumb.src = 'https://www.vietravel.com/Images/no-image-available.jpg';
+        productImage.value = '';
+        const changeBar = document.querySelectorAll('.change-img')[i];
+        changeBar.classList.remove('change-bar');
+        imgThumb.setAttribute('data-image-name', '');
+        imgThumb.setAttribute('data-type', '');
+        debugger;
+        listImgSlide.filter(x => x.Idx != i);
+    };
+    function sortImage(next, prev) {
+
+    }
+</script>
+<script>
+    const thumbnails = document.getElementsByClassName('thumbnail');
+    const listImgSlide = [];
+    for (let i = 0; i < thumbnails.length; i++) {
+        const thumbnail = thumbnails[i];
+        const input = document.getElementById(`inp-thumbnail-${i}`);
+        const imgInput = document.getElementById(`productImage-${i}`);
+        thumbnail.addEventListener("click", () => {
+            thumbnailHandle(i, input, imgInput)
+        })
+        input.addEventListener("change", readFile.bind(i, input));
+    }
+
+    function thumbnailHandle(i, input, imgInput) {
+        //debugger
+        if (!imgInput.value) {
+            input.click();
+        }
+    }
+    function checkfileimg(type) {
+        if (type.split('/')[0] === 'image') {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    function readFile(input) {
+        //debugger;
+        const index = this;
+        if (input.files && input.files[0]) {
+            var fileName = input.files[0].name;
+            var type = input.files[0].type;
+            if (checkfileimg(type)) {
+                var size = input.files[0].size;
+
+                var FR = new FileReader();
+                FR.addEventListener("load", function (e) {
+                    //debugger
+                    const productImageInputs = document.querySelectorAll('.product-images input');
+                    for (let i = 0; i <= index; i++) {
+                        if (!productImageInputs[i].value && i < index) {
+                            const imgThumnail = document.getElementById(`img-thumbnail-${i}`);
+                            const imgSlide = document.getElementById(`img-${i}`);
+                            const productImg = document.getElementById(`productImage-${i}`);
+                            var flagPath = imgThumnail.attr('flagpath');
+
+                            var base64 = event.target.result;
+                            imgThumnail.src = base64;
+                            imgThumnail.setAttribute('data-image-name', fileName);
+                            imgThumnail.setAttribute('data-idx', i);
+                            imgThumnail.setAttribute('onclick', 'currentImage(this)');
+                            imgThumnail.setAttribute('data-type', type);
+                            //imgThumnail.setAttribute('data-base64', dataBase64);
+
+                            imgSlide.setAttribute = e.target.result;
+                            productImg.value = e.target.result;
+                            productImg.setAttribute('data-image-name', fileName);
+
+                            const changeBar = document.querySelectorAll('.change-img')[i - 1];
+                            changeBar.classList.add('change-bar');
+                            var objImgSlide = {
+                                Idx: i,
+                                Base64: imgThumnail.src,
+                                Name: fileName,
+                                Type: type,
+                            };
+                            listImgSlide.push(objImgSlide);
+                            break;
+                        }
+                        if (i == index) {
+                            const imgThumnail = document.getElementById(`img-thumbnail-${i}`);
+                            const imgSlide = document.getElementById(`img-${i}`);
+                            const productImg = document.getElementById(`productImage-${i}`);
+
+                            var base64 = event.target.result;
+                            imgThumnail.src = base64;
+
+                            imgThumnail.setAttribute('data-image-name', fileName);
+                            imgThumnail.setAttribute('data-idx', i);
+                            imgThumnail.setAttribute('onclick', 'currentImage(this)');
+                            imgThumnail.setAttribute('data-type', type);
+                            //imgThumnail.setAttribute('data-base64', dataBase64);
+                            imgThumnail.setAttribute('flagPath', '0');
+                            imgSlide.src = e.target.result;
+                            productImg.value = e.target.result;
+                            productImg.setAttribute('data-image-name', fileName);
+
+                            const changeBar = document.querySelectorAll('.change-img')[i];
+                            changeBar.classList.add('change-bar');
+                            var objImgSlide = {
+                                Idx: i,
+                                Base64: imgThumnail.src,
+                                Name: fileName,
+                                Type: type,
+                            };
+                            listImgSlide.push(objImgSlide);
+                        }
+                    }
+                });
+                FR.readAsDataURL(input.files[0]);
+                input.value = '';
+            } else {
+                var listError = [];
+                listError = commonUtils.checkElementIsSame_AddListError(listError, '#ProductType', 'has-error-fix', 'file nhập phải là ảnh! ');
+                commonUtils.showToastr(listError);
+            }
+        }
+    }
+</script>
+<script>
+    let slideIndex = 0;
+    showSlides(slideIndex);
+
+    // Next/previous controls
+    function plusSlides(n) {
+        showSlides(slideIndex += Number(n));
+    }
+
+    // Thumbnail image controls
+    function currentSlide(n) {
+        showSlides(slideIndex = Number(n));
+    }
+
+    function showSlides(n) {
+        //debugger;
+        let i;
+        const slides = document.getElementsByClassName("mySlides");
+        const dots = document.getElementsByClassName("thumbnail");
+        if (n >= slides.length) {
+            slideIndex = 0;
+        }
+        if (n < 0) {
+            slideIndex = slides.length - 1;
+        }
+        for (i = 0; i < slides.length; i++) {
+            slides[i].style.display = "none";
+            slides[i].classList.remove("show");
+        }
+        for (i = 0; i < dots.length; i++) {
+            dots[i].className = dots[i].className.replace(" active", "");
+        }
+        slides[slideIndex].style.display = "block";
+        slides[slideIndex].classList.add("show");
+        dots[slideIndex].className += " active";
+    }
+</script>
+<script>
+    function currentImage(thiz) {
+        //debugger;
+        var idx = $(thiz).attr('data-idx');
+        currentSlide(idx);
+    }
+</script>

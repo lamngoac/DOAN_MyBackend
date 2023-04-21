@@ -1,0 +1,576 @@
+﻿@model PageInfo<Sys_Modules>
+@{
+    var title = "QUẢN LÝ GÓI Module";
+    ViewBag.Title = title;
+    var startCount = 0;
+    var strStartCount = ViewBag.StartCount as string;
+    if (!CUtils.IsNullOrEmpty(strStartCount))
+    {
+        startCount = Convert.ToInt32(strStartCount);
+    }
+
+    var solutionCode = ViewBag.SolutionCode as string;
+    if (CUtils.IsNullOrEmpty(solutionCode))
+    {
+        solutionCode = String.Format("{0}", "idocNet.TVAN.HDDT");
+    }
+    var solutionName = ViewBag.SolutionName as string;
+    if (CUtils.IsNullOrEmpty(solutionName))
+    {
+        solutionName = String.Format("{0}", "Giải pháp Hóa đơn điện tử");
+    }
+    var userState = ViewBag.UserState as UserState;
+}
+<style>
+    .modal-body {
+        padding: 10px 60px;
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="panel-group" id="steps">
+                <div class="panel panel-info">
+                    <div class="title">
+                        <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                    </div>
+                    <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                        <aside class="col-xs-12">
+                            @using (Html.BeginForm(null, null, FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" value="search" name="init" id="init" />
+                                <div class="col-xs-12 padding-left-0 padding-right-0">
+                                    <aside class="col-sm-8">
+                                        <div class="form-group margin-bottom-5">
+                                            <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Mã solution</label>
+                                            <div class="col-xs-12 col-sm-7">
+                                                <input type="text" id="solutioncode" name="solutioncode" class="col-xs-11 solutioncode disabled-fix" value="@MvcHtmlString.Create(solutionCode)" autocomplete="off">
+                                            </div>
+                                        </div>
+                                        <div class="form-group margin-bottom-5">
+                                            <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Tên solution</label>
+                                            <div class="col-xs-12 col-sm-7">
+                                                <input type="text" id="solutionname" name="solutionname" class="col-xs-11 solutionname disabled-fix" value="@MvcHtmlString.Create(solutionName)" autocomplete="off" readonly>
+                                            </div>
+                                        </div>
+                                    </aside>
+                                </div>
+                            }
+                        </aside>
+                    </div>
+                </div>
+                <div class="panel panel-info">
+                    @*<div class="title">
+                            <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                        </div>*@
+                    <div class="panel-body no-padding" id="panel-body" style="">
+                        <aside class="col-xs-12 no-padding layout-tk">
+                            @if (userState != null && userState.RptSv_Sys_User.FlagSysAdmin.Equals("1"))
+                            {
+                                @*<a class="btn font-color mybtn-Button dropdown-toggle" data-toggle="dropdown" aria-expanded="false" style="float: right; font-size: 13px; margin-top: 20px; position: relative;">...</a>
+                                    <ul class="dropdown-menu" role="menu" style="">
+                                        <li>
+                                            <a class="mybtn-Button-1" onclick="ShowPopupImportExcel()" href="javascript:void(0);" style=""><img class="img-button" src="~/Images/import.svg">Nhập Excel</a>
+                                        </li>
+                                        <li>
+                                            <a class="mybtn-Button-1" onclick="Export()" href="javascript:void(0);" style=""><img class="img-button" src="~/Images/export.svg">Xuất Excel</a>
+                                        </li>
+                                        <li>
+                                            <a class="mybtn-Button-1" onclick="ExportTemplate()" href="javascript:void(0);" style=""><img class="img-button" src="~/Images/export.svg">Xuất Excel template</a>
+                                        </li>
+                                    </ul>*@
+                                @*<a class="btn font-color mybtn-Button" href="@Url.Action("Create", "Sys_Modules")" style="float: right; font-size: 13px; margin-top: 20px; margin-right: 10px;">
+                                        <img class="img-button in-acti" src="~/Images/Hoadon/Tao.svg">
+                                        <img class="img-button acti" src="~/Images/Hoadon/TaoHDDieuChinh.svg">Tạo
+                                    </a>*@
+                                @RenderItemFormat("BTN_QL_MODULE_TAO", "<a class=\"btn mybtn-Button\" id=\"create-button\" href=\'" + Url.Action("Create", "Sys_Modules") + "\' title=\"Tạo mới\" style=\"margin-left: 10px;\">+ Tạo mới</a>", "", "")
+                            }
+
+                        </aside>
+                    </div>
+                    <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                        @Html.AntiForgeryToken()
+                        <aside class="col-xs-12 no-padding">
+                            <div class="scrollable-horizontal padding-left-0 padding-right-0 div-scrollable" data-size="950" style="padding-top: 0!important;">
+                                <div style="width: 100%; float: left;">
+                                    <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center cell-50">@MvcHtmlString.Create("STT")</th>
+                                                <th class="cell-150">&nbsp;</th>
+                                                <th class="text-center cell-200">
+                                                    @MvcHtmlString.Create("Modules")
+                                                </th>
+                                                <th class="text-center cell-250">
+                                                    @MvcHtmlString.Create("Tên module")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("SL hóa đơn")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Dung lượng")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Trạng thái")
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                                <div class="scrollable" data-size="500" style="width: 100%; float: left;">
+                                    <table id="dynamic-table-tbody" class="table table-striped table-bordered table-hover table-tbody">
+                                        <tbody id="table-tbodyID">
+                                            @if (Model != null && Model.DataList != null && Model.DataList.Count > 0)
+                                            {
+                                                var idx = 0;
+                                                foreach (var item in Model.DataList)
+                                                {
+                                                    var iindex = startCount + (idx + 1);
+                                                    var moduleCode = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.ModuleCode))
+                                                    {
+                                                        moduleCode = CUtils.StrValue(item.ModuleCode);
+                                                    }
+                                                    var moduleName = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.ModuleName))
+                                                    {
+                                                        moduleName = CUtils.StrValue(item.ModuleName);
+                                                    }
+                                                    var description = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.Description))
+                                                    {
+                                                        description = CUtils.StrValue(item.Description);
+                                                    }
+                                                    var qtyInvoice = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.QtyInvoice) && CUtils.IsNumeric(item.QtyInvoice))
+                                                    {
+                                                        qtyInvoice = CUtils.formatInteger(Convert.ToInt32(item.QtyInvoice.ToString()), Nonsense.INTEGER_DB_FORMAT);
+                                                    }
+                                                    var valCapacity = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.ValCapacity) && CUtils.IsNumeric(item.ValCapacity))
+                                                    {
+                                                        valCapacity = CUtils.formatInteger(Convert.ToInt32(item.ValCapacity.ToString()), Nonsense.INTEGER_DB_FORMAT);
+                                                    }
+                                                    var flagActive = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.FlagActive))
+                                                    {
+                                                        flagActive = CUtils.StrValue(item.FlagActive);
+                                                    }
+                                                    <tr idx="@idx" class="data-item trdata">
+                                                        <td class="text-center cell-50" style="background: #D3EDE4;">
+                                                            @MvcHtmlString.Create(iindex.ToString())
+                                                        </td>
+                                                        <td class="text-center cell-150">
+                                                            <div class="action-buttons padding-top-2">
+                                                                @{
+                                                                    var urlDetail = Url.Action("Detail", "Sys_Modules", new { modulecode = item.ModuleCode });
+                                                                    var urlUpdate = Url.Action("Update", "Sys_Modules", new { modulecode = item.ModuleCode });
+
+                                                                }
+                                                                @if (userState != null && userState.RptSv_Sys_User.FlagSysAdmin.Equals("1"))
+                                                                {
+                                                                    @*<a class="icon-detail" href="@urlDetail" title="Chi tiết"><img class="img-icon" src='@Url.Content("~/Images/Xem.svg")'></a>
+                                                                        <a class="icon-edit" href="@urlUpdate" title="Sửa"><img class="img-icon" src="~/Images/Sua.svg"></a>*@
+                                                                    @RenderItemFormat("BTN_QL_MODULE_CHI_TIET", "<a class=\"icon-detail\" href=\'" + urlDetail + "\' title=\"Chi tiết\"><img class=\"img-icon\" src='" + Url.Content("~/Images/Xem.svg") + "'></a>", "", "")
+                                                                    @RenderItemFormat("BTN_QL_MODULE_SUA", "<a class=\"icon-edit\" href=\'" + urlUpdate + "\' title=\"Sửa\"><img class=\"img-icon\" src='" + Url.Content("~/Images/Sua.svg") + "'></a>", "", "")
+                                                                    if (flagActive.Equals("0"))
+                                                                    {
+                                                                        @*<a class="icon-edit" href="javascript:;" onclick="ActiveModule('@item.ModuleCode')" title="Active"><img class="img-icon" src="/Images/inactive.svg"></a>*@
+                                                                        @RenderItemFormat("BTN_QL_MODULE_ACTIVE", "<a class=\"icon-edit\" href=\"javascript:;\" onclick=\"ActiveModule('" + item.ModuleCode.ToString() + "')\" title=\"Active\"><img class=\"img-icon\" src='" + Url.Content("~/Images/inactive.svg") + "'></a>", "", "")
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        @*<a class="icon-edit" href="javascript:;" onclick="InactiveModule('@item.ModuleCode')" title="Inactive"><img class="img-icon" src="/Images/active.svg"></a>*@
+                                                                        @RenderItemFormat("BTN_QL_MODULE_INACTIVE", "<a class=\"icon-edit\" href=\"javascript:;\" onclick=\"InactiveModule('" + item.ModuleCode.ToString() + "')\" title=\"Inactive\"><img class=\"img-icon\" src='" + Url.Content("~/Images/active.svg") + "'></a>", "", "")
+                                                                    }
+                                                                    @*<a href="javascript:;" id="btnAddMenuButtonInGroup" class="icon-cardrenew" title="Gán Menu - Button vào module" onclick="GetSysObject('@item.ModuleCode')"><img class="img-icon" src="/Images/Menu.svg"></a>
+                                                                        <a href="javascript:;" class="icon-delete" title="Xóa" onclick="Delete('@item.ModuleCode')"><img class="img-icon" src="~/Images/Xoa.svg"></a>*@
+                                                                    @RenderItemFormat("BTN_QL_MODULE_MAP_SOLUTION_PACKAGE_FEATURES", "<a href=\"javascript:;\" id=\"btnAddMenuButtonInGroup\" class=\"icon-cardrenew\" title=\"Gán Menu - Button vào module\" onclick=\"GetSysObject('" + item.ModuleCode + "')\"><img class=\"img-icon\" src='" + Url.Content("~/Images/Menu.svg") + "'></a>", "", "")
+                                                                    @RenderItemFormat("BTN_QL_MODULE_XOA", "<a href=\"javascript:;\" class=\"icon-delete\" title=\"Xóa\" onclick=\"Delete('" + item.ModuleCode.ToString() + "')\"><img class=\"img-icon\" src='" + Url.Content("~/Images/Xoa.svg") + "'></a>", "", "")
+                                                                }
+
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-left cell-200">
+                                                            @MvcHtmlString.Create(moduleCode)
+                                                        </td>
+                                                        <td class="text-left cell-250">
+                                                            <div>
+                                                                @MvcHtmlString.Create(moduleName)
+                                                            </div>
+
+                                                        </td>
+                                                        <td class="text-right cell-100">
+                                                            @MvcHtmlString.Create(qtyInvoice)
+                                                        </td>
+                                                        <td class="text-right cell-100">
+                                                            @MvcHtmlString.Create(valCapacity)
+                                                        </td>
+                                                        <td class="text-center cell-100">
+                                                            @if (flagActive.Equals("1"))
+                                                            {
+                                                                <span class="label label-sm label-success">Active</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="label label-sm label-danger">Inactive</span>
+                                                            }
+
+                                                        </td>
+                                                    </tr>
+                                                    idx++;
+                                                }
+                                            }
+
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            @if (Model != null && Model.DataList != null)
+                            {
+                                <div id="dynamic-table_paginate" class="dataTables_paginate paging_simple_numbers" style="padding-top: 15px;">
+                                    @Html.PagerBootstrap((int)Model.PageSize, -1 + (int)Model.PageIndex, (int)Model.ItemCount, new { init = Request["init"] }, "Trang trước", "Trang sau", "Trang đầu", "Trang cuối")
+                                </div>
+                            }
+                        </aside>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+@*Active Menu*@
+<script type="text/javascript">
+    setAdminCurrentUrl('@Url.Action("Index", "Sys_Modules")');
+</script>
+
+<script type="text/javascript">
+    function Delete(modulecode) {
+        if (!IsNullOrEmpty(modulecode)) {
+            bootbox.confirm({
+                title: "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO",
+                message: "Đồng ý xóa gói Module '" + modulecode + "' ?",
+                buttons: {
+                    'cancel': {
+                        label: 'Thoát',
+                        className: 'btn mybtn-Button btnButton'
+                    },
+                    'confirm': {
+                        label: 'Đồng ý',
+                        className: 'btn mybtn-Button btnButton'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        var url = '@Url.Action("Delete", "Sys_Modules")';
+                        var token = $('input[name=__RequestVerificationToken]').val();
+                        $.ajax({
+                            url: url,
+                            data: {
+                                modulecode: modulecode,
+                                __RequestVerificationToken: token
+                            },
+                            type: 'post',
+                            dataType: 'json',
+                            success: function (data) {
+                                if (data.Success) {
+                                    if (data.Messages != null && data.Messages !== undefined && data.Messages.length > 0) {
+                                        alert(data.Messages[0]);
+                                    }
+                                    window.location.href = window.location.href;
+                                } else {
+                                    _showErrorMsg123("Lỗi!",data.Detail);
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        } else {
+            alert("Chưa chọn bản ghi cần xóa!");
+            return;
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    function ActiveModule(modulecode) {
+        if (!IsNullOrEmpty(modulecode)) {
+            bootbox.confirm({
+                title: "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO",
+                message: "Đồng ý active gói Module '" + modulecode + "' ?",
+                buttons: {
+                    'cancel': {
+                        label: 'Thoát',
+                        className: 'btn mybtn-Button btnButton'
+                    },
+                    'confirm': {
+                        label: 'Đồng ý',
+                        className: 'btn mybtn-Button btnButton'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        var url = '@Url.Action("ActiveModule", "Sys_Modules")';
+                        var token = $('input[name=__RequestVerificationToken]').val();
+                        $.ajax({
+                            url: url,
+                            data: {
+                                modulecode: modulecode,
+                                __RequestVerificationToken: token
+                            },
+                            type: 'post',
+                            dataType: 'json',
+                            success: function (data) {
+                                if (data.Success) {
+                                    if (data.Messages != null && data.Messages !== undefined && data.Messages.length > 0) {
+                                        alert(data.Messages[0]);
+                                    }
+                                    window.location.href = window.location.href;
+                                } else {
+                                    _showErrorMsg123("Lỗi!",data.Detail);
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        } else {
+            alert("Chưa chọn bản ghi cần active!");
+            return;
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    function InactiveModule(modulecode) {
+        if (!IsNullOrEmpty(modulecode)) {
+            bootbox.confirm({
+                title: "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO",
+                message: "Đồng ý inactive gói Module '" + modulecode + "' ?",
+                buttons: {
+                    'cancel': {
+                        label: 'Thoát',
+                        className: 'btn mybtn-Button btnButton'
+                    },
+                    'confirm': {
+                        label: 'Đồng ý',
+                        className: 'btn mybtn-Button btnButton'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        var url = '@Url.Action("InactiveModule", "Sys_Modules")';
+                        var token = $('input[name=__RequestVerificationToken]').val();
+                        $.ajax({
+                            url: url,
+                            data: {
+                                modulecode: modulecode,
+                                __RequestVerificationToken: token
+                            },
+                            type: 'post',
+                            dataType: 'json',
+                            success: function (data) {
+                                if (data.Success) {
+                                    if (data.Messages != null && data.Messages !== undefined && data.Messages.length > 0) {
+                                        alert(data.Messages[0]);
+                                    }
+                                    window.location.href = window.location.href;
+                                } else {
+                                    _showErrorMsg123("Lỗi!",data.Detail);
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        } else {
+            alert("Chưa chọn bản ghi cần inactive!");
+            return;
+        }
+    }
+</script>
+
+@*Import Excel*@
+<div class="modal fade" id="ImportExcelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+
+<script type="text/javascript">
+    function ShowPopupImportExcel() {
+        var url = '@Url.Action("ShowPopupImportExcel", "Home")';
+        $.ajax({
+            url: url,
+            data: {},
+            type: 'post',
+            dataType: 'json',
+            traditional: true,
+            success: function (data) {
+                if (data.Success) {
+                    $('#ImportExcelModal').modal({
+                        backdrop: false,
+                        keyboard: true,
+                    });
+                    $("#ImportExcelModal").html(data.Html); // truyen html vao #form
+                } else {
+                    _showErrorMsg123('@MvcHtmlString.Create("Lỗi")', data.Detail);
+                }
+
+            }
+        });
+    }
+
+    function ImportFileExcel() {
+        var url = '@Url.Action("Import", "Sys_Modules")';
+        var formData = new window.FormData($('#manageFormImportExcel')[0]);
+        formData.append('tax_file', $('input[type=file]')[0].files[0]);
+        $.ajax({
+            url: url,
+            type: 'post',
+            beforeSend: function(){},
+            success: function (result) {
+                var mes = '';
+                if (result.Success) {
+                    mes = result.Messages[0];
+                    alert(mes);
+                    window.location.href = window.location.href;
+                } else {
+                    if (result.Messages !== null && result.Messages !== undefined && result.Messages.length > 0) {
+                        alert(result.Messages[0]);
+                    }
+                    else{
+                        mes = result.Detail;
+                        _showErrorMsg123("Lỗi!", mes);
+                    }
+                }
+
+            },
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    }
+</script>
+
+@*Export*@
+<script type="text/javascript">
+    function ExportTemplate()
+    {
+        var token = $('input[name=__RequestVerificationToken]').val();
+        var url = '@Url.Action("ExportTemplate", "Sys_Modules")';
+        ExportExcelTemplate(url, token);
+    }
+
+    function Export()
+    {
+        var token = $('input[name=__RequestVerificationToken]').val();
+        var url = '@Url.Action("Export", "Sys_Modules")';
+        var taxtypename = ReturnValueText('#taxtypename');
+        $.ajax({
+            url: url,
+            data: {
+                __RequestVerificationToken: token
+                , taxtypename: taxtypename
+            },
+            type: 'post',
+            dataType: 'JSON',
+            contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+            traditional: true,
+            beforeSend: function () {
+                //bodycur.addClass("my-loading");
+            },
+            success: function (data) {
+                try {
+                    var getData = data;
+                    if (getData.Success === false || getData.Success === 'false') {
+                        _showErrorMsg123("Lỗi!", getData.Detail);
+                    } else {
+                        alert(getData.Title);
+                        if (getData.CheckSuccess === "1") {
+                            if (getData.strUrl !== null && getData.strUrl.length > 0) {
+                                window.location = getData.strUrl;
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.log(e.message);
+                }
+            },
+            complete: function (data) {
+                // Hide image container
+                //bodycur.removeClass("my-loading");
+            }
+        });
+    }
+</script>
+
+@*Gán funtion vào module*@
+<div class="modal fade" id="ShowPopup" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+<script type="text/javascript">
+    function ClosePopup() {
+        $('#ShowPopup').modal("hide");
+        $('#ShowPopup').html('');
+    }
+    function GetSysObject(modulecode) {
+        if (!IsNullOrEmpty(modulecode)) {
+            var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+            var url = '@Url.Action("GetSysObject", "Sys_Modules")';
+            $.ajax({
+                url: url,
+                data: {
+                    __RequestVerificationToken: token
+                    , modulecode: modulecode
+                },
+                type: 'post',
+                dataType: 'json',
+                traditional: true,
+                success: function (data) {
+                    if (data.Success) {
+                        $('#ShowPopup').modal({
+                            backdrop: false,
+                            keyboard: true
+                        });
+                        $("#ShowPopup").html(data.Html);
+                    } else {
+                        _showErrorMsg123("Lỗi!", data.Detail);
+                    }
+
+                }
+            });
+        }
+    }
+</script>
+
+@*scroll*@
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.scrollable-horizontal').each(function () {
+            var $this = $(this);
+            $(this).ace_scroll(
+                {
+                    horizontal: true,
+                    //styleClass: 'scroll-top',//show the scrollbars on top(default is bottom)
+                    size: $this.attr('data-size') || 6500,
+                    mouseWheelLock: true
+                }
+            ).css({ 'padding-top': 0 });
+        });
+    });
+    $('.scrollable').each(function () {
+        var $this = $(this);
+        $(this).ace_scroll({
+            //size: 500,
+            size: $this.attr('data-size') || 1000,
+            mouseWheelLock: true
+            //styleClass: 'scroll-left scroll-margin scroll-thin scroll-dark scroll-light no-track scroll-visible'
+        });
+    });
+</script>
+
+
+
+

@@ -1,0 +1,201 @@
+﻿@model PageInfo<InvF_InventoryCusReturnDtlUI>
+@{
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+    var recordCount = CUtils.StrValue(ViewBag.RecordCount);
+    var totalPage = "0";
+    if (Model != null)
+    {
+        totalPage = CUtils.StrValue(Model.PageCount);
+    }
+
+    var showtext = "";
+    if (Model.ItemCount > 0)
+    {
+        var recordstart = (Model.PageIndex) * Model.PageSize + 1;
+        var recordend = (Model.PageIndex + 1) * Model.PageSize;
+        if (recordend > Model.ItemCount)
+        {
+            recordend = Model.ItemCount;
+        }
+        showtext = recordstart + "-" + recordend + " trong số " + Model.ItemCount;
+    }
+}
+
+<input type="hidden" id="page" value="@ViewBag.PageCur" />
+<input type="hidden" id="totalpage" value="@Model.PageCount" />
+
+<div class="col-12 row no-margin no-padding">
+    <div class="col-4">
+    </div>
+    <div class="col-8 no-padding-right layout-bot-top-16">
+        @*@Html.Partial("Pagination", null, new ViewDataDictionary() { { "PageCur", MvcHtmlString.Create(pageCur) }, { "RecordCount", MvcHtmlString.Create(recordCount) }, { "ShowText", showtext } })*@
+        <span style="float: right; margin-right: 10px; line-height: 30px;">
+            <a id="previousClick" href="javascript:void(0);" onclick="previousClick();"><i class="fa fa-chevron-left" aria-hidden="true"></i></a>
+            <a id="nextClick" href="javascript:void(0);" onclick="nextClick();"><i class="fa fa-chevron-right" aria-hidden="true"></i></a>
+        </span>
+        <span id="showText" style="float: right; margin-right: 10px; line-height: 30px;">@MvcHtmlString.Create(showtext)</span>
+        <div class="row col-4 no-padding" style="float: right; justify-content: flex-end; margin-right: 10px">
+            <label for="recordcount" class="no-margin font-weight-500 " style="float:left; line-height: 30px; padding-right: 20px;">@MvcHtmlString.Create("Hiển thị")</label>
+            <div class="row col-12 col-sm-5 no-padding-right">
+                <span class="block input-icon input-icon-right row col-12">
+                    <select id="recordcount" name="recordcount" onchange="SearchAndResetPage()" class="row col-12 recordcount no-padding" style="height: 30px; border: 1px solid #ddd">
+                        <option value="10" @(recordCount == "10" ? "selected" : "" )>10</option>
+                        <option value="50" @(recordCount == "50" ? "selected" : "" )>50</option>
+                        <option value="100" @(recordCount == "100" ? "selected" : "" )>100</option>
+                        <option value="2147483644" @(recordCount == "2147483644" ? "selected" : "" )>Tất cả</option>
+                    </select>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="panel-body no-padding" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+    <aside class="col-xs-12 layout-table no-padding">
+        <div class="scrollable-horizontal padding-left-0 padding-right-0" style="padding-top: 0!important;">
+            <div style="width: 100%; float: left;">
+                <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                    <thead>
+                        <tr class="trthead">
+                            <th fieldId="CONTROL" fieldName="CONTROL" fieldActive="0" class="text-center cell-15">
+                                <input type="checkbox" class="cl-check" onclick="CheckAll(this);" name="check-box-all" />
+                            </th>
+                            <th class="text-center cell-100">@("Mã hàng hoá".HtmlItemString("inventory"))</th>
+                            <th class="text-center cell-175">@("Tên hàng hoá".HtmlItemString("inventory"))</th>
+                            <th class="text-center cell-75">@("Đơn vị tính".HtmlItemString("inventory"))</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                    <tbody id="table-tbodyIDPopup">
+                        @if (Model != null && Model.DataList.Count > 0)
+                        {
+                            var i = 0;
+                            foreach (var item in Model.DataList)
+                            {
+                        <tr idx="@i" class="data-item trdata" id="unitpu_@item.ProductCode-@item.ProductCode" prdhost ="@item.ProductCode">
+                            <!-- Product -->
+                            <input type="hidden" name="ListProduct[@i].ProductCodeRoot" value="@item.ProductCodeRoot" />
+                            <input type="hidden" name="ListProduct[@i].ProductCodeBase" value="@item.mp_ProductCodeBase" />
+                            <input type="hidden" name="ListProduct[@i].ProductCode" value="@item.ProductCode" />
+                            <input type="hidden" name="ListProduct[@i].ProductCodeUser" value="@item.ProductCodeUser" />
+                            <input type="hidden" name="ListProduct[@i].ProductName" value="@item.mp_ProductName" />
+                            <input type="hidden" name="ListProduct[@i].UnitCode" value="@item.UnitCode" />
+                            <input type="hidden" name="ListProduct[@i].UPBuy" value="@item.UPBuy" />
+                            <input type="hidden" name="ListProduct[@i].mp_FlagLot" value="@item.mp_FlagLot" />
+                            <input type="hidden" name="ListProduct[@i].FlagCombo" value="@item.FlagCombo" />
+                            <input type="hidden" name="ListProduct[@i].mp_FlagSerial" value="@item.mp_FlagSerial" />
+                            <input type="hidden" name="ListProduct[@i].InvCodeSuggest" value="@item.InvCodeSuggest" />
+                            <td fieldId="CONTROL" fieldActive="0" class="text-center cell-15">
+                                <input type="checkbox" class="cl-check" name="ckb" onclick="CheckProductRow(this,'@item.ProductCode');" />
+                            </td>
+                            <td class="text-center cell-100">@item.ProductCodeUser</td>
+                            <td class="text-center cell-175">@item.mp_ProductName</td>
+                            <td class="text-center cell-75">@item.UnitCode</td>
+                            
+                        </tr>
+                                i++;
+                                
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </aside>
+</div>
+
+<!-- Check all rows-->
+<script>
+    function CheckAll(thiz) {
+        debugger;
+        let trArr = $('#ShowPopupProductSearch #dynamic-table-thead-tbody tr');
+        if (trArr !== null && trArr.length > 0) {
+            for (var i = 0; i < trArr.length; i++) {
+                var trCur = trArr[i];
+                if (trCur !== null && trCur !== undefined) {
+                    var inputCkb = $(trCur).find('input[type="checkbox"]');
+                    var check = false;
+                    if ($(thiz).is(":checked")) {
+                        check = true;
+                    }
+                    $(inputCkb).prop("checked", check);
+                }
+            }
+        }
+    }
+
+    function CheckProductRow(thiz, prdhost) {
+        debugger;
+        let trArr = $('#ShowPopupProductSearch #dynamic-table-thead-tbody tr');
+        var check = false;
+        if ($(thiz).is(":checked")) {
+            check = true;
+        }
+
+        if (trArr !== null && trArr.length > 0) {
+            for (var i = 0; i < trArr.length; i++) {
+                var trCur = trArr[i];
+                if (trCur !== null && trCur !== undefined) {
+                    //var idx = $(trCur).attr('idx');
+                    var prdhostcur = $(trCur).attr('prdhost');
+                    //var prdCodeBaseCur = $(trCur).find('input[type="hidden"][name="ListProduct[' + idx + '].ProductCodeBase"]').val();
+
+                    if (prdhost === prdhostcur) {
+                        var inputCkb = $(trCur).find('input[type="checkbox"]');
+                        $(inputCkb).prop("checked", check);
+                    }
+                }
+            }
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#recordcount').select2({
+            minimumResultsForSearch: -1
+        });
+
+        $('#nextClick').removeClass('disabled-fix');
+        $('#previousClick').removeClass('disabled-fix');
+        var page = parseInt($('#page').val());
+        var totalpage = parseInt($('#totalpage').val());
+        if (page <= 0) {
+            page = 0;
+            $('#previousClick').addClass('disabled-fix');
+        }
+        if (page >= (totalpage - 1)) {
+            $('#nextClick').addClass('disabled-fix');
+        }
+    });
+    function previousClick() {
+        var page = parseInt($('#page').val());
+        if (page <= 0) {
+            page = 0;
+        } else {
+            page = page - 1;
+        }
+        $('#page').val(page);
+        SearchData();
+    }
+    function nextClick() {
+        var page = parseInt($('#page').val());
+        var totalpage = parseInt($('#totalpage').val());
+        if (totalpage > 0) {
+            if (page > (totalpage - 1)) {
+                page = totalpage - 1;
+            } else {
+                page = page + 1;
+            }
+        }
+        $('#page').val(page);
+        SearchData();
+    }
+
+    function SearchAndResetPage() {
+        $('#page').val('0');
+        SearchData();
+    }
+</script>

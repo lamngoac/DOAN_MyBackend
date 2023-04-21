@@ -1,0 +1,138 @@
+﻿@model List<Invoice_TempGroup>
+@{
+    var title = "Danh sách loại mẫu hóa đơn";
+}
+<div class="container">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+
+                    <aside class="col-xs-12">
+                        <div class="widget-main">
+                            <div id="fuelux-wizard-container" class="no-steps-container">
+                                @using (Html.BeginForm("", "", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.ValidationSummary(true)
+                                    <div class="step-content pos-rel">
+                                        <div class="title">
+                                            <p style="vertical-align: bottom; width: 50%; float: left; ">@MvcHtmlString.Create(title)</p>
+                                            <a class="icon-detail" href='@Url.Action("Create","InvoiceTempGroup")' style="font-size: 16px;">Tạo mới +</a>
+                                        </div>
+                                        <div>
+                                            @{
+                                                <table class="table table-bordered table-thead table-cus table-bottom-0">
+                                                    <thead>
+                                                        <tr>
+                                                            <td></td>
+                                                            <th class="text-center">MST</th>
+                                                            <th class="text-center">Mã nhóm</th>
+                                                            <th class="text-center">Tên nhóm</th>
+                                                            <th class="text-center">Loại</th>
+                                                            <th class="text-center">Link logo</th>
+                                                            <th class="text-center">FlagActive</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var it in Model)
+                                                        {
+                                                            var urlUpdate = Url.Action("Update", "InvoiceTempGroup", new { InvoiceTGroupCode = it.InvoiceTGroupCode });
+                                                            <tr @*onclick="ViewHD('@it.InvoiceTGroupBody');"*@>
+                                                                <td class="text-center">
+                                                                    <a class="icon-detail" href='@urlUpdate' title="Cập nhật"><img class="img-icon" src='@Url.Content("~/Images/Sua.svg")'></a>
+                                                                    <a class="icon-delete" title="Xóa" onclick="Delete('@it.InvoiceTGroupCode');"><img class="img-icon" src='@Url.Content("~/Images/Xoa.svg")'></a>
+                                                                </td>
+                                                                <td>@it.MST</td>
+                                                                <td>@it.InvoiceTGroupCode</td>
+                                                                <td>@it.InvoiceTGroupName</td>
+                                                                <td>@it.Spec_Prd_Type</td>
+                                                                <td>@it.FilePathThumbnail</td>
+                                                                <td class="text-center">@it.FlagActive</td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                    </aside>
+
+                    @*<div id="divViewHD" class="col-xs-12"></div>*@
+
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div>
+
+<script>
+    //function ViewHD(Content) {
+    //    $('#divViewHD').html(Content);
+    //}
+
+    function Delete(InvoiceTGroupCode) {
+        if (!IsNullOrEmpty(InvoiceTGroupCode)) {
+            bootbox.confirm({
+                title: "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO",
+                message: "Đồng ý xóa loại mẫu đơn mẫu '" + InvoiceTGroupCode + "' ?",
+                buttons: {
+                    'cancel': {
+                        label: 'Thoát',
+                        className: 'btn mybtn-Button btnButton'
+                    },
+                    'confirm': {
+                        label: 'Đồng ý',
+                        className: 'btn mybtn-Button btnButton'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        var tem = new Object();
+                        tem.InvoiceTGroupCode = InvoiceTGroupCode;
+                        var modelCur = JSON.stringify(tem);
+                        var url = '@Url.Action("Delete", "InvoiceTempGroup")';
+                        var token = $('input[name=__RequestVerificationToken]').val();
+                        $.ajax({
+                            url: url,
+                            data: {
+                                model: modelCur,
+                                __RequestVerificationToken: token
+                            },
+                            type: 'post',
+                            dataType: 'json',
+                            success: function (data) {
+                                if (data.Success) {
+                                    if (data.Messages != null && data.Messages !== undefined && data.Messages.length > 0) {
+                                        alert(data.Messages[0]);
+                                    }
+                                    window.location.href = window.location.href;
+                                } else {
+                                    _showErrorMsg123("Lỗi!",data.Detail);
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        } else {
+            alert("Chưa chọn bản ghi cần xóa!");
+            return;
+        }
+    }
+</script>
+
+<script>
+    $(document).on('keypress', function (e) {
+        if (e.which == 13) {
+            Search();
+        }
+    });
+</script>

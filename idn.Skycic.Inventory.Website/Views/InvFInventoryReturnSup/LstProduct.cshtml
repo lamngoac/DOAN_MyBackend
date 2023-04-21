@@ -1,0 +1,242 @@
+﻿@model  List<InvF_InventoryReturnSupDtlUI>
+@{
+    var lstProductCode = new List<string>();
+    if (Model != null && Model.Count != 0)
+    {
+        foreach (var it in Model)
+        {
+            if (lstProductCode.Contains(it.ProductCode) == false)
+            {
+                lstProductCode.Add(it.ProductCode.ToString());
+            }
+        }
+    }
+
+    var viewonly = "0";
+}
+<div class="mt-3">
+    <div class="col-12">
+        <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+            <div style="width: 100%; float: left;">
+                <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                    <thead>
+                        <tr class="trthead">
+                            <th class="text-center cell-50">
+                            </th>
+                            <th fieldId="ProductCode" sorttype="T" fieldName="Mã hàng hóa" fieldActive="0" class="text-left cell-220">
+                                @("Mã hàng hóa".HtmlItemString("productcode"))
+                            </th>
+                            <th fieldId="INVNAME" sorttype="T" fieldName="Tên hàng hóa (TV)" fieldActive="0" class="text-left cell-200">
+                                @("Tên hàng hóa (TV)".HtmlItemString(""))
+                            </th>
+                            <th fieldId="INVCODEPARENT" sorttype="T" fieldName="Đơn vị tính" fieldActive="0" class="text-left cell-100">
+                                @("Đơn vị tính".HtmlItemString(""))
+                            </th>
+                            <th fieldId="INVADDRESS" sorttype="T" fieldName="Tồn kho" fieldActive="0" class="text-left cell-100">
+                                @("Tồn kho".HtmlItemString(""))
+                            </th>
+                            <th fieldId="Qty" sorttype="T" fieldName="Số lượng" fieldActive="0" class="text-left cell-100">
+                                @("Số lượng".HtmlItemString(""))
+                            </th>
+                            <th fieldId="INVTYPE" sorttype="T" fieldName="Vị trí xuất" fieldActive="0" class="text-left cell-150">
+                                @("Vị trí xuất".HtmlItemString(""))
+                            </th>
+                            <th fieldId="" sorttype="T" fieldName="Giá nhập" fieldActive="0" class="text-left cell-100">
+                                @("Giá nhập".HtmlItemString(""))
+                            </th>
+                            <th fieldId="" sorttype="T" fieldName="Giá trả hàng" fieldActive="0" class="text-left cell-100">
+                                @("Giá trả hàng".HtmlItemString(""))
+                            </th>
+                            <th fieldId="" sorttype="T" fieldName="Thành tiền" fieldActive="0" class="text-left cell-100">
+                                @("Thành tiền".HtmlItemString(""))
+                            </th>
+                            <th fieldId="" sorttype="T" fieldName="Ghi chú" fieldActive="0" class="text-left cell-150">
+                                @("Ghi chú".HtmlItemString("remark"))
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                    <tbody id="table-tbodyID">
+                        @{
+                            if (lstProductCode != null && lstProductCode.Count != 0)
+                            {
+                                var idx = 0;
+                                var itFirst = new InvF_InventoryReturnSupDtlUI();
+                                foreach (var productcode in lstProductCode)
+                                {
+                                    var sumqty = 0.0;
+                                    var lstInvCode = "";
+                                    var InvCodeOutActual = "";
+                                    var ProductCode = "";
+                                    var ProductCodeUser = "";
+                                    var ProductName = "";
+                                    var ProductType = "";
+                                    var Qty = 0.0;
+                                    var flaglo = "0";
+                                    var flagserial = "0";
+                                    var showTonKho = "";
+                                    var unitCode = "";
+                                    var uPReturnSup = 0.0;
+
+                                    var lstInvF_InventoryReturnSup = Model.Where(x => x.ProductCode.Equals(productcode)).ToList();
+                                    if (lstInvF_InventoryReturnSup != null && lstInvF_InventoryReturnSup.Count != 0)
+                                    {
+                                        itFirst = lstInvF_InventoryReturnSup[0];
+                                        InvCodeOutActual = itFirst.InvCodeOutActual == null ? "" : itFirst.InvCodeOutActual.ToString();
+                                        ProductCode = itFirst.ProductCode == null ? "" : itFirst.ProductCode.ToString();
+                                        ProductCodeUser = itFirst.mp_ProductCodeUser == null ? "" : itFirst.mp_ProductCodeUser.ToString();
+                                        Qty = itFirst.Qty == null ? 0 : Convert.ToDouble(itFirst.Qty);
+                                        ProductName = itFirst.mp_ProductName == null ? "" : itFirst.mp_ProductName.ToString();
+                                        unitCode = itFirst.UnitCode == null ? "" : itFirst.UnitCode.ToString();
+                                        if (!CUtils.IsNullOrEmpty(itFirst.UPReturnSup))
+                                        {
+                                            uPReturnSup = Convert.ToDouble(itFirst.UPReturnSup);
+                                        }
+
+                                        if (itFirst.mp_FlagSerial != null && itFirst.mp_FlagSerial.ToString() == "1")
+                                        {
+                                            ProductType = "<a href=\"javascript:;\" titFirstle=\"Chi tiết Serial\" onclick=\"ShowSerial('" + itFirst.ProductCode + "', '" + itFirst.mp_ProductCodeBase + "', '" + itFirst.mp_ProductCodeUser + "', '" + itFirst.mp_ProductName + "')\">(Serial)</a>";
+                                            flagserial = "1";
+                                        }
+                                        else if (itFirst.mp_FlagLot != null && itFirst.mp_FlagLot.ToString() == "1")
+                                        {
+                                            ProductType = "<a href=\"javascript:;\" titFirstle=\"Chi tiết Lô\" onclick=\"ShowLo('" + itFirst.ProductCode + "', '" + itFirst.mp_ProductCodeBase + "', '" + itFirst.mp_ProductCodeUser + "', '" + itFirst.mp_ProductName + "', '" + itFirst.mp_ValConvert + "')\">(Lô)</a>";
+                                            flaglo = "1";
+                                        }
+                                        else
+                                        {
+                                            showTonKho = "<a href=\"javascript:;\" title=\"Chọn vị trí\" onclick=\"ShowInvOut(this, '" + ProductCode + "', '" + itFirst.mp_ProductCodeUser + "', '" + ProductName + "')\"><i class = \"fa fa-caret-down\"></i></a>";
+                                        }
+                                    }
+                                    foreach (var it in lstInvF_InventoryReturnSup)
+                                    {
+                                        var qty = it.Qty == null ? 0 : Convert.ToDouble(it.Qty);
+                                        var invcode = it.InvCodeOutActual == null ? "" : it.InvCodeOutActual;
+                                        sumqty += qty;
+                                        if (lstInvCode != "")
+                                        {
+                                            lstInvCode += ", " + invcode;
+                                        }
+                                        else
+                                        {
+                                            lstInvCode += invcode;
+                                        }
+                                    }
+                                    var valReturnSup = sumqty * uPReturnSup;
+
+                        <tr class="trdata" idx="@idx" productcode="@productcode" productcodebase="@(itFirst.mp_ProductCodeBase)" flaglot="@flaglo" flagserial="@flagserial">
+                            <input type="hidden" name="Lst_InvF_InventoryReturnSupDtl[@idx].FlagLot" value="@flaglo" />
+                            <input type="hidden" name="Lst_InvF_InventoryReturnSupDtl[@idx].FlagSerial" value="@flagserial" />
+
+                            <td class="text-center cell-50">
+                                <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteProduct(this)"><i class="fas fa-trash-alt"></i></a>
+                            </td>
+                            <td fieldid="ProductCode" sorttype="T" fieldname="Mã hàng hóa" fieldactive="0" class="text-left cell-220">
+                                <input type="hidden" name="Lst_InvF_InventoryReturnSupDtl[@idx].ProductCode" value="@ProductCode"/>
+                                <input name="Lst_InvF_InventoryReturnSupDtl[@idx].ProductCodeUser" value="@ProductCodeUser" class="col-md-9 iphover" style="float: left; border: none; background-color:white; color: black" readonly="readonly">
+
+                                <div class="ProductType">@(MvcHtmlString.Create(ProductType))</div>
+                            </td>
+                            <td fieldid="ProductName" sorttype="T" fieldname="Tên hàng hóa (TV)" fieldactive="0" class="text-left cell-200">
+                                <input readonly="readonly" class="col-md-12 ProductName" name="Lst_InvF_InventoryReturnSupDtl[0].ProductName" value="@ProductName">
+                            </td>
+                            <td fieldid="UnitCode" sorttype="T" fieldname="Đơn vị tính" fieldactive="0" class="text-left cell-100">
+                                <select class="UnitCode col-md-12" onchange="ChangeUnitCode(this); setDefaultQty(this); onchangeQty(this);" name="Lst_InvF_InventoryReturnSupDtl[0].UnitCode">
+                                    @{
+                                        if (itFirst.lstUnitCodeUIByProduct != null && itFirst.lstUnitCodeUIByProduct.Count != 0)
+                                        {
+                                            foreach (var item in itFirst.lstUnitCodeUIByProduct)
+                                            {
+                                                <option value="@(item.UnitCode == null ? "" : item.UnitCode)" @(unitCode == CUtils.StrValue(item.UnitCode) ? "selected" : "") InvCode="@(item.InvCode == null ? "" : item.InvCode)" ProductCode="@item.ProductCode" ProductCodeUser ="@item.ProductCodeUser" ProductName="@(item.ProductName == null ? "" : item.ProductName)" UnitCode="@(item.UnitCode == null ? "" : item.UnitCode)" SellPrice="@(item.SellPrice == null ? "0" : item.SellPrice.ToString())" SellOrder="@(item.SellOrder == null ? "0" : item.SellOrder.ToString())" QtyTotalOK="@(item.QtyTotalOK == null ? "0" : item.QtyTotalOK.ToString())" DiscountPrice="@(item.DiscountPrice == null ? "0": item.DiscountPrice)" FlagLot="@(item.FlagLot)" FlagSerial="@item.FlagSerial" ProductType="@(item.ProductType == null ? "" : item.ProductType.ToString())" valconvert="@item.ValConvert">@item.UnitCode</option>
+                                            }
+                                        }
+                                    }
+                                </select>
+                            </td>
+                            <td fieldid="QtyTotalOK" sorttype="T" fieldname="Tồn kho" fieldactive="0" class="text-right cell-100">
+                                <input readonly="readonly" class="col-md-12 QtyTotalOK number text-right" name="Lst_InvF_InventoryReturnSupDtl[@idx].QtyTotalOK" value=@(itFirst.QtyTotalOK == null ? "0" : itFirst.QtyTotalOK)>
+                            </td>
+                            <td fieldid="Qty" sorttype="T" fieldname="Số lượng" fieldactive="0" class="text-left cell-100">
+                                <input class="col-md-12 Qty number text-right" name="Lst_InvF_InventoryReturnSupDtl[@idx].Qty" onchange="onchangeQty(this);" value="@sumqty">
+                            </td>
+                            <td fieldid="InvCode" sorttype="T" fieldname="Vị trí xuất" fieldactive="0" class="text-left cell-150">
+                                <input readonly="readonly" class="col-md-11 InvCode" name="Lst_InvF_InventoryReturnSupDtl[@idx].InvCodeOutActual" value="@lstInvCode">
+                                @MvcHtmlString.Create(showTonKho)
+                            </td>
+                            <td fieldid="UPIn" sorttype="T" fieldname="Giá nhập" fieldactive="0" class="text-left cell-100">
+                                <input readonly="readonly" class="col-md-12 number text-right" name="Lst_InvF_InventoryReturnSupDtl[@idx].UPIn" value="@(itFirst.UPIN == null ? "" : itFirst.UPIN)">
+                            </td>
+                            <td fieldid="UPReturnSup" sorttype="T" fieldname="Giá trả hàng" fieldactive="0" class="text-left cell-100">
+                                <input class="col-md-12 number text-right" name="Lst_InvF_InventoryReturnSupDtl[@idx].UPReturnSup" value="@(itFirst.UPReturnSup == null ? "" : itFirst.UPReturnSup)" onchange="TongTien();">
+                            </td>
+                            <td fieldid="ValReturnSup" sorttype="T" fieldname="Thành tiền" fieldactive="0" class="text-left cell-100">
+                                <input readonly="readonly" class="col-md-12 text-right number" name="Lst_InvF_InventoryReturnSupDtl[@idx].ValReturnSup" value="@valReturnSup">
+                            </td>
+                            <td fieldid="Remark" sorttype="T" fieldname="Ghi chú" fieldactive="0" class="text-left cell-150">
+                                <input class="col-md-12" name="Lst_InvF_InventoryReturnSupDtl[@idx].Remark" value="@(itFirst.Remark == null ? "" : itFirst.Remark)">
+                            </td>
+                        </tr>
+                                }
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<table hidden>
+    <tbody id="rowtemplateProduct">
+        <tr class="trdata" idx="==idx==" productCode="==ProductCode==" productcodebase="==productcodebase==" flagCombo="==flagCombo==" flaglot="==flagLo==" flagserial="==flagSerial==">
+            <input type="hidden" name="Lst_InvF_InventoryReturnSupDtl[==idx==].InvCodeInit" value="==InvCode==" />
+            <input type="hidden" name="Lst_InvF_InventoryReturnSupDtl[==idx==].ProductCode" value="==ProductCode==" class="col-md-9 iphover" style="float: left; border: none; background-color:white; color: ==colortext==" />
+            <input type="hidden" name="Lst_InvF_InventoryReturnSupDtl[==idx==].FlagLot" value="==FlagLot==" />
+            <input type="hidden" name="Lst_InvF_InventoryReturnSupDtl[==idx==].FlagSerial" value="==FlagSerial==" />
+
+            <td class="text-center cell-50">
+                <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteProduct(this)"><i class="fas fa-trash-alt"></i></a>
+            </td>
+            <td fieldId="ProductCodeUser" sorttype="T" fieldName="Mã hàng hóa KH" fieldActive="0" class="text-left cell-220">
+                <input name="Lst_InvF_InventoryReturnSupDtl[==idx==].ProductCodeUser" value="==ProductCodeUser==" readonly="readonly" class="col-md-9 iphover" style="float: left; border: none; background-color:white; color: ==colortext==" />
+
+                <div class="ProductType"> ==ProductType==</div>
+            </td>
+            <td fieldId="ProductName" sorttype="T" fieldName="Tên hàng hóa (TV)" fieldActive="0" class="text-left cell-200">
+                <input readonly="readonly" class="col-md-12 ProductName" name="Lst_InvF_InventoryReturnSupDtl[==idx==].ProductName" value="==ProductName==" />
+            </td>
+            <td fieldId="UnitCode" sorttype="T" fieldName="Đơn vị tính" fieldActive="0" class="text-left cell-100">
+                <select class="UnitCode col-md-12" onchange="ChangeUnitCode(this); setDefaultQty(this); onchangeQty(this);" name="Lst_InvF_InventoryReturnSupDtl[==idx==].UnitCode">
+                    ==UnitCode==
+                </select>
+            </td>
+            <td fieldId="QtyTotalOK" sorttype="T" fieldName="Tồn kho" fieldActive="0" class="text-right cell-100">
+                <input readonly="readonly" value="==QtyTotalOK==" class="col-md-12 QtyTotalOK number text-right" name="Lst_InvF_InventoryReturnSupDtl[==idx==].QtyTotalOK" />
+            </td>
+            <td fieldId="Qty" sorttype="T" fieldName="Số lượng" fieldActive="0" class="text-right cell-100">
+                <input type="hidden" class="Qty_Hidden" value="==Qty==" />
+                <input value="==Qty==" class="col-md-12 Qty number text-right" name="Lst_InvF_InventoryReturnSupDtl[==idx==].Qty" onchange="onchangeQty(this);" />
+            </td>
+            <td fieldId="InvCode" sorttype="T" fieldName="Vị trí xuất" fieldActive="0" class="text-left cell-150">
+                <input readonly="readonly" class="col-md-11 InvCode" name="Lst_InvF_InventoryReturnSupDtl[==idx==].InvCodeOutActual" value="==InvCode==" />
+                ==showTonKho==
+            </td>
+            <td fieldId="UPIn" sorttype="T" fieldName="Giá nhập" fieldActive="0" class="text-right cell-100">
+                <input class="col-md-12 number text-right" name="Lst_InvF_InventoryReturnSupDtl[==idx==].UPIn" value="==SellProduct==" />
+            </td>
+            <td fieldId="UPReturnSup" sorttype="T" fieldName="Giá trả hàng" fieldActive="0" class="text-right cell-100">
+                <input class="col-md-12 number text-right" name="Lst_InvF_InventoryReturnSupDtl[==idx==].UPReturnSup" value="==SellProduct==" onchange="TongTien();" /> @*Mặc định giá trả hàng = giá nhập*@
+            </td>
+            <td fieldId="ValReturnSup" sorttype="T" fieldName="Thành tiền" fieldActive="0" class="text-right cell-100">
+                <input readonly="readonly" class="col-md-12 number text-right" name="Lst_InvF_InventoryReturnSupDtl[==idx==].ValReturnSup" value="==ValAmount==" />
+            </td>
+            <td fieldId="Remark" sorttype="T" fieldName="Ghi chú" fieldActive="0" class="text-left cell-150">
+                <input class="col-md-12" name="Lst_InvF_InventoryReturnSupDtl[==idx==].Remark" value="" />
+            </td>
+        </tr>
+    </tbody>
+</table>
+

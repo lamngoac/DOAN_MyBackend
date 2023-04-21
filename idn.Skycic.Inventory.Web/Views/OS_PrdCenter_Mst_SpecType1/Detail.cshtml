@@ -1,0 +1,118 @@
+﻿@model Mst_SpecType1
+@{
+    Layout = "~/Views/Shared/_LayoutQuantri.cshtml";
+    var title = "CHI TIẾT LOẠI SẢN PHẨM";
+    var titleMng = "Danh mục loại sản phẩm";
+    ViewBag.Title = title;
+}
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="row no-margin box-shadow-tk">
+                        @using (Html.BeginForm("Detail", "OS_PrdCenter_Mst_SpecType1", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="OrgID" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã tổ chức <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="OrgID" name="OrgID" class="col-xs-12 OrgID disabled-fix" onkeyup="locdau(this);" value="@Model.OrgID" autocomplete="off" required />
+                                        </span>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="SpecType1" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã loại sản phẩm <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="SpecType1" name="SpecType1" class="col-xs-12 disabled-fix SpecType1" onkeyup="locdau(this);" value="@if (Model != null && Model.SpecType1 != null){@MvcHtmlString.Create(Model.SpecType1.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="SpecType1Name" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên loại sản phẩm <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="SpecType1Name" name="SpecType1Name" class="col-xs-12 disabled-fix SpecType1Name" value="@if (Model != null && Model.SpecType1Name != null){@MvcHtmlString.Create(Model.SpecType1Name.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    @{
+                                        var checkActive = "";
+                                        if (Model != null && Model.FlagActive.Equals("1"))
+                                        {
+                                            checkActive = "checked";
+                                        }
+                                        else
+                                        {
+                                            checkActive = "";
+                                        }
+                                    }
+                                    <label for="" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">Trạng thái</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right disabled-checkbox-fix padding-top-5">
+                                            <label>
+                                                <input name="FlagActive" id="FlagActive" class="ace ace-switch ace-switch-4 FlagActive" type="checkbox" value="1" @checkActive />
+                                                <span class="lbl"></span>
+                                                <input name="FlagActive" type="hidden" value="0" />
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </aside>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+<script type="text/javascript">
+    processAjaxForm($('#manageForm'), function (response) {
+        processAjaxFormResult(response);
+
+    });
+</script>
+
+@*Active Menu*@
+<script type="text/javascript">
+    setAdminCurrentUrl('@Url.Action("Index", "OS_PrdCenter_Mst_SpecType1")');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,703 @@
+﻿@model PageInfo<Mst_Customer>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var listMst_CustomerGroup = ViewBag.listMst_CustomerGroup as List<Mst_CustomerGroup>;
+    var listMst_CustomerType = ViewBag.listMst_CustomerType as List<Mst_CustomerType>;
+    var listMst_CustomerSource = ViewBag.listMst_CustomerSource as List<Mst_CustomerSource>;
+
+    var init = CUtils.StrValue(ViewBag.init);
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+    var pageCount = CUtils.StrValue(ViewBag.PageCount);
+    var recordCount = CUtils.StrValue(ViewBag.RecordCount);
+
+
+
+
+    var userType = "";
+    var userState = ViewBag.UserState as UserState;
+    if (userState != null)
+    {
+        userType = CUtils.StrValue(userState.UserType);
+    }
+    var viewid = string.Format("{0}_{1}_{2}_{3}", CUtils.StrValue(userState.SysUser.UserCode), CUtils.StrValue(ViewBag.SolutionCodeSignature), CUtils.StrValue(userState.Mst_NNT.OrgID), "Mst_Customer_Mng");
+
+}
+<script>
+    setAdminCurrentUrl('@Url.Action("Index", "Mst_Customer")');
+</script>
+<script src="~/Content/assets/js/bootbox.js"></script>
+<style>
+    .padding-top-50 {
+        padding-top: 50px !important;
+    }
+
+    .margin-top-5 {
+        margin-top: 5px !important;
+    }
+
+
+    .chk input.cl-check {
+        margin-top: 2px;
+    }
+
+    .span-title-check {
+        margin-left: 7px;
+    }
+
+    .layout-search .btn {
+        padding: 0.2rem 0.75rem;
+    }
+
+    /*.select2-selection__rendered {
+        cursor: pointer;
+    }*/
+
+    .select2-container--default .select2-results__group {
+        padding: 0;
+    }
+
+    .selection--multiple:before {
+        display: inline-block;
+        font-style: normal;
+        font-variant: normal;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        content: "\f0d7";
+        position: absolute;
+        top: 15%;
+        left: 90%;
+        color: #787878;
+        font-size: 16px;
+        z-index: 9;
+    }
+
+    .row.chk {
+        margin-right: 50px;
+    }
+</style>
+
+<div class="row no-margin">
+    <div class="col-sm-12">
+     
+        <aside class="row no-margin">
+            @using (Html.BeginForm("Index", "Mst_Customer", FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <input type="hidden" id="viewid" name="viewid" value="@MvcHtmlString.Create(viewid)" />
+                <input hidden id="init" name="init" value="search" />
+                <div class="layout-search layout-bot-top-16">
+                    <div class="row no-margin">
+                        <div class="col-sm-11 row no-margin">
+                            <div class="col-sm-4">
+                                <div class="row form-group margin-bottom-9">
+                                    <label for="CustomerName" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Khách hàng".HtmlItemString("customer"))</label>
+                                    <div class="col-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="CustomerName" name="CustomerName" class="col-12 CustomerName" value="" autocomplete="off" required />
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="row form-group margin-bottom-9">
+                                    <label for="CustomerGrpCode" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Nhóm khách hàng".HtmlItemString("customer"))</label>
+                                    <div class="col-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right selection--multiple">
+                                            <select class="select2-selection--multiple" id="CustomerGrpCode" name="CustomerGrpCode" multiple="multiple">
+                                                <optgroup label="">
+                                                    @{
+                                                        if (listMst_CustomerGroup != null && listMst_CustomerGroup.Count > 0)
+                                                        {
+                                                            foreach (var grp in listMst_CustomerGroup)
+                                                            {
+                                                                <option value="@grp.CustomerGrpCode">@grp.CustomerGrpName</option>
+                                                            }
+                                                        }
+                                                    }
+                                                </optgroup>
+                                                @*<option value="">@("".HtmlItemString("product"))</option>*@
+                                            </select>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="row form-group margin-bottom-9">
+                                    <label for="CustomerType" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Loại khách hàng".HtmlItemString("customer"))</label>
+                                    <div class="col-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right selection--multiple">
+                                            <select class="select2-selection--multiple" name="CustomerType" id="CustomerType" multiple="multiple">
+                                                <optgroup label="">
+                                                    @{
+                                                        if (listMst_CustomerType != null && listMst_CustomerType.Count > 0)
+                                                        {
+                                                            foreach (var type in listMst_CustomerType)
+                                                            {
+                                                                <option value="@type.CustomerType">@type.CustomerTypeName</option>
+                                                            }
+                                                        }
+                                                    }
+                                                </optgroup>
+                                                @*<option value="ADDDATA">@("".HtmlItemString("product"))</option>*@
+                                            </select>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="row form-group margin-bottom-9">
+                                    <label for="CustomerSourceCode" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Nguồn khách".HtmlItemString("customer"))</label>
+                                    <div class="col-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right selection--multiple">
+                                            <select class="select2-selection--multiple" name="CustomerSourceCode" id="CustomerSourceCode" multiple="multiple">
+                                                <optgroup label="">
+                                                    @{
+                                                        if (listMst_CustomerSource != null && listMst_CustomerSource.Count > 0)
+                                                        {
+                                                            foreach (var src in listMst_CustomerSource)
+                                                            {
+                                                                <option value="@src.CustomerSourceCode">@src.CustomerSourceName</option>
+                                                            }
+                                                        }
+                                                    }
+                                                </optgroup>
+                                            </select>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="row form-group margin-bottom-9">
+                                    <label for="CustomerMobilePhone" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Điện thoại di động".HtmlItemString("customer"))</label>
+                                    <div class="col-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="CustomerMobilePhone" name="CustomerMobilePhone" class="col-12 CustomerMobilePhone" value="" autocomplete="off" required />
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="row form-group margin-bottom-9">
+                                    <label for="ContactEmail" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Email liên hệ".HtmlItemString("customer"))</label>
+                                    <div class="col-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="ContactEmail" name="ContactEmail" class="col-12 ContactEmail" value="" autocomplete="off" required />
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-1">
+                            <span class="block input-icon input-icon-right">
+                                @*<a class="btn btn-nc-button" onclick="SearchData()" href="javascript:void(0);" style=""><img class="img-button-search" src="@Url.Content("~/Images/search.svg")"></a>*@
+                                @{ var imgSearch = Url.Content("~/Images/search.svg");}
+                                @RenderItemFormat("BTN_QL_CUSTOMER_NTT_ORGADMIN_TK", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\"  onclick=\"SearchData();\"><img class=\"img-button-search\" src=" + imgSearch + "></a>", "", "")
+
+
+                            </span>
+                        </div>
+                        <div class="col-12 no-padding margin-top-5">
+                            <div class="col-sm-11">
+                                <div class="form-group margin-bottom-9">
+                                    <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 " style="max-width: 12.5%">@MvcHtmlString.Create("")</label>
+                                    <div class="row no-margin">
+                                        <div class="row chk">
+                                            <input type="checkbox" class="cl-check" name="FlagDealer" id="FlagDealer" />
+                                            <div class="span-title-check">Đại lý</div>
+                                        </div>
+                                        <div class="row chk">
+                                            <input type="checkbox" class="cl-check" name="FlagSupplier" id="FlagSupplier" />
+                                            <div class="span-title-check">Nhà cung cấp</div>
+                                        </div>
+                                        <div class="row chk">
+                                            <input type="checkbox" class="cl-check" name="FlagShipper" id="FlagShipper" />
+                                            <div class="span-title-check">Đơn vị giao hàng</div>
+                                        </div>
+                                        <div class="row chk">
+                                            <input type="checkbox" class="cl-check" name="FlagEndUser" id="FlagEndUser" />
+                                            <div class="span-title-check">Khách hàng cuối</div>
+                                        </div>
+                                        <div class="row chk">
+                                            <input type="checkbox" class="cl-check" name="FlagBank" id="FlagBank" />
+                                            <div class="span-title-check">Ngân hàng</div>
+                                        </div>
+                                        <div class="row chk">
+                                            <input type="checkbox" class="cl-check" name="FlagInsurrance" id="FlagInsurrance" />
+                                            <div class="span-title-check">Bảo hiểm</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </aside>
+        <div id="BindDataMst_Customer" class="conten-table">
+            @Html.Partial("BindDataMst_Customer", Model, new ViewDataDictionary() { { "init", MvcHtmlString.Create(init) }, { "PageCur", MvcHtmlString.Create(pageCur) }, { "RecordCount", MvcHtmlString.Create(recordCount) } })
+        </div>
+    </div>
+</div>
+
+<!-- Import Modal -->
+<div class="modal fade" id="ImportModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h3 class="modal-title" id="exampleModalLabel">Nhập file Excel</h3>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "manageFormImportExcel" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group margin-bottom-9">
+                        <input type="file" name="file" id="file" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-nc-button no-margin-top-bot" data-dismiss="modal" id="btnThoat">Thoát</button>
+                        <a href="javascript:void(0);" class="btn btn-nc-button no-margin-top-bot" onclick="Import()" id="btnSaveImport">Nhập</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Select2 -->
+<script>
+    $(document).ready(function () {
+        $('.select2-selection--multiple').select2({
+            minimumResultsForSearch: -1
+        });
+        $('.dropdown-menu').on('click', function (event) {
+            // The event won't be propagated up to the document NODE and
+            // therefore delegated events won't be fired
+            event.stopPropagation();
+        });
+        $('#nextClick').removeClass('disabled-fix');
+        $('#previousClick').removeClass('disabled-fix');
+    });
+</script>
+
+<!-- Excel -->
+<script>
+    var objCommonExcel = new CommonExcel();
+    var objVariablesInit = {
+        Id_FormMain: '',
+        Id_FormImportExcel: 'manageFormImportExcel',
+        Id_Modal: 'ImportExcelModal',
+        Id_FileInput: 'file',
+    };
+
+    var ajaxSettings_Excel = {};
+    ajaxSettings_Excel.Type = 'post';
+    ajaxSettings_Excel.DataType = 'json';
+
+    function ShowPopupImportExcel() {
+        ajaxSettings_Excel.Url = '@Url.Action("ShowPopupImportExcel", "Mst_Customer")';
+
+        objCommonExcel.ajaxSettingsInit();
+        objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+        objCommonExcel.variablesInit(objVariablesInit);
+        objCommonExcel.showPopupImportExcel();
+    }
+
+    function ExportTemplate() {
+        ajaxSettings_Excel.Url = '@Url.Action("ExportTemplate", "Mst_Customer")';
+
+        objCommonExcel.ajaxSettingsInit();
+        objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+        objCommonExcel.exportExcel();
+    }
+
+    function Import() {
+        var file = $("#file").val();
+        if (file.length == 0) {
+            alert("Nhập file cần Import");
+            return false;
+        } else {
+            var re = /[\.xlsx]{1,}$/i;
+            var rex = /[\.xls]{1,}$/i;
+            if (!re.test(file)) {
+                alert('File excel nhập vào không hợp lệ');
+                return false;
+            } else {
+                if (!rex.test(file)) {
+                    alert('File excel nhập vào không hợp lệ');
+                    return false;
+                }
+                $('#manageFormImportExcel').attr('action', '@(Url.Action("Import", "Mst_Customer"))').submit();
+            }
+        }
+    }
+
+    processAjaxForm($('#manageFormImportExcel'), function (response) {
+        debugger
+        processAjaxFormResult(response);
+    });
+
+    function Export() {
+        ajaxSettings_Excel.Url = '@Url.Action("Export", "Mst_Customer")';
+        var customerName = "";
+        var customerMobilePhone = "";
+        var contactEmail = "";
+        var customerGrpCode = customerType = customerSourceCode = [];
+        customerName = commonUtils.returnValueText('#CustomerName');
+        customerGrpCode = $('#CustomerGrpCode').val();
+        customerType = $('#customerType').val();
+        customerSourceCode = $('#CustomerSourceCode').val();
+        customerMobilePhone = commonUtils.returnValueText('#CustomerMobilePhone');
+        contactEmail = commonUtils.returnValueText('#ContactEmail');
+        var flagDealer = commonUtils.returnValueCheckBox('#FlagDealer');
+        var flagSupplier = commonUtils.returnValueCheckBox('#FlagSupplier');
+        var flagShipper = commonUtils.returnValueCheckBox('#FlagShipper');
+        var flagEndUser = commonUtils.returnValueCheckBox('#FlagEndUser');
+        var flagBank = commonUtils.returnValueCheckBox('#FlagBank');
+        var flagInsurrance = commonUtils.returnValueCheckBox('#FlagInsurrance');
+        var recordcount = commonUtils.returnValueText('#recordcount');
+        var pagecur = commonUtils.returnValueText('#page');
+        var listParams = [
+            { "Key": 'customerName', "Value": customerName },
+            { "Key": 'customerMobilePhone', "Value": customerMobilePhone },
+            { "Key": 'contactEmail', "Value": contactEmail },
+            { "Key": 'customerGrpCode', "Value": customerGrpCode },
+            { "Key": 'customerSourceCode', "Value": customerSourceCode },
+            { "Key": 'customerType', "Value": customerType },
+            { "Key": 'flagDealer', "Value": flagDealer },
+            { "Key": 'flagSupplier', "Value": flagSupplier },
+            { "Key": 'flagShipper', "Value": flagShipper },
+            { "Key": 'flagEndUser', "Value": flagEndUser },
+            { "Key": 'flagBank', "Value": flagBank },
+            { "Key": 'flagInsurrance', "Value": flagInsurrance },
+            { "Key": 'recordcount', "Value": recordcount },
+            { "Key": 'pagecur', "Value": pagecur },
+        ];
+        objCommonExcel.ajaxSettingsInit();
+        objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+        objCommonExcel.exportExcel(listParams);
+    }
+</script>
+
+<!-- Search Customer -->
+<script type="text/javascript">
+    // Search
+    function SearchData() {
+        var customerName = "";
+        var customerMobilePhone = "";
+        var contactEmail = "";
+        var customerGrpCode = new Array();
+        var customerType = new Array();
+        var customerSourceCode = new Array();
+        customerName = commonUtils.returnValueText('#CustomerName');
+        customerGrpCode = $('#CustomerGrpCode').val();
+        customerType = $('#CustomerType').val();
+        customerSourceCode = $('#CustomerSourceCode').val();
+        customerMobilePhone = commonUtils.returnValueText('#CustomerMobilePhone');
+        contactEmail = commonUtils.returnValueText('#ContactEmail');
+        var flagDealer = commonUtils.returnValueCheckBox('#FlagDealer');
+        var flagSupplier = commonUtils.returnValueCheckBox('#FlagSupplier');
+        var flagShipper = commonUtils.returnValueCheckBox('#FlagShipper');
+        var flagEndUser = commonUtils.returnValueCheckBox('#FlagEndUser');
+        var flagBank = commonUtils.returnValueCheckBox('#FlagBank');
+        var flagInsurrance = commonUtils.returnValueCheckBox('#FlagInsurrance');
+        var recordcount = commonUtils.returnValueText('#recordcount');
+        var pagecur = commonUtils.returnValueText('#page');
+        debugger
+        var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+        var url = '@Url.Action("DoSearch", "Mst_Customer")';
+        $.ajax({
+            type: "post",
+            data: {
+                __RequestVerificationToken: token,
+                customerName: customerName,
+                customerGrpCode: customerGrpCode,
+                customerType: customerType,
+                customerSourceCode: customerSourceCode,
+                customerMobilePhone: customerMobilePhone,
+                contactEmail: contactEmail,
+                flagDealer: flagDealer,
+                flagSupplier: flagSupplier,
+                flagShipper: flagShipper,
+                flagEndUser: flagEndUser,
+                flagBank: flagBank,
+                flagInsurrance: flagInsurrance,
+                page: pagecur,
+                recordcount: recordcount,
+            },
+            url: url,
+            dataType: 'json',
+            beforeSend: function () {
+
+            }
+        }).done(function (result) {
+            debugger;
+            if (result.Success) {
+                $('#BindDataMst_Customer').html('');
+                $('#BindDataMst_Customer').html(result.Html);
+                initDefault();
+                readCookies("CustomerCenter");
+                $('.dropdown-menu').on('click', function (event) {
+                    // The event won't be propagated up to the document NODE and
+                    // therefore delegated events won't be fired
+                    event.stopPropagation();
+                });
+                //Disabled_previous_Next();
+                $('.numberic').number(true, 2);
+            } else {
+                if (!commonUtils.isNullOrEmpty(result.Detail)) {
+                    showErrorDialog(result.Detail);
+                }
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+
+        }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+            //alert("complete");
+        });
+    }
+</script>
+
+
+
+
+
+<!-- #region table sort -->
+<script>
+    var initDefault = function () {
+        $('#dynamic-table-thead').idnTable({
+            searchTextbox: '#dynamic-table-thead-search', columnToggleButton: '#togglecolumn',
+            cookieId: '#viewid',
+        });
+    };
+    var initCustom = function () {
+        var tb = $('#dynamic-table-thead').idnTable();
+
+        $('#dynamic-table-thead-search').keyup(function () {
+            var kw = $(this).val();
+            tb.search(kw);
+        });
+
+        //tb.showColumns(['STT'], false);
+        //tb.reload();
+        var colList = tb.getAllColumns();
+        $('#togglecolumn').html('');
+
+        for (var i = 0; i < colList.length; ++i) {
+
+            var col = colList[i];
+            var fieldid = col.id;
+            var title = col.name;
+
+            if (title !== undefined && title !== null && title.toString().trim().length > 0) {
+                title = title.toString().trim();
+            } else {
+                title = '';
+            }
+
+            var fieldactive = col.show;
+
+            //B2: Sinh popup tùy chỉnh các cột trong bảng #dynamic-table-thead
+            var $input = $('<input>');
+            $input.attr('type', 'checkbox');
+            $input.attr('name', fieldid);
+
+            if (fieldactive === true) { //Nếu trạng thái bằng 0 cho hiện cột và checked ô input tương ứng
+                $input.attr('checked', 'checked');
+
+            }
+
+            var $spaninput = $('<span>');
+            $spaninput.append($input);
+            $spaninput.css('margin-right', '10px');
+
+            var $spantext = $('<span>');
+            $spantext.text(title);
+
+            var $li = $('<li>');
+            $li.css('line-height', '19px');
+            $li.css('margin-bottom', '18px');
+            $li.append($spaninput);
+            $li.append($spantext);
+
+            $('#togglecolumn').append($li);
+
+            $input.click(function () {
+                if ($(this).is(':checked')) {
+                    tb.showColumns([$(this).attr('name')], false);
+                }
+                else {
+                    tb.hideColumns([$(this).attr('name')], false);
+                }
+            });
+        }
+    };
+    $(document).ready(function () {
+        initDefault();
+        //initCustom();
+    });
+    $(document).ready(function () {
+        (function ($) {
+            var body = $('body');
+            body.on('keyup', '#dynamic-table-thead-search', function () {
+                var datafilter = $(this).val();
+                if (datafilter !== undefined && datafilter !== null && datafilter.toString().trim()) {
+                    datafilter = datafilter.toUpperCase().trim();
+                }
+                var rex = new RegExp($(this).val(), 'i');
+                $('#table-tbodyID tr').hide();
+                $('#table-tbodyID tr').filter(function () {
+                    //debugger
+                    var dataOfRow = $(this).text();
+                    if (dataOfRow !== undefined && dataOfRow !== null && dataOfRow.toString().trim().length > 0) {
+                        dataOfRow = dataOfRow.toUpperCase().trim();
+                    }
+                    if (dataOfRow.toUpperCase().indexOf(datafilter) > -1) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }).show();
+            });
+
+        }(jQuery));
+
+    });
+    $(document).ready(function () {
+        //debugger;
+        var viewId = commonUtils.returnValueText('#viewid');
+        if (!commonUtils.isNullOrEmpty(viewId)) {
+            var cookie = commonUtils.getCookie(viewId);
+            if (commonUtils.isNullOrEmpty(cookie)) {
+                var cookieValue = 'CONTROL|CUSTOMERCODE|CUSTOMERNAME|MCT_CUSTOMERTYPENAME|MCS_CUSTOMERSOURCENAME|MCG_CUSTOMERGRPNAME|CUSTOMERMOBILEPHONE|CONTACTEMAIL|CUSTOMERADDRESS';
+                commonUtils.setCookie(viewId, cookieValue, 10);
+            }
+        }
+        initDefault();
+
+        //initCustom();
+
+    });
+</script>
+<!-- #endregion -->
+
+
+<!-- Use cookies -->
+<script>
+    // $(document).readdy();
+    document.addEventListener('DOMContentLoaded', function () {
+        readCookies("CustomerCenter");
+        var checkboxs = document.querySelectorAll('#togglecolumn.ulshowdata input[type="checkbox"]');
+        for (let checkbox of checkboxs) {
+            checkbox.addEventListener('change', setCookie)
+        }
+    });
+
+    function saveSelectedToCookie() {
+        setCookie("CustomerCenter", {
+            path: '/',
+            expires: 10
+        });
+    }
+
+    function setCookie(name, options = {}) {
+        debugger
+        var checkboxs = document.querySelectorAll('#togglecolumn.ulshowdata input[type="checkbox"]');
+        var value = new Object();
+        for (const ckb of checkboxs) {
+            value[ckb.name] = ckb.checked === true ? "0" : "1";
+        }
+        let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(JSON.stringify(value));
+
+        if (options.expires instanceof Date) {
+            options.expires = options.expires.toUTCString();
+        }
+
+        for (let optionKey in options) {
+            updatedCookie += "; " + optionKey;
+            let optionValue = options[optionKey];
+            if (optionValue !== true) {
+                updatedCookie += "=" + optionValue;
+            }
+        }
+        document.cookie = updatedCookie;
+    }
+
+    function readCookies(name) {
+        var result = document.cookie.match(new RegExp(name + '=([^;]+)'));
+        result && (result = JSON.parse(decodeURIComponent(result[1])));
+        if (result != null && result != undefined) {
+            for (const key in result) {
+                $('#dynamic-table-thead').find('th[fieldid="' + key + '"]').attr('fieldactive', result[key]);
+            }
+        }
+    }
+</script>
+
+<!-- Delete Customer-->
+<script>
+    function DeleteCustomers() {
+        var listCustomers = [];
+        $('#table-tbodyID').find('.cl-check:checked').each(function () {
+            debugger
+            var tr = $(this).parent().parent();
+            idx = $(tr).attr('idx');
+
+            var tem = new Object();
+            var orgid = $('[name="ListCustomer[' + idx + '].OrgID"]').val();
+            var customercode = $('[name="ListCustomer[' + idx + '].CustomerCode"]').val();
+            var customercodesys = $('[name="ListCustomer[' + idx + '].CustomerCodeSys"]').val();
+            var networkid = $('[name="ListCustomer[' + idx + '].NetworkID"]').val();
+
+            tem.OrgID = orgid;
+            tem.CustomerCode = customercode;
+            tem.CustomerCodeSys = customercodesys;
+            tem.NetworkID = networkid;
+
+            listCustomers.push(tem);
+        })
+        if (listCustomers.length > 0) {
+            var modelCur = JSON.stringify(listCustomers);
+            bootbox.confirm({
+                title: "THÔNG BÁO",
+                message: "Đồng ý xóa tất cả khách hàng đã chọn?",
+                buttons: {
+                    'cancel': {
+                        label: 'Thoát',
+                        className: 'btn mybtn-Button btnButton'
+                    },
+                    'confirm': {
+                        label: 'Đồng ý',
+                        className: 'btn mybtn-Button btnButton'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        var url = '@Url.Action("Delete", "Mst_Customer")';
+                        var token = $('input[name=__RequestVerificationToken]').val();
+                        $.ajax({
+                            url: url,
+                            data: {
+                                listCustomers: modelCur,
+                                __RequestVerificationToken: token
+                            },
+                            type: 'post',
+                            dataType: 'json',
+                            success: function (data) {
+                                if (data.Success) {
+                                    if (data.Messages != null && data.Messages !== undefined && data.Messages.length > 0) {
+                                        alert(data.Messages[0]);
+                                    }
+                                    window.location.href = window.location.href;
+                                } else {
+                                    _showErrorMsg123("Lỗi!",data.Detail);
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        } else {
+            alert("Chưa chọn bản ghi cần xóa!");
+            return;
+        }
+    }
+</script>

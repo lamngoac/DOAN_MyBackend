@@ -1,0 +1,137 @@
+﻿@{
+    var listMst_Inventory = ViewBag.ListMst_Inventory as List<Mst_Inventory>;
+    if(listMst_Inventory == null || listMst_Inventory.Count == 0)
+    {
+        listMst_Inventory = new List<Mst_Inventory>();
+    }
+    listMst_Inventory.Insert(0, new Mst_Inventory()
+    {
+        InvCode = "",
+        InvName = "--Chọn vị trí--",
+    });
+    var listInvF_InventoryInDtl = ViewBag.ListInvF_InventoryInDtl as List<InvF_InventoryInDtl>;
+
+    var iF_InvInStatus = CUtils.StrValue(ViewBag.IF_InvInStatus);
+    var viewType = CUtils.StrValue(ViewBag.ViewType);
+
+}
+<div class="modal-dialog" style="width: 500px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel"><b>Chọn vị trí nhập hàng hóa: @MvcHtmlString.Create(CUtils.StrValue(ViewBag.ProductName))</b></h2>
+            <a href="javascript:;" onclick="closePopupInvCodeInActual()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body" style="">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupInvCodeInActual" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="col-xs-12" style="float: left;">
+                    <input type="hidden" class="ProductCode_Popup_InvCodeInActual" value="@MvcHtmlString.Create(CUtils.StrValue(ViewBag.ProductCode))" />
+                    
+                </div>
+                <div class=" col-xs-12" style="float: left;">
+                    <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+                        <div style="width: 100%; float: left;">
+                            <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                                <thead>
+                                    <tr class="trthead">
+                                        <th class="text-center cell-50">
+                                        </th>
+                                        <th class="text-left cell-150">
+                                            @("Mã vị trí".HtmlItemString("invf_inventoryin"))
+                                        </th>
+                                        <th class="text-left cell-150">
+                                            @("Số lượng".HtmlItemString("invf_inventoryin"))
+                                        </th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                            <table class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                                <tbody id="table-tbodyIDInvCodeInActual">
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    @if (!viewType.Equals("detail") && iF_InvInStatus.Equals(Client_Status.PENDING))
+                    {
+                    <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="product_InvCodeInActual_AddNewRow()" style="float: left;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Thêm</a>
+                    }
+                </div>
+            }
+        </div>
+        <div class="modal-footer" style="display:flex; align-items:center; justify-content: center">
+            @if (!viewType.Equals("detail") && iF_InvInStatus.Equals(Client_Status.PENDING))
+            {
+                <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="product_InvCodeInActual_Save()" style="float: left;font-size: 13px;margin-left: 10px"><i class="fa fa-save" aria-hidden="true"></i> OK</a>
+            }
+            <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="closePopupInvCodeInActual()" style="float: left;font-size: 13px;margin-left: 10px"> Đóng</a>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var Lst_Mst_Inventory = []; @*Danh sách vị trí kho*@
+    @if(listMst_Inventory != null && listMst_Inventory.Count > 0)
+    {
+        foreach(var item in listMst_Inventory)
+        {
+            var invCode = CUtils.StrValue(item.InvCode);
+            var invName = CUtils.StrValue(item.InvName);
+            <text>
+                var objMst_Inventory = {
+                    InvCode: '@invCode',
+                    InvName: '@invName',
+                };
+                Lst_Mst_Inventory.push(objMst_Inventory);
+            </text>
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    var ListInvF_InventoryInDtl = [];
+    @if(listInvF_InventoryInDtl != null && listInvF_InventoryInDtl.Count > 0)
+    {
+        foreach(var item in listInvF_InventoryInDtl)
+        {
+            var invCodeInActual = CUtils.StrValue(item.InvCodeInActual);
+            var qty = CUtils.StrValue(item.Qty);
+            var productCode = CUtils.StrValue(item.ProductCode);
+            if (CUtils.IsNullOrEmpty(qty))
+            {
+                qty = "0";
+            }
+            <text>
+                var objProduct_InvCodeInActual = {
+                    InvCodeInActual: '@invCodeInActual',
+                    Qty: '@qty',
+                    ProductCode: '@productCode',
+                }
+                ListInvF_InventoryInDtl.push(objProduct_InvCodeInActual);
+            </text>
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        @*Add danh sách vị trí kho vào Popup*@
+        if (ListInvF_InventoryInDtl !== undefined && ListInvF_InventoryInDtl !== null && ListInvF_InventoryInDtl.length > 0) {
+            for (var i = 0; i < ListInvF_InventoryInDtl.length; i++) {
+                var objProduct_InvCodeInActual_AddRow = {
+                    Product_InvCodeInActual: ListInvF_InventoryInDtl[i],
+                    Lst_Mst_Inventory: Lst_Mst_Inventory,
+                };
+
+                renderProductInvCodeInActual(objProduct_InvCodeInActual_AddRow);
+            }
+        }
+    })
+
+    
+</script>

@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>@ViewBag.Title - Inventory</title>
+
+    @Html.Partial("Render_StyleSheet")
+    @*Chèn CSS tại trang con nếu cần*@
+    <style>
+    </style>
+    @RenderSection("StyleSheet", required: false)
+    @Html.Partial("Render_JavaScript")
+    @*End Show Error*@
+    @Html.Partial("_loading")
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        @*@Html.Partial("Navbar")*@
+        <!-- Content Wrapper. Contains page content -->
+        <div class="row no-margin">
+            <!-- Content Header (Page header) -->
+            <!-- /.content-header -->
+            <!-- Main content -->
+            <section class="content col-12 no-padding">
+                @RenderBody()
+                <!-- /.container-fluid -->
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+        </aside>
+        <!-- /.control-sidebar -->
+    </div>
+
+    @*Chèn Scripts tại trang con nếu cần*@
+    @RenderSection("Scripts", required: false)
+    <script type="text/javascript">
+        $(window).ready(function () {
+            var x = window.location.origin;
+            $("#ProductIntro img").attr("src", x + $("#ProductIntro img").attr('src'));
+        });
+
+    </script>
+</body>
+</html>

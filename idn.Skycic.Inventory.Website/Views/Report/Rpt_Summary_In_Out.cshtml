@@ -1,0 +1,442 @@
+﻿@{
+    ViewBag.Title = "Báo cáo nhập xuất theo kỳ";
+
+    var yearrpt = ViewBag.yearrpt as string;
+    var productcodeuser = ViewBag.productcodeuser as string;
+    var productname = ViewBag.productname as string;
+    var unitcode = ViewBag.unitcode as string;
+
+    var listData = ViewBag.ListData as List<Rpt_Summary_In_Out>;
+}
+<script>
+    setAdminCurrentUrl('@Url.Action("Rpt_Summary_In_Out", "Report")');
+</script>
+<style>
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        /* display: none; <- Crashes Chrome on hover */
+        -webkit-appearance: none;
+        margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+    }
+</style>
+
+<div class="row no-margin">
+    <div class="col-sm-12">
+        <aside class="row no-margin">
+            @using (Html.BeginForm("Rpt_Summary_In_Out", "Report", FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <input hidden id="init" name="init" value="search" />
+                <div class="layout-search layout-bot-top-16">
+                    <div class="row no-margin">
+                        <div class="col-4 row no-margin">
+                            <label for="YearRpt" class="col-12 col-sm-2 control-label no-padding-right font-weight-500 ">@("Năm".HtmlItemString("report_yearrpt")) <span style="color: red;"> *</span></label>
+                            <div class="col-sm-9 row date-input-group no-margin">
+                                <div class="row col-5 no-margin">
+                                    <div class="col-12 no-padding">
+                                        <div class="input-group form-group" id="dtYearRpt">
+                                            <input type="text" id="YearRpt" name="YearRpt" class="col-9 cl-date YearRpt hasDatepicker" data-date-format="yyyy" value="@yearrpt" autocomplete="off">
+                                            <span class="input-group-addon col-3">
+                                                <i class="far fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4 row no-margin">
+                            <div class="row form-group">
+                                <label for="IF_MONo" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Hàng hoá".HtmlItemString("report")) <span style="color: red;"> *</span></label>
+                                <div class="col-12 col-sm-9 form-group">
+                                    <span class="block input-icon input-icon-right col-12">
+                                        <input class="col-10" id="myInput" type="text" name="myInput" onkeyup="Autocompletesearch()" placeholder="@("Nhập mã, tên để tìm kiếm".HtmlItemString("report"))" value="@productcodeuser">
+                                        <input type="hidden" id="ProductCodeUser" name="ProductCodeUser" class="col-10 ProductCodeUser" value="@productcodeuser" autocomplete="off" required />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-12 col-sm-3 control-label no-padding-right font-weight-500 "></label>
+                                <div class="col-12 col-sm-9 form-group">                                    
+                                    <span class="block input-icon input-icon-right col-12">
+                                        <input type="text" id="ProductName" name="ProductName" readonly="readonly" class="ProductName" style="border: none; width: 400px" value="@productname" />
+                                        <input type="hidden" id="UnitCode" name="UnitCode" value="@unitcode" />
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-4 row no-margin">
+                            <div class="form-group margin-bottom-9">
+                                <div class="row no-margin">
+                                    <span class="block input-icon input-icon-right">
+                                        @if (CheckAccess("BTN_RPT_SUMMARY_IN_OUT_SEARCH"))
+                                        {
+                                            <a class="btn btn-nc-button" onclick="SearchData()" href="javascript:void(0);" style=""><img class="img-button-search" src="@Url.Content("~/Images/search.svg")"></a>
+                                        }
+                                        @if (CheckAccess("BTN_RPT_SUMMARY_IN_OUT_EXPORT_EXCEL"))
+                                        {
+                                            <a class="btn btn-nc-button" href="javascript:;" onclick="Export();" style=""><i class="far fa-file-excel" aria-hidden="true"></i> Xuất Excel</a>
+                                        }
+
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </aside>
+        <div class="row no-margin">
+            <div class="row col-12 no-padding">
+                <!--Vẽ biểu đồ-->
+                <div id="RptSummaryInOut" class="row col-12" style="margin: 10px auto;height: 400px;"></div>
+                <!--End vẽ biểu đồ-->
+                <br />
+                @{
+                    using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "mngForm" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        if (listData != null && listData.Count > 0)
+                        {
+                            <div class="col-xs-12 no-padding" style="margin-left: 66px">
+                                <table class="table table-hover table-striped table-bordered table-order" id="tblData" style="border: 1px solid #ddd;">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center cell-100"></th>
+                                            <th class="text-center cell-75">T1</th>
+                                            <th class="text-center cell-75">T2</th>
+                                            <th class="text-center cell-75">T3</th>
+                                            <th class="text-center cell-75">T4</th>
+                                            <th class="text-center cell-75">T5</th>
+                                            <th class="text-center cell-75">T6</th>
+                                            <th class="text-center cell-75">T7</th>
+                                            <th class="text-center cell-75">T8</th>
+                                            <th class="text-center cell-75">T9</th>
+                                            <th class="text-center cell-75">T10</th>
+                                            <th class="text-center cell-75">T11</th>
+                                            <th class="text-center cell-75">T12</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="listData">
+                                        
+                                        @foreach (var item in listData.OrderBy(m => m.ActionRpt))
+                                        {
+                                            <tr class="trData">
+                                                <td class="text-center">@(CUtils.StrValue(item.ActionRpt) == "IN" ? "Nhập" : "Xuất")</td>
+                                                <td class="text-right numberic valTotalQty">@item.TotalQtyT1</td>
+                                                <td class="text-right numberic valTotalQty">@item.TotalQtyT2</td>
+                                                <td class="text-right numberic valTotalQty">@item.TotalQtyT3</td>
+                                                <td class="text-right numberic valTotalQty">@item.TotalQtyT4</td>
+                                                <td class="text-right numberic valTotalQty">@item.TotalQtyT5</td>
+                                                <td class="text-right numberic valTotalQty">@item.TotalQtyT6</td>
+                                                <td class="text-right numberic valTotalQty">@item.TotalQtyT7</td>
+                                                <td class="text-right numberic valTotalQty">@item.TotalQtyT8</td>
+                                                <td class="text-right numberic valTotalQty">@item.TotalQtyT9</td>
+                                                <td class="text-right numberic valTotalQty">@item.TotalQtyT10</td>
+                                                <td class="text-right numberic valTotalQty">@item.TotalQtyT11</td>
+                                                <td class="text-right numberic valTotalQty">@item.TotalQtyT12</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="@Url.Content("~/Scripts/js/mycharts.js")"></script>
+<script src="https://code.highcharts.com/highcharts.src.js"></script>
+<script src="https://code.highcharts.com/highcharts-3d.js"></script>
+
+<script>
+    $('#YearRpt').datepicker({
+        autoclose: true,
+        format: 'yyyy'
+    })
+    jQuery(function ($) {
+        $('.numberic').number(true, 2);
+    });
+</script>
+<!-- Search -->
+<script>
+        @*@*Active Menu*@
+        //setAdminCurrentUrl('@Url.Action("Rpt_Summary_In_Out", "Report")');
+
+    function SearchData() {
+        var productCodeUser = commonUtils.returnValueText('#ProductCodeUser');
+        var yearRpt = commonUtils.returnValueText('#YearRpt');
+        if (productCodeUser == undefined || productCodeUser.length == 0) {
+            alert('Chưa chọn hàng hóa');
+            $('#ProductCodeUser').focus();
+            return false;
+        }
+        if (yearRpt == undefined || yearRpt.length == 0) {
+            $('#YearRpt').focus();
+            alert('Chưa chọn năm');
+            return false;
+        }
+
+        $('#manageForm').attr('action', '@(Url.Action("Rpt_Summary_In_Out", "Report"))').submit();
+    }
+</script>
+<!-- Excel -->
+<script>
+    function Export() {
+        var productCodeUser = commonUtils.returnValueText('#ProductCodeUser');
+        var yearRpt = commonUtils.returnValueText('#YearRpt');
+        if (productCodeUser == undefined || productCodeUser.length == 0) {
+            alert('Chưa chọn hàng hóa');
+            $('#ProductCodeUser').focus();
+            return false;
+        }
+        if (yearRpt == undefined || yearRpt.length == 0) {
+            $('#YearRpt').focus();
+            alert('Chưa chọn năm');
+            return false;
+        }
+
+        var objCommonExcel = new CommonExcel();
+        var ajaxSettings_Excel = {};
+        ajaxSettings_Excel.Type = 'post';
+        ajaxSettings_Excel.DataType = 'json';
+        ajaxSettings_Excel.Url = '@Url.Action("Rpt_Summary_In_Out_Export", "Report")';
+
+        var listParams = [
+            { "Key": 'productcodeuser', "Value": productCodeUser },
+            { "Key": 'yearrpt', "Value": yearRpt }
+        ];
+
+        objCommonExcel.ajaxSettingsInit();
+        objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+        objCommonExcel.exportExcel(listParams);
+        }
+</script>
+
+@*Chart*@
+<script>
+    
+    $(document).ready(function () {
+        
+        var categories = [];
+        var arr = JSON.parse('@Html.Raw(Json.Encode(listData))');
+        var series = [];        
+        var objS1 = new Object();
+        objS1.name = 'Nhập';
+        var arrIn = [];
+        var arrOut = [];
+        for (var i = 0; i < arr.length; i++) {
+            var actionRpt = arr[i].ActionRpt;
+            if (actionRpt === 'IN') {
+                arrIn.push(parseFloat(arr[i].TotalQtyT1));
+                arrIn.push(parseFloat(arr[i].TotalQtyT2));
+                arrIn.push(parseFloat(arr[i].TotalQtyT3));
+                arrIn.push(parseFloat(arr[i].TotalQtyT4));
+                arrIn.push(parseFloat(arr[i].TotalQtyT5));
+                arrIn.push(parseFloat(arr[i].TotalQtyT6));
+                arrIn.push(parseFloat(arr[i].TotalQtyT7));
+                arrIn.push(parseFloat(arr[i].TotalQtyT8));
+                arrIn.push(parseFloat(arr[i].TotalQtyT9));
+                arrIn.push(parseFloat(arr[i].TotalQtyT10));
+                arrIn.push(parseFloat(arr[i].TotalQtyT11));
+                arrIn.push(parseFloat(arr[i].TotalQtyT12));
+            } else {
+                arrOut.push(parseFloat(arr[i].TotalQtyT1));
+                arrOut.push(parseFloat(arr[i].TotalQtyT2));
+                arrOut.push(parseFloat(arr[i].TotalQtyT3));
+                arrOut.push(parseFloat(arr[i].TotalQtyT4));
+                arrOut.push(parseFloat(arr[i].TotalQtyT5));
+                arrOut.push(parseFloat(arr[i].TotalQtyT6));
+                arrOut.push(parseFloat(arr[i].TotalQtyT7));
+                arrOut.push(parseFloat(arr[i].TotalQtyT8));
+                arrOut.push(parseFloat(arr[i].TotalQtyT9));
+                arrOut.push(parseFloat(arr[i].TotalQtyT10));
+                arrOut.push(parseFloat(arr[i].TotalQtyT11));
+                arrOut.push(parseFloat(arr[i].TotalQtyT12));
+            }
+        }
+        //objS1.data =[70.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4];
+        objS1.data = arrIn;
+        var objS2 = new Object();
+        objS2.name = 'Xuất';
+        //objS2.data =[42.4, 33.2, 34.5, 39.7, 52.6, 75.5, 57.4, 60.4, 47.6, 39.1, 46.8, 51.1];
+        objS2.data = arrOut;
+        series.push(objS1);
+        series.push(objS2);
+
+        for (var i = 1; i <= 12; i++) {
+            categories.push('T' + i);
+        }
+
+        let unitCode = '';
+        let valUnitCode = $('#UnitCode').val();
+        if (valUnitCode !== undefined && valUnitCode.length > 0) {
+            unitCode = '(' + valUnitCode + ')';
+        }
+
+        stackedColumnChart3('RptSummaryInOut', 'column', 'Báo cáo nhập xuất theo kỳ', 'Số lượng ' + unitCode, 'Tháng', categories, series);
+        formatnumber();
+    });
+</script>
+
+<script type="text/javascript">
+        function Autocompletesearch() {
+            function autocomplete(inp, arrr) {
+                var currentFocus;
+                var a, b, i, c, val = inp.value;
+                    closeAllLists();
+                    if (!val) { return false; }
+                    currentFocus = -1;
+                    a = document.createElement("DIV");
+                    a.setAttribute("id", inp.id + "autocomplete-list");
+                    a.setAttribute("class", "autocomplete-items row col-10 no-padding");
+                    inp.parentNode.appendChild(a);
+                for (i = 0; i < arrr.length; i++) {
+                        /* kiểm tra xem mục có bắt đầu bằng các chữ cái giống như giá trị trường văn bản không: */
+                    let productCur = arrr[i];
+                    if (productCur.ProductName.toUpperCase().includes(val.toUpperCase())) {
+                            /* tạo thành phần DIV cho từng thành phần phù hợp: */
+                            b = document.createElement("DIV");
+                            b.setAttribute("class", "col-12 autocomplete-itemssmall");
+                            /* làm cho các chữ cái phù hợp in đậm: */
+                        b.innerHTML = "<span>" + productCur.ProductName + "</span>";
+                            //b.innerHTML += arrr[i].ProducName;
+                            /* chèn trường đầu vào sẽ giữ giá trị của mục mảng hiện tại: */
+                        b.innerHTML += "<input type='hidden' value='" + productCur.ProductCode + "'>";
+                            /* thực thi chức năng khi ai đó nhấp vào giá trị mục (phần tử DIV): */
+                            b.addEventListener("click", function (e) {
+                                /* chèn giá trị cho trường văn bản tự động hoàn thành: */
+                                inp.value = productCur.ProductName;
+                                GetProduct(productCur.ProductCode);
+                                closeAllLists();
+                            });
+                            a.appendChild(b);
+                        }
+
+                    }                    
+                    /* thực thi một chức năng nhấn một phím trên bàn phím: */
+                inp.addEventListener("keydown", function (e) {
+                    var x = document.getElementById(inp.id + "autocomplete-list");
+                    if (x) x = x.getElementsByTagName("div");
+                    if (e.keyCode == 40) {
+                        /* Nếu nhấn phím mũi tên DOWN, hãy tăng biến Focus hiện tại: */
+                        currentFocus++;
+                        /* và làm cho mục hiện tại rõ hơn: */
+                        addActive(x);
+                    } else if (e.keyCode == 38) {
+                        currentFocus--;
+                        addActive(x);
+                    } else if (e.keyCode == 13) {
+                        e.preventDefault();
+                        if (currentFocus > -1) {
+                            if (x) x[currentFocus].click();
+                        }
+                    }
+                });
+                document.addEventListener("click", function (e) {
+                    closeAllLists(e.target);
+                });
+                function addActive(x) {
+                    if (!x) return false;
+                    removeActive(x);
+                    if (currentFocus >= x.length) currentFocus = 0;
+                    if (currentFocus < 0) currentFocus = (x.length - 1);
+                    x[currentFocus].classList.add("autocomplete-active");
+                }
+                function removeActive(x) {
+                    for (var i = 0; i < x.length; i++) {
+                        x[i].classList.remove("autocomplete-active");
+                    }
+                }
+                function closeAllLists(elmnt) {
+                    var x = document.getElementsByClassName("autocomplete-items");
+                    for (var i = 0; i < x.length; i++) {
+                        if (elmnt != x[i] && elmnt != inp) {
+                            x[i].parentNode.removeChild(x[i]);
+                        }
+                    }
+                }
+            }
+            function GetProduct(prdid) {                
+            let url = '@Url.Action("GetProductExactly", "Report")';
+                $.ajax({
+                    url: url,
+                    type: 'post',
+                    data: {
+                        prdid: prdid
+                        //__RequestVerificationToken: token
+                    },
+                    cache: false,
+                    dataType: 'json',
+                    traditional: true,
+                    //contentType: "application/json; charset=utf-8",
+                    //success: function (data) {
+                    //    $(".GetBom").html(data);
+
+                    //}
+                    success: function (data) {
+                        if (data.Data !== undefined) {
+                            var dataPrd = data.Data;
+
+                            $("#ProductName").val(dataPrd.ProductCodeUser + ' - ' + dataPrd.ProductName + ' - ' + dataPrd.UnitCode);
+                            $("#ProductCodeUser").val(dataPrd.ProductCodeUser);
+                            $("#UnitCode").val(dataPrd.UnitCode);
+                            $("#myInput").val(dataPrd.ProductCodeUser);
+                        }
+                        else {
+                            //$('.GetPrd').append('');
+                        }
+                    }
+
+                });
+            }
+            var x = document.getElementById("myInput");
+            Getkeyup(x.value);
+            function Getkeyup(prdid) {
+                if (prdid.length < 2) { return; }
+
+                var url = '@Url.Action("SearchProduct", "Report")';
+                $.ajax({
+                    url: url,
+                    type: 'post',
+                    data: {
+                        prdid: prdid,
+                    },
+                    cache: false,
+                    dataType: 'json',
+                    traditional: true,
+                    success: function (data) {
+                        var arr = [];                        
+                        if (data.length >0) {
+                            for (var i = 0; i < data.length; i++) {
+                                let prd = {};
+                                prd.ProductCode = data[i].ProductCode;
+                                prd.ProductName = data[i].ProductCodeUser + ' - ' + data[i].ProductName;
+
+                                arr.push(prd);
+                            }
+                        }
+                        debugger;
+                        autocomplete(document.getElementById("myInput"), arr);
+                    }
+                });
+
+            }
+        }
+</script>
+
+
+@*format number*@
+<script type="text/javascript">
+    function formatnumber(){
+        var tableName = 'Rpt_Summary_In_Out';
+        var TotalQtyFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalQty');
+        
+
+        $('.valTotalQty').number(true, TotalQtyFormat);
+    }
+</script>

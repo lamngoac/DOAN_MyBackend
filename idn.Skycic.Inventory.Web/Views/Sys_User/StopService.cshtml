@@ -1,0 +1,100 @@
+﻿
+@{
+    var title = "ĐĂNG KÝ NGỪNG SỬ DỤNG DỊCH VỤ";
+    var titleMng = "Người dùng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript">
+    var parents = new Array();
+    parents.push("@Url.Action("Index", "Sys_User")");
+    parents.push("");
+    var parentsText = new Array();
+    parentsText.push("@MvcHtmlString.Create(titleMng)");
+    parentsText.push("@MvcHtmlString.Create(title)");
+    setAdminCurrentTag(parents, parentsText);
+</script>
+
+<div class="container">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="col-xs-12">
+                        @using (Html.BeginForm("StopService", "Account", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="row no-margin">
+                                <div class="col-xs-9">
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="lydo" class="col-xs-12 no-padding-right font-weight-500 margin-bottom-20"><b>@MvcHtmlString.Create("Lý do ngừng dịch vụ")</b></label>
+                                        <div class="col-xs-12" style="padding-left: 50px">
+                                            <div class="row no-margin margin-bottom-20">
+                                                <input type="radio" id="lydo" name="lydo" class="lydo" value="" autocomplete="off" />
+                                                <span>Đường truyền mạng không đảm bảo</span>
+                                            </div>
+                                            <div class="row no-margin margin-bottom-20">
+                                                <input type="radio" id="lydo" name="lydo" class="lydo" value="" autocomplete="off" />
+                                                <span>Thời gian giao dịch quá lâu</span>
+                                            </div>
+                                            <div class="row no-margin margin-bottom-20">
+                                                <input type="radio" id="lydo" name="lydo" class="lydo" value="" autocomplete="off" />
+                                                <span>Dịch vụ không đáp ứng được yêu cầu</span>
+                                            </div>
+                                            <div class="row no-margin margin-bottom-20">
+                                                <input style="vertical-align: top" type="radio" id="lydo" name="lydo" class="lydo4" value="" autocomplete="off" />
+                                                <span style="vertical-align: top">Lý do khác</span>
+                                                <textarea rows="4" style="width: 50%;"></textarea>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </aside>
+                    <div class="col-xs-12 text-center">
+                        <div class="clearfix">
+                            <div class="row no-margin text-center">
+                                <a href="javascript:void();" class="btn font-color mybtn-Button" style="margin-left: 10px; padding-left: 15px!important; padding-right: 15px!important; " onclick="Change();">Tiếp tục</a>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+<script type="text/javascript">
+    processAjaxForm($('#manageForm'), function (response) {
+        processAjaxFormResult(response);
+
+    });
+</script>
+
+@*Active Menu*@
+<script type="text/javascript">
+    setAdminCurrentUrl('@Url.Action("Index", "Sys_User")');
+</script>
+@*Set focus*@
+<script type="text/javascript">
+    var _getForm = document.getElementById("manageForm");
+    _getForm.addEventListener('reset', function () {
+        document.getElementById("").focus()
+    })
+</script>
+
+
+
+
+
+

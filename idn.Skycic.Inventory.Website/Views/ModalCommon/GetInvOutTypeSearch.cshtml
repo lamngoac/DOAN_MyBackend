@@ -1,0 +1,127 @@
+﻿@model List<Mst_InvOutType>
+<div class="modal-dialog" style="width: 500px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel"><b>Tìm kiếm loại xuất kho</b></h2>
+            <a href="javascript:;" onclick="ClosePopupInvOutType()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body" style="">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupCustomer" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="col-xs-10">
+                    <div class="form-group margin-bottom-5">
+                        @*<label for="ParentCode" class="col-xs-3 col-sm-2 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tìm số mã/tên <span style=\"color: red\">*</span>")</label>*@
+                        <div class="col-xs-3 col-sm-4">
+                            <input class="col-md-12" placeholder="Nhập tìm kiếm" style="height: 30px" id="keyword" value="@(Request["keyword"] == null ? "" : Request["keyword"])" />
+                        </div>
+                        <div class="col-xs-2">
+                            <a href="javascript:void(0);" class="btn btn-nc-button" onclick="SearchInvOutType();">Tìm kiếm</a>
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+                <div style="width: 100%; float: left;">
+                    <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                        <thead>
+                            <tr class="trthead">
+                                <th class="text-center cell-50">
+                                </th>
+                                <th fieldId="CustomerCode" sorttype="T" fieldName="Mã loại xuất kho" fieldActive="0" class="text-left cell-150">
+                                    @("Mã loại xuất kho".HtmlItemString("CustomerCode"))
+                                </th>
+                                <th fieldId="CustomerName" sorttype="T" fieldName="Tên loại xuất kho" fieldActive="0" class="text-left cell-150">
+                                    @("Tên loại xuất kho".HtmlItemString("CustomerName"))
+                                </th>                                
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                    <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                        <tbody id="table-tbodyIDInvOutType">
+                            @{
+                                if (Model != null && Model.Count != 0)
+                                {
+                                    var idx = 0;
+                                    foreach (var it in Model)
+                                    {
+                                        <tr class="data-item trdata" idx="@idx">
+                                            <input type="hidden" name="Lst_InvOutType[@idx].InvOutType" value="@(it.InvOutType == null ? "" : it.InvOutType)" />
+                                            <input type="hidden" name="Lst_InvOutType[@idx].InvOutTypeName" value="@(it.InvOutTypeName == null ? "" : it.InvOutTypeName)" />
+                                            
+                                            <td fieldId="CONTROL" fieldActive="0" class="text-center cell-50 action-buttons">
+                                                <input type="radio" class="checkInvOutType" name="checkInvOutType" />
+                                            </td>
+                                            <td fieldActive="InvOutType" class="text-left cell-150">
+                                                @(it.InvOutType == null ? "" : it.InvOutType)
+                                            </td>
+                                            <td fieldId="InvOutTypeName" fieldActive="0" class="text-left cell-150">
+                                                @(it.InvOutTypeName == null ? "" : it.InvOutTypeName)
+                                            </td>                                            
+                                        </tr>
+                                        idx++;
+                                    }
+
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="SelectInvOutType()" style="float: right;font-size: 13px;">Chọn</a>
+            @*<a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="SaveProduct()" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i>Lưu</a>*@
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function SearchInvOutType() {
+        debugger;
+        var keyword = $('#keyword').val();
+         $.ajax({
+                url: '@Url.Action("GetInvOutTypeSearch", "ModalCommon")',
+                data: {
+                    keyword: keyword                    
+                },
+                type: 'post',
+                dataType: 'json',
+                traditional: true,
+                success: function (data) {
+                    if (data.Success) {
+                        $('#ShowPopupInvOutType').modal({
+                            backdrop: false,
+                            keyboard: true,
+                        });
+                        $("#ShowPopupInvOutType").html(data.Html);
+                    } else {
+                        showErrorDialog(data.Detail);
+                    }
+                }
+            });
+    }
+
+    function SelectInvOutType() {
+        debugger;
+        var length = $("tbody#table-tbodyIDInvOutType tr.trdata input.checkInvOutType:checked").length;
+        if (length == 0) {
+            alert("Không có hàng hóa nào được chọn");
+            return;
+        }
+        $("tbody#table-tbodyIDInvOutType tr.trdata input.checkInvOutType:checked").each(function () {
+            var tr = $(this).parents('tr');
+            var idx = $(tr).attr('idx');
+            var strInvOutTypeCode = tr.find('input[name="Lst_InvOutType[' + idx + '].InvOutType"]').val();           
+
+            if (strInvOutTypeCode != undefined && strInvOutTypeCode != "") {
+                $('#InvOutType').val(strInvOutTypeCode).trigger('change');
+            }
+            ClosePopupInvOutType();
+        });
+    }
+</script>
+

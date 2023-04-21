@@ -1,0 +1,267 @@
+﻿@model Sys_User
+@{
+    var title = "Chi tiết người dùng";
+    var titleMng = "Quản lý người dùng";
+    ViewBag.Title = title;
+    var listMst_Department = ViewBag.ListMst_Department as List<Mst_DepartmentExt>;
+    var listMst_Customer = ViewBag.ListMst_Customer as List<Mst_Customer>;
+    var listMst_NNT = ViewBag.ListMst_NNTCur as List<Mst_NNT>;
+    if (listMst_NNT == null || listMst_NNT.Count == 0)
+    {
+        listMst_NNT = new List<Mst_NNT>();
+    }
+    var isParent = ViewBag.IsParent;
+    var inosUrl = System.Configuration.ConfigurationManager.AppSettings["InosBaseUrl"];
+}
+<style>
+    .lbl-flag {
+        margin-bottom: 0;
+        padding-top: 0px !important;
+    }
+</style>
+<div class="">
+    <div class="col-12">
+        <aside class="row no-margin">
+            @using (Html.BeginForm("Edit", "Sys_User", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <div class="layout-bot-top-16">
+                    <div class="row col-12">
+                        <div class="col-3 no-padding">
+                            <div class="avatar-user">
+                                <div class="avatar-user-img">
+                                    @{
+                                        var avartarImg = "";
+                                        if (!CUtils.IsNullOrEmpty(Model.ACAvatar))
+                                        {
+                                            avartarImg = @CUtils.StrValue(inosUrl.ToString() + Model.ACAvatar.Split('~')[1].ToString());
+                                        }
+                                        else
+                                        {
+                                            avartarImg = Url.Content("~/Images/no-image.png");
+                                        }
+                                    }
+                                    <img class="img-avatar" src="@CUtils.StrValue(avartarImg)" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4 no-padding">
+                            <div class="form-group margin-bottom-9">
+                                <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Họ tên <span style=\"color: red\">*</span>")</label>
+                                <div class="col-12 col-sm-8 disabled-fix">
+                                    <span class="block input-icon input-icon-right">
+                                        <input type="text" id="UserName" name="UserName" class="col-12  UserName" value="@if (Model != null && Model.UserName != null){@MvcHtmlString.Create(Model.UserName.ToString())} else { @("")}" autocomplete="off" required />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Email <span style=\"color: red\">*</span>")</label>
+                                <div class="col-12 col-sm-8 disabled-fix">
+                                    <span class="block input-icon input-icon-right">
+                                        <input type="text" id="UserCode" name="UserCode" class="col-12  UserCode" value="@if (Model != null && Model.EMail != null){@MvcHtmlString.Create(Model.EMail.ToString())} else { @("")}" autocomplete="off" required />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Điện thoại")</label>
+                                <div class="col-12 col-sm-8 disabled-fix">
+                                    <span class="block input-icon input-icon-right">
+                                        <input type="text" maxlength="11" id="PhoneNo" name="PhoneNo" class="col-12 PhoneNo" onKeyPress="return commonUtils.isNumberKey(event)" value="@if (Model != null && Model.ACPhone != null){@MvcHtmlString.Create(Model.ACPhone.ToString())} else { @("")}" autocomplete="off" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("User ID <span style=\"color: red\">*</span>")</label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <input type="text" id="ACId" name="ACId" class="col-12 ACId disabled-fix" value="@if (Model != null && Model.ACId != null){@MvcHtmlString.Create(Model.ACId.ToString())} else { @("")}" autocomplete="off" required />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Ngôn ngữ")</label>
+                                <div class="col-12 col-sm-8 disabled-fix">
+                                    <span class="block input-icon input-icon-right">
+                                        <select id="Language" name="Language" class="col-12" required @*onchange="LoadMstCustomer(this);"*@>
+                                            <optgroup label="">
+                                                <option value="">Chọn</option>
+                                                <option value="vi" @(!CUtils.IsNullOrEmpty(Model.ACLanguage) && Model.ACLanguage.Equals("vi") ? "selected" : "")>Tiếng Việt</option>
+                                                <option value="en" @(!CUtils.IsNullOrEmpty(Model.ACLanguage) && Model.ACLanguage.Equals("en") ? "selected" : "")>English</option>
+                                            </optgroup>
+                                        </select>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Múi giờ")</label>
+                                <div class="col-12 col-sm-8 disabled-fix">
+                                    <span class="block input-icon input-icon-right">
+                                        <select id="TimeZone" name="TimeZone" class="col-12" required @*onchange="LoadMstCustomer(this);"*@>
+                                            <optgroup label="">
+                                                <option value="">Chọn</option>
+                                                @for (int i = -12; i <= 12; ++i)
+                                                {
+                                                    string titleTimeZone = i.ToString();
+                                                    if (i > 0) { titleTimeZone = "+ " + titleTimeZone; }
+                                                    <option value="@i" @(!CUtils.IsNullOrEmpty(Model.ACTimeZone) && Model.ACTimeZone.Equals(i.ToString()) ? "selected" : "")>UTC @(titleTimeZone)</option>
+                                                }
+                                            </optgroup>
+                                        </select>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4 no-padding">
+                            <div class="form-group margin-bottom-9">
+                                <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Chi nhánh <span style=\"color: red\">*</span>")</label>
+                                <div class="col-12 col-sm-8 disabled-fix">
+                                    <span class="block input-icon input-icon-right">
+                                        <select id="MST" name="MST" class="col-12" required @*onchange="LoadMstCustomer(this);"*@>
+                                            <optgroup label="">
+                                                <option value="">Chọn</option>
+                                                @{
+                                                    if (listMst_NNT != null && listMst_NNT.Count > 0)
+                                                    {
+                                                        foreach (var it in listMst_NNT)
+                                                        {
+                                                            <option value="@MvcHtmlString.Create(it.MST.ToString().Trim())" @((!CUtils.IsNullOrEmpty(Model.MST) && Model.MST.Equals(it.MST)) ? "selected" : "")>@MvcHtmlString.Create(it.MST.ToString().Trim())</option>
+                                                        }
+                                                    }
+                                                }
+                                            </optgroup>
+                                        </select>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Đại lý")</label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right disabled-fix">
+                                        @*<input type="text" id="CustomerCodeSys" name="CustomerCodeSys" class="col-12 CustomerCodeSys disabled-fix" value="@if (Model != null && Model.CustomerCodeSys != null){@MvcHtmlString.Create(Model.CustomerCodeSys.ToString())} else { @("")}" autocomplete="off" required />*@
+                                        <select id="CustomerCodeSys" name="CustomerCodeSys" class="col-12 disabled-fix" required>
+                                            <optgroup label="">
+                                                <option value="@CUtils.StrValue(Model.CustomerCodeSys)">@CUtils.StrValue(Model.CustomerName)</option>
+
+                                            </optgroup>
+                                        </select>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9" style="display: none;">
+                                <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Bộ phận/Phòng ban")</label>
+                                <div class="col-12 col-sm-8 disabled-fix">
+                                    <span class="block input-icon input-icon-right">
+                                        <select id="DepartmentCode" name="DepartmentCode" class="col-12" required @*onchange="LoadMstCustomer(this);"*@>
+                                            <optgroup label="">
+                                                <option value="">Chọn</option>
+                                                @{
+                                                    if (listMst_Department != null && listMst_Department.Count > 0)
+                                                    {
+                                                        foreach (var it in listMst_Department)
+                                                        {
+                                                            <option value="@MvcHtmlString.Create(it.DepartmentCode.ToString().Trim())" @((CUtils.IsNullOrEmpty(Model.DepartmentCode) && Model.MST.Equals(it.DepartmentCode))) ?"selected":"")>@MvcHtmlString.Create(it.DepartmentName.ToString().Trim())</option>
+                                                        }
+                                                    }
+                                                }
+                                            </optgroup>
+                                        </select>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label for="Position" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Chức vụ")</label>
+                                <div class="col-12 col-sm-8 disabled-fix">
+                                    <span class="block input-icon input-icon-right">
+                                        <input type="text" name="Position" id="Position" value="@CUtils.StrValue(Model.Position)" class="col-12" />
+                                    </span>
+                                </div>
+                            </div>
+                            @{
+
+                                var disableAdmin = "";
+                                if (Session.UserState.SysUser != null && !CUtils.IsNullOrEmpty(Session.UserState.SysUser.FlagSysAdmin) && Session.UserState.SysUser.FlagSysAdmin.Equals("1"))
+                                {
+                                    disableAdmin = "";
+                                }
+                                else
+                                {
+                                    disableAdmin = " disabled-fix";
+                                }
+                            }
+                            <div class="form-group margin-bottom-9">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        @{
+                                            var checkSysAdmin = "";
+                                            if (Model != null && !CUtils.IsNullOrEmpty(Model.FlagSysAdmin) && Model.FlagSysAdmin.Equals("1"))
+                                            {
+                                                checkSysAdmin = "checked";
+                                            }
+                                            else
+                                            {
+                                                checkSysAdmin = "";
+                                            }
+                                        }
+                                        <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">QT hệ thống</label>
+                                        <div class="col-12 col-sm-8 @disableAdmin">
+                                            <span class="block input-icon input-icon-right padding-top-5">
+                                                <label class="lbl-flag">
+                                                    <input name="FlagSysAdmin" id="FlagSysAdmin" class="icon-flag" type="checkbox" value="1" @checkSysAdmin />
+                                                    <span class="lbl"></span>
+                                                    <input name="FlagSysAdmin" type="hidden" value="0" />
+                                                </label>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                @{
+                                    var checkActive = "";
+                                    if (Model != null && Model.FlagActive.Equals("1"))
+                                    {
+                                        checkActive = "checked";
+                                    }
+                                    else
+                                    {
+                                        checkActive = "";
+                                    }
+                                }
+                                <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">Trạng thái</label>
+                                <div class="col-12 col-sm-8 disabled-fix">
+                                    <span class="block input-icon input-icon-right padding-top-5">
+                                        <label class="lbl-flag" style="padding-left:5px!important;">
+                                            <input name="FlagActive" id="FlagActive" class="icon-flag" type="checkbox" value="1" @checkActive />
+                                            <span class="lbl"></span>
+                                            <input name="FlagActive" type="hidden" value="0" />
+                                        </label>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </aside>
+    </div><!-- /.col -->
+</div>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Sys_User.js")"></script>
+    <script type="text/javascript">
+        //setAdminCurrentUrl('@Url.Action("Index", "Sys_User")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+
+        });
+        var _getForm = document.getElementById("manageForm");
+        _getForm.addEventListener('reset', function () {
+            document.getElementById("UserCode").focus();
+        });
+        $('#MST').select2();
+        $('#DepartmentCode').select2();
+        $('#CustomerCodeSys').select2();
+    </script>
+}

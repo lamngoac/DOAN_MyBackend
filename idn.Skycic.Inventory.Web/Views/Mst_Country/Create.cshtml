@@ -1,0 +1,99 @@
+﻿@model Mst_Country
+@{
+    var title = "TẠO MỚI DANH MỤC QUỐC GIA";
+    Layout = "~/Views/Shared/_LayoutQuantri.cshtml";
+    var titleMng = "Danh mục quốc gia";
+    ViewBag.Title = title;
+}
+<script type="text/javascript">
+    var parents = new Array();
+    parents.push("@Url.Action("Index", "Mst_Country")");
+    parents.push("");
+    var parentsText = new Array();
+    parentsText.push("@MvcHtmlString.Create("titleMng")");
+    parentsText.push("@MvcHtmlString.Create("title")");
+    setAdminCurrentTag(parents, parentsText);
+</script>
+
+<div class="container">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="col-xs-12">
+                        @using (Html.BeginForm("Create", "Mst_PaymentType", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="col-sm-10">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="CountryCode" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã quốc gia")</label>
+                                    <div class="col-xs-12 col-sm-5">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="CountryCode" name="CountryCode" class="col-xs-11 CountryCode" onkeyup="locdau(this);" value="" autocomplete="off" required />
+                                        </span>
+                                        <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="CountryName" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên quốc gia")</label>
+                                    <div class="col-xs-12 col-sm-5">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="CountryName" name="CountryName" class="col-xs-11 Code CountryName" value="" autocomplete="off" required />
+                                        </span>
+                                        <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+                        }
+                    </aside>
+                    <div class="col-xs-12 text-center">
+                        <div class="clearfix">
+                            <div class="row no-margin text-center">
+                                @RenderItemFormat("BTN_TAO_QUOC_GIA_LUU", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-left: 10px; padding-left: 15px!important; padding-right: 15px!important; \" onclick=\"SaveData();\"><i class=\"ace-icon fa fa-floppy-o bigger-110\"></i>Lưu</a>", "", "")
+
+                                @*<a href="javascript:void();" class="btn font-color mybtn-Button" style="margin-left: 10px; padding-left: 15px!important; padding-right: 15px!important; " onclick="SaveData();"><i class="ace-icon fa fa-floppy-o bigger-110"></i>Lưu</a>*@
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Mst_Country.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "Mst_Country")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+        });
+        var _getForm = document.getElementById("manageForm");
+        _getForm.addEventListener('reset', function () {
+            document.getElementById("").focus()
+        });
+        function SaveData() {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Create", "Mst_Country")';
+            var objMst_Country = new Mst_Country();
+            objMst_Country.ActionType = 'create';
+            objMst_Country.ajaxSettings = ajaxSettings;
+            objMst_Country.saveData();
+        }
+    </script>
+}

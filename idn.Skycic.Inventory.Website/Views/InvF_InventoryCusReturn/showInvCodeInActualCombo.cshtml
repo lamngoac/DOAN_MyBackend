@@ -1,0 +1,321 @@
+﻿@{
+    var listInvCodeIn = ViewBag.ListInvCodeIn as List<Mst_Inventory>;
+    var listInventoryCusReturnDtl = ViewBag.ListInvF_InventoryCusReturnDtl as List<InvF_InventoryCusReturnDtlUI>;
+    var invCodeMax = ViewBag.InvCodeMax as string;
+    var modelUI = new InvF_InventoryCusReturnDtlUI();
+    if (listInventoryCusReturnDtl != null && listInventoryCusReturnDtl.Count > 0)
+    {
+        modelUI = listInventoryCusReturnDtl[0];
+    }
+}
+<div class="modal-dialog" style="width: 500px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel"><b>Chọn vị trí nhập</b></h2>
+            <a href="javascript:;" onclick="ClosePopupVTNhap()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body" style="">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupInvCodeInActual" }))
+            {
+                @Html.AntiForgeryToken()
+            <div class="col-xs-12">
+                <input hidden id="mdVTNhap_ProductCode" value="@(ViewBag.ProductCode == null ? "" : ViewBag.ProductCode)" />
+                <input hidden id="mdVTNhap_Qty" value="@(ViewBag.Qty == null ? "0" : ViewBag.Qty)" />
+                <label class="control-label col-md-12" style="text-align: left;">
+                    @(ViewBag.ProductName == null ? "" : ViewBag.ProductName)
+                </label>
+            </div>
+            }
+            <div class="col-6 margin-bottom-9" style="height: 30px">
+                <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="AddVTNhapCombo()" style="float: left;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Thêm</a>
+                <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="SaveVTNhapCombo()" style="float: left;font-size: 13px;margin-left: 10px"><i class="fa fa-save" aria-hidden="true"></i> OK</a>
+            </div>
+            <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+                <div style="width: 100%; float: left;">
+                    <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                        <thead>
+                            <tr class="trthead">
+                                <th class="text-center cell-50">
+                                </th>
+                                <th fieldId="InvCodeInActual" sorttype="T" fieldName="Mã vị trí" fieldActive="0" class="text-left cell-200">
+                                    @("Mã vị trí".HtmlItemString("invf_inventoryin"))
+                                </th>
+                                <th fieldId="Qty" sorttype="T" fieldName="Số lượng" fieldActive="0" class="text-left cell-150">
+                                    @("Số lượng".HtmlItemString("invf_inventoryin"))
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                    <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                        <tbody id="table-tbodyIDInvCodeInActual">
+                            @{ if (listInventoryCusReturnDtl != null && listInventoryCusReturnDtl.Count > 0)
+                                {
+                                    var idx = 0;
+                                    foreach (var item in listInventoryCusReturnDtl)
+                                    {
+                            <tr class="data-item trdata" idx="@idx">
+
+                                <td fieldId="CONTROL" fieldActive="0" class="text-center cell-50 action-buttons">
+                                    <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteVTNhapCombo(this, '@item.InvCodeInActual');"><i class="fas fa-trash-alt"></i></a>
+                                </td>
+                                <td fieldId="InvCodeInActual" fieldActive="0" class="text-left cell-200">
+                                    <span class="block input-icon input-icon-right">
+                                        <select class="InvCodeInActual_Dtl col-md-12" name="Lst_InvF_InventoryCusReturnDtlPopup[@idx].InvCodeInActual">
+                                            <optgroup label="">
+                                                <option value="">--Chọn vị trí--</option>
+                                                @if (listInvCodeIn != null && listInvCodeIn.Count > 0)
+                                                {
+                                                    foreach (var it in listInvCodeIn)
+                                                    {
+                                                        var invCode = CUtils.StrValue(it.InvCode);
+                                                        var invName = CUtils.StrValue(it.InvName);
+                                                        <option value="@MvcHtmlString.Create(invCode)" @(CUtils.StrValue(item.InvCodeInActual) == invCode ? "selected" : "")>@MvcHtmlString.Create(invName)</option>
+                                                    }
+                                                }
+                                            </optgroup>
+                                            <option value="SEARCHDATA"></option>
+                                        </select>
+                                    </span>
+                                </td>
+                                <td fieldId="QTY" fieldActive="0" class="text-right cell-150">
+                                    <input class="col-md-12 text-right numberQty" name="Lst_InvF_InventoryCusReturnDtlPopup[@idx].Qty" value="@item.Qty">
+                                </td>
+                                <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlPopup[@idx].ProductCodeRoot" value="@item.ProductCodeRoot">
+                                <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlPopup[@idx].ProductCode" value="@(item.ProductCode)" />
+                                <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlPopup[@idx].UnitCode" value="@(item.UnitCode == null ? "" : item.UnitCode)" />
+                                <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlPopup[@idx].Remark" value="" />
+                                <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlPopup[@idx].ProductCodeUser" value="@(item.mp_ProductCodeUser)" />
+                                <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlPopup[@idx].ProductName" value="@(item.mp_ProductName)" />
+                                <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlPopup[@idx].UPSell" value="@(item.ificrc_UPCusReturn)" />
+                                <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlPopup[@idx].QtyRoot" value="@(item.QtyRoot)" />
+                                <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlPopup[@idx].ProductCodeBase" value="@(item.mp_ProductCodeBase)" />
+                            </tr>
+                                        idx++;
+                                    }
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<table hidden>
+    <tbody id="rowtemplateAddVTNhap">
+        <tr class="data-item trdata" idx="==idx==">
+            <td fieldId="CONTROL" fieldActive="0" class="text-center cell-50 action-buttons">
+                <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteVTNhapCombo(this, '==InvCodeInActual==');"><i class="fas fa-trash-alt"></i></a>
+            </td>
+            <td fieldId="InvCodeInActual" fieldActive="0" class="text-left cell-200">
+                <span class="block input-icon input-icon-right">
+                    <select id="==idselect==" class="col-md-12" name="Lst_InvF_InventoryCusReturnDtlPopup[==idx==].InvCodeInActual">
+                        <optgroup label="">
+                            <option value="">--Chọn vị trí--</option>
+                            @if (listInvCodeIn != null && listInvCodeIn.Count > 0)
+                            {
+                                foreach (var item in listInvCodeIn)
+                                {
+                                    var invCode = CUtils.StrValue(item.InvCode);
+                                    var invName = CUtils.StrValue(item.InvName);
+                                    <option value="@MvcHtmlString.Create(invCode)">@MvcHtmlString.Create(invName)</option>
+                                }
+                            }
+                        </optgroup>
+                        <option value="SEARCHDATA"></option>
+                    </select>
+                </span>
+            </td>
+            <td fieldId="QTY" fieldActive="0" class="text-right cell-150">
+                <input class="col-md-12 text-right numberQty" name="Lst_InvF_InventoryCusReturnDtlPopup[==idx==].Qty" value="==Qty==">
+            </td>
+            
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlPopup[==idx==].ProductCodeRoot" value="@modelUI.ProductCodeRoot">
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlPopup[==idx==].ProductCode" value="@(modelUI.ProductCode)" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlPopup[==idx==].UnitCode" value="@(modelUI.UnitCode == null ? "" : modelUI.UnitCode)" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlPopup[==idx==].Remark" value="" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlPopup[==idx==].ProductCodeUser" value="@(modelUI.mp_ProductCodeUser)" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlPopup[==idx==].ProductName" value="@(modelUI.mp_ProductName)" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlPopup[==idx==].UPSell" value="@(modelUI.ificrc_UPCusReturn)" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlPopup[==idx==].QtyRoot" value="@(modelUI.QtyRoot)" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlPopup[==idx==].ProductCodeBase" value="@(modelUI.mp_ProductCodeBase)" />
+        </tr>
+    </tbody>
+</table>
+
+<script>
+
+    $(document).ready(function () {
+        $('select.InvCodeInActual_Dtl').select2();
+
+        if ($('.numberQty').length) {
+            //$('.numberQty').number(true, 2);
+
+            format_Number();
+        }
+    })
+
+    function format_Number(){
+        var tableName = 'InvF_InventoryCusReturn';
+        var qtyFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'Qty');
+         $('.numberQty').number(true, qtyFormat);
+    
+    }
+
+    function AddVTNhapCombo() {
+
+        var date = new Date();
+        var randomCur = date.getTime();
+        var randHex = commonUtils.randHex(12);
+        randomCur = randomCur + randHex;
+        var idselect = 'idselect-' + randomCur;
+        var strHtml = getHtmlFromTemplate($('#rowtemplateAddVTNhap'), {
+            Qty: '0',
+            InvCodeInActual: '',
+            idselect: idselect,
+            idx: 999999
+        });
+        $('#table-tbodyIDInvCodeInActual').append(strHtml);
+        $('.numberQty').number(true, 2);
+        $('select#' + idselect).select2();
+        updateTableTrIdx($('#table-tbodyIDInvCodeInActual tr'), false);
+    }
+
+    function DeleteVTNhapCombo(thiz, invCodeInActual) {
+        bootbox.confirm("Đồng ý xóa vị trí " + invCodeInActual + " ?", function (result) {
+            if (result) {
+                var tr = $(thiz).parents('tr');
+                if (tr != undefined) {
+                    tr.remove();
+                    updateTableTrIdx($('#table-tbodyIDInvCodeInActual tr'), false);
+                }
+            }
+        });
+    }
+
+    function SaveVTNhapCombo() {
+        var length = $('#table-tbodyIDInvCodeInActual').length;
+        var productcode = $('#mdVTNhap_ProductCode').val();
+        var strQty = $('#mdVTNhap_Qty').val();
+        var qtyRoot = 0.00;
+        if (strQty !== undefined && strQty.length > 0) {
+            qtyRoot = parseFloat(strQty);
+        }
+
+        if (length > 0) {
+                    
+            var arVitri = [];
+            var sumqty = 0.00;
+
+            //Check dữ liệu
+            var hasErr = false;
+            $("#table-tbodyIDInvCodeInActual tr.trdata").each(function () {
+                var tr = $(this);
+                var idx = $(tr).attr('idx');
+
+                var qty = tr.find('input[name="Lst_InvF_InventoryCusReturnDtlPopup[' + idx + '].Qty"]').val();
+                if (qty != null && qty != undefined && qty.length > 0) {
+                    if (parseFloat(qty) <= 0) {
+                        alert('Số lượng phải > 0!')
+                        hasErr = true;
+                        return false;
+                    }
+                    else {
+                        sumqty += parseFloat(qty);
+                    }
+                }
+                else {
+                    alert('Số lượng trống!')
+                    hasErr = true;
+                    return false;
+                }
+
+                var InvCodeInActual = tr.find('select[name="Lst_InvF_InventoryCusReturnDtlPopup[' + idx + '].InvCodeInActual"]').val();
+                if (InvCodeInActual != null && InvCodeInActual != undefined && InvCodeInActual.length > 0) {
+                    if (!arVitri.includes(InvCodeInActual)) {
+                        arVitri.push(InvCodeInActual);
+                    }
+                    else {
+                        alert('Không thể chọn trùng mã vị trí!')
+                        hasErr = true;
+                        return false;
+                    }
+                }
+                else {
+                    alert('Mã vị trí trống!')
+                    hasErr = true;
+                    return false;
+                }
+            });
+            if (hasErr) {
+                return;
+            }
+            if (qtyRoot !== sumqty) {
+                alert('Số lượng không chính xác!');
+                return false;
+            }
+
+            //Xóa VT cũ cùng ProductCode
+            var trOlds = $('#table-tbodyIDCombo').find('tr[productcode="' + productcode + '"]');
+            $(trOlds).each(function () {
+                $(this).remove();
+            });
+            updateTableTrIdx($('#table-tbodyIDCombo tr'), false);
+
+            var lstVitri = "";
+            
+            $("#table-tbodyIDInvCodeInActual tr.trdata").each(function () {
+                var tr = $(this);
+                var idx = $(tr).attr('idx');
+                debugger;
+                var strHtml;
+
+                var qty = tr.find('input[name="Lst_InvF_InventoryCusReturnDtlPopup[' + idx + '].Qty"]').val();                
+                var InvCodeInActual = tr.find('select[name="Lst_InvF_InventoryCusReturnDtlPopup[' + idx + '].InvCodeInActual"]').val();
+                if (InvCodeInActual != null) {
+                    if (lstVitri == "") {
+                        lstVitri += InvCodeInActual;
+                    }
+                    else {
+                        lstVitri += ", " + InvCodeInActual;
+                    }
+                }
+                let productCodeRoot = tr.find('input[type="hidden"][name="Lst_InvF_InventoryCusReturnDtlPopup[' + idx + '].ProductCodeRoot"]').val();
+                let productCodeBase = tr.find('input[type="hidden"][name="Lst_InvF_InventoryCusReturnDtlPopup[' + idx + '].ProductCodeBase"]').val();
+                let unitCode = tr.find('input[type="hidden"][name="Lst_InvF_InventoryCusReturnDtlPopup[' + idx + '].UnitCode"]').val();
+                let productCodeUser = tr.find('input[type="hidden"][name="Lst_InvF_InventoryCusReturnDtlPopup[' + idx + '].ProductCodeUser"]').val();
+                let productName = tr.find('input[type="hidden"][name="Lst_InvF_InventoryCusReturnDtlPopup[' + idx + '].ProductName"]').val();
+                let uPSell = tr.find('input[type="hidden"][name="Lst_InvF_InventoryCusReturnDtlPopup[' + idx + '].UPSell"]').val();
+                let qtyRoot = tr.find('input[type="hidden"][name="Lst_InvF_InventoryCusReturnDtlPopup[' + idx + '].QtyRoot"]').val();
+
+                strHtml = getHtmlFromTemplate($('#rowtemplateInvCodeInActualCombo'), {
+                    ProductCode: productcode,
+                    ProductCodeRoot: productCodeRoot,
+                    ProductCodeBase: productCodeBase,
+                    ProductCodeUser: productCodeUser,
+                    ProductName: productName,
+                    UnitCode: unitCode,
+                    UPSell: uPSell,
+                    Qty: qty,
+                    QtyRoot: qtyRoot,
+                    InvCodeInActual: InvCodeInActual,
+                    idx: 999999
+                });
+
+                $('#table-tbodyIDCombo').append(strHtml);
+                updateTableTrIdx($('#table-tbodyIDCombo tr'), false);
+            });
+            debugger;
+            // Cập nhật lại vị trí
+            var trProduct = $('#table-tbodyIDComboGroup').find('tr[productcode="' + productcode + '"]');
+            var productIdx = trProduct.attr('idx');
+            trProduct.find('input[name="Lst_InvF_InventoryCusReturnComboDtlPopup[' + productIdx + '].InvCodeInActual"]').val(lstVitri);
+            
+            //
+            ClosePopupVTNhap();
+        }
+    }
+</script>

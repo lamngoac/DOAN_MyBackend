@@ -1,0 +1,273 @@
+﻿@model PageInfo<InvF_InventoryCusReturn>
+@{
+    var userState = ViewBag.UserState as UserState;
+    var init = CUtils.StrValue(ViewBag.init);
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+    var recordCount = CUtils.StrValue(ViewBag.RecordCount);
+    var totalPage = "0";
+    if (Model != null)
+    {
+        totalPage = CUtils.StrValue(Model.PageCount);
+    }
+
+    var showtext = "";
+    if (Model.ItemCount > 0)
+    {
+        var recordstart = (Model.PageIndex) * Model.PageSize + 1;
+        var recordend = (Model.PageIndex + 1) * Model.PageSize;
+        if (recordend > Model.ItemCount)
+        {
+            recordend = Model.ItemCount;
+        }
+        showtext = recordstart + "-" + recordend + " trong số " + Model.ItemCount;
+    }
+}
+
+
+<input type="hidden" id="page" value="@ViewBag.PageCur" />
+<input type="hidden" id="totalpage" value="@Model.PageCount" />
+
+<div class="col-xs-12 layout-bot-top-16" style="">
+    <div class="row">
+        <div class="col-6">
+            @{
+                var urlCreate = Url.Action("Create", "InvF_InventoryCusReturn");
+                var urlUpdate = Url.Action("Update", "InvF_InventoryCusReturn", new { if_invcusreturnno = "ZZZ" });
+            }
+            @RenderItemFormat("BTN_INVF_INVENTORYCUSRETURN_CREATE", " <a class=\"btn btn-nc-button\" href=\"" + urlCreate + "\"><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i> Tạo mới</a>")
+            @RenderItemFormat("BTN_INVF_INVENTORYCUSRETURN_APPROVE", " <a class=\"btn btn-nc-button\" onclick=\"Approve()\" href=\"javascript:;\"><i class=\"fa fa-check-circle\" aria-hidden=\"true\"></i> Duyệt</a>")
+
+            <a class="btn font-color mybtn-Button" data-toggle="dropdown" aria-expanded="false" style="font-size: 13px; position: relative;"><i class="fas fa-ellipsis-h"></i></a>
+            <ul class="dropdown-menu dropdown-action" role="menu" style="">
+                @*<li style="padding: 5px">
+                <a class="row no-margin col-12 no-padding" onclick="Delete()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-trash-alt" aria-hidden="true"></i> Xoá</a>
+            </li>*@
+                <li style="padding: 5px">
+                    @*@RenderItemFormat("BTN_INVF_INVENTORYCUSRETURN_CANCEL", " <a class=\"btn btn-nc-button\" onclick=\"Cancel()\" href=\"javascript:;\"><i class=\"fas fa-ban\" aria-hidden=\"true\"></i> Huỷ</a>")*@
+                    <a class="row no-margin col-12 no-padding" onclick="Cancel()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-ban" aria-hidden="true"></i> &nbsp; Hủy</a>
+                </li>
+                <li style="padding: 5px">
+                    @*@RenderItemFormat("BTN_INVF_INVENTORYCUSRETURN_DELETE", " <a class=\"btn btn-nc-button\" onclick=\"Delete()\" href=\"javascript:;\"><i class=\"fas fa-trash\" aria-hidden=\"true\"></i> Xóa</a>") &nbsp; Xuất Excel</a>*@
+                    <a class="row no-margin col-12 no-padding" onclick="Delete()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-trash" aria-hidden="true"></i> &nbsp; Xóa</a>
+                </li>
+                @*<li style="padding: 5px">
+                @RenderItemFormat("BTN_INVF_INVENTORYCUSRETURN_EDIT", " <a class=\"btn btn-nc-button\" onclick=\"Edit('" + @urlUpdate + "')\" href=\"javascript:;\"><i class=\"fas fa-edit\" aria-hidden=\"true\"></i> Sửa</a>")
+            </li>*@
+                <li style="padding: 5px">
+                    <a class="row no-margin col-12 no-padding" onclick="Export()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" aria-hidden="true"></i> &nbsp; Xuất Excel</a>
+                </li>
+                <li style="padding: 5px">
+                    <a class="row no-margin col-12 no-padding" onclick="Print()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-print" aria-hidden="true"></i> &nbsp; In phiếu</a>
+                </li>
+                <li style="padding: 5px">
+                    <a class="row no-margin col-12 no-padding" onclick="SendEmail()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-envelope-open-text" aria-hidden="true"></i> &nbsp; Gửi email</a>
+                </li>
+                <li style="padding: 5px">
+                    <a class="row no-margin col-12 no-padding" onclick="PrintTemp()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-print" aria-hidden="true"></i> &nbsp; In tem mã</a>
+                </li>
+            </ul>
+            <span class="search-bar" style="margin-left:5px;margin-top:3px;">
+                <input type="text" id="dynamic-table-thead-search" class="quicksearch txtSearchObj" name="search">
+                <input type="text" class="quicksearch1 txtSearchObj1" name="search" style="z-index: -1000; height: 0; padding: 0; margin: 0; border: 0">
+            </span>
+        </div>
+        <div class="col-6">
+            @Html.Partial("Pagination", null, new ViewDataDictionary() { { "PageCur", MvcHtmlString.Create(pageCur) }, { "RecordCount", MvcHtmlString.Create(recordCount) }, { "ShowText", showtext } })
+        </div>
+    </div>
+</div>
+
+<div class="panel-body no-padding" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+    <aside class="col-xs-12 layout-table no-padding">
+        @Html.AntiForgeryToken()
+        <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+            <div style="width: 100%; float: left;">
+                <table id="dynamic-table-thead" idn-datatable-id="dynamic-table-thead-tbody" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                    <thead class="thead-selectdata">
+                        <tr class="trthead">
+                            <th fieldId="CONTROL" fieldName="CONTROL" fieldActive="0" class="text-center cell-50">
+                                <input type="checkbox" class="cl-check idn-checkbox" onclick="CheckAll(this);" name="check-box-all" id="check-box-all" />
+                                <label for="check-box-all"><span></span></label>
+                            </th>
+                            <th fieldId="STT" fieldName="STT" fieldActive="0" class="text-center cell-50">
+                                @("STT".HtmlItemString("invf_inventorycusreturn"))
+                            </th>
+                            <th fieldId="IF_INVCUSRETURNNO" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" fieldName="Số phiếu KH trả hàng" fieldActive="0" class="text-left cell-150">
+                                @("Số phiếu KH trả hàng".HtmlItemString("invf_inventorycusreturn"))
+                            </th>
+                            <th fieldId="APPRDTIMEUTC" idn-data-type="D" idn-data-sort="1" fieldName="Thời gian duyệt" fieldActive="0" class="text-left cell-150">
+                                @("Thời gian duyệt".HtmlItemString("invf_inventorycusreturn"))
+                            </th>
+                            <th fieldId="INVCODEIN" idn-data-type="T" idn-data-sort="1" fieldName="Kho nhập" fieldActive="0" class="text-left cell-150">
+                                @("Kho nhập".HtmlItemString("invf_inventorycusreturn"))
+                            </th>
+                            <th fieldId="CUSTOMERCODE" idn-data-type="T" idn-data-sort="1" fieldName="Khách hàng" fieldActive="0" class="text-left cell-200">
+                                @("Khách hàng".HtmlItemString("invf_inventorycusreturn"))
+                            </th>
+                            <th fieldId="TOTALVALCUSRETURNAFTERDESC" idn-data-type="T" idn-data-sort="1" fieldName="Tổng tiền" fieldActive="1" class="text-left cell-200 idn-hidden">
+                                @("Tổng tiền".HtmlItemString("invf_inventorycusreturn"))
+                            </th>
+                            <th fieldId="IF_INVCUSRETURNSTATUS" idn-data-type="T" idn-data-sort="1" fieldName="Trạng thái" fieldActive="0" class="text-left cell-100">
+                                @("Trạng thái".HtmlItemString("invf_inventorycusreturn"))
+                            </th>
+                            <th fieldId="REMARK" sorttype="T" fieldName="Nội dung trả" fieldActive="1" class="text-left cell-200 idn-hidden">
+                                @("Nội dung trả".HtmlItemString("invf_inventorycusreturn"))
+                            </th>
+                            <th fieldId="INVOICENO" idn-data-type="T" idn-data-sort="1" fieldName="Số hóa đơn" fieldActive="1" class="text-left cell-100 idn-hidden">
+                                @("Số hóa đơn".HtmlItemString("invf_inventorycusreturn"))
+                            </th>
+                            <th fieldId="CREATEDTIMEUTC" idn-data-type="D" idn-data-sort="1" fieldName="Thời gian tạo" fieldActive="1" class="text-left cell-150 idn-hidden">
+                                @("Thời gian tạo".HtmlItemString("invf_inventorycusreturn"))
+                            </th>
+                            <th fieldId="REFNO" idn-data-type="T" idn-data-sort="1" fieldName="Số đơn hàng" fieldActive="1" class="text-left cell-150 idn-hidden">
+                                @("Số đơn hàng".HtmlItemString("invf_inventorycusreturn"))
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                    <tbody id="table-tbodyID">
+                        @if (Model != null && Model.DataList != null && Model.DataList.Count > 0)
+                        {
+                            var i = 0;
+                            int stt = Convert.ToInt32(pageCur) * Convert.ToInt32(recordCount) + 1;
+                            foreach (var item in Model.DataList)
+                            {
+                                var createDTimeUTC = CUtils.StrValue(item.CreateDTimeUTC);
+                                if (!CUtils.IsNullOrEmpty(createDTimeUTC))
+                                {
+                                    createDTimeUTC = CUtils.ReturnDateTimeUtcToLocalTime(createDTimeUTC, Nonsense.DATE_TIME_FORMAT, userState.UtcOffset);
+                                }
+                        <tr idx="@(i)" class="data-item trdata" ondblclick="location.href='@Url.Action("Detail", "InvF_InventoryCusReturn", new { if_invcusreturnno = item.IF_InvCusReturnNo })'">
+                            <input type="hidden" name="IF_InvCusReturnNo" value="@item.IF_InvCusReturnNo" />
+                            <input type="hidden" name="IF_InvCusReturnStatus" value="@item.IF_InvCusReturnStatus" />
+                            <input type="hidden" name="Remark" value="@MvcHtmlString.Create(CUtils.StrValue(item.Remark))" />
+                            <td fieldId="CONTROL" class="text-center cell-50">
+                                <input type="checkbox" class="cl-check idn-checkbox" name="ckb" id="check-box-@i" onclick="checkBox_PopupSelectData(this, $('.thead-selectdata'), $('#table-tbodyID'));" />
+                                <label for="check-box-@i"><span></span></label>
+                            </td>
+                            <td fieldId="STT" fieldActive="0" class="text-left cell-50 text-center">
+                                @stt
+                            </td>
+                            <td fieldId="IF_INVCUSRETURNNO" fieldActive="0" class="text-left cell-150">
+                                @item.IF_InvCusReturnNo
+                            </td>
+                            <td fieldId="APPRDTIMEUTC" fieldActive="0" class="text-left cell-150">
+                                @(CUtils.IsNullOrEmpty(item.ApprDTimeUTC) ? "" : Convert.ToDateTime(item.ApprDTimeUTC).ToString("yyyy-MM-dd"))
+                            </td>
+                            <td fieldId="INVCODEIN" fieldActive="0" class="text-left cell-150">
+                                @item.InvCodeIn
+                            </td>
+                            <td fieldId="CUSTOMERCODE" fieldActive="0" class="text-left cell-200">
+                                @item.mct_CustomerName
+                            </td>
+                            <td fieldId="TOTALVALCUSRETURNAFTERDESC" fieldActive="1" class="text-left numberic cell-200 idn-hidden">
+                                @item.TotalValCusReturnAfterDesc
+                            </td>
+                            <td fieldId="IF_INVCUSRETURNSTATUS" fieldActive="0" class="text-left cell-100">
+                                @item.IF_InvCusReturnStatus
+                            </td>
+                            <td fieldId="REMARK" fieldActive="1" class="text-left cell-200 idn-hidden">
+                                @item.Remark
+                            </td>
+                            <td fieldId="INVOICENO" fieldActive="1" class="text-left cell-100 idn-hidden">
+                                @item.InvoiceNo
+                            </td>
+                            <td fieldId="CREATEDTIMEUTC" fieldActive="1" class="text-left cell-150 idn-hidden">
+                                @MvcHtmlString.Create(createDTimeUTC)
+                            </td>
+                            <td fieldId="REFNO" fieldActive="1" class="text-left cell-150 idn-hidden">
+                                @item.RefNo
+                            </td>
+                        </tr>
+                                stt++;
+                                i++;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </aside>
+</div>
+
+<!-- Sort Table -->
+<script>
+    $(document).ready(function () {
+        //tablesort();
+        $('.scrollable-horizontal').hScroll();
+    });
+
+    //function tablesort() {
+    //    var listColumns = {
+    //        'IF_INVCUSRETURNNO': [],
+    //        'APPRDTIMEUTC': [],
+    //        'INVCODEIN': [],
+    //        'CUSTOMERCODE': [],
+    //        'TOTALVALCUSRETURNAFTERDESC': [],
+    //        'IF_INVCUSRETURNSTATUS': [],
+    //        'REMARK': [],
+    //        'INVOICENO': [],
+    //        'CREATEDTIMEUTC': [],
+    //        'REFNO': []
+    //    };
+    //    var options = {};
+    //    options.Columns = listColumns;
+    //    $('#dynamic-table-thead').table_Sortable(options);
+    //}
+</script>
+<!-- Check all rows-->
+<script>
+    function CheckAll(thiz) {
+        debugger;
+        let trArr = $('#table-tbodyID');
+        if (trArr !== null && trArr.length > 0) {
+            for (var i = 0; i < trArr.length; i++) {
+                var trCur = trArr[i];
+                if (trCur !== null && trCur !== undefined) {
+                    var inputCkb = $(trCur).find('input[type="checkbox"]');
+                    var check = false;
+                    if ($(thiz).is(":checked")) {
+                        check = true;
+                    }
+                    $(inputCkb).prop("checked", check);
+                }
+            }
+        }
+    }
+</script>
+<script>
+    function checkBox_PopupSelectData(thiz, $thead, $tbody) {
+        debugger;
+        var c_all = false;
+        if ($(thiz).is(":checked")) {
+            c_all = true;
+        }
+        if (!c_all) {
+            var $inputCheckBox_CheckAll = $thead.find('input.idn-checkbox');
+            if ($inputCheckBox_CheckAll !== undefined && $inputCheckBox_CheckAll !== null) {
+                $inputCheckBox_CheckAll.prop("checked", c_all);
+            }
+        }
+        else {
+            var rows = $tbody.find('tr.trdata').length;
+            if (rows > 0) {
+                var trArr = $tbody.find('tr.trdata').has('input[type=checkbox]:checked');
+                if (trArr !== null) {
+                    var trLength = trArr.length;
+                    if (trLength === rows) {
+                        $thead.find('input.idn-checkbox').prop("checked", c_all);
+                    }
+                    else {
+                        $thead.find('input.idn-checkbox').prop("checked", !c_all);
+                    }
+                }
+                else {
+                    $thead.find('input.idn-checkbox').prop("checked", !c_all);
+                }
+            }
+        }
+    }
+</script>

@@ -1,0 +1,26 @@
+<svg id="logo_qcontract" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="53" height="36.45" viewBox="0 0 53 36.45">
+  <defs>
+    <clipPath id="clip-path">
+      <path id="Path_3807" data-name="Path 3807" d="M221.856,206.813s-.6.729-1.314,1.5a20.77,20.77,0,0,1-1.684,1.562l8.664,8.393,3.084-2.951Z" transform="translate(-218.858 -206.813)" fill="none"/>
+    </clipPath>
+    <clipPath id="clip-path-2">
+      <path id="Path_3809" data-name="Path 3809" d="M208.965,191.571c.172.172-.482,1.105-1.461,2.084s-1.912,1.633-2.084,1.461-1.487-3.423-.508-4.4S208.793,191.4,208.965,191.571Z" transform="translate(-204.552 -190.409)" fill="none"/>
+    </clipPath>
+  </defs>
+  <g id="logo_Qcontract-2" data-name="logo_Qcontract" transform="translate(9.459 1.5)">
+    <path id="Path_3803" data-name="Path 3803" d="M103.407,47.632s.934-8.4-6.8-11.137S80.4,39.962,77.6,45.9s-1.134,12.2,3.935,13.4,9.67-1.68,9.67-1.68-5.2,4.115-10.27,4.015S69,58.324,72.063,47.409s21.608-21.052,30.077-7.447A12.932,12.932,0,0,1,103.407,47.632Z" transform="translate(-70.056 -33.416)" fill="#098850"/>
+    <path id="Path_3804" data-name="Path 3804" d="M62.087,86.709s-.934,8.4,6.8,11.137S85.1,94.379,87.9,88.443s1.134-12.2-3.935-13.4-9.67,1.68-9.67,1.68,5.2-4.115,10.27-4.015,11.937,3.312,8.87,14.227-21.608,21.052-30.077,7.447A12.932,12.932,0,0,1,62.087,86.709Z" transform="translate(-61.963 -67.462)"/>
+    <path id="Path_3805" data-name="Path 3805" d="M272.092,261.974l-.469-.469,2.709-2.709.469.469a1.21,1.21,0,0,1,0,1.712l-1,1A1.217,1.217,0,0,1,272.092,261.974Z" transform="translate(-243.659 -228.735)" fill="#098850"/>
+    <g id="Group_3386" data-name="Group 3386" transform="translate(20.927 23.128)">
+      <g id="Group_3385" data-name="Group 3385" clip-path="url(#clip-path)">
+        <path id="Path_3806" data-name="Path 3806" d="M219.867,209.745l1.391-1.391,1.315-1.315,6.544,6.544-2.706,2.706Z" transform="translate(-219.733 -207.01)" fill="#098850"/>
+      </g>
+    </g>
+    <g id="Group_3388" data-name="Group 3388" transform="translate(19.019 20.94)">
+      <g id="Group_3387" data-name="Group 3387" transform="translate(0 0)" clip-path="url(#clip-path-2)">
+        <path id="Path_3808" data-name="Path 3808" d="M212.4,197.092l-2.482,2.482-1.239-3.721Z" transform="translate(-208.13 -195.127)" fill="#098850"/>
+      </g>
+    </g>
+  </g>
+  <rect id="Rectangle_14269" data-name="Rectangle 14269" width="53" height="36.45" fill="none"/>
+</svg>

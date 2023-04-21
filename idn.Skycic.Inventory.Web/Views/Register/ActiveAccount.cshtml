@@ -1,0 +1,63 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_LayoutActiveAccount.cshtml";
+    var success = ViewBag.Success as string;
+    if (CUtils.IsNullOrEmpty(success))
+    {
+        success = "0";
+    }
+    var detailErr = ViewBag.DetailErr as string;
+    if (CUtils.IsNullOrEmpty(detailErr))
+    {
+        detailErr = "";
+    }
+    var domain = ViewBag.Domain as string;
+    if (CUtils.IsNullOrEmpty(domain))
+    {
+        domain = "";
+    }
+}
+@if (success.Equals("1"))
+{
+    <center>
+        <h1>Bạn đã kích hoạt tài khoản thành công</h1>
+        <h4>Bạn sẽ được chuyển hướng đến website Inbrand Clound sau <span id="time">5</span> giây</h4>
+    </center>
+    <script type="text/javascript">
+        function startTimer(duration, display) {
+            var timer = duration, minutes, seconds;
+            setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+
+                display.textContent = seconds;
+
+                if (--timer < 0) {
+                    timer = duration;
+                }
+            }, 1000);
+        }
+
+        window.onload = function () {
+            var fiveseconds = 5,
+                display = document.querySelector('#time');
+            startTimer(fiveseconds, display);
+        };
+        alertTimeout(5000);
+        function alertTimeout(wait){
+            setTimeout(function() {
+                window.location.href = '@MvcHtmlString.Create(domain)';
+            }, wait);
+        }
+    </script>
+}
+else //if (success.Equals("0"))
+{
+    <div class="row no-margin">
+        <div class="col-xs-12">
+            @MvcHtmlString.Create(detailErr)
+        </div>
+    </div>
+}

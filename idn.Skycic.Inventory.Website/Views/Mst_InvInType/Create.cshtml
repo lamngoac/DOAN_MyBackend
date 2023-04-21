@@ -1,0 +1,54 @@
+﻿@{
+    Layout = null;
+    ViewBag.Title = "Tạo mới loại nhập kho";
+}
+
+<div class="modal-dialog" style="width: 600px; max-width: 600px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel"><b>Tạo mới loại nhập kho</b></h2>
+            <a href="javascript:;" onclick="ClosePopupCreate()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body" style="">
+            <div class="col-12">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true)
+                    <div class="col-12 layout-bot-top-16">
+                        <div class="col-12">
+                            <div class="form-group margin-bottom-9">
+                                <label class="control-label col-4 col-sm-4 no-padding-right" for="InvInType">@("Mã loại nhập kho".HtmlItemString("inventory"))</label>
+                                <div class="col-8 col-sm-8">
+                                    <div class="clearfix">
+                                        <input type="text" name="InvInType" id="InvInType" class="col-11" value="" />
+                                        <label class="span-input" style="color: red; padding-left: 10px;">*</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group margin-bottom-9">
+                                <label class="control-label col-4 no-padding-right" for="InvInTypeName">@("Tên loại nhập kho".HtmlItemString("inventory"))</label>
+                                <div class="col-8 col-sm-8">
+                                    <div class="clearfix">
+                                        <input type="text" name="InvInTypeName" id="InvInTypeName" class="col-11" value="" required />
+                                        <label class="span-input" style="color: red; padding-left: 10px;">*</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 text-center">
+                                @RenderItemFormat("BTN_LOAI_NHAP_KHO_TAO_MOI", "<a href=\"javascript: void(0); \" class=\"btn btn-nc-button\" onclick=\"SaveData();\"  style=\"float: right;\"><i class=\"fas fa-save\" aria-hidden=\"true\"></i> Lưu</a>", "", "")
+                                @*<a class="btn btn-nc-button" href="javascript:void(0);" onclick="SaveData()"><i class="fas fa-save"></i> Lưu</a>*@
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Mst_InvInType.js")"></script>
+
+}

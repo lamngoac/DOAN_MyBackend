@@ -1,0 +1,362 @@
+﻿
+@model NotificationSetting
+@{
+    ViewBag.Title = "Cài đặt";
+    var errorDetail = CUtils.StrValueNew(ViewBag.ErrorDetail);
+    var listNotificationSettingItemSystem = ViewBag.ListNotificationSettingItemSystem as List<NotificationSettingItem>;
+    var listNotificationSettingItemSolutionCode = ViewBag.ListNotificationSettingItemSolutionCode as List<NotificationSettingItem>;
+    var userState = ViewBag.UserState as UserState;
+    if (userState == null)
+    {
+        userState = new UserState();
+    }
+}
+@if (!CUtils.IsNullOrEmpty(errorDetail))
+{
+    <input type="hidden" id="ErrorDetailMethodGet" value="@MvcHtmlString.Create(errorDetail)" />
+    <script type="text/javascript">
+        $(document).ready(function () {
+            _showErrorMsg123_MothodGet('Lỗi!');
+        });
+    </script>
+}
+else
+{
+    @*<link href="~/Content/Notify.css" rel="stylesheet" />*@
+    <div class="row no-margin">
+        @*<div class="col-12 setting-box">
+                <div class="title-setting">
+                    Cài đặt thông báo
+                </div>
+            </div>*@
+        <div class="col-12 detail-setting-box">
+            <div class="layout-bot-top-16 type-notifi display-none">
+                <div class="type-title">
+                    Kiểu thông báo
+                </div>
+                <div class="row no-margin type-notifi-box">
+                    <div class="row no-margin no-padding col-6 type-box">
+                        <div class="row no-margin form-group">
+                            <label for="" class="col-12 col-sm-4 control-label no-padding font-weight-500 title-type-box">Âm thanh</label>
+                            <div class="col-sm-8">
+                                <div class="form-group">
+                                    <div class="col-12 col-sm-8">
+                                        @{
+                                            var checkSound = "";
+                                            if (Model != null && Model.Sound)
+                                            {
+                                                checkSound = "checked";
+                                            }
+                                            else
+                                            {
+                                                checkSound = "";
+                                            }
+                                        }
+                                        <span class="block input-icon input-icon-right padding-top-5">
+                                            <label class="lbl-flag">
+                                                <input name="Sound" id="Sound" class="icon-flag" type="checkbox" value="1" @MvcHtmlString.Create(checkSound) />
+                                                <span class="lbl"></span>
+                                                <input name="Sound" type="hidden" value="0" />
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row col-12 no-margin no-padding detail-type-box">
+                        Có âm thanh khi có thông báo
+                    </div>
+                    <div class="row no-margin no-padding col-6 type-box">
+                        <div class="row no-margin form-group">
+                            <label for="" class="col-12 col-sm-4 control-label no-padding font-weight-500 title-type-box">Popup</label>
+                            <div class="col-sm-8">
+                                <div class="form-group">
+                                    <div class="col-12 col-sm-8">
+                                        @{
+                                            var checkPopup = "";
+                                            if (Model != null && Model.Popup)
+                                            {
+                                                checkPopup = "checked";
+                                            }
+                                            else
+                                            {
+                                                checkPopup = "";
+                                            }
+                                        }
+                                        <span class="block input-icon input-icon-right padding-top-5">
+                                            <label class="lbl-flag">
+                                                <input name="Popup" id="Popup" class="icon-flag" type="checkbox" value="1" @MvcHtmlString.Create(checkPopup) />
+                                                <span class="lbl"></span>
+                                                <input name="Popup" type="hidden" value="0" />
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row col-12 no-margin no-padding detail-type-box">
+                        Hiển thị khi có thông báo
+                    </div>
+                </div>
+            </div>
+            <div class="layout-bot-top-16 type-notifi">
+                <div class="type-title">
+                    Những nội dung được thông báo
+                </div>
+                <div class="row no-margin type-notifi-box">
+                    @{
+                        var ipage = 0;
+                        if (listNotificationSettingItemSolutionCode != null && listNotificationSettingItemSolutionCode.Count > 0)
+                        {
+                            ipage = (listNotificationSettingItemSolutionCode.Count % 2) == 0 ? listNotificationSettingItemSolutionCode.Count / 2 : listNotificationSettingItemSolutionCode.Count / 2 + 1;
+                        }
+                    }
+                    <div class="no-padding col-4 type-box">
+                        @for (var i = 0; i < ipage; i++)
+                        {
+                            var notificationSetting = listNotificationSettingItemSolutionCode[i];
+                            var checkedNotificationSetting = "";
+                            if (notificationSetting.Enable)
+                            {
+                                checkedNotificationSetting = "checked";
+                            }
+                            <div class="form-group" style="height: 30px;">
+                                <label for="" class="col-12 col-sm-4 control-label no-padding font-weight-500 title-type-box" style="padding-top: 10px!important;">@MvcHtmlString.Create(CUtils.StrValueNew(notificationSetting.SolutionName))</label>
+                                <div class="col-sm-8">
+                                    <div class="form-group">
+                                        <div class="col-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right padding-top-5">
+                                                <label class="lbl-flag">
+                                                    <input class="icon-flag" type="checkbox" value="1" solutioncode="@MvcHtmlString.Create(notificationSetting.SolutionCode)" @MvcHtmlString.Create(checkedNotificationSetting) onchange="UpdateTypeCode(this)" />
+                                                    <span class="lbl"></span>
+                                                    <input name="" type="hidden" value="0" />
+                                                </label>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="no-padding col-4 type-box">
+                        @for (var i = ipage; i < listNotificationSettingItemSolutionCode.Count; i++)
+                        {
+                            var notificationSetting = listNotificationSettingItemSolutionCode[i];
+                            var checkedNotificationSetting = "";
+                            if (notificationSetting.Enable)
+                            {
+                                checkedNotificationSetting = "checked";
+                            }
+                            <div class="form-group" style="height: 30px;">
+                                <label for="" class="col-12 col-sm-4 control-label no-padding font-weight-500 title-type-box" style="padding-top: 10px!important;">@MvcHtmlString.Create(CUtils.StrValueNew(notificationSetting.SolutionName))</label>
+                                <div class="col-sm-8">
+                                    <div class="form-group">
+                                        <div class="col-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right padding-top-5">
+                                                <label class="lbl-flag">
+                                                    <input class="icon-flag" type="checkbox" value="1" solutioncode="@MvcHtmlString.Create(notificationSetting.SolutionCode)" @MvcHtmlString.Create(checkedNotificationSetting) onchange="UpdateTypeCode(this)" />
+                                                    <span class="lbl"></span>
+                                                    <input name="" type="hidden" value="0" />
+                                                </label>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="layout-bot-top-16 type-notifi">
+                <div class="type-title">
+                    Thông báo hệ thống
+                </div>
+                <div class="row no-margin type-notifi-box">
+                    @{
+                        var ipageSystem = 0;
+                        if (listNotificationSettingItemSystem != null && listNotificationSettingItemSystem.Count > 0)
+                        {
+                            ipageSystem = (listNotificationSettingItemSystem.Count % 2) == 0 ? listNotificationSettingItemSystem.Count / 2 : listNotificationSettingItemSystem.Count / 2 + 1;
+                        }
+                    }
+                    <div class="no-padding col-4 type-box">
+                        @for (var i = 0; i < ipageSystem; i++)
+                        {
+                            var notificationSetting = listNotificationSettingItemSystem[i];
+                            var checkedNotificationSetting = "";
+                            if (notificationSetting.Enable)
+                            {
+                                checkedNotificationSetting = "checked";
+                            }
+                            <div class="form-group" style="height: 30px;">
+                                <label for="" class="col-12 col-sm-4 control-label no-padding font-weight-500 title-type-box" style="padding-top: 10px!important;">@MvcHtmlString.Create(CUtils.StrValueNew(notificationSetting.SolutionName))</label>
+                                <div class="col-sm-8">
+                                    <div class="form-group">
+                                        <div class="col-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right padding-top-5">
+                                                <label class="lbl-flag">
+                                                    <input class="icon-flag" type="checkbox" value="1" solutioncode="@MvcHtmlString.Create(notificationSetting.SolutionCode)" @MvcHtmlString.Create(checkedNotificationSetting) onchange="UpdateTypeCode(this)" />
+                                                    <span class="lbl"></span>
+                                                    <input name="" type="hidden" value="0" />
+                                                </label>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="row no-margin col-6 type-box">
+                        @for (var i = ipageSystem; i < listNotificationSettingItemSystem.Count; i++)
+                        {
+                            var notificationSetting = listNotificationSettingItemSystem[i];
+                            var checkedNotificationSetting = "";
+                            if (notificationSetting.Enable)
+                            {
+                                checkedNotificationSetting = "checked";
+                            }
+                            <div class="row no-margin form-group">
+                                <label for="" class="col-12 col-sm-4 control-label no-padding font-weight-500 title-type-box">@MvcHtmlString.Create(CUtils.StrValueNew(notificationSetting.SolutionName))</label>
+                                <div class="col-sm-8">
+                                    <div class="form-group">
+                                        <div class="col-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right padding-top-5">
+                                                <label class="lbl-flag">
+                                                    <input class="icon-flag" type="checkbox" value="1" solutioncode="@MvcHtmlString.Create(notificationSetting.SolutionCode)" @MvcHtmlString.Create(checkedNotificationSetting) onchange="UpdateTypeCode(this)" />
+                                                    <span class="lbl"></span>
+                                                    <input name="" type="hidden" value="0" />
+                                                </label>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="row no-margin col-12 layout-bot-top-16">
+                <a href="javascript: void(0); " class="btn btn-nc-button" onclick="SaveData();">Lưu</a>
+                @*<button class="btn btn-nc-button btn-save" style="" type="submit">Lưu</button>
+                    <button class="btn btn-nc-button btn-cancel" style="">Hủy</button>*@
+            </div>
+        </div>
+    </div>
+
+    <table id="table-notify-setting" style="display: none;">
+        <tbody>
+            @if (Model != null && Model.Items != null && Model.Items.Count > 0)
+            {
+                <input type="hidden" name="NetworkId" id="NetworkId" value="@CUtils.StrValueNew(userState.Mst_NNT.NetworkID)" />
+                foreach (var item in Model.Items)
+                {
+                    <tr solutioncode="@MvcHtmlString.Create(CUtils.StrValueNew(item.SolutionCode))">
+                        <td>
+                            <input type="hidden" class="SolutionCode" value="@MvcHtmlString.Create(CUtils.StrValueNew(item.SolutionCode))" />
+                            <input type="hidden" class="SolutionName" value="@MvcHtmlString.Create(CUtils.StrValueNew(item.SolutionName))" />
+                            <input type="hidden" class="TypeCode" value="@MvcHtmlString.Create(CUtils.StrValueNew(item.TypeCode))" />
+                            <input type="hidden" class="Description" value="@MvcHtmlString.Create(CUtils.StrValueNew(item.Description))" />
+                            <input type="hidden" class="Enable" value="@MvcHtmlString.Create(item.Enable ? "1" : "0")" />
+                        </td>
+                    </tr>
+                }
+            }
+
+        </tbody>
+    </table>
+
+    <script type="text/javascript">
+        function UpdateTypeCode(thiz) {
+            if (thiz !== undefined && thiz !== null) {
+                var solutionCode = $(thiz).attr('solutioncode');
+                if (!commonUtils.isNullOrEmpty(solutionCode)) {
+                    var enable = '0';
+                    if ($(thiz).prop('checked')) {
+                        enable = '1';
+                    }
+                    $('#table-notify-setting tr[solutioncode="' + solutionCode + '"]').each(function () {
+                        $(this).find('input.Enable').val(enable);
+                    });
+                }
+            }
+        }
+    </script>
+    <script type="text/javascript">
+        function SaveData() {
+            var objNotificationSetting = {
+
+            }
+            var Items = [];
+
+            var sound = false
+            var popup = false
+            var userId = 0;
+            if ($('#Sound').prop('checked')) {
+                sound = true;
+            }
+            if ($('#Popup').prop('checked')) {
+                popup = true;
+            }
+            var networkid = $('#NetworkId').val();
+            objNotificationSetting.Sound = sound;
+            objNotificationSetting.Popup = popup;
+            objNotificationSetting.UserId = userId;
+            objNotificationSetting.NetworkId = networkid;
+
+            $('#table-notify-setting tr').each(function () {
+                //debugger;
+                var typeCode = $(this).find('input.TypeCode').val();
+                var description = $(this).find('input.Description').val();
+                var solutionCode = $(this).find('input.SolutionCode').val();
+                var solutionName = $(this).find('input.SolutionName').val();
+                var enable = $(this).find('input.Enable').val();
+
+                var objNotificationSettingItem = {};
+                objNotificationSettingItem.TypeCode = typeCode;
+                objNotificationSettingItem.Description = description;
+                objNotificationSettingItem.SolutionCode = solutionCode;
+                objNotificationSettingItem.SolutionName = solutionName;
+                objNotificationSettingItem.Enable = (enable === '1') ? true : false;
+                Items.push(objNotificationSettingItem);
+            });
+
+            objNotificationSetting.Items = Items;
+            var modelCur = commonUtils.returnJSONValue(objNotificationSetting);
+            var token = $('#form-notify input[name=__RequestVerificationToken]').val();
+            var url = '@Url.Action("Setting", "Notification")';
+            var listToastr = [];
+            $.ajax({
+                type: 'post',
+                data: {
+                    __RequestVerificationToken: token
+                    , model: modelCur
+                },
+                url: url,
+                dataType: 'json',
+                async: false,
+                beforeSend: function () {
+
+                }
+            }).done(function (objResult) {
+                if (objResult.Success) {
+                    objToastr = { ToastrType: 'success', ToastrMessage: 'Cập nhật cấu hình thông báo thành công' };
+                    listToastr.push(objToastr);
+                    commonUtils.showToastr(listToastr);
+                    setTimeout(function () {
+                        window.location.href = '@Url.Action("Setting", "Notification")';
+                    }, 1000);
+                    //return false;
+                }
+                else {
+                    _showErrorMsg123('Lỗi', objResult.Detail);
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                //failFunction(jqXHR, textStatus, errorThrown);
+            }).always(function () {
+                //alwaysFunction();
+            });
+        }
+    </script>
+}

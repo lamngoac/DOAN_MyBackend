@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 22.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="logo_qinvoice" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
+	 y="0px" viewBox="0 0 53 36.5" style="enable-background:new 0 0 53 36.5;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;}
+	.st1{fill:#098850;}
+	.st2{clip-path:url(#SVGID_2_);}
+	.st3{clip-path:url(#SVGID_4_);}
+</style>
+<rect id="Rectangle_14269_3_" x="88" y="0" class="st0" width="53" height="36.5"/>
+<rect id="Rectangle_14269_4_" y="0" class="st0" width="53" height="36.5"/>
+<g>
+	<path id="Path_3803_1_" class="st1" d="M43.3,15.8c0,0,0.9-8.4-6.8-11.2s-16.2,3.5-19,9.4s-1.1,12.2,3.9,13.4
+		c3.3,0.6,6.8,0,9.7-1.7c0,0-5.2,4.1-10.3,4c-5.1-0.1-12-3.3-8.9-14.3S33.6-5.6,42.1,8.1C43.3,10.4,43.7,13.1,43.3,15.8z"/>
+	<path id="Path_3804_1_" d="M10,20.8c0,0-0.9,8.4,6.8,11.2s16.2-3.5,19-9.4S37,10.3,32,9.1c-3.3-0.6-6.8,0-9.7,1.7
+		c0,0,5.2-4.1,10.3-4s12,3.3,8.9,14.3C38.4,32,19.8,42.1,11.3,28.5C10.1,26.1,9.7,23.4,10,20.8z"/>
+	<path id="Path_3805_1_" class="st1" d="M38.4,34.8l-0.5-0.5l2.7-2.7l0.5,0.5c0.5,0.5,0.5,1.2,0,1.7c0,0,0,0,0,0l-1,1
+		C39.6,35.3,38.9,35.3,38.4,34.8z"/>
+	<g id="Group_3386_1_" transform="translate(78.165 51.322)">
+		<g>
+			<defs>
+				<path id="SVGID_1_" d="M-44.3-26.6c0,0-0.6,0.7-1.3,1.5c-0.5,0.6-1.1,1.1-1.7,1.6l8.7,8.4l3.1-3L-44.3-26.6z"/>
+			</defs>
+			<clipPath id="SVGID_2_">
+				<use xlink:href="#SVGID_1_"  style="overflow:visible;"/>
+			</clipPath>
+			<g id="Group_3385_1_" class="st2">
+				<path id="Path_3806_1_" class="st1" d="M-47.2-23.9l1.4-1.4l1.3-1.3l6.6,6.6l-2.7,2.7L-47.2-23.9z"/>
+			</g>
+		</g>
+	</g>
+	<g id="Group_3388_1_" transform="translate(76.687 49.628)">
+		<g>
+			<defs>
+				<path id="SVGID_3_" d="M-43.3-26c0.2,0.2-0.5,1.1-1.5,2.1c-1,1-1.9,1.6-2.1,1.5c-0.2-0.2-1.5-3.4-0.5-4.4
+					C-46.4-27.8-43.5-26.1-43.3-26z"/>
+			</defs>
+			<clipPath id="SVGID_4_">
+				<use xlink:href="#SVGID_3_"  style="overflow:visible;"/>
+			</clipPath>
+			<g id="Group_3387_1_" transform="translate(0 0)" class="st3">
+				<path id="Path_3808_1_" class="st1" d="M-43.4-25.2l-2.5,2.5l-1.2-3.7L-43.4-25.2z"/>
+			</g>
+		</g>
+	</g>
+</g>
+</svg>

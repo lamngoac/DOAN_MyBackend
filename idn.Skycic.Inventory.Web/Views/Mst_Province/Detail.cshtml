@@ -1,0 +1,117 @@
+﻿@model Mst_Province
+@{
+    Layout = "~/Views/Shared/CoreLayoutQuanTri.cshtml";
+    var title = "CHI TIẾT DANH MỤC TỈNH/THÀNH PHỐ";
+    var titleMng = "Danh mục tỉnh/thành phố";
+    ViewBag.Title = title;
+}
+<script type="text/javascript">
+    var parents = new Array();
+    parents.push("@Url.Action("Index", "Mst_Province")");
+    parents.push("");
+    var parentsText = new Array();
+    parentsText.push("@MvcHtmlString.Create("titleMng")");
+    parentsText.push("@MvcHtmlString.Create("title")");
+    setAdminCurrentTag(parents, parentsText);
+</script>
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="row no-margin box-shadow-tk">
+                        @using (Html.BeginForm("Detail", "Mst_Province", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="col-xs-4 no-padding">
+                                <div class="form-group margin-bottom-9">
+                                    <label for="ProvinceCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã tỉnh/ thành phố <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-5">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="ProvinceCode" name="ProvinceCode" class="col-xs-12 ProvinceCode" onkeyup="locdau(this);" value="@if (Model != null && Model.ProvinceCode != null){@MvcHtmlString.Create(Model.ProvinceCode.ToString())} else { @("")}" disabled autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-4 no-padding">
+                                <div class="form-group margin-bottom-9">
+                                    <label for="ProvinceName" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên tỉnh/ thành phố <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-5">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="ProvinceName" name="ProvinceName" class="col-xs-12 Code ProvinceName" value="@if (Model != null && Model.ProvinceName != null){@MvcHtmlString.Create(Model.ProvinceName.ToString())} else { @("")}" disabled autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-4 no-padding">
+                                <div class="form-group margin-bottom-9">
+                                    @{
+                                        var checkActive = "";
+                                        if (Model != null && Model.FlagActive.Equals("1"))
+                                        {
+                                            checkActive = "checked";
+                                        }
+                                        else
+                                        {
+                                            checkActive = "";
+                                        }
+                                    }
+                                    <label for="FlagActive" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">Trạng thái</label>
+                                    <div class="col-xs-12 col-sm-5">
+                                        <span class="block input-icon input-icon-right padding-top-5">
+                                            <label>
+                                                <input name="FlagActive" id="FlagActive" class="ace ace-switch ace-switch-4 " type="checkbox" value="1" @checkActive disabled readonly />
+                                                <span class="lbl"></span>
+                                                <input name="" type="hidden" value="0" />
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        }
+                    </aside>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+<script type="text/javascript">
+    processAjaxForm($('#manageForm'), function (response) {
+        processAjaxFormResult(response);
+
+    });
+</script>
+
+@*Active Menu*@
+<script type="text/javascript">
+    setAdminCurrentUrl('@Url.Action("Index", "Mst_Province")');
+</script>
+@*Set focus*@
+<script type="text/javascript">
+    var _getForm = document.getElementById("manageForm");
+    _getForm.addEventListener('reset', function () {
+        document.getElementById("").focus()
+    })
+</script>
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,23 @@
+﻿@model List<Ord_OrderPDUI>
+@{
+
+}
+@{
+    if (Model != null && Model.Count > 0)
+    {
+<optgroup label="">
+    <option value="">--Chọn hàng hóa--</option>
+    @foreach (var it in Model)
+    {
+
+        @*<option value="@it.ProductCode" CustomerCodeSys="@it.CustomerCodeSys" ProductName="@it.ProductName" ProductCodeUser="@it.ProductCodeUser" FlagLot="@(it.FlagLot == null ? "0" : it.FlagLot.ToString())" FlagSerial="@(it.FlagSerial == null ? "0" : it.FlagSerial.ToString())" UnitCode="@it.UnitCode" UPIn="@(it.UPIn == null ? "0" : it.UPIn.ToString())" Qty="@(it.PrintedQty == null ? "0" : it.PrintedQty.ToString())">@it.ProductCodeUser - @it.ProductName</option>*@
+        <option value="@it.ProductCode" CustomerCodeSys="@it.CustomerCodeSys" ProductName="@it.ProductName" ProductCodeUser="@it.ProductCodeUser" FlagLot="@(it.FlagLot == null ? "0" : it.FlagLot.ToString())" FlagSerial="@(it.FlagSerial == null ? "0" : it.FlagSerial.ToString())" UnitCode="@it.UnitCode" UPIn="@(it.UPIn == null ? "0" : it.UPIn.ToString())" PlanQty="@(it.PlanQty == null ? "0" : it.PlanQty.ToString())" OrderPDNo="@it.OrderPDNo" OrderPDNoSys="@it.OrderPDNoSys">@it.ProductCodeUser - @it.ProductName</option>
+
+
+    }
+</optgroup>
+
+    }
+    <option value="SEARCHDATA">Tìm kiếm thêm</option>
+}
+

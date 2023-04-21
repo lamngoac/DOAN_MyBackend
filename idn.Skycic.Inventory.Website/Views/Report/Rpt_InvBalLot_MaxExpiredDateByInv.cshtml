@@ -1,0 +1,476 @@
+﻿@{
+
+    ViewBag.Title = "Báo cáo hạn sử dụng hàng hóa";
+    var List_Mst_InventoryInOut = ViewBag.List_Mst_InventoryInOut as List<Mst_Inventory>;
+    var List_Mst_ProductGroup = ViewBag.Lst_Mst_ProductGroup as List<Mst_ProductGroup>;
+}
+<script>
+    setAdminCurrentUrl('@Url.Action("Rpt_InvBalLot_MaxExpiredDateByInv", "Report")');
+</script>
+<style>
+    a[target="_blank"] {
+        display: none;
+    }
+
+    .selection--multiple:before {
+        display: inline-block;
+        font-style: normal;
+        font-variant: normal;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        content: "\f0d7";
+        position: absolute;
+        top: 15%;
+        left: 92%;
+        color: #787878;
+        font-size: 16px;
+        z-index: 9;
+    }
+
+    #myInput {
+        border: 1px solid #d5d5d5;
+    }
+</style>
+
+<div class="row no-margin">
+    <div class="col-sm-12">
+        <aside class="row no-margin">
+            @using (Html.BeginForm("Rpt_Summary_In_Pivot", "Report", FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <input hidden id="init" name="init" value="search" />
+                <div class="row layout-search layout-bot-top-16">
+                    <div class="col-10 row no-margin">
+                        <div class="col-5 row no-margin">
+                            <div class="row form-group margin-bottom-9">
+                                <label for="ProductGroupCode" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Nhóm hàng".HtmlItemString("inventory"))</label>
+                                <div class="col-12 col-sm-9">
+                                    <span class="block input-icon input-icon-right selection--multiple">
+                                        <select class="select2-selection--multiple col-12" name="ProductGroupCode" id="ProductGroupCode" multiple="multiple">
+                                            @{
+                                                if (List_Mst_ProductGroup != null && List_Mst_ProductGroup.Count > 0)
+                                                {
+                                                    foreach (var grp in List_Mst_ProductGroup)
+                                                    {
+                                                        <option value="@grp.ProductGrpCode">@grp.ProductGrpName</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="row form-group margin-bottom-9">
+                                <label for="InvCode" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Kho".HtmlItemString("inventory")) @*<span style="color: red;">*</span>*@</label>
+                                <div class="col-12 col-sm-9">
+                                    <span class="block input-icon input-icon-right selection--multiple">
+                                        <select class="select2-selection--multiple col-12" name="InvCode" id="InvCode" multiple="multiple">
+                                            @{
+                                                if (List_Mst_InventoryInOut != null && List_Mst_InventoryInOut.Count > 0)
+                                                {
+                                                    foreach (var inv in List_Mst_InventoryInOut)
+                                                    {
+                                                        <option value="@inv.InvCode">@inv.InvName</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-5 row no-margin">
+                            <div class="row form-group margin-bottom-9">
+                                <label for="ProductCodeUser" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Hàng hoá".HtmlItemString("inventory"))</label>
+                                <div class="col-12 col-sm-9 form-group">
+                                    <span class="block input-icon input-icon-right col-12 no-padding">
+                                        <input class="col-12" id="myInput" type="text" name="myInput" onkeyup="Autocompletesearch()" placeholder="@("Nhập mã, tên để tìm kiếm".HtmlItemString("report"))">
+                                        <input type="hidden" id="ProductCodeUser" name="ProductCodeUser" class="col-12 ProductCodeUser" value="" autocomplete="off" required />
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2 row no-margin">
+                        <div class="form-group margin-bottom-9">
+                            <div class="row no-margin">
+                                <span class="block input-icon input-icon-right">
+                                    <a class="btn btn-nc-button" onclick="SearchData()" href="javascript:void(0);" style=""><img class="img-button-search" src="@Url.Content("~/Images/search.svg")"></a>
+                                </span>
+                                <a class="btn btn-nc-button" href="javascript:;" onclick="Export()" style=""><i class="far fa-file-excel" aria-hidden="true"></i> Xuất Excel</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </aside>
+        <div class="row no-margin">
+            <div class="col-sm-12 no-padding">
+                <div id="pivotTable" style="overflow-x: scroll"></div>
+            </div>            
+        </div>
+    </div>
+</div>
+
+<!-- Search -->
+<script>
+
+        $(document).ready(function () {
+            $('.select2-selection--multiple').select2({
+                minimumResultsForSearch: -1
+            });
+            $('.dropdown-menu').on('click', function (event) {
+                // The event won't be propagated up to the document NODE and
+                // therefore delegated events won't be fired
+                event.stopPropagation();
+            });
+        })
+        function SearchData() {
+            var productCodeUser = commonUtils.returnValueText('#ProductCodeUser');
+            var productGrpCode = $('#ProductGroupCode').val();
+            var invCode = $('#InvCode').val();
+            
+            //if (invCode == undefined || invCode.length == 0) {
+            //    alert('Chưa chọn kho');
+            //    $('#InvCode').focus();
+            //    return false;
+            //}
+            
+            var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+            var url = '@Url.Action("DoSearch_Rpt_InvBalLot_MaxExpiredDateByInv", "Report")';
+            $.ajax({
+            type: "post",
+            data: {
+                __RequestVerificationToken: token,
+                invcode: invCode,
+                productcodeuser: productCodeUser,                
+                productgrpcode: productGrpCode
+            },
+            url: url,
+            dataType: 'json',
+                beforeSend: function () { }
+            }).done(function (result) {
+                if (result.Success) {
+
+                    let data = result.Data;
+                    if (data != null) {
+                        var JSONData = [
+                            {
+                                "ProductCodeUser": {
+                                    type: "string",
+                                    caption: "Mã hàng hóa"
+                                },
+                                "ProductName": {
+                                    type: "string",
+                                    caption: "Tên hàng hóa"
+                                },
+                                "UnitCode": {
+                                    type: "string",
+                                    caption: "Đơn vị"
+                                },
+                                "InvCode": {
+                                    type: "string",
+                                    caption: "Kho"
+                                },
+                                "ProductLotNo": {
+                                    type: "string",
+                                    caption: "Lô"
+                                },
+                                "TotalQtyTotalOK": {
+                                    type: "number",
+                                    caption: "Số lượng"
+                                },
+                                "LastInInvDate": {
+                                    type: "string",
+                                    caption: "Ngày nhập kho"
+                                },                                
+                                "QtyDayInv": {
+                                    type: "number",
+                                    caption: "Số ngày tồn"
+                                },                                
+                                "MaxExpiredDate": {
+                                    type: "string",
+                                    caption: "Ngày hết hạn"
+                                },
+                                "ProductGrpName": {
+                                    type: "string",
+                                    caption: "Nhóm hàng"
+                                }
+                            },
+                        ];
+                        if (data != null && data.length > 0) {
+                            var idx = JSONData.length;
+                            for (var i = 0; i < data.length; i++) {
+                                JSONData[idx + i] = data[i];
+                            }
+                        }
+                        var pivot = new WebDataRocks({
+                            container: "#pivotTable",
+                            toolbar: true,
+                            beforetoolbarcreated: customizeToolbar,
+                            height: 600,
+                            report: {
+                                formats: [
+                                    {
+                                        name: "",
+                                        thousandsSeparator: ",",
+                                        decimalPlaces: 0,
+                                        //currencySymbol: "$",
+                                        textAlign: "right",
+                                        ///textAlign: "left"
+                                    }
+                                ],
+                                dataSource: {
+                                    data: JSONData
+                                },
+                                options: {
+                                    grid: {
+                                        type: "classic"
+                                    }
+                                },
+                                slice: {
+                                    "reportFilters": [
+                                        {
+                                            "uniqueName": "LastInInvDate"
+                                        },
+                                        {
+                                            "uniqueName": "ProductGrpName"
+                                        }
+                                    ],
+                                    "rows": [
+                                        {
+                                            "uniqueName": "ProductCodeUser"
+                                        },
+                                        {
+                                            "uniqueName": "ProductName"
+                                        },
+                                        {
+                                            "uniqueName": "UnitCode"
+                                        },
+                                        {
+                                            "uniqueName": "InvCode"
+                                        },
+                                        {
+                                            "uniqueName": "ProductLotNo"
+                                        },
+                                        {
+                                            "uniqueName": "QtyDayInv"
+                                        },
+                                    ],
+                                    "columns": [                                        
+                                        {
+                                            "uniqueName": "MaxExpiredDate"
+                                        }
+                                    ],
+                                    "measures": [
+                                        {
+                                            "uniqueName": "TotalQtyTotalOK",
+                                            "aggregation": "sum",
+                                            "format": "currency"
+                                        },
+                                    ],
+                                },
+                            },
+                        });
+
+                        webdatarocks.expandAllData();
+                    }
+
+                } else {
+                    if (!commonUtils.isNullOrEmpty(result.Detail)) {
+                        showErrorDialog(result.Detail);
+                    }
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+
+            }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+                //alert("complete");
+            });
+    }
+
+    function customizeToolbar(toolbar) {
+        var tabs = toolbar.getTabs(); // get all tabs from the toolbar
+        toolbar.getTabs = function () {
+            delete tabs[0]; // delete the first tab
+            delete tabs[1];
+            delete tabs[2];
+            delete tabs[3];
+            return tabs;
+        }
+    }
+</script>
+<!-- Excel -->
+<script>
+    function Export() {
+
+        if ($('#pivotTable').html() === "") {
+            alert("Chưa có dữ liệu cần xuất excel.");
+            return;
+        }
+        exportData('excel');
+    }
+
+    function exportData(type) {
+        webdatarocks.exportTo(
+            type,
+            {
+                filename: "BC hạn sử dụng hàng hóa",
+                excelSheetName: "Rpt_InvBalLot_MaxExpiredDateByInv"
+            },
+            function () {
+                console.log("Export process is finished");
+            }
+        );
+    }
+</script>
+
+<script type="text/javascript">
+        function Autocompletesearch() {
+            function autocomplete(inp, arrr) {
+                var currentFocus;
+                var a, b, i, c, val = inp.value;
+                    closeAllLists();
+                    if (!val) { return false; }
+                    currentFocus = -1;
+                    a = document.createElement("DIV");
+                    a.setAttribute("id", inp.id + "autocomplete-list");
+                    a.setAttribute("class", "autocomplete-items row col-12 no-padding");
+                    inp.parentNode.appendChild(a);
+                for (i = 0; i < arrr.length; i++) {
+                        /* kiểm tra xem mục có bắt đầu bằng các chữ cái giống như giá trị trường văn bản không: */
+                    let productCur = arrr[i];
+                    if (productCur.ProductName.toUpperCase().includes(val.toUpperCase())) {
+                            /* tạo thành phần DIV cho từng thành phần phù hợp: */
+                            b = document.createElement("DIV");
+                            b.setAttribute("class", "col-12 autocomplete-itemssmall");
+                            /* làm cho các chữ cái phù hợp in đậm: */
+                        b.innerHTML = "<span>" + productCur.ProductName + "</span>";
+                            //b.innerHTML += arrr[i].ProducName;
+                            /* chèn trường đầu vào sẽ giữ giá trị của mục mảng hiện tại: */
+                        b.innerHTML += "<input type='hidden' value='" + productCur.ProductCode + "'>";
+                            /* thực thi chức năng khi ai đó nhấp vào giá trị mục (phần tử DIV): */
+                            b.addEventListener("click", function (e) {
+                                /* chèn giá trị cho trường văn bản tự động hoàn thành: */
+                                inp.value = productCur.ProductName;
+                                GetProduct(productCur.ProductCode);
+                                closeAllLists();
+                            });
+                            a.appendChild(b);
+                        }
+
+                    }
+                    /* thực thi một chức năng nhấn một phím trên bàn phím: */
+                inp.addEventListener("keydown", function (e) {
+                    var x = document.getElementById(inp.id + "autocomplete-list");
+                    if (x) x = x.getElementsByTagName("div");
+                    if (e.keyCode == 40) {
+                        /* Nếu nhấn phím mũi tên DOWN, hãy tăng biến Focus hiện tại: */
+                        currentFocus++;
+                        /* và làm cho mục hiện tại rõ hơn: */
+                        addActive(x);
+                    } else if (e.keyCode == 38) {
+                        currentFocus--;
+                        addActive(x);
+                    } else if (e.keyCode == 13) {
+                        e.preventDefault();
+                        if (currentFocus > -1) {
+                            if (x) x[currentFocus].click();
+                        }
+                    }
+                });
+                document.addEventListener("click", function (e) {
+                    closeAllLists(e.target);
+                });
+                function addActive(x) {
+                    if (!x) return false;
+                    removeActive(x);
+                    if (currentFocus >= x.length) currentFocus = 0;
+                    if (currentFocus < 0) currentFocus = (x.length - 1);
+                    x[currentFocus].classList.add("autocomplete-active");
+                }
+                function removeActive(x) {
+                    for (var i = 0; i < x.length; i++) {
+                        x[i].classList.remove("autocomplete-active");
+                    }
+                }
+                function closeAllLists(elmnt) {
+                    var x = document.getElementsByClassName("autocomplete-items");
+                    for (var i = 0; i < x.length; i++) {
+                        if (elmnt != x[i] && elmnt != inp) {
+                            x[i].parentNode.removeChild(x[i]);
+                        }
+                    }
+                }
+            }
+            function GetProduct(prdid) {
+            let url = '@Url.Action("GetProductExactly", "Report")';
+                $.ajax({
+                    url: url,
+                    type: 'post',
+                    data: {
+                        prdid: prdid
+                        //__RequestVerificationToken: token
+                    },
+                    cache: false,
+                    dataType: 'json',
+                    traditional: true,
+                    //contentType: "application/json; charset=utf-8",
+                    //success: function (data) {
+                    //    $(".GetBom").html(data);
+
+                    //}
+                    success: function (data) {
+                        if (data.Data !== undefined) {
+                            var dataPrd = data.Data;
+
+                            $("#ProductCodeUser").val(dataPrd.ProductCodeUser);
+                            $("#myInput").val(dataPrd.ProductCodeUser + ' - ' + dataPrd.ProductName);
+                        }
+                        else {
+                            //$('.GetPrd').append('');
+                        }
+                    }
+
+                });
+            }
+            var x = document.getElementById("myInput");
+            Getkeyup(x.value);
+            function Getkeyup(prdid) {
+                if (prdid.length < 2) {
+                    $("#ProductCodeUser").val('');
+                    return;
+                }
+
+                var url = '@Url.Action("SearchProduct", "Report")';
+                $.ajax({
+                    url: url,
+                    type: 'post',
+                    data: {
+                        prdid: prdid,
+                    },
+                    cache: false,
+                    dataType: 'json',
+                    traditional: true,
+                    success: function (data) {
+                        var arr = [];
+                        if (data.length >0) {
+                            for (var i = 0; i < data.length; i++) {
+                                let prd = {};
+                                prd.ProductCode = data[i].ProductCode;
+                                prd.ProductName = data[i].ProductCodeUser + ' - ' + data[i].ProductName;
+
+                                arr.push(prd);
+                            }
+                        }
+
+                        autocomplete(document.getElementById("myInput"), arr);
+                    }
+                });
+
+            }
+        }
+</script>

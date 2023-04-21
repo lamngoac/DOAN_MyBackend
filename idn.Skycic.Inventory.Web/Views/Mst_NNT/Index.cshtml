@@ -1,0 +1,449 @@
+﻿@model PageInfo<Mst_NNT>
+@{
+    Layout = "~/Views/Shared/CoreLayoutQuanTri.cshtml";
+    var title = "DANH SÁCH ĐƠN VỊ THÀNH VIÊN";
+    ViewBag.Title = title;
+    ViewBag.OverflowX = true;
+    var startCount = 0;
+    var strStartCount = ViewBag.StartCount as string;
+    if (!CUtils.IsNullOrEmpty(strStartCount))
+    {
+        startCount = Convert.ToInt32(strStartCount);
+    }
+    var listMst_NNTCur = ViewBag.ListMst_NNTCur as List<Mst_NNT>;
+    if (listMst_NNTCur == null || listMst_NNTCur.Count == 0)
+    {
+        listMst_NNTCur = new List<Mst_NNT>();
+    }
+    var showtext = "";
+    if (Model.ItemCount > 0)
+    {
+        var recordstart = (Model.PageIndex) * Model.PageSize + 1;
+        var recordend = (Model.PageIndex + 1) * Model.PageSize;
+        if (recordend > Model.ItemCount)
+        {
+            recordend = Model.ItemCount;
+        }
+        showtext = recordstart + "-" + recordend + " trong số " + Model.ItemCount;
+    }
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+}
+
+<div class="row no-margin">
+    <div class="row no-margin">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="panel-group" id="steps">
+                <div class="panel panel-info">
+                    <div class="panel-body no-padding" id="panel-body">
+                        <aside class="col-xs-12 no-padding">
+                            @using (Html.BeginForm(null, null, FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+                            {
+                                <input type="hidden" value="search" name="init" id="init" />
+                                <div class="col-xs-12 layout-search" style="padding: 10px;">
+                                    <aside class="col-xs-4">
+                                        <div class="form-group margin-bottom-9">
+                                            <label for="mst" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Mã số thuế</label>
+                                            <div class="col-xs-12 col-sm-7">
+                                                <span class="block input-icon input-icon-right">
+                                                    <select id="mst" name="mst" class="col-xs-12 mst" title="">
+                                                        <option></option>
+                                                        @{
+                                                            var mst = "";
+                                                            if (!CUtils.IsNullOrEmpty(ViewBag.MST))
+                                                            {
+                                                                mst = CUtils.StrValue(ViewBag.MST);
+                                                            }
+
+                                                        }
+                                                        @if (listMst_NNTCur != null && listMst_NNTCur.Count > 0)
+                                                        {
+                                                            foreach (var item in listMst_NNTCur)
+                                                            {
+                                                                <option value="@MvcHtmlString.Create(CUtils.StrValue(item.MST))"
+                                                                        @(item.MST.ToString().Trim().Equals(mst) ? "selected" : "")>
+                                                                    @MvcHtmlString.Create(CUtils.StrValue(item.MST))
+                                                                </option>
+                                                            }
+                                                        }
+
+                                                    </select>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group margin-bottom-9">
+                                            <label for="nntfullname" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Tên tổ chức</label>
+                                            <div class="col-xs-12 col-sm-7">
+                                                <input type="text" id="nntfullname" name="nntfullname" class="col-xs-12 nntfullname" value="@MvcHtmlString.Create(ViewBag.NNTFullName)" autocomplete="off">
+                                            </div>
+                                        </div>
+                                    </aside>
+                                    <aside class="col-xs-4">
+                                        <div class="form-group margin-bottom-9">
+                                            <label for="contactemail" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Email liên hệ</label>
+                                            <div class="col-xs-12 col-sm-7">
+                                                <input type="text" id="contactemail" name="contactemail" class="col-xs-12 contactemail" value="@MvcHtmlString.Create(ViewBag.ContactEmail)" autocomplete="off">
+                                            </div>
+                                        </div>
+                                        <div class="form-group margin-bottom-9">
+                                            <label for="flagactive" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Trạng thái</label>
+                                            <div class="col-xs-12 col-sm-7">
+                                                <span class="block input-icon input-icon-right">
+                                                    @{
+                                                        var flagactive = Request["flagactive"] == null ? "" : Request["flagactive"];
+                                                    }
+                                                    <select id="flagactive" name="flagactive" class="col-xs-12 flagactive" title="">
+                                                        <option value=""></option>
+                                                        <option value="1" @(flagactive.Equals("1") ? "selected" : "")>Active</option>
+                                                        <option value="0" @(flagactive.Equals("0") ? "selected" : "")>Inactive</option>
+                                                    </select>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </aside>
+                                    <div class="button-tk">
+                                        <div class="form-group margin-bottom-9">
+                                            <div class="col-xs-12 col-sm-8">
+                                                <span class="block input-icon input-icon-right">
+                                                    @RenderItemFormat("BTN_QL_NNT_TK", "<a class=\"btn font-color button-search\" onclick=\"Search()\" href=\"javascript: void(0);\"><img class=\"img-search\" src=" + @Url.Content("~/Images/search.svg") + "></a>", "", "")
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12" style="margin: 10px 0">
+                                    @RenderItemFormat("BTN_QL_NNT_TAO", "<a class=\"btn btn-nc-button\" href=\"" + Url.Action("Create", "Mst_NNT") + "\"><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i> Tạo</a>", "", "")
+                                    <span class="search-bar">
+                                        <input type="text" class="quicksearch txtSearchObj" name="search">
+                                        <input type="text" class="quicksearch1 txtSearchObj1" name="search" style="z-index: -1000; height: 0; padding: 0; margin: 0; border: 0">
+                                    </span>
+                                    @Html.Partial("Pagination", null, new ViewDataDictionary() { { "PageCur", MvcHtmlString.Create("1") }, { "RecordCount", MvcHtmlString.Create(Model.PageSize.ToString()) }, { "ShowText", showtext }, { "mst", Request["mst"] }, { "nntfullname", Request["nntfullname"] }, { "contactemail", Request["contactemail"] }, { "flagactive", Request["flagactive"] } })
+                                </div>
+                                <input type="hidden" value="@MvcHtmlString.Create(pageCur)" name="page" id="page" />
+                            }
+                            <input type="hidden" value="@MvcHtmlString.Create(Model.PageCount.ToString())" name="totalpage" id="totalpage" />
+                        </aside>
+                    </div>
+                </div>
+                <div class="panel panel-info no-margin">
+                    <div class="panel-body no-padding" id="panel-body">
+                        @Html.AntiForgeryToken()
+                        <aside class="col-xs-12 no-padding">
+                            <div class="scrollable-horizontal padding-left-0 padding-right-0 div-scrollable" data-size="1200" style="padding-top: 0!important;">
+                                <div style="width: 100%; float: left;">
+                                    <table id="dynamic-table" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                                        <thead>
+                                            <tr class="trthead">
+                                                <th class="cell-120">&nbsp;</th>
+                                                <th class="text-center cell-50">@MvcHtmlString.Create("TT")</th>
+                                                <th class="text-center cell-150">
+                                                    @MvcHtmlString.Create("Mã tổ chức")<br />
+                                                    @MvcHtmlString.Create("<i>Tên tổ chức</i>")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Địa chỉ")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Quận/Huyện")<br />
+                                                    @MvcHtmlString.Create("<i>Tỉnh/Thành phố</i>")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Loại đại lý")
+                                                </th>
+                                                <th class="text-center cell-50">
+                                                    @MvcHtmlString.Create("Trạng thái")
+                                                </th>
+                                                <th class="text-center cell-150">
+                                                    @MvcHtmlString.Create("Email liên hệ")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("ĐT Di động")<br />
+                                                    @MvcHtmlString.Create("<i>ĐT Cố định</i>")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Người liên hệ")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Điện thoại")
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                                <div>
+                                    <table id="dynamic-table-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody no-margin">
+                                        <tbody id="table-tbodyID">
+                                            @if (Model != null && Model.DataList != null && Model.DataList.Count > 0)
+                                            {
+                                                var idx = 0;
+                                                foreach (var item in Model.DataList)
+                                                {
+                                                    var iindex = startCount + (idx + 1);
+                                                    var mst = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.MST))
+                                                    {
+                                                        mst = CUtils.StrValue(item.MST); // Mã số thuế
+                                                    }
+                                                    var nNTFullName = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.NNTFullName))
+                                                    {
+                                                        nNTFullName = CUtils.StrValue(item.NNTFullName); //Tên tổ chức
+                                                    }
+                                                    var nNTAddress = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.NNTAddress))
+                                                    {
+                                                        nNTAddress = CUtils.StrValue(item.NNTAddress); //Địa chỉ
+                                                    }
+                                                    var districtcode = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.DistrictCode))
+                                                    {
+                                                        districtcode = CUtils.StrValue(item.DistrictCode); //Quận/Huyện
+                                                    }
+                                                    var provincecode = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.ProvinceCode))
+                                                    {
+                                                        provincecode = CUtils.StrValue(item.ProvinceCode); //Tỉnh/Thành phố
+                                                    }
+                                                    var districtname = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.md_DistrictName))
+                                                    {
+                                                        districtname = CUtils.StrValue(item.md_DistrictName); //Quận/Huyện
+                                                    }
+                                                    var provincename = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.mp_ProvinceName))
+                                                    {
+                                                        provincename = CUtils.StrValue(item.mp_ProvinceName); //Tỉnh/Thành phố
+                                                    }
+                                                    var flagactive = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.FlagActive))
+                                                    {
+                                                        flagactive = CUtils.StrValue(item.FlagActive); //Trạng thái
+                                                    }
+                                                    var contactEmail = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.ContactEmail))
+                                                    {
+                                                        contactEmail = CUtils.StrValue(item.ContactEmail); //Email liên hệ
+                                                    }
+                                                    var nNTMobile = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.NNTMobile))
+                                                    {
+                                                        nNTMobile = CUtils.StrValue(item.NNTMobile); //ĐT Di động
+                                                    }
+                                                    var nNTPhone = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.NNTPhone))
+                                                    {
+                                                        nNTPhone = CUtils.StrValue(item.NNTPhone); //ĐT Cố định
+                                                    }
+                                                    var businessRegNo = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.BusinessRegNo))
+                                                    {
+                                                        businessRegNo = CUtils.StrValue(item.BusinessRegNo); //Giấy phép KD
+                                                    }
+                                                    var presentBy = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.PresentBy))
+                                                    {
+                                                        presentBy = CUtils.StrValue(item.PresentBy); //Người đại diện
+                                                    }
+                                                    var nNTPosition = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.NNTPosition))
+                                                    {
+                                                        nNTPosition = CUtils.StrValue(item.NNTPosition); //Chức vụ
+                                                    }
+                                                    var presentIDNo = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.PresentIDNo))
+                                                    {
+                                                        presentIDNo = CUtils.StrValue(item.PresentIDNo); //Số giấy tờ
+                                                    }
+                                                    var presentIDType = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.PresentIDType))
+                                                    {
+                                                        presentIDType = CUtils.StrValue(item.PresentIDType); //Loại giấy tờ
+                                                    }
+                                                    var govTaxID = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.GovTaxID))
+                                                    {
+                                                        govTaxID = CUtils.StrValue(item.GovTaxID); //CQT quản lý
+                                                    }
+                                                    var accno = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.AccNo))
+                                                    {
+                                                        accno = CUtils.StrValue(item.AccNo); //Số tài khoản
+                                                    }
+                                                    var accHolder = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.AccHolder))
+                                                    {
+                                                        accHolder = CUtils.StrValue(item.AccHolder); //Chủ tài khoản
+                                                    }
+                                                    var bankName = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.BankName))
+                                                    {
+                                                        bankName = CUtils.StrValue(item.BankName); //Tại ngân hàng
+                                                    }
+                                                    var typedealer = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.DealerType))
+                                                    {
+                                                        typedealer = CUtils.StrValue(item.DealerType); //Tại ngân hàng
+                                                    }
+                                                    var contactname = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.ContactName))
+                                                    {
+                                                        contactname = CUtils.StrValue(item.ContactName); //Người liên hệ
+                                                    }
+                                                    var contactphone = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.ContactPhone))
+                                                    {
+                                                        contactphone = CUtils.StrValue(item.ContactPhone); //Điện thoại người liên hệ
+                                                    }
+                                                    var dealertype = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.DealerType))
+                                                    {
+                                                        dealertype = CUtils.StrValue(item.DealerType); //Loại đại lý
+                                                    }
+                                                    <tr idx="@idx" class="data-item trdata">
+                                                        <td class="text-center cell-120">
+                                                            <div class="action-buttons padding-top-2">
+                                                                @{
+                                                                    var urlDetail = Url.Action("Detail", "Mst_NNT", new { mst = item.MST });
+                                                                    var urlUpdate = Url.Action("Update", "Mst_NNT", new { mst = item.MST });
+
+                                                                }
+                                                                @RenderItemFormat("BTN_QL_NNT_CHI_TIET", "<a class=\"icon-detail\" href=\'" + urlDetail + "\' title=\"Chi tiết\"><i class=\"far fa-eye\"></i></a>", "", "")
+                                                                @RenderItemFormat("BTN_QL_NNT_SUA", "<a class=\"icon-edit\" href=\'" + urlUpdate + "\' title=\"Sửa\"><i class=\"fas fa-pencil-alt\"></i></a>", "", "")
+                                                                @RenderItemFormat("BTN_QL_NNT_XOA", "<a href=\"javascript:;\" class=\"icon-delete\" title=\"Xóa\" onclick=\"Delete('" + item.MST.ToString() + "')\"><i class=\"fas fa-trash-alt\"></i></a>", "", "")
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center cell-50">
+                                                            @MvcHtmlString.Create(iindex.ToString())
+                                                        </td>
+                                                        <td class="text-center cell-150">
+                                                            @MvcHtmlString.Create(mst)<br /> <!--MST-->
+                                                            <i>@MvcHtmlString.Create(nNTFullName)</i> <!--Tên doanh nghiệp-->
+                                                        </td>
+                                                        <td class="text-center cell-100">
+                                                            @MvcHtmlString.Create(nNTAddress) <!--Địa chỉ-->
+                                                        </td>
+                                                        <td class="text-center cell-100">
+                                                            @MvcHtmlString.Create(districtname)<br /> <!--Quận/Huyện-->
+                                                            <i>@MvcHtmlString.Create(provincename)</i> <!--Tỉnh/Thành phố-->
+                                                        </td>
+                                                        <td class="text-center cell-100">
+                                                            @MvcHtmlString.Create(dealertype)
+                                                        </td>
+                                                        <td class="text-center cell-50">
+                                                            @if (flagactive.Equals("1"))
+                                                            {
+                                                                <span class="label label-sm label-success">Active</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="label label-sm label-danger">Inactive</span>
+                                                            } <!--Trạng thái-->
+                                                        </td>
+                                                        <td class="text-center cell-150">
+                                                            @MvcHtmlString.Create(contactEmail) <!--Email liên hệ-->
+                                                        </td>
+                                                        <td class="text-center cell-100">
+                                                            @MvcHtmlString.Create(nNTMobile)<br /> <!--ĐT Di động-->
+                                                            <i>@MvcHtmlString.Create(nNTPhone)</i> <!--ĐT Cố định-->
+                                                        </td>
+                                                        <td class="text-center cell-100">
+                                                            @MvcHtmlString.Create(contactname) <!--Người liên hệ-->
+                                                        </td>
+                                                        <td class="text-center cell-100">
+                                                            @MvcHtmlString.Create(contactphone) <!--Điện thoại người liên hệ-->
+                                                        </td>
+                                                    </tr>
+                                                    idx++;
+                                                }
+                                            }
+
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Mst_NNT.js")"></script>
+
+    @* Active Menu *@
+    <script type="text/javascript">
+        setAdminCurrentUrl('@Url.Action("Index", "Mst_NNT")');
+    </script>
+
+    @*scroll*@
+    <script type="text/javascript">
+        $('.scrollable').each(function () {
+            var $this = $(this);
+            $(this).ace_scroll({
+                //size: 500,
+                size: $this.attr('data-size') || 1000,
+                mouseWheelLock: true
+                //styleClass: 'scroll-left scroll-margin scroll-thin scroll-dark scroll-light no-track scroll-visible'
+            });
+        });
+        $(document).ready(function () {
+            $('.scrollable-horizontal').each(function () {
+                var $this = $(this);
+                $(this).ace_scroll(
+                    {
+                        horizontal: true,
+                        //styleClass: 'scroll-top',//show the scrollbars on top(default is bottom)
+                        size: $this.attr('data-size') || 6500,
+                        mouseWheelLock: true
+                    }
+                ).css({ 'padding-top': 0 });
+            });
+        });
+
+    </script>
+
+    @*Keypress*@
+    <script type="text/javascript">
+        $(document).on('keypress', function (e) {
+            if (e.which == 13) {
+                Search();
+            }
+        });
+    </script>
+
+    @*Search*@
+    <script type="text/javascript">
+        function Search()
+        {
+            $('#manageForm').attr('action', '@Url.Action("Index", "Mst_NNT")').submit();
+        }
+    </script>
+
+    @*Delete*@
+    <script type="text/javascript">
+        var objMst_NNT = new Mst_NNT();
+        function Delete(mst) {
+            debugger
+            var objMst_NNT_Delete = {
+                MST: mst,
+            };
+
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Delete", "Mst_NNT")';
+
+            objMst_NNT.Image_Message = "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO";
+            objMst_NNT.Confirm_Message = "Đồng ý xóa NNT '" + mst + "' ?";
+            objMst_NNT.ajaxSettings = ajaxSettings;
+            objMst_NNT.deleteData(objMst_NNT_Delete);
+        }
+    </script>
+}
+
+

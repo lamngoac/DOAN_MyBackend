@@ -1,0 +1,538 @@
+﻿@{
+    var listTem = ViewBag.Temp_PrintTempCur as List<Temp_PrintTempUI>;
+    var fromdate = ViewBag.FromDate as string;
+    var listPrintType = ViewBag.Lst_Mst_TempPrintType as List<Mst_TempPrintType>;
+    var linkPDF = "";
+}
+
+<style>
+    #ViewTemResult, .divTem {
+        box-shadow: 2px 4px 4px 4px #dadada;
+        border-radius: 20px;
+        margin-bottom: 20px;
+    }
+
+        .divTem.active {
+            background: #C8ECDC;
+            border: 1px solid #61B691;
+        }
+
+    input#LogoFilePath {
+        background: url(../images/image.svg)no-repeat;
+        background-position-x: center;
+        background-position-y: center;
+        background-size: 50%;
+        height: 4em;
+    }
+
+    .content {
+        background: #fff;
+    }
+
+    .margin-bottom-9 {
+        margin-bottom: 9px !important;
+    }
+
+    .show {
+        display: block !important;
+    }
+
+    .hide {
+        display: none !important;
+    }
+</style>
+<div class="clearfix margin-bottom-9"></div>
+<script>
+    setAdminCurrentUrl('@Url.Action("Index", "InvFTempPrint")');
+</script>
+<div class="no-margin row">
+    <div class="col-12">
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div class="col-12">
+                <div class="row col-sm-8">
+                    <div class="row form-group margin-bottom-9">
+                        <label for="TempPrintType" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">Loại mẫu in</label>
+                        <div class="col-xs-12 col-sm-8">
+                            <select id="TempPrintType" name="TempPrintType" class="TempPrintType col-xs-12" onchange="GetTempPrint(this);">
+                                <option value=""></option>
+                                @if (listPrintType != null && listPrintType.Count > 0)
+                                {
+                                    foreach (var lstprint in listPrintType)
+                                    {
+                                        <option value="@lstprint.TempPrintType">@lstprint.TempPrintName</option>
+                                    }
+                                }
+                            </select>
+                            <input type="hidden" name="IF_TempPrintNo" id="IF_TempPrintNo" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="chontem" class="col-12">
+                <div class="col-12 row no-margin">
+                    <div class="col-8" style="border-right:1px solid #ddd;min-height:100px;">
+                        <div class="col-xs-12 FindtempType1" style="max-height:800px; overflow:auto">
+                            <div class="col-xs-12 col-md-12 col-lg-12" style="text-align: center" id="divView">
+                                <object id="objPDF" data="@MvcHtmlString.Create(linkPDF)" data-body="" type="application/pdf" style="width: 100%; height: 500px;"> </object>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        @using (Html.BeginForm("Index", "InvFTempPrint", FormMethod.Post, new { id = "manageFormtem", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+
+
+                            <div class="col-xs-12">
+                                <div class="col-xs-12">
+                                    <h4>Cập nhật thông tin</h4>
+                                </div>
+                                <div class="form-group margin-bottom-9 display-none">
+                                    <label for="LogoFilePath" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500  ">Logo</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <a href="javascript:void(0);" id="btnLogoTem" class=" font-color" @*onchange="readURL(this);"*@>
+                                                <img src="~/Images/no-image.jpg" alt="" id="ImagePath" image-src="" saved="" src-link="" style="max-width:100px;max-height:100px" />
+                                                <input type="file" id="LogoFilePath" @*onchange="readURL(this);"*@ onchange="setFileCom(this, '1');" name="LogoFilePath" class="col-xs-3 text-right LogoFilePath" style="display: none;">
+                                            </a>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group margin-bottom-9" style="display: none">
+                                    <label for="BackgroundFilePath" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500  ">Background</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <a href="javascript:void(0);" id="btnLogoBackground" class=" font-color">
+                                                <img src="~/Images/no-image.jpg" alt="" id="ImagePathBackground" image-src="" saved="" src-link="" style="max-width:100px;max-height:100px" />
+                                                <input type="file" id="BackgroundFilePath" onchange="setFileCom(this, '0');" name="BackgroundFilePath" class="col-xs-3 text-right BackgroundFilePath" style="display: none;">
+                                            </a>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 text-center">
+                                <div class="col-xs-12" id="Viewtem">
+
+                                </div>
+                            </div>
+                            <div class="col-xs-12 text-center" style="margin-top:20px;">
+                                @RenderItemFormat("BTN_QL_MAU_IN_LUU", "<a href=\"javascript:void(0);\" class=\"btn font-color mybtn-Button preview\" style=\"margin-left: 10px; padding-left: 15px!important;padding-right: 15px!important;width:15%; margin:0 auto;\" onclick=\"SaveData();\">Lưu</a>", "", "")
+                            </div>
+
+                            <div class="col-12 text-center" style="margin-top:20px;">
+                                @RenderItemFormat("BTN_QL_MAU_IN_IMPORT_MAU", "<a href=\"javascript:void(0);\" class=\"btn font-color mybtn-Button preview\" style=\"margin-left: 10px; padding-left: 15px!important;padding-right: 15px!important;width:30%; margin:0 auto;\" onclick=\"ShowPopupImport();\">Import mẫu</a>", "", "")
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>            
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ImportPrintTemp" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="max-width:500px;width:100%">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#ddd !important;color:#373737;height: 45px;">
+                <h5 class="modal-title" id="exampleModalLabel" style="font-weight:unset;">Import mẫu</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="ClosePopupImport()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="min-height:100px;border-top:1px solid #eee;">
+                <aside class="row no-margin" style="border-bottom: 1px solid #eee">
+                    @using (Html.BeginForm("Create", "InvFTempPrintGroup", FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true)
+                        <input hidden id="init" name="init" value="search" />
+                        <div class="layout-bot-top-16">
+                            <div class="row">
+                                <div class="row col-sm-6 no-padding">
+                                    <div class="row form-group margin-bottom-9">
+                                        <label for="TempPrintType" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">Loại mẫu in</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <select id="pTempPrintType" name="pTempPrintType" class="pTempPrintType col-xs-12">
+                                                <option value=""></option>
+                                                @if (listPrintType != null && listPrintType.Count > 0)
+                                                {
+                                                    foreach (var lstprint in listPrintType)
+                                                    {
+                                                        <option value="@lstprint.TempPrintType">@lstprint.TempPrintName</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row no-margin">
+                                <div class="col-xs-6 no-padding">
+                                    <div class="form-group  margin-bottom-9">                                        
+                                        <div class="col-xs-12 col-sm-7">
+                                            <input type="file" name="file" id="file" />                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-6 no-padding" style="margin-left: 80px;">
+                                    @RenderItemFormat("BTN_QL_MAU_IN_IMPORT_MAU_LUU", "<a href=\"javascript:;\" class=\"btn font-color mybtn-Button\" style=\"\" onclick=\"SaveTempGroup();\">Lưu</a>", "", "")
+                                    @*<a href="javascript:;" class="btn font-color mybtn-Button" style="" onclick="SaveTempGroup();">Lưu</a>*@
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </aside>
+            </div>
+            <div class="modal-footer">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="@Url.Content("~/Scripts/mine/InvFTempPrint.js")"></script>
+<script src="@Url.Content("~/Scripts/mine/Mst_TempPrintGroup.js")"></script>
+
+@section Scripts{
+
+    <script>
+        
+        var objInvFTempPrint = new InvFTempPrint();
+        var objVariablesInit = {
+            Id_FormMain: '',
+            Id_FormImportFile: 'manageForm',
+            Id_Modal: 'ImportFileModal',
+            Id_FileInput: 'file',
+        };
+        var ajaxSettings = {};
+        ajaxSettings.Type = 'post';
+        ajaxSettings.DataType = 'json';
+        
+        function SaveData() {
+            debugger;
+
+            ajaxSettings.Url = '@Url.Action("Save", "InvFTempPrint")';
+            objInvFTempPrint.ActionType = 'save';
+            objInvFTempPrint.ajaxSettingsInit();
+            objInvFTempPrint.ajaxSettings = ajaxSettings;
+            objInvFTempPrint.variablesInit(objVariablesInit);
+            objInvFTempPrint.saveData();
+        }
+    </script>
+
+    <script>
+        var maxImageWidth = 800,
+            totalFiles = 0,
+            currentTotalFiles = 0,
+            fileTypeError = false,
+            fileSizeError = false,
+            ListImages = [],
+            ListFiles = [],
+            ImgId = 0,
+            FileId = 0;
+        $(document).ready(function () {
+            $("#ImagePath").bind('click', function () {
+                $('#LogoFilePath').click();
+                //$('#fileInput').val('');
+            });
+            $("#ImagePathBackground").bind('click', function () {
+                $('#BackgroundFilePath').click();
+                //$('#fileInput').val('');
+            });
+        });
+        document.getElementById("ImagePath").addEventListener('change', setFileCom, false);
+        document.getElementById("ImagePathBackground").addEventListener('change', setFileCom, false);
+
+        var base64 = "";
+        function renderFileInfo(file, isLogo) {
+            var name = file.name;
+            var size = file.size;
+            var type = file.type;
+
+            var classtypefile = '';
+            if (name.match(/(?:gif|jpg|jpeg|png|bmp)$/)) {
+                classtypefile = 'far fa-file-image';
+            }
+
+            var fileReader = new FileReader();
+
+            fileReader.onload = function (event) {
+                base64 = event.target.result;
+                if (isLogo === '1') {
+                    $('#ImagePath').attr('image-src', base64);
+                    $('#ImagePath').attr('image-type', type);
+                    $('#ImagePath').attr('image-name', name);
+                }
+                else {
+                    $('#ImagePathBackground').attr('image-src', base64);
+                    $('#ImagePathBackground').attr('image-type', type);
+                    $('#ImagePathBackground').attr('image-name', name);
+                }
+            }
+            fileReader.readAsDataURL(file);
+        }
+        function setFileCom(input, isLogo) {
+
+        if (input.files && input.files[0]) {
+            var name = input.files[0].name.toLowerCase();
+            if (!name.match(/(?:gif|jpeg|bmp|png|jpg)$/)) {
+                alert("File upload phải thuộc các định dạng sau: \" gif|jpeg|bmp|png|jpg \"!");
+                return false;
+            }
+            var fsize = input.files[0].size;
+            if (fsize > 4194304) {
+                alert("File có dung lượng lớn hơn 4mb");
+                return false;
+            }
+            else {
+                var listFiles = input.files;
+                totalFiles = listFiles.length;
+                currentTotalFiles = 0;
+                fileTypeError = false;
+                fileSizeError = false;
+                if (totalFiles > 0) {
+                    for (var i = 0; i < listFiles.length; i++) {                        
+                        var file = listFiles[i];
+                        renderFileInfo(file, isLogo);
+
+                    }
+                }
+            }
+            var frmdata = new FormData();
+            frmdata.append("fileupload", input.files[0]);
+            frmdata.append("filetype", "fileCommit");
+            frmdata.append("filefolder", "InvFTempPrint");
+            //03/02/2018
+            $.ajax({
+                 url: '@Url.Action("UploadFileServer", "InvFTempPrint")',
+                type: 'POST',
+                contentType: false,
+                processData: false,
+                enctype: 'multipart/form-data',
+                data: frmdata,
+                success: function (data) {
+                    debugger;
+                    if (data.UrlFilePath !== null && data.UrlFilePath !== "") {
+                        var host = window.location.origin;
+                        var linkimg = host + data.UrlFilePath;
+                        if (isLogo === '1') {
+                            $('#ImagePath').attr('src', linkimg);
+                        }
+                        else {
+                            $('#ImagePathBackground').attr('src', linkimg);
+                        }
+                    }
+                }
+            });
+        }
+    }
+    
+    </script>
+    <script type="text/javascript">
+        function printPdfdata() {
+            debugger;
+            var linkPdf = $('#intem').find('#objPDF').attr('data');
+            printPdf(linkPdf);
+        }
+        function printPdf(linkPdf) {
+            printJS({
+                printable: linkPdf,
+                type: 'pdf',
+                showModal: true,
+                //onPrintDialogClose: () => console.log('The print dialog was closed'),
+                //onPdfOpen: () => console.log('Pdf was opened in a new tab due to an incompatible browser')
+            })
+        }
+
+
+        var pdf2Image = function (pdf_url, image_width, funcRet) {
+
+            var __PDF_DOC,
+                __CURRENT_PAGE;
+
+            var __CANVAS = $('<canvas style="display:none;"></canvas>').width(image_width).appendTo('body').get(0);
+            //var _CANVAS_CTX = _CANVAS.getContext('2d');
+
+            PDFJS.getDocument({ url: pdf_url }).then(function (pdf_doc) {
+                __PDF_DOC = pdf_doc;
+
+                __CURRENT_PAGE = 1;
+
+
+                // Fetch the page
+                __PDF_DOC.getPage(__CURRENT_PAGE).then(function (page) {
+                    // As the canvas is of a fixed width we need to set the scale of the viewport accordingly
+                    var scale_required = __CANVAS.width / page.getViewport(1).width;
+
+                    // Get viewport of the page at required scale
+                    var viewport = page.getViewport(scale_required);
+
+                    // Set canvas height
+                    __CANVAS.height = viewport.height;
+
+                    var renderContext = {
+                        canvasContext: __CANVAS_CTX,
+                        viewport: viewport
+                    };
+
+                    // Render the page contents in the canvas
+                    page.render(renderContext).then(function () {
+                        debugger;
+                        funcRet(__CANVAS.toDataURL());
+
+                    });
+                });
+
+
+            }).catch(function (error) {
+
+            });;
+
+        };
+
+        function imagetem() {
+            debugger;
+            var trArr = $('#ViewTemResult .objimg');
+            for (var i = 0; i < trArr.length; i++) {
+                var pdfUrl = $(trArr).find('object').attr('data');
+                window.pdf2Image(pdfUrl, 150, function (imgData) {
+                    $(trArr).find('img').attr('src', imgData);
+                });
+            }
+        }
+    </script>
+
+}
+<script>
+    function ShowPopupImport() {
+                        $('#ImportPrintTemp').modal({
+                            backdrop: false,
+                            keyboard: true,
+                        });
+                        $('#ImportPrintTemp').modal('show');
+    }
+    function ClosePopupImport() {
+        $('#ImportPrintTemp').modal('hide');
+        $('#ImportPrintTemp').on('hidden.bs.modal', function () {
+            $('#ImportPrintTemp form')[0].reset();
+        });
+    }
+
+
+</script>
+
+<script type="text/javascript">
+    function ShowPopupImportFile() {
+            $('#ImportFileModal').modal({
+                            backdrop: false,
+                            keyboard: true,
+                        });
+           $('#ImportFileModal').modal('show');
+        }
+
+    var objMst_TempPrintGroup_ImportFile = new Mst_TempPrintGroup();
+
+    $(document).ready(function () {
+        $('input[type="file"][id="file"]').change(function (e) {
+            objMst_TempPrintGroup_ImportFile.checkFileImport(this, e)
+        });
+    });
+
+    function CloseModalImportFile() {
+        objMst_TempPrintGroup_ImportFile.closeModalImportFile('ImportFileModal');
+    }
+
+    function Import(title) {
+        var file = $("#fileImport").val();
+        if (file.length === 0) {
+            alert("Nhập file cần Import");
+            $("#fileImport").val('');
+            return false;
+        } else {            
+            var checkFile = false;
+            var _index = file.lastIndexOf('.');
+            if (_index !== undefined && _index !== null && _index > 0) {
+                var fileType = commonUtils.toLowerCase(file.substring(_index + 1, file.length));
+                if (fileType === 'rtmpl') {
+                    checkFile = true;
+                }
+            }
+            if (checkFile) {
+                $("#file").val(file);
+                CloseModalImportFile();
+            } else {
+                alert("File Import không hợp lệ!");
+            }
+        }
+    }
+
+    var objMst_TempPrintGroup = new Mst_TempPrintGroup();
+        var objVariablesInit = {
+            Id_FormMain: '',
+            Id_FormImportFile: 'manageForm',
+            Id_Modal: 'ImportPrintTemp',
+            Id_FileInput: 'file',
+        };
+        var ajaxSettings = {};
+        ajaxSettings.Type = 'post';
+        ajaxSettings.DataType = 'json';
+
+
+        function ImportFile() {
+            ajaxSettings.Url = '@Url.Action("ImportFileMst_TempPrintGroup", "InvFTempPrint")';
+
+            objMst_TempPrintGroup.ajaxSettingsInit();
+            objMst_TempPrintGroup.ajaxSettings = ajaxSettings;
+            objMst_TempPrintGroup.variablesInit(objVariablesInit);
+            objMst_TempPrintGroup.importFile();
+        }
+
+        function SaveTempGroup() {
+            ajaxSettings.Url = '@Url.Action("CreateTempPrintGroup", "InvFTempPrint")';
+            objMst_TempPrintGroup.ActionType = 'create';
+            objMst_TempPrintGroup.ajaxSettingsInit();
+            objMst_TempPrintGroup.ajaxSettings = ajaxSettings;
+            objMst_TempPrintGroup.variablesInit(objVariablesInit);
+            objMst_TempPrintGroup.saveData();
+
+        }
+</script>
+
+<script>
+    function GetTempPrint(thiz) {
+        var tempPrintType = $(thiz).val();
+        if (tempPrintType === undefined || tempPrintType.length === 0) {
+            return;
+        }
+
+        var url = '@Url.Action("GetTempPrint", "InvFTempPrint")';
+        $.ajax({
+            type: "post",
+            data: {
+                tempprinttype: tempPrintType
+            },
+            url: url,
+            dataType: 'json',
+            beforeSend: function () { }
+        }).done(function (result) {
+            if (result.Success) {
+                if (!document.getElementById("objPDF")) {
+                    return false;
+                }
+                document.getElementById("objPDF").setAttribute('data', result.LinkPDF);
+                document.getElementById("objPDF").setAttribute('data-body', result.TempPrintBody);
+                $('#IF_TempPrintNo').val(result.IF_TempPrintNo);
+            } else {
+                if (!commonUtils.isNullOrEmpty(result.Detail)) {
+                    showErrorDialog(result.Detail);
+                }
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+
+        }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+            //alert("complete");
+        });
+    }
+</script>

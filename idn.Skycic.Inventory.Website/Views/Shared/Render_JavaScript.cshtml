@@ -1,0 +1,38 @@
+﻿@{
+    /**/
+
+}
+
+@*Thư viện Jquery - Bootstrap*@
+<!--[if gte IE 9]><!-->
+@Scripts.Render("~/bundles/jquery.min")
+@Scripts.Render("~/bundles/jquery-ui")
+<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+<script>
+    $.widget.bridge('uibutton', $.ui.button)
+</script>
+@Scripts.Render("~/bundles/popper.min.js")
+@Scripts.Render("~/bundles/bootstrap")
+<!--<![endif]-->
+<!--[if IE 9]>
+    @Scripts.Render("~/bundles/bootstrap-fix-ie9")
+<![endif]-->
+<!--[if lte IE 8]>
+    @Scripts.Render("~/bundles/jquery-library-lte-ie8")
+    @Scripts.Render("~/bundles/bootstrap-fix-ie8")
+    @Scripts.Render("~/bundles/bootstrap-lte-ie8")
+<![endif]-->
+
+@Scripts.Render("~/bundles/jquery-validate")
+@Scripts.Render("~/bundles/adminlte-js")
+@Scripts.Render("~/bundles/jquery-number")
+@Scripts.Render("~/bundles/toastr-js")
+@Scripts.Render("~/bundles/bootstrap-tagsinput-js")
+@Scripts.Render("~/bundles/select2.min.js")
+@Scripts.Render("~/bundles/library-js")
+@Scripts.Render("~/bundles/hrscroll")
+@Scripts.Render("~/bundles/bootbox")
+@Scripts.Render("~/bundles/bootstrap-datepicker-js")
+<!--Ckfinder-->
+@*@Scripts.Render("~/bundles/Ckfinder")*@
+

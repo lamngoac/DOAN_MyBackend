@@ -1,0 +1,180 @@
+﻿@model List<Rpt_Inv_InventoryBalance_MinimumUI>
+
+<style>
+    .hidden {
+        display: none;
+    }
+</style>
+
+<div class="col-xs-12 layout-bot-top-16" style="">
+    <div class="row">
+        <div class="col-6">
+            <a class="btn btn-nc-button" href="javascript:;" onclick="Print()" style=""><i class="fas fa-print" aria-hidden="true"></i> In</a>
+            <a class="btn btn-nc-button" href="javascript:;" onclick="Export()" style=""><i class="far fa-file-excel" aria-hidden="true"></i> Xuất Excel</a>
+        </div>
+    </div>
+</div>
+<div class="panel-body no-padding" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+    <aside class="col-xs-12 layout-table no-padding">
+        @Html.AntiForgeryToken()
+        <div class="padding-left-0 padding-right-0" style="padding-top: 0!important;">
+            <div style="width: 100%; float: left;">
+                <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                    <thead>
+                        <tr class="trthead">
+                            <th fieldId="STT" fieldName="STT" fieldActive="0" class="text-center cell-50">
+                                @("STT".HtmlItemString("storagetime"))
+                            </th>
+                            <th fieldId="PRODUCTCODE" fieldName="Mã hàng hoá" fieldActive="0" class="text-center cell-150">
+                                @("Mã hàng hóa".HtmlItemString("storagetime"))
+                            </th>
+                            <th fieldId="PRODUCTNAME" sorttype="T" fieldName="Tên hàng hoá" fieldActive="0" class="text-center cell-150">
+                                @("Tên hàng hoá".HtmlItemString("storagetime"))
+                            </th>
+                            <th fieldId="UNITCODE" sorttype="T" fieldName="Đơn vị" fieldActive="0" class="text-center cell-100">
+                                @("Đơn vị".HtmlItemString("storagetime"))
+                            </th>
+                            <th fieldId="PRODUCTGRPNAME" sorttype="T" fieldName="Nhóm hàng" fieldActive="0" class="text-center cell-150">
+                                @("Nhóm hàng".HtmlItemString("storagetime"))
+                            </th>
+                            <th fieldId="QTYMINST" sorttype="N" fieldName="SL tồn tối thiểu" fieldActive="0" class="text-center cell-100">
+                                @("SL tồn tối thiểu".HtmlItemString("storagetime"))
+                            </th>
+                            <th fieldId="QTYTOTALOK" sorttype="N" fieldName="SL tồn kho" fieldActive="0" class="text-center cell-100">
+                                @("SL tồn kho".HtmlItemString("storagetime"))
+                            </th>
+                    </thead>
+                </table>
+            </div>
+            <div id="scrollable_1" class="scrollable">
+                <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                    <tbody id="table-tbodyID">
+                        @if (Model != null && Model.Count > 0)
+                        {
+                            int stt = 1;
+                            foreach (var item in Model)
+                            {
+                                <tr class="data-item trdata" ProductCode="@item.ProductCode">
+                                    <td fieldId="STT" fieldActive="0" class="text-center cell-50 text-center">
+                                        @stt
+                                    </td>
+                                    <td fieldId="PRODUCTCODE" fieldActive="0" class="text-left cell-150">
+                                        @item.mp_ProductCodeUser
+                                    </td>
+                                    <td fieldId="PRODUCTNAME" fieldActive="0" class="text-left cell-150">
+                                        @item.mp_ProductName
+                                    </td>
+                                    <td fieldId="UNITCODE" fieldActive="0" class="text-center cell-100">
+                                        <select class="select2-selection col-12" name="UnitCode" onchange="ChangeProduct(this)">
+                                            <option value="@item.ProductCode" productcode="@item.ProductCode">@item.mp_UnitCode</option>
+                                            @if (item.ListRpt_Inv_InventoryBalance_MinimumUIChild != null && item.ListRpt_Inv_InventoryBalance_MinimumUIChild.Count > 0)
+                                            {
+                                                foreach (var unitCodeChild in item.ListRpt_Inv_InventoryBalance_MinimumUIChild)
+                                                {
+                                                    <option value="@unitCodeChild.ProductCode" productcode="@unitCodeChild.ProductCode">@unitCodeChild.mp_UnitCode</option>
+                                                }
+                                            }
+                                        </select>
+                                    </td>
+                                    <td fieldId="PRODUCTGRPNAME" fieldActive="0" class="text-center cell-150">
+                                        @item.mpc_ProductGrpName
+                                    </td>
+                                    <td fieldId="QTYMINST" fieldActive="0" class="text-right cell-100 numberic qtyMinSt">
+                                        @item.QtyMinSt
+                                    </td>
+                                    <td fieldId="QTYTOTALOK" fieldActive="0" class="text-right cell-100 numberic qtyTotalOK">
+                                        @item.QtyTotalOK
+                                    </td>
+                                </tr>
+                                if (item.ListRpt_Inv_InventoryBalance_MinimumUIChild != null && item.ListRpt_Inv_InventoryBalance_MinimumUIChild.Count > 0)
+                                {
+                                    foreach (var child in item.ListRpt_Inv_InventoryBalance_MinimumUIChild)
+                                    {
+
+
+                                        <tr class="data-item trdata hidden" ProductCode="@child.ProductCode" ProductCodeUser="@child.mp_ProductCodeUser" ProductName="@child.mp_ProductName" ProductCodeBase="@child.mp_ProductCodeBase" ValConvert="@child.mp_ValConvert">
+                                            <td fieldId="STT" fieldActive="0" class="text-center cell-50 text-center">
+                                                @stt
+                                            </td>
+                                            <td fieldId="PRODUCTCODE" fieldActive="0" class="text-left cell-150">
+                                                @child.mp_ProductCodeUser
+                                            </td>
+                                            <td fieldId="PRODUCTNAME" fieldActive="0" class="text-left cell-150">
+                                                @child.mp_ProductName
+                                            </td>
+                                            <td fieldId="UNITCODE" fieldActive="0" class="text-center cell-100">
+                                                <select class="select2-selection1 col-12" name="UnitCode" onchange="ChangeProduct(this)">
+                                                    @if (item.ListRpt_Inv_InventoryBalance_MinimumUIChild != null && item.ListRpt_Inv_InventoryBalance_MinimumUIChild.Count > 0)
+                                                    {
+                                                        <option value="@item.mp_UnitCode" productcode="@item.ProductCode">@item.mp_UnitCode</option>
+                                                        foreach (var unitCodeChild in item.ListRpt_Inv_InventoryBalance_MinimumUIChild)
+                                                        {
+                                                            var selected = !CUtils.IsNullOrEmpty(child.mp_UnitCode) && child.mp_UnitCode.Equals(unitCodeChild.mp_UnitCode) ? "selected" : "";
+                                                            <option value="@unitCodeChild.ProductCode" @selected productcode="@unitCodeChild.ProductCode">@unitCodeChild.mp_UnitCode</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </td>
+                                            <td fieldId="PRODUCTGRPNAME" fieldActive="0" class="text-center cell-150 numberic valmpc_ProductGrpName">
+                                                @child.mpc_ProductGrpName
+                                            </td>
+                                            <td fieldId="QTYMINST" fieldActive="0" class="text-right cell-100 numberic qtyMinSt">
+                                                @child.QtyMinSt
+                                            </td>
+                                            <td fieldId="QTYTOTALOK" fieldActive="0" class="text-right cell-100 numberic qtyTotalOK">
+                                                @child.QtyTotalOK
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                stt++;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </aside>
+</div>
+
+<script>
+    $(document).ready(function () {
+       // tablesort();
+        $('.scrollable-horizontal').hScroll();
+    });
+    function tablesort() {
+        var listColumns = {
+            'PRODUCTCODE': [],
+            'PRODUCTNAME': [],
+            'UNITCODE': [],
+            'PRODUCTGRPNAME': [],
+            'QTYTOTALOK': [],
+            'QTYMINST': []
+        };
+        var options = {};
+        options.Columns = listColumns;
+        $('#dynamic-table-thead').table_Sortable(options);
+    }
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('.select2-selection').select2({
+            minimumResultsForSearch: -1
+        });
+    })
+</script>
+
+<script>
+    function ChangeProduct(thiz) {
+        var targetPrdCode = $(thiz).find('option:selected').attr('productcode');
+        var currentRow = $(thiz).parent().parent();
+        var targetRow = $(thiz).closest('tbody').find('tr.trdata.hidden[productcode="' + targetPrdCode + '"]')
+        $(currentRow).addClass('hidden');
+        $(targetRow).find('select[name="UnitCode"]').val(targetPrdCode).prop('selected', true);
+        $(targetRow).find('select[name="UnitCode"]').select2({
+            minimumResultsForSearch: -1
+        });
+        $(targetRow).removeClass('hidden');
+    }
+</script>

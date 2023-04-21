@@ -1,0 +1,12 @@
+﻿@model List<Mst_NNT>
+@{
+    Layout = null;
+}
+
+@if (Model != null && Model.Count > 0)
+{
+    foreach (var item in Model)
+    {
+        <option value="@MvcHtmlString.Create(item.OrgID.ToString().Trim())" desc="@MvcHtmlString.Create(item.NNTFullName.ToString().Trim())">@MvcHtmlString.Create(item.OrgID.ToString().Trim())</option>
+    }
+}

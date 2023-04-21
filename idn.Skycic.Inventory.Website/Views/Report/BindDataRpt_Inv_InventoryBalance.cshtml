@@ -1,0 +1,243 @@
+﻿@model List<Rpt_Inv_InventoryBalanceUI>
+@{
+    var init = CUtils.StrValue(ViewBag.init);
+    var List_Rpt_Inv_InventoryBalanceChild = ViewBag.List_Rpt_Inv_InventoryBalanceChild;
+    string strFlagShowPopup = ViewBag.FlagShowPopup as string;
+    bool flagShowPopup = strFlagShowPopup == "1";
+}
+<style>
+    .hidden {
+        display: none;
+    }
+</style>
+
+<div class="col-xs-12 layout-bot-top-16" style="">
+    <div class="row">
+        <div class="col-6">
+            @RenderItemFormat("BTN_BC_TON_KHO_PRINT", "<a class=\"btn btn-nc-button\" style=\"line-height: 13px; color: #000000\" onclick=\"Print()\" href=\"javascript:void(0);\" style=\"\"><i class=\"fas fa-print\" aria-hidden=\"true\" style=\"margin-right: 7px\"></i> In</a>", "", "")
+            @RenderItemFormat("BTN_BC_TON_KHO_EXCEL", "<a class=\"btn btn-nc-button\" style=\"line-height: 13px; color: #000000\" onclick=\"Export()\" href=\"javascript:void(0);\" style=\"\"><i class=\"fas fa-file-excel\" aria-hidden=\"true\" style=\"margin-right: 7px\"></i> Xuất Excel</a>", "", "")
+            @*<a class="btn btn-nc-button" href="javascript:;" onclick="Print()" style=""><i class="fas fa-print" aria-hidden="true"></i> In</a>
+            <a class="btn btn-nc-button" href="javascript:;" onclick="Export()" style=""><i class="far fa-file-excel" aria-hidden="true"></i> Xuất Excel</a>*@
+        </div>
+    </div>
+</div>
+<div class="panel-body no-padding" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+    <aside class="col-xs-12 layout-table no-padding">
+        @Html.AntiForgeryToken()
+        <div class="scrollable-horizontal padding-left-0 padding-right-0" style="padding-top: 0!important;">
+            <div style="width: 100%; float: left;">
+                <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                    <thead>
+                        <tr class="trthead">
+                            <th fieldId="STT" fieldName="STT" fieldActive="0" class="text-center cell-30">
+                                @("STT".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="PRODUCTCODE" sorttype="T" fieldName="Mã hàng hoá" fieldActive="0" class="text-left cell-150">
+                                @("Mã hàng hoá".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="PRODUCTNAME" sorttype="T" fieldName="Tên hàng hoá" fieldActive="0" class="text-left cell-220">
+                                @("Tên hàng hoá".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="UNITCODE" sorttype="T" fieldName="Đơn vị" fieldActive="0" class="text-left cell-75">
+                                @("Đơn vị".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="INVCODE" fieldName="Kho" fieldActive="0" class="text-left cell-220">
+                                @("Kho".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="QTYTOTALOK" sorttype="T" fieldName="Số lượng tổng" fieldActive="0" class="text-left cell-100">
+                                @("Số lượng tổng".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="QTYAVAILOK" sorttype="T" fieldName="SL Available" fieldActive="0" class="text-left cell-120">
+                                @("SL Available".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="QTYBLOCKOK" sorttype="T" fieldName="SL block" fieldActive="0" class="text-left cell-120">
+                                @("SL block".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="TOTALVALINV" sorttype="T" fieldName="Giá tồn kho" fieldActive="0" class="text-left cell-120">
+                                @("Giá trị".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="UPINV" sorttype="T" fieldName="Giá trị" fieldActive="0" class="text-left cell-120">
+                                @("Giá tồn kho".HtmlItemString("inventory"))
+                            </th>
+
+                        </thead>
+                </table>
+            </div>
+            <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                    <tbody id="table-tbodyID">
+                        @if (Model != null && Model.Count > 0)
+                        {
+                            int stt = 1;
+                            foreach (var item in Model)
+                            {
+                                <tr class="data-item trdata" ProductCode="@item.ProductCode" ProductCodeUser="@item.mp_ProductCodeUser" ListInvCode="@item.ListInvCode" ProductName="@item.mp_ProductName" ProductCodeBase="@item.ProductCode" ValConvert="1">
+                                    <td fieldId="STT" fieldActive="0" class="text-center cell-30 text-center">
+                                        @stt
+                                    </td>
+                                    <td fieldId="PRODUCTCODE" fieldActive="0" class="text-left cell-150">
+                                        @item.mp_ProductCodeUser
+                                        @if (flagShowPopup && item.mp_FlagLot != null && item.mp_FlagLot.Equals("1"))
+                                        {
+                                            <a href="javascript:;" class="float-right" onclick="ShowPopupLo(this)">Lô</a>
+                                        }
+                                        @if (flagShowPopup && item.mp_FlagSerial != null && item.mp_FlagSerial.Equals("1"))
+                                        {
+                                            <a href="javascript:;" class="float-right" onclick="ShowPopupSerial(this)">Serial</a>
+                                        }
+                                    </td>
+                                    <td fieldId="PRODUCTNAME" fieldActive="0" class="text-left cell-220">
+                                        @item.mp_ProductName
+                                    </td>
+                                    <td fieldId="UNITCODE" fieldActive="0" class="text-left cell-75">
+                                        <select class="select2-selection1 col-12" name="UnitCode" onchange="ChangeProduct(this)">
+                                            <option value="@item.ProductCode" productcode="@item.ProductCode">@item.mp_UnitCode</option>
+                                            @if (item.ListRpt_Inv_InventoryBalanceUIChild != null && item.ListRpt_Inv_InventoryBalanceUIChild.Count > 0)
+                                            {
+                                                foreach (var unitCodeChild in item.ListRpt_Inv_InventoryBalanceUIChild)
+                                                {
+                                                    <option value="@unitCodeChild.ProductCode" productcode="@unitCodeChild.ProductCode">@unitCodeChild.mp_UnitCode</option>
+                                                }
+                                            }
+                                        </select>
+                                    </td>
+                                    <td fieldId="INVCODE" fieldActive="0" class="text-left cell-220">
+                                        @{
+                                            var listInvCode = item.ListInvCode.ToString().Split(',');
+                                            foreach (var invCode in listInvCode)
+                                            {
+                                                <span class="badges-sm">@invCode</span>
+                                            }
+                                        }
+                                    </td>
+                                    <td fieldId="QTYTOTALOK" fieldActive="0" class="text-right cell-100 numberic valTotalOK">
+                                        @item.QtyTotalOK
+                                    </td>
+                                    <td fieldId="QTYAVAILOK" fieldActive="0" class="text-right cell-120 numberic valAvailOK">
+                                        @item.QtyAvailOK
+                                    </td>
+                                    <td fieldId="QTYBLOCKOK" fieldActive="0" class="text-right cell-120 numberic valBlockOK">
+                                        @item.QtyBlockOK
+                                    </td>
+                                    <td fieldId="TOTALVALINV" fieldActive="0" class="text-right cell-120 numberic valBlockOK">
+                                        @item.TotalValInv
+                                    </td>
+                                    <td fieldId="UPINV" fieldActive="0" class="text-right cell-120 numberic valBlockOK">
+                                        @item.UPInv
+                                    </td>
+                                </tr>
+                                if (item.ListRpt_Inv_InventoryBalanceUIChild != null && item.ListRpt_Inv_InventoryBalanceUIChild.Count > 0)
+                                {
+                                    foreach (var child in item.ListRpt_Inv_InventoryBalanceUIChild)
+                                    {
+                                        <tr class="data-item trdata hidden" ProductCode="@child.ProductCode" ProductCodeUser="@child.mp_ProductCodeUser" ListInvCode="@child.ListInvCode" ProductName="@child.mp_ProductName" ProductCodeBase="@child.mp_ProductCodeBase" ValConvert="@child.mp_ValConvert">
+                                            <td fieldId="STT" fieldActive="0" class="text-center cell-30 text-center">
+                                                @stt
+                                            </td>
+                                            <td fieldId="PRODUCTCODE" fieldActive="0" class="text-left cell-150">
+                                                @child.mp_ProductCodeUser
+                                                @if (flagShowPopup && child.mp_FlagLot != null && child.mp_FlagLot.Equals("1"))
+                                                {
+                                                    <a href="javascript:;" class="float-right" onclick="ShowPopupLo(this)">Lô</a>
+                                                }
+                                                @if (flagShowPopup && child.mp_FlagSerial != null && child.mp_FlagSerial.Equals("1"))
+                                                {
+                                                    <a href="javascript:;" class="float-right" onclick="ShowPopupSerial(this)">Serial</a>
+                                                }
+                                            </td>
+                                            <td fieldId="PRODUCTNAME" fieldActive="0" class="text-left cell-220">
+                                                @child.mp_ProductName
+                                            </td>
+                                            <td fieldId="UNITCODE" fieldActive="0" class="text-left cell-75">
+                                                <select class="select2-selection1 col-12" name="UnitCode" onchange="ChangeProduct(this)">
+                                                    @if (item.ListRpt_Inv_InventoryBalanceUIChild != null && item.ListRpt_Inv_InventoryBalanceUIChild.Count > 0)
+                                                    {
+                                                        <option value="@item.mp_UnitCode" productcode="@item.ProductCode">@item.mp_UnitCode</option>
+                                                        foreach (var unitCodeChild in item.ListRpt_Inv_InventoryBalanceUIChild)
+                                                        {
+                                                            var selected = !CUtils.IsNullOrEmpty(child.mp_UnitCode) && child.mp_UnitCode.Equals(unitCodeChild.mp_UnitCode) ? "selected" : "";
+                                                            <option value="@unitCodeChild.ProductCode" @selected productcode="@unitCodeChild.ProductCode">@unitCodeChild.mp_UnitCode</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </td>
+                                            <td fieldId="INVCODE" fieldActive="0" class="text-left cell-220">
+                                                @{
+                                                    foreach (var invCode in listInvCode)
+                                                    {
+                                                        <span class="badges-sm">@invCode</span>
+                                                    }
+                                                }
+                                            </td>
+                                            <td fieldId="QTYTOTALOK" fieldActive="0" class="text-right cell-100 numberic valTotalOK">
+                                                @child.QtyTotalOK
+                                            </td>
+                                            <td fieldId="QTYAVAILOK" fieldActive="0" class="text-right cell-120 numberic valAvailOK">
+                                                @child.QtyAvailOK
+                                            </td>
+                                            <td fieldId="QTYBLOCKOK" fieldActive="0" class="text-right cell-120 numberic valBlockOK">
+                                                @child.QtyBlockOK
+                                            </td>
+                                            <td fieldId="TOTALVALINV" fieldActive="0" class="text-right cell-120 numberic valBlockOK">
+                                                @child.TotalValInv
+                                            </td>
+                                            <td fieldId="UPINV" fieldActive="0" class="text-right cell-120 numberic valBlockOK">
+                                                @child.UPInv
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                stt++;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </aside>
+</div>
+<script>
+    $(document).ready(function () {
+        tablesort();
+        $('.scrollable-horizontal').hScroll();
+    });
+
+    function tablesort() {
+        var listColumns = {
+            'PRODUCTCODE': [],
+            'PRODUCTNAME': [],
+            'QTYTOTALOK': [],
+            'QTYAVAILOK': [],
+            'QTYBLOCKOK': [],
+            'INVCODE': [],
+            'TOTALVALINV': [],
+            'UPINV': []
+        };
+        var options = {};
+        options.Columns = listColumns;
+        //$('#dynamic-table-thead').table_Sortable(options);
+    }
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('.select2-selection1').select2({
+            minimumResultsForSearch: -1
+        });
+    })
+</script>
+
+<script>
+    function ChangeProduct(thiz) {
+        var targetPrdCode = $(thiz).find('option:selected').attr('productcode');
+        var currentRow = $(thiz).parent().parent();
+        var targetRow = $(thiz).closest('tbody').find('tr.trdata.hidden[productcode="' + targetPrdCode + '"]')
+        $(currentRow).addClass('hidden');
+        $(targetRow).find('select[name="UnitCode"]').val(targetPrdCode).prop('selected', true);
+        $(targetRow).find('select[name="UnitCode"]').select2({
+            minimumResultsForSearch: -1
+        });
+        $(targetRow).removeClass('hidden');
+        //format_Number();
+    }
+</script>

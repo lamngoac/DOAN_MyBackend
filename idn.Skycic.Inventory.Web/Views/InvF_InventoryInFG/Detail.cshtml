@@ -1,0 +1,202 @@
+﻿@model InvF_InventoryInFGDtl
+@{
+    /**/
+
+    Layout = "~/Views/Shared/CoreLayoutKho.cshtml";
+    const string title = "Chi tiết phiếu nhập kho thành phẩm";
+    ViewBag.Title = title;
+    var today = ViewBag.Today as string;
+    var lstdtl = ViewBag.ListDtl as List<InvF_InventoryInFGDtlUI>;
+    var lst = ViewBag.List as List<InvF_InventoryInFG>;
+    var offset = ViewBag.Offset;
+
+}
+<script type="text/javascript">
+    var parents = new Array();
+    parents.push("@Url.Action("Index", "InvF_InventoryInFG")");
+    parents.push("");
+    var parentsText = new Array();
+    parentsText.push("@MvcHtmlString.Create("Quản lý kho thành phẩm")");
+    parentsText.push("@MvcHtmlString.Create(title)");
+    setAdminCurrentTag(parents, parentsText);
+</script>
+<style>
+    .modal-dialog {
+        width: 700px;
+        height: auto;
+    }
+</style>
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                @*<div class="title">
+            <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+        </div>*@
+                <div class="panel-body no-padding" id="panel-body">
+                    @using (Html.BeginForm("Detail", "InvF_InventoryInFG", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true)
+                        <div class="col-xs-12 layout-search layout-bot-top-16">
+                            <aside class="col-xs-4">
+                                <div class="form-group margin-bottom-9">
+                                    <label for="PmtNo" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500">Số phiếu nhập</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="IF_InvInFGNo" name="IF_InvInFGNo" class="col-xs-12 PmtNo" onkeyup="locdau(this);" value="@if (lst[0] != null && lst[0].IF_InvInFGNo != null){@lst[0].IF_InvInFGNo} else { @("")}" autocomplete="off" readonly required />
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group margin-bottom-9">
+                                    <label for="CreateDTimeUTC" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500">Ngày tạo</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            @{
+                                                var createDTimeUTC = CUtils.ReturnDateTimeUtcToLocalTime(CUtils.StrValue(lst[0].CreateDTimeUTC), Nonsense.DATE_TIME_FORMAT, offset);
+                                            }
+                                            <input type="text" id="CreateDTimeUTC" name="CreateDTimeUTC" class="col-xs-12 CreateDTime" value="@createDTimeUTC" autocomplete="off" readonly />
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group margin-bottom-9">
+                                    <label for="CreateBy" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500">Người nhập phiếu</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="CreateBy" name="CreateBy" class="col-xs-12 CreateBy" value="@if (lst[0] != null && lst[0].CreateBy != null){@lst[0].CreateBy} else { @("")}" autocomplete="off" readonly required />
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group margin-bottom-9">
+                                    <label for="InvCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500">Mã kho</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <input type="text" id="InvCode" name="InvCode" class="col-xs-12 CreateBy" value="@lst[0].InvCode" autocomplete="off" readonly required />
+                                    </div>
+                                </div>
+                            </aside>
+                            <aside class="col-xs-4">
+                                <div class="form-group margin-bottom-9">
+                                    <label for="Remark" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500">Diễn giải</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <textarea id="Remark" name="Remark" class="col-xs-12 Remark" rows="5" maxlength="400" readonly>@lst[0].Remark</textarea>
+                                    </div>
+                                </div>
+                            </aside>
+                        </div>
+                    }
+                </div>
+
+                <div class="panel-body no-padding" id="panel-body">
+                    <div class="col-xs-12 layout-table no-padding">
+                        <div class="scrollable-horizontal padding-left-0 padding-right-0 div-scrollable" data-size="570" style="padding-top: 0!important;">
+                            <div style="width: 100%; float: left;">
+                                <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                                    <thead>
+                                        <tr>
+                                            @if (!CUtils.IsNullOrEmpty(lst[0].FormInType))
+                                            {
+                                                if (lst[0].FormInType.ToString().Equals("MAVACH"))
+                                                {
+                                                    <th class="text-center cell-50">
+                                                    </th>
+                                                }
+                                            }
+                                            <th class="text-center cell-30">
+                                                <label class="pos-rel">
+                                                    <input type="checkbox" class="cl-check" onclick="CheckAll(this);" disabled />
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </th>
+                                            <th class="cell-150">
+                                                Mã sản phẩm
+                                            </th>
+                                            <th class="cell-200">
+                                                Tên sản phẩm
+                                            </th>
+                                            <th class="cell-200">
+                                                Số lượng
+                                            </th>
+                                            <th class="cell-150">
+                                                Ngày sản xuất
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                            <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                                <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody table-tbody">
+                                    <tbody id="table-tbodyID">
+                                        @Html.Partial("ImportExcel", lstdtl, new ViewDataDictionary() { { "Disabled", "disabled" } })
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+@*Import Excel*@
+<div class="modal fade" id="ImportExcelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+
+<script type="text/javascript">
+    processAjaxForm($('#manageForm'), function (response) {
+        processAjaxFormResult(response);
+
+    });
+</script>
+
+@*Active Menu*@
+<script type="text/javascript">
+    setAdminCurrentUrl('@Url.Action("Index", "InvF_InventoryInFG")');
+</script>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/InvF_InventoryInFG.js")"></script>
+    <script type="text/javascript">
+    setAdminCurrentUrl('@Url.Action("Index", "InvF_InventoryInFG")');
+    processAjaxForm($('#manageForm'), function (response) {
+        processAjaxFormResult(response);
+
+    });
+    @* Set focus *@
+    //var _getForm = document.getElementById("manageForm");
+    //_getForm.addEventListener('reset', function () {
+    //    document.getElementById("IF_InvOutFGNo").focus()
+    //    });
+
+        var objInvF_InventoryInFG = new InvF_InventoryInFG();
+
+        var objVariablesInit = {
+            Id_FormMain: '',
+            Id_FormImportExcel: 'manageFormImportExcel',
+            Id_Modal: 'ImportExcelModal',
+            Id_FileInput: 'file',
+        };
+
+        function ShowPopupSerial(ifinvinfgno, partcode) {
+            //debugger;
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("ShowPopupSerial", "InvF_InventoryInFG")';
+
+            objInvF_InventoryInFG.ajaxSettings = ajaxSettings;
+            objInvF_InventoryInFG.variablesInit(objVariablesInit);
+            objInvF_InventoryInFG.showPopupSerial(ifinvinfgno, partcode);
+        }
+        function CloseModalImportExcel() {
+            $('#ImportExcelModal').modal("hide");
+            $('#ImportExcelModal').html('');
+        }
+    </script>
+
+}
+
+

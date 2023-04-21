@@ -1,0 +1,97 @@
+﻿@model Mst_PartMaterialType
+@{
+    Layout = "~/Views/Shared/CoreLayoutQuanTri.cshtml";
+    var title = "CHI TIẾT NHÓM SẢN PHẨM";
+    var titleMng = "Danh mục nhóm sản phẩm";
+    ViewBag.Title = title;
+}
+@{
+
+}
+<script type="text/javascript">
+    var parents = new Array();
+    parents.push("@Url.Action("Index", "Mst_PartMaterialType")");
+    parents.push("");
+    var parentsText = new Array();
+    parentsText.push("@MvcHtmlString.Create("titleMng")");
+    parentsText.push("@MvcHtmlString.Create("title")");
+    setAdminCurrentTag(parents, parentsText);
+</script>
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                @*<div class="title">
+                        <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                    </div>*@
+                <div class="panel-body no-padding" id="panel-body">
+                    <aside class="col-xs-12 no-padding">
+                        @using (Html.BeginForm("Create", "Mst_PaymentType", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="col-xs-12 layout-search layout-bot-top-16">
+
+                                <div class="col-xs-4 no-padding">
+                                    <div class="form-group margin-bottom-9">
+                                        <label for="PMType" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã nhóm sản phẩm <span style=\"color: red\">*</span>")</label>
+                                        <div class="col-xs-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="PMType" name="PMType" class="col-xs-12 PMType" onkeyup="locdau(this);" value="@if (Model != null && Model.PMType != null){@MvcHtmlString.Create(Model.PMType.ToString())} else { @("")}" autocomplete="off" disabled />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-xs-4 no-padding">
+                                    <div class="form-group margin-bottom-9">
+                                        <label for="PMTypeName" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên nhóm sản phẩm <span style=\"color: red\">*</span>")</label>
+                                        <div class="col-xs-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="PMTypeName" name="PMTypeName" class="col-xs-12 Code PMTypeName" value="@if (Model != null && Model.PMTypeName != null){@MvcHtmlString.Create(Model.PMTypeName.ToString())} else { @("")}" autocomplete="off" disabled />
+                                            </span>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <div class="col-xs-4 no-padding">
+                                    <div class="form-group margin-bottom-9">
+                                        @{
+                                            var checkActive = "";
+                                            if (Model != null && Model.FlagActive.Equals("1"))
+                                            {
+                                                checkActive = "checked";
+                                            }
+                                            else
+                                            {
+                                                checkActive = "";
+                                            }
+                                        }
+                                        <label for="FlagActive" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">Trạng thái</label>
+                                        <div class="col-xs-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right padding-top-5">
+                                                <label>
+                                                    <input name="FlagActive" id="FlagActive" class="ace ace-switch ace-switch-4 " type="checkbox" value="1" @checkActive disabled />
+                                                    <span class="lbl"></span>
+                                                    <input name="" type="hidden" value="0" />
+                                                </label>
+                                            </span>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        }
+                    </aside>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE CONTENT ENDS -->
+</div><!-- /.col -->

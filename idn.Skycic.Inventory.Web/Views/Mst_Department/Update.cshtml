@@ -1,0 +1,281 @@
+﻿@model Mst_Department
+@{
+    Layout = "~/Views/Shared/CoreLayoutQuanTri.cshtml";
+    var title = "CẬP NHẬT BỘ PHẬN/PHÒNG BAN";
+    var titleMng = "Danh mục bộ phận/phòng ban";
+    ViewBag.Title = title;
+    var listMst_DepartmentUI = ViewBag.ListMst_DepartmentUI as List<Mst_DepartmentUI>;
+    if (listMst_DepartmentUI == null || listMst_DepartmentUI.Count == 0)
+    {
+        listMst_DepartmentUI = new List<Mst_DepartmentUI>();
+    }
+
+    var listMst_NNT = ViewBag.ListMst_NNT as List<Mst_NNT>;
+    if (listMst_NNT == null || listMst_NNT.Count == 0)
+    {
+        listMst_NNT = new List<Mst_NNT>();
+    }
+
+}
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="row no-margin box-shadow-tk">
+                        @using (Html.BeginForm("Update", "Mst_Department", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-9">
+                                    <label for="DepartmentCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã BP/PB <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="DepartmentCode" name="DepartmentCode" class="col-xs-12 DepartmentCode" onkeyup="locdau(this);" value="@if (Model != null && Model.DepartmentCode != null){@MvcHtmlString.Create(Model.DepartmentCode.ToString())} else { @("")}" disabled autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-9">
+                                    <label for="DepartmentName" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên BP/PB <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="DepartmentName" name="DepartmentName" class="col-xs-12 DepartmentName" value="@if (Model != null && Model.DepartmentName != null){@MvcHtmlString.Create(Model.DepartmentName.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-9">
+                                    <label for="DepartmentCodeParent" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("BP/PB quản lý <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right disabled-fix">
+                                            @{
+                                                var departmentCodeParent = "";
+                                                if (Model != null && !CUtils.IsNullOrEmpty(Model.DepartmentCodeParent))
+                                                {
+                                                    departmentCodeParent = Model.DepartmentCodeParent.ToString().Trim();
+                                                }
+                                            }
+                                            <select id="DepartmentCodeParent" name="DepartmentCodeParent" class="col-xs-12 DepartmentCodeParent disabled-fix">
+                                                <option value=""></option>
+                                                @if (listMst_DepartmentUI != null && listMst_DepartmentUI.Count > 0)
+                                                {
+                                                    foreach (var item in listMst_DepartmentUI)
+                                                    {
+                                                        <option value="@MvcHtmlString.Create(item.DepartmentCode.ToString().Trim())" desc="@MvcHtmlString.Create(item.DepartmentName.ToString().Trim())" @( item.DepartmentCode.ToString().Trim().Equals(departmentCodeParent) ? "selected" : "")>@MvcHtmlString.Create(item.HlevelTitle.ToString().Trim())</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-9">
+                                    <label for="MST" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã số thuế <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            @{
+                                                var mst = "";
+                                                if (Model != null)
+                                                {
+                                                    if (Model.DepartmentCode != null)
+                                                    {
+                                                        mst = Model.MST.ToString();
+                                                    }
+                                                }
+                                            }
+                                            <select id="MST" name="MST" class="col-xs-12 MST disabled-fix">
+                                                <option value=""></option>
+                                                @if (listMst_NNT != null && listMst_NNT.Count > 0)
+                                                {
+                                                    foreach (var item in listMst_NNT)
+                                                    {
+                                                        <option value="@MvcHtmlString.Create(item.MST.ToString().Trim())" desc="@MvcHtmlString.Create(item.MST.ToString().Trim())" @(item.MST.ToString().Trim().Equals(mst) ? "selected" : "")>@MvcHtmlString.Create(item.MST.ToString().Trim())</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-9">
+                                    @{
+                                        var checkActive = "";
+                                        if (Model != null && Model.FlagActive.Equals("1"))
+                                        {
+                                            checkActive = "checked";
+                                        }
+                                        else
+                                        {
+                                            checkActive = "";
+                                        }
+                                    }
+                                    <label for="" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">Trạng thái</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right padding-top-5">
+                                            <label>
+                                                <input name="FlagActive" id="FlagActive" class="ace ace-switch ace-switch-4 " type="checkbox" value="1" @checkActive />
+                                                <span class="lbl"></span>
+                                                <input name="" type="hidden" value="0" />
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        }
+                    </aside>
+                    <div class="col-xs-12 no-padding">
+                        <div class="clearfix">
+                            <div class="row no-margin" style="float: right">
+                                @RenderItemFormat("BTN_SUA_BPPB_LUU", " <a href=\"javascript:void();\" class=\"btn btn-nc-button\" style=\"margin-top: 20px;\" onclick=\"SaveData();\">Lưu</a>", "", "")
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+<script type="text/javascript">
+    processAjaxForm($('#manageForm'), function (response) {
+        processAjaxFormResult(response);
+
+    });
+</script>
+
+@*Active Menu*@
+<script type="text/javascript">
+    setAdminCurrentUrl('@Url.Action("Index", "Mst_Department")');
+</script>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Mst_Department.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "Mst_Department")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+        });
+        @* Set focus *@
+        var _getForm = document.getElementById("manageForm");
+        _getForm.addEventListener('reset', function () {
+            document.getElementById("DepartmentCode").focus()
+        })
+        function SaveData() {
+            debugger;
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Edit", "Mst_Department")';
+            var objMst_Department = new Mst_Department();
+            objMst_Department.ActionType = 'edit';
+            objMst_Department.ajaxSettings = ajaxSettings;
+            objMst_Department.saveData();
+        }
+    </script>
+}
+@*<script>
+    function CheckForm() {
+        if (!CheckIsNullOrEmpty('#DepartmentCode', 'has-error-fix', '@MvcHtmlString.Create("Mã bộ phận/phòng ban không được trống!")'))
+        {
+            return false;
+        }
+        if (!CheckIsNullOrEmpty('#DepartmentName', 'has-error-fix', '@MvcHtmlString.Create("Tên bộ phận/phòng ban không được trống!")'))
+        {
+            return false;
+        }
+        if (!CheckIsNullOrEmpty('#DepartmentCodeParent', 'has-error-fix', '@MvcHtmlString.Create("Bộ phận/phòng ban quản lý không được trống!")'))
+        {
+            return false;
+        }
+        if (!CheckIsNullOrEmpty('#MST', 'has-error-fix', '@MvcHtmlString.Create("Mã đơn vị không được trống!")'))
+        {
+            return false;
+        }
+        return true;
+    }
+
+    function SaveData()
+    {
+        var check = CheckForm();
+
+        if (check)
+        {
+            var departmentCode = ReturnValueText('#DepartmentCode');
+            var departmentName = ReturnValueText('#DepartmentName');
+            var departmentCodeParent = ReturnValueText('#DepartmentCodeParent');
+            var mST = ReturnValueText('#MST');
+            var flagActive = '0';
+            var inputFlagActive = $('#FlagActive');
+            if (inputFlagActive !== undefined && inputFlagActive !== null) {
+                if (inputFlagActive.prop('checked')) {
+                    flagActive = '1';
+                }
+            }
+
+            var tem = new Object();
+            tem.DepartmentCode = departmentCode;
+            tem.DepartmentName = departmentName;
+            tem.DepartmentCodeParent = departmentCodeParent;
+            tem.MST = mST;
+            tem.FlagActive = flagActive;
+
+            var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+            var modelCur = JSON.stringify(tem);
+            var url = '@Url.Action("Edit", "Mst_Department")';
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    __RequestVerificationToken: token
+                    , model: modelCur
+                },
+                traditional: true,
+                //contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    if (data.Success) {
+                        if (data.Messages !== null && data.Messages !== undefined && data.Messages.length > 0) {
+                            alert(data.Messages[0]);
+                        }
+                        window.location.href = data.RedirectUrl;
+                    }
+                    else {
+                        if (data.Detail != null) {
+                            _showErrorMsg123("Lỗi!", data.Detail);
+                        }
+                    }
+                }, error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    debugger;
+                    if (textStatus === 'Unauthorized') {
+                        alert('custom message. Error: ' + errorThrown);
+                    } else {
+                        //alert('custom message. Error2: ' + errorThrown);
+                    }
+                }
+            });
+
+
+        }
+    }
+</script>*@
+
+
+
+
+
+

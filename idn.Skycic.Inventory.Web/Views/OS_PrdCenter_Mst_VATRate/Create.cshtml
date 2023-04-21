@@ -1,0 +1,174 @@
+﻿@model idn.Skycic.Inventory.Common.Models.ProductCentrer.Mst_VATRate
+@{
+
+    var title = "TẠO MỚI thuế suất";
+    var titleMng = "Danh mục thuế suất";
+    ViewBag.Title = title;
+}
+
+<div class="container">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="col-xs-12">
+                        @using (Html.BeginForm("Create", "OS_PrdCenter_Mst_VATRate", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                        <div class="col-sm-8">
+                            <div class="form-group margin-bottom-5">
+                                <label for="VATRateCode" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã thuế suất")</label>
+                                <div class="col-xs-12 col-sm-5">
+                                    <span class="block input-icon input-icon-right">
+                                        <input type="text" id="VATRateCode" name="VATRateCode" class="col-xs-11 VATRateCode" onkeyup="locdau(this);" value="" autocomplete="off" required />
+                                    </span>
+                                    <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                </div>
+
+                            </div>
+                            <div class="form-group margin-bottom-5">
+                                <label for="VATRate" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Thuế suất")</label>
+                                <div class="col-xs-12 col-sm-5">
+                                    <span class="block input-icon input-icon-right">
+                                        <input type="text" id="VATRate" name="VATRate" class="col-xs-11 VATRate" value="" autocomplete="off" required />
+                                    </span>
+                                    <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                </div>
+
+                            </div>
+                            <div class="form-group margin-bottom-5">
+                                <label for="VATDesc" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mô tả")</label>
+                                <div class="col-xs-12 col-sm-5">
+                                    <span class="block input-icon input-icon-right">
+                                        <textarea id="VATDesc" name="VATDesc" class="col-xs-11 VATDesc" rows="4" cols="50" maxlength="400"></textarea>
+                                    </span>
+                                </div>
+
+                            </div>
+                        </div>
+                        }
+                    </aside>
+                    <div class="col-xs-12 text-center">
+                        <div class="clearfix">
+                            <div class="row no-margin text-center">
+                                @RenderItemFormat("BTN_TAO_OS_PRDCENTER_MST_VATRATE_LUU", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-left: 10px; padding-left: 15px!important; padding-right: 15px!important; \" onclick=\"SaveData();\"><i class=\"ace-icon fa fa-floppy-o bigger-110\"></i>Lưu</a>", "", "")
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+<script type="text/javascript">
+    processAjaxForm($('#manageForm'), function (response) {
+        processAjaxFormResult(response);
+
+    });
+</script>
+
+@*Set focus*@
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#VATRateCode').focus();
+    });
+</script>
+
+<script>
+    function CheckForm() {
+        if (!CheckIsNullOrEmpty('#VATRateCode', 'has-error-fix', '@MvcHtmlString.Create("Mã thuế suất không được trống!")'))
+        {
+            return false;
+        }
+        if (!CheckIsNullOrEmpty('#VATRate', 'has-error-fix', '@MvcHtmlString.Create("Tên thuế suất không được trống!")'))
+        {
+            return false;
+        }
+        var vatDesc = ReturnValue('#VATDesc');
+        if (!IsNullOrEmpty(vatDesc)) {
+            if (vatDesc.length > parseInt('@MvcHtmlString.Create(Nonsense.RemarkLength.ToString())')) {
+                AddClassCss('#VATDesc', 'has-error-fix');
+                $('#VATDesc').focus();
+                alert('@MvcHtmlString.Create("Mô tả > " + Nonsense.RemarkLength + " ký tự!")');
+                return false;
+            } else {
+                RemoveClassCss('#VATDesc', 'has-error-fix');
+            }
+        }
+        return true;
+    }
+
+    function SaveData()
+    {
+        var check = CheckForm();
+
+        if (check)
+        {
+            var vatRateCode = ReturnValueText('#VATRateCode');
+            var vatRate = ReturnValueText('#VATRate');
+            var vatDesc = ReturnValueText('#VATDesc');
+            var tem = new Object();
+            tem.VATRateCode = vatRateCode;
+            tem.VATRate = vatRate;
+            tem.VATDesc = vatDesc;
+            var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+            var modelCur = JSON.stringify(tem);
+            var url = '@Url.Action("Create", "OS_PrdCenter_Mst_VATRate")';
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    __RequestVerificationToken: token
+                    , model: modelCur
+                },
+                traditional: true,
+                //contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    if (data.Success) {
+                        if (data.Messages != null && data.Messages !== undefined && data.Messages.length > 0) {
+                            alert(data.Messages[0]);
+                        }
+                        window.location.href = data.RedirectUrl;
+                    }
+                    else {
+                        if (data.Detail != null) {
+                            _showErrorMsg123("Lỗi!", data.Detail);
+                        }
+                    }
+                }, error: function (xmlHttpRequest, textStatus, errorThrown) {
+                    debugger;
+                    if (textStatus === 'Unauthorized') {
+                        alert('custom message. Error: ' + errorThrown);
+                    } else {
+                        //alert('custom message. Error2: ' + errorThrown);
+                    }
+                }
+            });
+
+
+        }
+    }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+

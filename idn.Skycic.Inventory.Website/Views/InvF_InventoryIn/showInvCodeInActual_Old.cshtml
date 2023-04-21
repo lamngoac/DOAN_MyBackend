@@ -1,0 +1,276 @@
+﻿@{
+    var listInvCodeIn = ViewBag.ListInvCodeIn as List<Mst_Inventory>;
+    var listInventoryInDtl = ViewBag.ListInvF_InventoryInDtl as List<InvF_InventoryInDtl>;
+    
+    var flagHideBtn = ViewBag.FlagHideBtn as string;
+
+    var strDisplay = "";
+    if (!string.IsNullOrEmpty(flagHideBtn) && flagHideBtn == "1")
+    {
+        strDisplay = "display:none";
+    }
+}
+<div class="modal-dialog" style="width: 500px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel"><b>Chọn vị trí nhập</b></h2>
+            <a href="javascript:;" onclick="ClosePopupVTNhap()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body" style="">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupInvCodeInActual" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="col-xs-12">
+                    <input hidden id="mdVTNhap_ProductCode" value="@(ViewBag.ProductCode == null ? "" : ViewBag.ProductCode)" />
+                    <label class="control-label col-md-12" style="text-align: left;">
+                        @(ViewBag.ProductName == null ? "" : ViewBag.ProductName)
+                    </label>
+                </div>
+            }
+            <div class="col-6 margin-bottom-9" style="height: 30px; @strDisplay">
+                <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="AddVTNhap()" style="float: left;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Thêm</a>
+                <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="SaveVTNhap()" style="float: left;font-size: 13px;margin-left: 10px"><i class="fa fa-save" aria-hidden="true"></i> OK</a>
+            </div>
+            <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+                <div style="width: 100%; float: left;">
+                    <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                        <thead>
+                            <tr class="trthead">
+                                <th class="text-center cell-50">
+                                </th>
+                                <th fieldId="InvCodeInActual" sorttype="T" fieldName="Mã vị trí" fieldActive="0" class="text-left cell-150">
+                                    @("Mã vị trí".HtmlItemString("invf_inventoryin"))
+                                </th>
+                                <th fieldId="Qty" sorttype="T" fieldName="Số lượng" fieldActive="0" class="text-left cell-200">
+                                    @("Số lượng".HtmlItemString("invf_inventoryin"))
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                    <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                        <tbody id="table-tbodyIDInvCodeInActual">
+                            @{ if (listInventoryInDtl != null && listInventoryInDtl.Count > 0)
+                                {
+                                    var idx = 0;
+                                    foreach (var item in listInventoryInDtl)
+                                    {
+                                        <tr class="data-item trdata" idx="@idx">
+                                            <td fieldId="CONTROL" fieldActive="0" class="text-center cell-50 action-buttons">
+                                                <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteVTNhap(this, '@item.InvCodeInActual');"><i class="fas fa-trash-alt"></i></a>
+                                            </td>
+                                            <td fieldId="InvCodeInActual" fieldActive="0" class="text-left cell-150">
+                                                <span class="block input-icon input-icon-right">
+                                                    <select class="InvCodeInActual_Dtl col-md-12" name="Lst_InvF_InventoryInDtlPopup[@idx].InvCodeInActual">
+                                                        <optgroup label="">
+                                                            <option value="">--Chọn vị trí--</option>
+                                                            @if (listInvCodeIn != null && listInvCodeIn.Count > 0)
+                                                            {
+                                                                foreach (var it in listInvCodeIn)
+                                                                {
+                                                                    var invCode = CUtils.StrValue(it.InvCode);
+                                                                    var invName = CUtils.StrValue(it.InvName);
+                                                                    <option value="@MvcHtmlString.Create(invCode)" @(CUtils.StrValue(item.InvCodeInActual) == invCode ? "selected" : "")>@MvcHtmlString.Create(invName)</option>
+                                                                }
+                                                            }
+                                                        </optgroup>
+                                                        @*<option value="SEARCHDATA">@("Tìm kiếm".HtmlItemString("invf_inventoryin"))</option>*@
+                                                    </select>
+                                                </span>
+                                            </td>
+                                            <td fieldId="QTY" fieldActive="0" class="text-right cell-200">
+                                                <input class="col-md-12 text-right numberQty" name="Lst_InvF_InventoryInDtlPopup[@idx].Qty" value="@item.Qty">
+                                            </td>
+                                            
+                                        </tr>
+                                        idx++;
+                                    }
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<table hidden>
+    <tbody id="rowtemplateAddVTNhap">
+        <tr class="data-item trdata" idx="==idx==">
+            <td fieldId="CONTROL" fieldActive="0" class="text-center cell-50 action-buttons">
+                <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteVTNhap(this, '==InvCodeInActual==');"><i class="fas fa-trash-alt"></i></a>
+            </td>
+            <td fieldId="InvCodeInActual" fieldActive="0" class="text-left cell-150">
+                <span class="block input-icon input-icon-right">
+                    <select id="==idselect==" class="col-md-12" name="Lst_InvF_InventoryInDtlPopup[==idx==].InvCodeInActual">
+                        <optgroup label="">
+                            <option value="">--Chọn vị trí--</option>
+                            @if (listInvCodeIn != null && listInvCodeIn.Count > 0)
+                            {
+                                foreach (var item in listInvCodeIn)
+                                {
+                                    var invCode = CUtils.StrValue(item.InvCode);
+                                    var invName = CUtils.StrValue(item.InvName);
+                                    <option value="@MvcHtmlString.Create(invCode)">@MvcHtmlString.Create(invName)</option>
+                                }
+                            }
+                        </optgroup>
+                        @*<option value="SEARCHDATA">@("Tìm kiếm".HtmlItemString("invf_inventoryin"))</option>*@
+                    </select>
+                </span>
+            </td>
+            <td fieldId="QTY" fieldActive="0" class="text-right cell-200">
+                <input class="col-md-12 text-right numberQty" name="Lst_InvF_InventoryInDtlPopup[==idx==].Qty" value="==Qty==">
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function () {
+        $('select.InvCodeInActual_Dtl').select2();
+
+        if ($('.numberQty').length) {
+            $('.numberQty').number(true, 2);
+        }
+    })
+
+    function AddVTNhap() {
+
+        var date = new Date();
+        var randomCur = date.getTime();
+        var randHex = commonUtils.randHex(12);
+        randomCur = randomCur + randHex;
+        var idselect = 'idselect-' + randomCur;
+
+        var strHtml = getHtmlFromTemplate($('#rowtemplateAddVTNhap'), {
+            Qty: '',
+            InvCodeInActual: '',
+            idselect: idselect,
+            idx: 999999
+        });
+        $('#table-tbodyIDInvCodeInActual').append(strHtml);
+        $('.numberQty').number(true, 2);
+        $('select#' + idselect).select2();
+        updateTableTrIdx($('#table-tbodyIDInvCodeInActual tr'), false);
+    }
+
+    function DeleteVTNhap(thiz, invCodeInActual) {
+        bootbox.confirm("Đồng ý xóa vị trí " + invCodeInActual + " ?", function (result) {
+            if (result) {
+                var tr = $(thiz).parents('tr');
+                if (tr != undefined) {
+                    tr.remove();
+                    updateTableTrIdx($('#table-tbodyIDInvCodeInActual tr'), false);
+                }
+            }
+        });
+    }
+
+    function SaveVTNhap() {
+        var length = $('#table-tbodyIDInvCodeInActual').length;
+        var productcode = $('#mdVTNhap_ProductCode').val();
+        
+        if (length > 0) {
+
+            var lenItem = $('#table-detailInvCodeInActual').find('tr [productcode="' + productcode + '"]').length;
+            var sumqty = $("#table-tbodyIDInvCodeInActual tr.trdata").length;
+            var arVitri = [];
+
+            //Check dữ liệu
+            var hasErr = false;
+            $("#table-tbodyIDInvCodeInActual tr.trdata").each(function () {
+                var tr = $(this);
+                var idx = $(tr).attr('idx');
+                
+                var qty = tr.find('input[name="Lst_InvF_InventoryInDtlPopup[' + idx + '].Qty"]').val();
+                if (qty != null && qty != undefined && qty.length > 0) {
+                    if (parseFloat(qty) <= 0) {
+                        alert('Số lượng phải > 0!')
+                        hasErr = true;
+                        return false;
+                    }
+                }
+                else {
+                    alert('Số lượng trống!')
+                    hasErr = true;
+                    return false;
+                }
+
+                var InvCodeInActual = tr.find('select[name="Lst_InvF_InventoryInDtlPopup[' + idx + '].InvCodeInActual"]').val();
+                if (InvCodeInActual != null && InvCodeInActual != undefined && InvCodeInActual.length > 0) {
+                    if (!arVitri.includes(InvCodeInActual)) {
+                        arVitri.push(InvCodeInActual);
+                    }
+                    else {
+                        alert('Không thể chọn trùng mã vị trí!')
+                        hasErr = true;
+                        return false;
+                    }
+                }
+                else {
+                    alert('Mã vị trí trống!')
+                    hasErr = true;
+                    return false;
+                }
+            });
+            if (hasErr) {
+                return;
+            }
+
+            //Xóa VT cũ cùng ProductCode
+            var trOlds = $('#table-detailInvCodeInActual').find('tr[productcode="' + productcode + '"]');
+            $(trOlds).each(function () {
+                $(this).remove();
+            });
+            updateTableTrIdx($('#table-detailInvCodeInActual tr'), false);
+
+            var lstVitri = "";
+            var sumqty = 0.0;
+            $("#table-tbodyIDInvCodeInActual tr.trdata").each(function () {
+                var tr = $(this);
+                var idx = $(tr).attr('idx');
+
+                var strHtml;
+                debugger;
+                var qty = tr.find('input[name="Lst_InvF_InventoryInDtlPopup[' + idx + '].Qty"]').val();
+                sumqty += parseFloat(qty);
+                var InvCodeInActual = tr.find('select[name="Lst_InvF_InventoryInDtlPopup[' + idx + '].InvCodeInActual"]').val();
+                if (InvCodeInActual != null) {
+                    if (lstVitri == "") {
+                        lstVitri += InvCodeInActual;                        
+                    }
+                    else {
+                        lstVitri += ", " + InvCodeInActual;
+                    }
+                }
+                strHtml = getHtmlFromTemplate($('#rowtemplateInvCodeInActual'), {
+                    ProductCode: productcode,
+                    Qty: qty,
+                    InvCodeInActual: InvCodeInActual,
+                    idx: 999999
+                });
+
+                if (lenItem == 0) {
+                    $('#table-detailInvCodeInActual').append(strHtml);
+                }
+                else {
+                    var trSerial_Old = $('#table-detailInvCodeInActual').find('tr[productcode="' + productcode + '"]').eq(0);
+                    trSerial_Old.replaceWith(strHtml);
+                }
+                updateTableTrIdx($('#table-detailInvCodeInActual tr'), false);                
+            });
+
+            // Cập nhật lại số lượng            
+            var trProduct = $('#table-tbodyID').find('tr[data-prdcode="' + productcode + '"]');
+            var ProductIdx = trProduct.attr('idx');
+            trProduct.find('input[name="Lst_InvF_InventoryInDtl[' + ProductIdx + '].Qty"]').val(sumqty);
+            trProduct.find('input[name="Lst_InvF_InventoryInDtl[' + ProductIdx + '].InvCodeInActual"]').val(lstVitri);
+            TongTienHang();
+            //
+            ClosePopupVTNhap();
+        }
+    }
+</script>

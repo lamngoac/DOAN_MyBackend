@@ -1,0 +1,240 @@
+﻿@{
+    var Lst_InvF_InventoryOutCover = new List<InvF_InventoryOutCover>();
+    if (ViewBag.Lst_InvF_InventoryOutCover != null)
+    {
+        Lst_InvF_InventoryOutCover = ViewBag.Lst_InvF_InventoryOutCover as List<InvF_InventoryOutCover>;
+    }
+    var lstMstProduct = new List<Mst_Product>();
+
+    if (ViewBag.LstMst_Product != null)
+    {
+        lstMstProduct = ViewBag.LstMst_Product as List<Mst_Product>;
+    }
+    var viewOnly = "1";
+}
+
+<div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+    <div style="width: 100%; float: left;">
+        <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+            <thead>
+                <tr class="trthead">
+                    <th class="text-center cell-50">
+                    </th>
+                    <th fieldId="ProductCode" sorttype="T" fieldName="Mã hàng hóa" fieldActive="0" class="text-left cell-220">
+                        @("Mã hàng hóa".HtmlItemString("productcode"))
+                    </th>
+                    <th fieldId="INVNAME" sorttype="T" fieldName="Tên hàng hóa (TV)" fieldActive="0" class="text-left cell-200">
+                        @("Tên hàng hóa (TV)".HtmlItemString(""))
+                    </th>
+                    <th fieldId="INVCODEPARENT" sorttype="T" fieldName="Đơn vị tính" fieldActive="0" class="text-left cell-100">
+                        @("Đơn vị tính".HtmlItemString(""))
+                    </th>
+                    @*<th fieldId="INVADDRESS" sorttype="T" fieldName="Tồn kho" fieldActive="0" class="text-left cell-100">
+            @("Tồn kho".HtmlItemString(""))
+        </th>*@
+                    <th fieldId="" sorttype="T" fieldName="Số lượng ban đầu" fieldActive="0" class="text-left cell-120">
+                        @("Số lượng ban đầu".HtmlItemString(""))
+                    </th>
+                    <th fieldId="" sorttype="T" fieldName="Số lượng xuất" fieldActive="0" class="text-left cell-100">
+                        @("Số lượng xuất".HtmlItemString(""))
+                    </th>
+                    <th fieldId="" sorttype="T" fieldName="Số lượng còn lại" fieldActive="0" class="text-left cell-120">
+                        @("Số lượng còn lại".HtmlItemString(""))
+                    </th>
+                    @*<th fieldId="INVTYPE" sorttype="T" fieldName="Vị trí xuất" fieldActive="0" class="text-left cell-200">
+            @("Vị trí xuất".HtmlItemString(""))
+        </th>*@
+                    <th fieldId="INVTYPE" sorttype="T" fieldName="Đơn giá" fieldActive="0" class="text-left cell-120">
+                        @("Đơn giá".HtmlItemString(""))
+                    </th>
+                    <th fieldId="INVTYPE" sorttype="T" fieldName="Giảm giá" fieldActive="0" class="text-left cell-100">
+                        @("Giảm giá".HtmlItemString(""))
+                    </th>
+                    <th fieldId="INVTYPE" sorttype="T" fieldName="Thành tiền" fieldActive="0" class="text-left cell-150">
+                        @("Thành tiền".HtmlItemString(""))
+                    </th>
+                    <th fieldId="INVTYPE" sorttype="T" fieldName="Ghi chú" fieldActive="0" class="text-left cell-200">
+                        @("Ghi chú".HtmlItemString(""))
+                    </th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+        <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+            <tbody id="table-tbodyID">
+                @{
+                    var idx = 0;
+                    foreach (var it in Lst_InvF_InventoryOutCover)
+                    {
+                        var flagcombo = "0";
+                        var flagSerial = "0";
+                        var flagLot = "0";
+                        var showtonkho = "";
+                        if (it.FlagSerial != null && it.FlagSerial.ToString() == "1")
+                        {
+                            flagSerial = "1";
+                        }
+                        else if (it.FlagLot != null && it.FlagLot.ToString() == "1")
+                        {
+                            flagLot = "1";
+                        }
+                        else if (it.ProductType != null && it.ProductType.ToString().ToUpper().Equals("COMBO"))
+                        {
+                            flagcombo = "1";
+                        }
+                        else
+                        {
+                            showtonkho = "<a href=\"javascript:;\" title=\"Chọn vị trí xuất\" onclick=\"ShowInvOut(this, '" + it.ProductCodeRoot + "', '" + it.IF_InvOutNo + "', '" + viewOnly + "', '" + it.mp_root_ProductCodeUser + "', '" + it.mp_root_ProductName + "')\"><i class = \"fa fa-caret-down\"></i></a>";
+                        }
+
+                <tr ProductCodeUser="@(it.mp_root_ProductCodeUser == null ? "" : it.mp_root_ProductCodeUser)" class="trdata" idx="0" productcodebase="@(it.mp_root_ProductCodeBase == null ? "" : it.mp_root_ProductCodeBase.ToString())" productcode="@(it.ProductCodeRoot == null ? "" : it.ProductCodeRoot.ToString())" flagcombo="@flagcombo" flaglot="@flagLot" flagserial="@flagSerial">
+                    <input type="hidden" name="Lst_InvF_InventoryOutDtl[0].ProductCodeRoot" value="@(it.ProductCodeRoot == null ? "" : it.ProductCodeRoot.ToString())">
+                    <input type="hidden" name="Lst_InvF_InventoryOutDtl[0].ProductCode" value="@(it.ProductCodeRoot == null ? "" : it.ProductCodeRoot.ToString())" class="col-md-9 iphover" style="float: left; border: none; background-color:white">
+                    <td class="text-center cell-50">
+                        <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteProductExpCross(this)"><i class="fas fa-trash-alt"></i></a>
+                    </td>
+                    <td fieldid="ProductCodeUser" sorttype="T" fieldname="Mã hàng hóa KH" fieldactive="0" class="text-left cell-220">
+                        <input value="@(it.mp_root_ProductCodeUser == null ? "" : it.mp_root_ProductCodeUser.ToString())" class="ProductCodeUser col-md-9 iphover" style="float: left; border: none; background-color:white" readonly="readonly">
+
+                        <div class="ProductType">
+                            @{
+                                if (it.FlagSerial != null && it.FlagSerial.ToString() == "1")
+                                {
+                                    <a href="javascript:;" title="Chi tiết Serial" onclick="ShowSerial('@(it.ProductCodeRoot)', '@(it.mp_root_ProductCodeBase)', '@(it.mp_root_ProductCodeUser)', '@(it.mp_root_ProductName)', '@(it.IF_InvOutNo)')">(Serial)</a>
+                                }
+                                else if (it.FlagLot != null && it.FlagLot.ToString() == "1")
+                                {
+                                    <a href="javascript:;" title="Chi tiết Lô" onclick="ShowLoDetail('@(it.IF_InvOutNo)', '@(it.ProductCodeRoot)', '@Url.Action("ShowLoDetail","InvF_InventoryOut")', '@viewOnly', '@(it.mp_root_ProductCodeBase)')">(Lô)</a>
+                                }
+                                else if (it.ProductType != null && it.ProductType.ToString().ToUpper().Equals("COMBO"))
+                                {
+                                    <a href="javascript:;" title="Chi tiết Combo" onclick="ShowComboAppr('@(it.IF_InvOutNo)', '@(it.ProductCodeRoot == null ? "" : it.ProductCodeRoot.ToString())', '@Url.Action("ComboAppr","InvF_InventoryOut")', '@(it.mp_root_ProductCodeUser)', '@(it.mp_root_ProductName)')">(Combo)</a>
+                                }
+                            }
+
+                        </div>
+                    </td>
+                    <td fieldid="ProductName" sorttype="T" fieldname="Tên hàng hóa (TV)" fieldactive="0" class="text-left cell-200">
+                        <input readonly="readonly" class="col-md-12 ProductName" name="Lst_InvF_InventoryOutDtl[0].ProductName" value="@(it.mp_root_ProductName == null ? "" : it.mp_root_ProductName.ToString())">
+                    </td>
+                    <td fieldid="UnitCode" sorttype="T" fieldname="Đơn vị tính" fieldactive="0" class="text-left cell-100">
+                        <select style="height: 100%" class="UnitCode col-md-12" onchange="ChangeUnitCode(this, '@Url.Action("GetBalanceByProduct", "ModalCommon")')" name="Lst_InvF_InventoryOutDtl[0].UnitCode">
+                            @{
+                                if (it.lstUnitCodeUIByProduct != null && it.lstUnitCodeUIByProduct.Count != 0)
+                                {
+                                    foreach (var item in it.lstUnitCodeUIByProduct)
+                                    {
+                                        <option ProductCodeBase="@item.ProductCodeBase" ProductCodeUser="@item.ProductCodeUser" @(it.UnitCode.Equals(item.UnitCode) ? "selected" : "") valconvert="@(item.ValConvert == null ? "" : item.ValConvert)" value="@(item.UnitCode == null ? "" : item.UnitCode)" InvCode="@(item.InvCode == null ? "" : item.InvCode)" ProductCode="@item.ProductCode" ProductName="@(item.ProductName == null ? "" : item.ProductName)" UnitCode="@(item.UnitCode == null ? "" : item.UnitCode)" SellPrice="@(item.SellPrice == null ? "0" : item.SellPrice.ToString())" SellOrder="@(item.SellOrder == null ? "0" : item.SellOrder.ToString())" QtyTotalOK="@(item.QtyTotalOK == null ? "0" : item.QtyTotalOK.ToString())" DiscountPrice="@(item.DiscountPrice == null ? "0": item.DiscountPrice)" FlagLot="@(item.FlagLot)" FlagSerial="@item.FlagSerial" ProductType="@(item.ProductType == null ? "" : item.ProductType.ToString())">@item.UnitCode</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </td>
+                    @*<td fieldid="QtyTotalOK" sorttype="T" fieldname="Tồn kho" fieldactive="0" class="text-right cell-100">
+            <input readonly="readonly" value="@(it.QtyInv == null ? 0: Math.Round(Convert.ToDouble(it.QtyInv), 2))" class="col-md-12 QtyTotalOK text-right" name="Lst_InvF_InventoryOutDtl[0].QtyTotalOK">
+        </td>*@
+                    <td fieldid="Qty" sorttype="T" fieldname="Số lượng" fieldactive="0" class="text-right cell-120">
+                        <input name="Lst_InvF_InventoryOutDtl[0].Qty" value="@(it.Qty == null ? "" : it.Qty.ToString())" class="col-md-12 Qty text-right number" onchange="TongTien();" readonly="readonly">
+                    </td>
+                    <td fieldid="QtyOut" class="text-right cell-100">
+                        <input name="Lst_InvF_InventoryOutDtl[0].QtyOut" value="0" class="col-md-12 Qty text-right number" onchange="TongTienExpCross();">
+                    </td>
+                    <td fieldid="QtyRemain" class="text-right cell-120">
+                        <input name="Lst_InvF_InventoryOutDtl[0].QtyRemain" value="@(it.Qty == null ? "" : it.Qty.ToString())" class="col-md-12 Qty text-right number" readonly="readonly">
+                    </td>
+                    @*<td fieldid="InvCode" sorttype="T" fieldname="Vị trí xuất" fieldactive="0" class="text-left cell-200">
+            <input readonly="readonly" class="col-md-11 InvCode" name="Lst_InvF_InventoryOutDtl[0].InvCodeOutActual" value="@(it.ListInvCodeOutActual == null ? "" : it.ListInvCodeOutActual.ToString().Substring(0, it.ListInvCodeOutActual.ToString().Length - 1))">
+            @MvcHtmlString.Create(showtonkho)
+        </td>*@
+                    <td fieldid="SellProduct" sorttype="T" fieldname="Đơn giá" fieldactive="0" class="text-right cell-120">
+                        <input onchange="TongTienExpCross();" value="@(it.UPOut == null ? "" : it.UPOut.ToString())" class="col-md-12 text-right SellProduct number" name="Lst_InvF_InventoryOutDtl[0].SellProduct">
+                    </td>
+                    <td fieldid="DiscountPrice" sorttype="T" fieldname="Giảm giá" fieldactive="0" class="text-right cell-100">
+                        <input onchange="TongTienExpCross();" value="@(it.UPOutDesc == null ? "" : it.UPOutDesc.ToString())" class="col-md-12 text-right DiscountPrice number" name="Lst_InvF_InventoryOutDtl[0].DiscountPrice">
+                    </td>
+                    <td fieldid="ValAmount" sorttype="T" fieldname="Thành tiền" fieldactive="0" class="text-right cell-150">
+                        <input readonly="readonly" name="Lst_InvF_InventoryOutDtl[0].ValAmount" value="@(it.ValOut == null ? "" : it.ValOut.ToString())" class="col-md-12 text-right ValAmount number">
+                    </td>
+                    <td fieldid="ReMark" sorttype="T" fieldname="Ghi chú" fieldactive="0" class="text-left cell-200">
+                        <input name="Lst_InvF_InventoryOutDtl[0].Remark" value="@(it.Remark == null ? "" : it.Remark.ToString())" class="col-md-12 remark">
+                    </td>
+                </tr>
+                        idx++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script lang="ja">
+    function ShowSerial(productCode, ProductCodeBase, ProductCodeUser, ProductName, IF_InvOutNo) {
+        debugger;
+        var idNameMstInvCode = "";
+        var invBUPattern = "";
+        var invcodeout = $('#InvCodeOut').val();
+        var invBUPattern = "";
+        var existKho = $('select.mstinventory').length;
+        if (existKho > 0) {
+            var mstInventory = $('select.mstinventory').eq(0);
+            idNameMstInvCode = mstInventory.attr("id");
+
+            invcodeout = mstInventory.val();
+            var optSelect = mstInventory.find('option:selected');
+            invBUPattern = $(optSelect).attr("invBUPattern");
+        }
+
+        if (invcodeout == "") {
+            if (idNameMstInvCode == "InvCodeOut") {
+                alert("Kho xuất chưa được chọn.");
+                $('#InvCodeOut').focus();
+            }
+            else if (idNameMstInvCode == "InvCodeAudit") {
+                alert("Kho kiểm kê chưa được chọn.");
+                $('#InvCodeAudit').focus();
+            }
+            return;
+        }
+
+        var type = "";
+        if ($('#IFInvAudNo').length == "1") {
+            type = 'kiemke';
+        }
+        //var optSelect = $('#InvCodeOut').find('option:selected');
+        //invBUPattern = $(optSelect).attr("invBUPattern");
+
+        var url = '@Url.Action("Serial", "InvF_InventoryOut")';
+        $.ajax({
+            url: url,
+            data: {
+                productCode: productCode,
+                invBUPattern: invBUPattern,
+                productCodeBase: ProductCodeBase,
+                type: type,
+                productCodeUser: ProductCodeUser,
+                productName: ProductName,
+                IF_InvOutNo: IF_InvOutNo
+            },
+            type: 'post',
+            dataType: 'json',
+            traditional: true,
+            success: function (data) {
+                if (data.Success) {
+
+                    $('#ShowPopupSerial').modal({
+                        backdrop: false,
+                        keyboard: true,
+                    });
+                    $("#ShowPopupSerial").html(data.Html); // truyen html vao #form
+                    var display = $("#ShowPopupSerial").css('display');
+                    if (display == "none") {
+                        $("#ShowPopupSerial").show();
+                    }
+                } else {
+                    showErrorDialog(data.Detail);
+                }
+            }
+        });
+    }
+</script>

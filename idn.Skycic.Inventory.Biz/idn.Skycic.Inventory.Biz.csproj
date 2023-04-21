@@ -1,0 +1,387 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{4782B015-4AE8-48D5-A0D3-972354052E55}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>idn.Skycic.Inventory.Biz</RootNamespace>
+    <AssemblyName>idn.Skycic.Inventory.Biz</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CommonUtils">
+      <HintPath>..\05.Refs\Libs\Common\CommonUtils.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.Core">
+      <HintPath>..\05.Refs\Libs\iNOS\DotNetOpenAuth.Core.4.3.4.13329\lib\net45-full\DotNetOpenAuth.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth">
+      <HintPath>..\05.Refs\Libs\iNOS\DotNetOpenAuth.OAuth.Core.4.1.4.12333\lib\net45-full\DotNetOpenAuth.OAuth.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth.Consumer">
+      <HintPath>..\05.Refs\Libs\iNOS\DotNetOpenAuth.OAuth.Consumer.4.1.4.12333\lib\net45-full\DotNetOpenAuth.OAuth.Consumer.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth2">
+      <HintPath>..\05.Refs\Libs\iNOS\DotNetOpenAuth.OAuth2.Core.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OAuth2.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth2.Client">
+      <HintPath>..\05.Refs\Libs\iNOS\DotNetOpenAuth.OAuth2.Client.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OAuth2.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth2.ClientAuthorization">
+      <HintPath>..\05.Refs\Libs\iNOS\DotNetOpenAuth.OAuth2.ClientAuthorization.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OAuth2.ClientAuthorization.dll</HintPath>
+    </Reference>
+    <Reference Include="EncryptionLib">
+      <HintPath>..\05.Refs\Libs\Common\EncryptionLib.dll</HintPath>
+    </Reference>
+    <Reference Include="EPPlus, Version=3.1.3.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\05.Refs\Libs\iNOS\EPPlus.dll</HintPath>
+    </Reference>
+    <Reference Include="EzDAL, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\05.Refs\Libs\EzSql\EzDAL.dll</HintPath>
+    </Reference>
+    <Reference Include="EzSql, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\05.Refs\Libs\EzSql\EzSql.dll</HintPath>
+    </Reference>
+    <Reference Include="EzSqlServer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\05.Refs\Libs\EzSql\EzSqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="inos.common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\05.Refs\Libs\iNOS\inos.common.dll</HintPath>
+    </Reference>
+    <Reference Include="mbiz.core">
+      <HintPath>..\05.Refs\Libs\iNOS\mbiz.core.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="RestSharp">
+      <HintPath>..\05.Refs\Libs\RestSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="TLog.Core">
+      <HintPath>..\05.Refs\Libs\Common\TLog.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="TSession.Core">
+      <HintPath>..\05.Refs\Libs\Common\TSession.Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BizInv.zSqlTemplate.cs" />
+    <Compile Include="Common.cs" />
+    <Compile Include="Config.cs" />
+    <Compile Include="CustomerCentrer\Customer.cs" />
+    <Compile Include="CustomerCentrer\zTemp.Customer.cs" />
+    <Compile Include="Email.cs" />
+    <Compile Include="Form.cs" />
+    <Compile Include="FormCustomField.cs" />
+    <Compile Include="Inventory.cs" />
+    <Compile Include="InventoryForm.cs" />
+    <Compile Include="InvF_Temp.cs" />
+    <Compile Include="Invoice.1.cs" />
+    <Compile Include="Invoice.cs" />
+    <Compile Include="License.cs" />
+    <Compile Include="Master.DOAN.cs" />
+    <Compile Include="Master.Inventory.cs" />
+    <Compile Include="MasterData.cs" />
+    <Compile Include="MasterData.Org.cs" />
+    <Compile Include="MasterServer.cs" />
+    <Compile Include="MasterServerCenter.cs" />
+    <Compile Include="OS.Inos.1.cs" />
+    <Compile Include="OS.Inos.cs" />
+    <Compile Include="OS.MasterProductCenter.cs" />
+    <Compile Include="OS3A_Invoice.cs" />
+    <Compile Include="OS_Inbrand.cs" />
+    <Compile Include="OS_MstProductCentrer.cs" />
+    <Compile Include="OS_MstServerProductCenter.cs" />
+    <Compile Include="OS_MstServerTVAN20.cs" />
+    <Compile Include="OS_MstServerTVAN.cs" />
+    <Compile Include="OS_TVAN.cs" />
+    <Compile Include="Part.cs" />
+    <Compile Include="ProductCenter.MasterData.cs" />
+    <Compile Include="Report.cs" />
+    <Compile Include="ReportServer.cs" />
+    <Compile Include="RptSv.System.cs" />
+    <Compile Include="Seq.DOAN.cs" />
+    <Compile Include="Service References\WSKQuaGDich\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Service References\WSNhanHSoThue\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Session.cs" />
+    <Compile Include="Master.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Seq.cs" />
+    <Compile Include="System.cs" />
+    <Compile Include="System.DOAN.cs" />
+    <Compile Include="Temp.cs" />
+    <Compile Include="Web References\WSAccCenter\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
+    <Compile Include="Web References\WSHTC\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
+    <Compile Include="zTemp.1.cs" />
+    <Compile Include="zTemp.cs" />
+    <Compile Include="zTemp.OS_MstProductCentrer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferences Include="Web References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferenceUrl Include="http://11.22.0.1:11208/Test.DMS.HTC.Sales.WH.WS/WSHTC.asmx">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\WSHTC\</RelPath>
+      <UpdateFromURL>http://11.22.0.1:11208/Test.DMS.HTC.Sales.WH.WS/WSHTC.asmx</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
+      <CachedSettingsPropName>idN_TVAN_Biz_WSHTC_WSHTC64</CachedSettingsPropName>
+    </WebReferenceUrl>
+    <WebReferenceUrl Include="http://118.70.129.122:12608/idocNet.Test.idocNet.AccCenter.V10.Ws/WS.asmx">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\WSAccCenter\</RelPath>
+      <UpdateFromURL>http://118.70.129.122:12608/idocNet.Test.idocNet.AccCenter.V10.Ws/WS.asmx</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
+      <CachedSettingsPropName>HTC_NM_Biz_WSAccCenter_WS</CachedSettingsPropName>
+    </WebReferenceUrl>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
+    <Compile Include="OS.Sys.cs" />
+    <None Include="EzDAL.VN239c.FW35.AnyCPU">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Service References\WSKQuaGDich\idn.Skycic.Inventory.Biz.WSKQuaGDich.mesgTKError.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSKQuaGDich\idn.Skycic.Inventory.Biz.WSKQuaGDich.traDanhMucResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSKQuaGDich\idn.Skycic.Inventory.Biz.WSKQuaGDich.traDsachTKhaiLoiResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSKQuaGDich\idn.Skycic.Inventory.Biz.WSKQuaGDich.traKQuaGDichResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSKQuaGDich\idn.Skycic.Inventory.Biz.WSKQuaGDich.traKQuaPhienGDichResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSKQuaGDich\idn.Skycic.Inventory.Biz.WSKQuaGDich.traTThaiMaSoThueResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSKQuaGDich\idn.Skycic.Inventory.Biz.WSKQuaGDich.traTTinLoiTKhaiResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSKQuaGDich\idn.Skycic.Inventory.Biz.WSKQuaGDich.traTTinMaSoThueResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSKQuaGDich\idn.Skycic.Inventory.Biz.WSKQuaGDich.viewTin.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSKQuaGDich\KQuaGDichService.wsdl" />
+    <None Include="Service References\WSKQuaGDich\KQuaGDichServicePort.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\WSNhanHSoThue\idn.Skycic.Inventory.Biz.WSNhanHSoThue.getDsachTbaoResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSNhanHSoThue\idn.Skycic.Inventory.Biz.WSNhanHSoThue.getTBaoLan2Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSNhanHSoThue\idn.Skycic.Inventory.Biz.WSNhanHSoThue.getTbaoResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSNhanHSoThue\idn.Skycic.Inventory.Biz.WSNhanHSoThue.getxmlTBaoLan2Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSNhanHSoThue\idn.Skycic.Inventory.Biz.WSNhanHSoThue.nhanBCAnChiResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSNhanHSoThue\idn.Skycic.Inventory.Biz.WSNhanHSoThue.nhanBCAnChiTuDLTResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSNhanHSoThue\idn.Skycic.Inventory.Biz.WSNhanHSoThue.nhanHSoQTThueTNCNCoIdResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSNhanHSoThue\idn.Skycic.Inventory.Biz.WSNhanHSoThue.nhanHSoQTThueTNCNResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSNhanHSoThue\idn.Skycic.Inventory.Biz.WSNhanHSoThue.nhanHSoThueResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSNhanHSoThue\idn.Skycic.Inventory.Biz.WSNhanHSoThue.nhanHSoXMLCoIdResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSNhanHSoThue\idn.Skycic.Inventory.Biz.WSNhanHSoThue.nhanHSoXMLCoIdResponse1.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSNhanHSoThue\idn.Skycic.Inventory.Biz.WSNhanHSoThue.nhanHSoXMLResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSNhanHSoThue\idn.Skycic.Inventory.Biz.WSNhanHSoThue.nhanHSoXMLResponse1.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSNhanHSoThue\idn.Skycic.Inventory.Biz.WSNhanHSoThue.nhanPLucHSoHoanThueResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSNhanHSoThue\idn.Skycic.Inventory.Biz.WSNhanHSoThue.nhanPLucHSoThueResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSNhanHSoThue\idn.Skycic.Inventory.Biz.WSNhanHSoThue.nhanPLucHSoThueTuDLTResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSNhanHSoThue\idn.Skycic.Inventory.Biz.WSNhanHSoThue.nhanToKhaiThueResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\WSNhanHSoThue\NhanHSoThueService.wsdl" />
+    <None Include="Service References\WSNhanHSoThue\NhanHSoThueServicePort.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Web References\WSAccCenter\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\WSAccCenter\WS.wsdl" />
+    <None Include="Web References\WSHTC\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\WSHTC\WSHTC.wsdl" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Web References\WSAccCenter\WS.disco" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\WSKQuaGDich\" />
+    <WCFMetadataStorage Include="Service References\WSNhanHSoThue\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\WSKQuaGDich\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\WSKQuaGDich\configuration.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\WSKQuaGDich\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\WSNhanHSoThue\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\WSNhanHSoThue\configuration.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\WSNhanHSoThue\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Web References\WSHTC\WSHTC.disco" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\idn.Skycic.Inventory.BizService\idn.Skycic.Inventory.BizService.csproj">
+      <Project>{f4d5b2b3-4638-46cd-90a3-9293cc2b1665}</Project>
+      <Name>idn.Skycic.Inventory.BizService</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\idn.Skycic.Inventory.Common\idn.Skycic.Inventory.Common.csproj">
+      <Project>{f95f377c-72c1-4bb7-b07c-cb7b090a15d1}</Project>
+      <Name>idn.Skycic.Inventory.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\idn.Skycic.Inventory.Constants\idn.Skycic.Inventory.Constants.csproj">
+      <Project>{050fc41b-8a80-4d6e-9d6e-0126cf0a0ad5}</Project>
+      <Name>idn.Skycic.Inventory.Constants</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\idn.Skycic.Inventory.Utils\idn.Skycic.Inventory.Utils.csproj">
+      <Project>{44d1e3cb-3335-458d-b014-a72c482342e4}</Project>
+      <Name>idn.Skycic.Inventory.Utils</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ProductCenter\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

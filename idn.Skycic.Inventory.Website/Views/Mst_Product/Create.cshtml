@@ -1,0 +1,1206 @@
+﻿@using idn.Skycic.Inventory.Common.Models.ProductCentrer
+@model List<Mst_Product>
+@{
+    /**/
+    ViewBag.Title = "Tạo hàng hóa";
+    /**/
+    var objRT_Mst_Product = new RT_Mst_Product()
+    {
+        Lst_Mst_Product = new List<Mst_Product>(),
+    };
+    var list_Mst_ProductType = ViewBag.List_Mst_ProductType as List<Mst_ProductType>;
+    var list_Mst_ProductGroup = ViewBag.List_Mst_ProductGroup as List<Mst_ProductGroup>;
+    var list_Mst_ProductGroupUI = ViewBag.List_Mst_ProductGroupUI as List<Mst_ProductGroupExt>;
+    var list_Mst_Brand = ViewBag.List_Mst_Brand as List<Mst_Brand>;
+    var list_Prd_DynamicField = ViewBag.List_Prd_DynamicField as List<Prd_DynamicField>;
+    var listProduct_CustomField = ViewBag.ListProduct_CustomField as List<Product_CustomField>;
+    var list_PrdDynamicFieldParamType = new List<PrdDynamicFieldParamType>();
+    string sJSONResponse_Prd_DynamicField = "";
+    if (list_Prd_DynamicField != null && list_Prd_DynamicField.Count > 0)
+    {
+        if (list_Prd_DynamicField[0].ParamTypes != null)
+        {
+            foreach (var item in list_Prd_DynamicField[0].ParamTypes)
+            {
+                if (list_PrdDynamicFieldParamType.Where(x => x.Code.Equals(item.Code)).ToList().Count == 0)
+                {
+                    list_PrdDynamicFieldParamType.Add(item);
+                }
+            }
+
+            list_Prd_DynamicField[0].ParamTypes = list_PrdDynamicFieldParamType;
+
+            sJSONResponse_Prd_DynamicField = JsonConvert.SerializeObject(list_PrdDynamicFieldParamType);
+        }
+
+    }
+    var list_Mst_Attribute = ViewBag.List_Mst_Attribute as List<Mst_Attribute>;
+    string sJSONResponse = JsonConvert.SerializeObject(list_Mst_Attribute);
+    var productCode = CUtils.StrValue(ViewBag.ProductCode);
+    var networkID = CUtils.StrValue(ViewBag.NetworkID);
+    var orgID = CUtils.StrValue(ViewBag.OrgID);
+    var listMst_Product = new List<Mst_Product>();
+    if (Model != null && Model.Count > 0)
+    {
+        listMst_Product.AddRange(Model);
+    }
+    else
+    {
+        listMst_Product.Add(new Mst_Product()
+        {
+            ProductCode = productCode,
+            ProductCodeBase = productCode,
+            ProductCodeRoot = productCode,
+            ProductType = "PRODUCT",
+            NetworkID = orgID,
+            OrgID = orgID,
+        });
+    }
+    objRT_Mst_Product.Lst_Mst_Product.AddRange(listMst_Product);
+    var listMst_VATRate = ViewBag.List_Mst_VATRate as List<Mst_VATRate>;
+}
+<script>
+    setAdminCurrentUrl('@Url.Action("Index", "Mst_Product")');
+</script>
+
+@section StyleSheet{
+    <style>
+        /* bootstrap-tagsinput.css */
+
+        .slideshow-container {
+            max-width: 500px;
+            position: relative;
+            margin: auto;
+        }
+
+        /* Hide the images by default */
+        .mySlides {
+            display: none;
+        }
+
+        /* Next & previous buttons */
+        .prev, .next {
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            width: auto;
+            margin-top: -22px;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+            transition: 0.6s ease;
+            border-radius: 0 3px 3px 0;
+            user-select: none;
+        }
+
+        .prev {
+            left: 2%;
+        }
+
+        /* Position the "next button" to the right */
+        .next {
+            right: 2%;
+        }
+
+        /* On hover, add a black background color with a little bit see-through */
+        /*.prev:hover, .next:hover {
+                background-color: rgba(0,0,0,0.8);
+            }*/
+
+        /* Caption text */
+        .text {
+            color: #f2f2f2;
+            font-size: 15px;
+            padding: 8px 12px;
+            position: absolute;
+            bottom: 8px;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Number text (1/3 etc) */
+        .numbertext {
+            color: #f2f2f2;
+            font-size: 12px;
+            padding: 8px 12px;
+            position: absolute;
+            top: 0;
+        }
+
+        /* The dots/bullets/indicators */
+        .thumbnail {
+            position: relative;
+            cursor: pointer;
+            height: 80px;
+            width: calc((100% - 60px)/ 5);
+            padding: 0;
+            margin: 0 2px;
+            border: none;
+            border-radius: 0;
+            display: inline-block;
+            transition: background-color 0.6s ease;
+        }
+
+            .thumbnail img {
+                height: 100%;
+            }
+        /*.active, .dot:hover {
+            background-color: #717171;
+        }*/
+        /* Fading animation */
+        .fade {
+            -webkit-animation-name: fade;
+            -webkit-animation-duration: 1.5s;
+            animation-name: fade;
+            animation-duration: 1.5s;
+        }
+
+        @@-webkit-keyframes fade {
+            from {
+                opacity: .4
+            }
+
+            to {
+                opacity: 1
+            }
+        }
+
+        @@keyframes fade {
+            from {
+                opacity: .4
+            }
+
+            to {
+                opacity: 1
+            }
+        }
+
+        /*.fade.show {
+            opacity: 1;
+        }*/
+
+        /*.thumbnail.active img{
+            border: 1px solid #ccc;
+        }*/
+
+        .change-img {
+            position: absolute;
+            width: 100%;
+            left: 0;
+            background: #000;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: flex-end;
+            height: 20px;
+            align-items: center;
+            padding-right: 5px;
+            z-index: 99;
+            display: none;
+        }
+
+        .thumbnail:hover .change-bar {
+            display: flex;
+        }
+
+        .change-img i {
+            color: rgba(255, 255, 255, 1);
+            margin-left: 10px;
+        }
+    </style>
+}
+<div class="col-12">
+    <div class="clearfix">
+        <div class="row no-margin" style="padding-top: 20px;">
+            <div class="no-padding">
+                @RenderItemFormat("BTN_TAO_HANG_HOA_TAO_MOI", "<a href=\"javascript: void(0); \" class=\"btn btn-nc-button\" style=\"\" onclick=\"CheckData(0);\"><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i> Lưu</a>", "", "")
+            </div>
+            <div class="col-2">
+                @RenderItemFormat("BTN_TAO_HANG_HOA_TAO_MOI_LUU", "<a href=\"javascript: void(0); \" class=\"btn btn-nc-button\" style=\"\" onclick=\"SaveData(1);\">Lưu & tạo mới</a>", "", "")
+            </div>
+        </div>
+    </div>
+</div>
+<div class="mt-3">
+    @using (Html.BeginForm("Create", "Mst_Product", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#ProductInformation">@("Thông tin chung".HtmlItemString("product"))</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#ProductIngredient">Hàng thành phần</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#ProductOtherInformation">Thông tin khác</a>
+            </li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div id="ProductInformation" class="container-fluid padding-left-right-15 tab-pane active">
+                @Html.Partial("ProductInformation", Model, new ViewDataDictionary() { { "List_Mst_ProductType", list_Mst_ProductType }, { "List_Mst_ProductGroupUI", list_Mst_ProductGroupUI }, { "List_Mst_Brand", list_Mst_Brand }, { "List_Prd_DynamicField", list_Prd_DynamicField }, { "List_Mst_Attribute", list_Mst_Attribute }, { "List_Mst_VATRate", listMst_VATRate } })
+            </div>
+            <div id="ProductIngredient" class="container-fluid padding-left-right-15 tab-pane">
+                <br>
+                @Html.Partial("ProductIngredient", Model)
+            </div>
+            <div id="ProductOtherInformation" class="container-fluid padding-left-right-15 tab-pane">
+                <br>
+                @Html.Partial("ProductOtherInformation", Model, new ViewDataDictionary() { { "ListProduct_CustomField", listProduct_CustomField } })
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts{
+
+    @*Thiết lập mẫu*@
+
+    <script src="@Url.Content("~/Scripts/mine/Mst_Product.js")"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            /**/
+            debugger;
+            var productType = commonUtils.returnValueText('#ProductType');
+            if (productType === 'PRODUCT') {
+                commonUtils.removeClassCss('#div-QtyMinSt', 'display-none');
+                commonUtils.removeClassCss('#div-QtyEffSt', 'display-none');
+                commonUtils.removeClassCss('#div-QtyMaxSt', 'display-none');
+            } else {
+                commonUtils.addClassCss('#div-QtyMinSt', 'display-none');
+                commonUtils.addClassCss('#div-QtyEffSt', 'display-none');
+                commonUtils.addClassCss('#div-QtyMaxSt', 'display-none');
+            }
+
+            $('#FlagSerial').on('change', function () {
+                if ($('#FlagSerial:checked').length > 0 || productType === 'COMBO') {
+                    $('.btn-Add-Unit').hide();
+                } else {
+                    $('.btn-Add-Unit').show();
+                }
+            });
+            debugger
+            var objMst_Product_Init = new Mst_Product();
+            objMst_Product_Init.formatNumber();
+            ListDataAttribute = @MvcHtmlString.Create(sJSONResponse);
+            ListDataInformation = @MvcHtmlString.Create(sJSONResponse_Prd_DynamicField);
+     
+            /**/
+        });
+    </script>
+    <script type="text/javascript">
+        function ProductType_Change(thiz) {
+            if (thiz !== undefined && thiz !== null) {
+                var productType = commonUtils.returnValueText('#ProductType');
+                if (productType === 'PRODUCT') {
+                    commonUtils.removeClassCss('#div-QtyMinSt', 'display-none');
+                    commonUtils.removeClassCss('#div-QtyEffSt', 'display-none');
+                    commonUtils.removeClassCss('#div-QtyMaxSt', 'display-none');
+
+                } else {
+                    commonUtils.addClassCss('#div-QtyMinSt', 'display-none');
+                    commonUtils.addClassCss('#div-QtyEffSt', 'display-none');
+                    commonUtils.addClassCss('#div-QtyMaxSt', 'display-none');
+                }
+                if (productType === 'COMBO') {
+                    $('#FlagSerial').addClass('disabled-fix');
+                    $('#FlagLot').addClass('disabled-fix');
+                } else {
+                    $('#FlagSerial').removeClass('disabled-fix');
+                    $('#FlagLot').removeClass('disabled-fix');
+                }
+                if (productType === 'SERVICE') {
+                    $('.cl-flags').hide();
+                    $('#manageForm').find('a[href="#ProductIngredient"]').hide();
+                    $('#FlagSell_Root').attr('checked','checked');
+                    $('#FlagBuy_Root').attr('checked', 'checked');
+                    $('#FlagSell_Root').val('1');
+                    $('#FlagBuy_Root').val('1');
+                } else {
+                    $('.cl-flags').show();
+                    $('#manageForm').find('a[href="#ProductIngredient"]').show();
+                    $('#FlagSell_Root').removeAttr('checked', 'checked');
+                    $('#FlagBuy_Root').removeAttr('checked', 'checked');
+                    $('#FlagSell_Root').val('0');
+                    $('#FlagBuy_Root').val('0');
+                }
+                if (productType === 'COMBO' || $('#FlagSerial:checked').length > 0 ) {
+                    $('.btn-Add-Unit').hide();
+                } else {
+                    $('.btn-Add-Unit').show();
+                }
+            }
+        }
+
+        function ProductCodeUser_OnChange(thiz) {
+            $('#ProductBarCode').val($(thiz).val());
+            var objMst_Product = new Mst_Product();
+            objMst_Product.change_Element(thiz);
+        }
+        function ProductCodeUser_OnBlur(thiz) {
+            var objMst_Product = new Mst_Product();
+            objMst_Product.blur_Element(thiz);
+        }
+
+        function ProductBarCode_OnChange(thiz) {
+            //var objMst_Product = new Mst_Product();
+            //objMst_Product.change_Element(thiz);
+        }
+        function ProductBarCode_OnBlur(thiz) {
+            //var objMst_Product = new Mst_Product();
+            //objMst_Product.change_Element(thiz);
+        }
+
+        function ProductName_OnChange(thiz) {
+            //var objMst_Product = new Mst_Product();
+            //objMst_Product.change_Element(thiz);
+        }
+        function ProductName_OnBlur(thiz) {
+            //var objMst_Product = new Mst_Product();
+            //objMst_Product.change_Element(thiz);
+        }
+
+        function UPBuy_OnChange(thiz) {
+            var objMst_Product = new Mst_Product();
+            objMst_Product.change_Element(thiz);
+        }
+        function UPBuy_OnBlur(thiz) {
+            var objMst_Product = new Mst_Product();
+            objMst_Product.blur_Element(thiz);
+        }
+
+        function UPSell_OnChange(thiz) {
+            var objMst_Product = new Mst_Product();
+            objMst_Product.change_Element(thiz);
+        }
+        function UPSell_OnBlur(thiz) {
+            var objMst_Product = new Mst_Product();
+            objMst_Product.blur_Element(thiz);
+        }
+
+
+        function UnitName_Root_Change(thiz) {
+            var objMst_Product = new Mst_Product();
+            objMst_Product.change_UnitName_Root(thiz);
+        }
+
+        function UnitName_Root_Blur(thiz) {
+            var objMst_Product = new Mst_Product();
+            //objMst_Product.blur_Element(thiz);
+            objMst_Product.blur_UnitName_Root(thiz);
+        }
+
+        function FlagSell_Root_Change(thiz) {
+            var objMst_Product = new Mst_Product();
+            objMst_Product.change_FlagSell_Root(thiz);
+        }
+        function FlagBuy_Root_Change(thiz) {
+            var objMst_Product = new Mst_Product();
+            objMst_Product.change_FlagBuy_Root(thiz);
+        }
+
+        function AddRow_Information() {
+            var objMst_Product = new Mst_Product();
+            objMst_Product.addRow_Information();
+        }
+
+        function AddRow_Attribute() {
+            var objMst_Product = new Mst_Product();
+            objMst_Product.addRow_Attribute();
+        }
+
+        function AddRow_Unit() {
+            var objMst_Product = new Mst_Product();
+            objMst_Product.addRow_Unit();
+        }
+
+        //function Change_UnitName_Root(thiz) {
+        //    var objMst_Product = new Mst_Product();
+        //    objMst_Product.change_UnitName_Root();
+        //}
+        //function Blur_UnitName_Root(thiz) {
+        //    var objMst_Product = new Mst_Product();
+        //    objMst_Product.blur_UnitName_Root();
+        //}
+        function CheckData(flagRedirect) {
+            var productCodeUser = commonUtils.returnValueTextOrNull('#ProductCodeUser');
+            if (commonUtils.checkCharSpecial(productCodeUser) === false) {
+                ShowPopupWarning(flagRedirect);
+            } else {
+                SaveData(flagRedirect);
+            }
+        }
+        function SaveData(flagRedirect) {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Create", "Mst_Product")';
+            var objMst_Product = new Mst_Product();
+            objMst_Product.ActionType = 'create';
+            objMst_Product.ajaxSettings = ajaxSettings;
+            objMst_Product.saveData(flagRedirect);
+        }
+    </script>
+    <!--Open V.Hà (không phận sự miễn viết vào)-->
+    <script type="text/javascript">
+    // Search
+    function SearchData() {
+        var productCodeUserName = commonUtils.returnValueText('#ProductCodeUserName'); //Mã or tên hàng
+        var productGrpCode = commonUtils.returnValueText('#ProductGrpCode'); //Nhóm hàng
+        var ckbproduct = commonUtils.returnValueCheckBox('#ckb-product'); //Thuộc loại sản phẩm
+        var ckbservices = commonUtils.returnValueCheckBox('#ckb-services'); //Thuộc loại dịch vụ
+        var ckbcombo = commonUtils.returnValueCheckBox('#ckb-combo'); //Thuộc loại combo
+        var recordcount = commonUtils.returnValueText('#recordcount'); //Số bản ghi trên 1 trang
+        var pagecur = commonUtils.returnValueText('#pagecur'); //Trang hiện tại
+        var lstAttribute = [];
+        $('#attribute-search').find('div[idx]').each(function () {
+            var tem = new Object();
+            var idx = $(this).attr('idx');
+            var attributecode = $('[name="ListMstAttribute[' + idx + '].AttributeCode"]').val();
+            var attributevalue = $('[name="ListMstAttribute[' + idx + '].AttributeValue"]').val();
+
+            if (!commonUtils.isNullOrEmpty(attributevalue)) {
+                tem.AttributeCode = attributecode;
+                tem.AttributeValue = attributevalue;
+
+                lstAttribute.push(tem);
+            }
+        });
+        var modelCur = JSON.stringify(lstAttribute);
+
+        var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+        var url = '@Url.Action("GetSearch", "Mst_Product")';
+        $.ajax({
+            type: "post",
+            data: {
+                __RequestVerificationToken: token,
+                productCodeUserName: productCodeUserName,
+                productGrpCode: productGrpCode,
+                ckbproduct: ckbproduct,
+                ckbservices: ckbservices,
+                ckbcombo: ckbcombo,
+                page: pagecur,
+                recordcount: recordcount,
+                lstattribute: modelCur
+            },
+            url: url,
+            dataType: 'json',
+            beforeSend: function () {
+
+            }
+        }).done(function (result) {
+            //debugger;
+            if (result.Success) {
+                $('#BindDataMst_Product').html('');
+                $('#BindDataMst_Product').html(result.Html);
+                //Disabled_previous_Next();
+                var ttotalValOrdActual = $('input[name="ttotalValOrdActual"]').val();
+                $('.sttotalValOrdActual').html(ttotalValOrdActual);
+                var ttotalValDiscountActual = $('input[name="ttotalValDiscountActual"]').val();
+                $('.sttotalValDiscountActual').html(ttotalValDiscountActual);
+                var ttotalPriceAfterDiscount = $('input[name="ttotalPriceAfterDiscount"]').val();
+                $('.sttotalPriceAfterDiscount').html(ttotalPriceAfterDiscount);
+                var ttotalValPaid = $('input[name="ttotalValPaid"]').val();
+                $('.sttotalValPaid').html(ttotalValPaid);
+                var ttotalValRemain = $('input[name="ttotalValRemain"]').val();
+                $('.sttotalValRemain').html(ttotalValRemain);
+                $('.numberic').number(true, 2);
+                RefeshTable();
+            } else {
+                if (!commonUtils.isNullOrEmpty(result.Detail)) {
+                    showErrorDialog(result.Detail);
+                }
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+
+        }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+            //alert("complete");
+        });
+    }
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#ProductGrpCode').select2();
+        });
+    </script>
+    <!--Close V.Hà (không phận sự miễn viết vào)-->
+    <script type="text/javascript">
+        function CheckBoxFlagSerial() {
+            var $boxes = $('input[name=FlagSerial]:checked');
+            if ($boxes.length > 0) {
+                $('input[name=FlagLot]').prop('checked', false);
+                //$('input[name=FlagSerial]').prop('checked',true);
+            }
+        }
+        function CheckBoxFlagLot() {
+            var $boxes = $('input[name=FlagLot]:checked');
+            if ($boxes.length > 0) {
+                $('input[name=FlagSerial]').prop('checked', false);
+                //$('input[name=FlagLot]').prop('checked', true);
+            }
+        }
+    </script>
+    <script type="text/javascript">
+        function Autocompleteseacrh() {
+            function autocomplete(inp, arrr) {
+                var currentFocus;
+                var a, b, i, c, val = inp.value;
+                    closeAllLists();
+                    if (!val) { return false; }
+                    currentFocus = -1;
+                    a = document.createElement("DIV");
+                    a.setAttribute("id", inp.id + "autocomplete-list");
+                    a.setAttribute("class", "autocomplete-items row col-10 no-padding");
+                    inp.parentNode.appendChild(a);
+                    for (i = 0; i < arrr.length; i++) {
+                        /* kiểm tra xem mục có bắt đầu bằng các chữ cái giống như giá trị trường văn bản không: */
+                        if (arrr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+                            /* tạo thành phần DIV cho từng thành phần phù hợp: */
+                            b = document.createElement("DIV");
+                            b.setAttribute("class", "col-12 autocomplete-itemssmall");
+                            /* làm cho các chữ cái phù hợp in đậm: */
+                            b.innerHTML = "<span>" + arrr[i].substr(0, val.length) + "</span>";
+                            b.innerHTML += arrr[i].substr(val.length);
+                            /* chèn trường đầu vào sẽ giữ giá trị của mục mảng hiện tại: */
+                            b.innerHTML += "<input type='hidden' value='" + arrr[i] + "'>";
+                            /* thực thi chức năng khi ai đó nhấp vào giá trị mục (phần tử DIV): */
+                            b.addEventListener("click", function (e) {
+                                /* chèn giá trị cho trường văn bản tự động hoàn thành: */
+                                inp.value = this.getElementsByTagName("input")[0].value;
+                                GetProduct(inp.value);
+                                closeAllLists();
+                            });
+                            a.appendChild(b);
+                        }
+
+                    }
+                    c = document.createElement("DIV");
+                    c.setAttribute("class", "col-12 autocomplete-itemssmall autocomplete-orther");
+                    c.setAttribute("data-toggle", "modal");
+                    c.setAttribute("data-target", "#exampleModal");
+                    inp.parentNode.appendChild(c);
+                    c.innerHTML = "<strong class=''>Tìm kiếm thêm</strong>";
+                    c.addEventListener("click", function (e) {
+                    //$('.modal-dialog').css('display', 'block');
+                        $('#ModelSearchProduct').modal({
+                            backdrop: false,
+                            keyboard: true,
+                        });
+                        $('#ModelSearchProduct').modal('show');
+                    });
+                    a.appendChild(c);
+                    /* thực thi một chức năng nhấn một phím trên bàn phím: */
+                    inp.addEventListener("keydown", function (e) {
+                    var x = document.getElementById(inp.id + "autocomplete-list");
+                    if (x) x = x.getElementsByTagName("div");
+                    if (e.keyCode == 40) {
+                        /* Nếu nhấn phím mũi tên DOWN, hãy tăng biến Focus hiện tại: */
+                        currentFocus++;
+                        /* và làm cho mục hiện tại rõ hơn: */
+                        addActive(x);
+                    } else if (e.keyCode == 38) {
+                        currentFocus--;
+                        addActive(x);
+                    } else if (e.keyCode == 13) {
+                        e.preventDefault();
+                        if (currentFocus > -1) {
+                            if (x) x[currentFocus].click();
+                        }
+                    }
+                });
+                document.addEventListener("click", function (e) {
+                    closeAllLists(e.target);
+                });
+                function addActive(x) {
+                    if (!x) return false;
+                    removeActive(x);
+                    if (currentFocus >= x.length) currentFocus = 0;
+                    if (currentFocus < 0) currentFocus = (x.length - 1);
+                    x[currentFocus].classList.add("autocomplete-active");
+                }
+                function removeActive(x) {
+                    for (var i = 0; i < x.length; i++) {
+                        x[i].classList.remove("autocomplete-active");
+                    }
+                }
+                function closeAllLists(elmnt) {
+                    var x = document.getElementsByClassName("autocomplete-items");
+                    for (var i = 0; i < x.length; i++) {
+                        if (elmnt != x[i] && elmnt != inp) {
+                            x[i].parentNode.removeChild(x[i]);
+                        }
+                    }
+                }
+            }
+            function GetProduct(prdid) {
+            var url = '@Url.Action("GetBOM", "Mst_Product")';
+                $.ajax({
+                    url: url,
+                    type: 'post',
+                    data: {
+                        prdid: prdid,
+                        //__RequestVerificationToken: token
+                    },
+                    cache: false,
+                    dataType: 'json',
+                    traditional: true,
+                    //contentType: "application/json; charset=utf-8",
+                    //success: function (data) {
+                    //    $(".GetBom").html(data);
+
+                    //}
+                    success: function (data) {
+                        debugger
+                        var str = "";
+                        var idxx = 0;
+                        var lastTr = $(".GetPrd").find("tr").last();
+                        var idxLast = $(lastTr).attr('idx');
+                        if (data.Data.length > 0) {
+                            if (data.Data[0].QtyEffSt != null && data.Data[0].QtyEffSt != undefined) {
+                                data.Data[0].QtyEffSt = data.Data[0].QtyEffSt;
+                            } else {
+                                data.Data[0].QtyEffSt = 1;
+                            }
+                            var idx = 1;
+                            if (idxLast != undefined > 0 && idxLast != null) {
+                                idx = 1 + parseInt(idxLast);
+                            }
+                            if (data.Data[0].UPBuy === null) {
+                                data.Data[0].UPBuy = "";
+                            }
+                            if (data.Data[0].UPSell === null) {
+                                data.Data[0].UPSell = "";
+                            }
+                            var UPBuyamount = data.Data[0].QtyEffSt * data.Data[0].UPBuy;
+                            var UPSellamount = data.Data[0].QtyEffSt * data.Data[0].UPSell;
+                            str += "<tr data-prdcode=\"" + data.Data[0].ProductCode +"\" class=\"data-item trdata getbom " + data.Data[0].ProductCode + "\">";
+                            str += "<td class=\"text-center cell-50\" onclick=\"DeleleRowBom('" + data.Data[0].ProductCode + "')\"> <div class=\"action-buttons padding - top - 2\" ><i class=\"fa fa-trash-alt\"></i ></div ></td>";
+                            str += "<td fieldid=\"PRODUCTCODE\" sorttype=\"T\" class=\"text-center cell-50 xoa_'" + idx + "'\">" + idx + "</td>";
+                            str += "<td fieldid=\"PRODUCTCODE\" sorttype=\"T\" class=\"cell-100 \">" + data.Data[0].ProductCodeUser + "</td>";
+                            str += "<td fieldid=\"PRODUCTCODE\" sorttype=\"T\" class=\"cell-200 \">" + data.Data[0].ProductName + "</td>";
+                            str += "<td fieldid=\"CREATEDTIMEUTC\" sorttype=\"T\" class=\"text-center cell-75 \"><input style=\"width:75px;\" type=\"text\" class=\"text-right\" name=\"ListBOM[" + idx + "].Qty\" id=\"qtybuysell_"+data.Data[0].ProductCode + "\" value=\""+data.Data[0].QtyEffSt + "\" onchange=\"UpAmount('" + data.Data[0].ProductCode + "','" + data.Data[0].UPBuy + "','" + data.Data[0].UPSell + "')\" /></td>";
+                            str += "<td fieldid=\"APPRDTIMEUTC\" sorttype=\"T\" class=\"text-center cell-100 \">" + data.Data[0].UPBuy + "</td>";
+                            str += "<td fieldid=\"APPRDTIMEUTC\" sorttype=\"T\" class=\"text-center cell-100 \" id=\"uPBuyAmount_" + data.Data[0].ProductCode +"\">" + UPBuyamount + "</td>";
+                            str += "<td fieldid=\"APPRDTIMEUTC\" sorttype=\"T\" class=\"text-center cell-100 \">" + data.Data[0].UPSell + "</td>";
+                            str += "<td fieldid=\"APPRDTIMEUTC\" sorttype=\"T\" class=\"text-center cell-100 \" id=\"uPSellAmount_" + data.Data[0].ProductCode +"\">" + UPSellamount + "</td>";
+                            str += "<input type=\"hidden\" name=\"ListBOM[" + idx + "].ProductCode\" value =\"" + data.Data[0].ProductCode + "\" />";
+                            str += "<input type=\"hidden\" name=\"ListBOM[" + idx + "].OrgID\" value =\"" + data.Data[0].OrgID + "\" />";
+                            str += "<input type=\"hidden\" name=\"ListBOM[" + idx + "].ProductCodeParent\" value =\"" + data.Data[0].ProductCodeParent + "\" />";
+                            str += "<input type=\"hidden\" name=\"ListBOM[" + idx + "].Qty\" value =\"" + data.Data[0].QtyEffSt + "\" />";
+                            str += "<input type=\"hidden\" name=\"ListBOM[" + idx + "].mp_UPSell\" value =\"" + data.Data[0].UPSell + "\" />";
+                            str += "<input type=\"hidden\" name=\"ListBOM[" + idx + "].mp_UPBuy\" value =\"" + data.Data[0].UPBuy + "\" />";
+                            str += "<input type=\"hidden\" name=\"ListBOM[" + idx + "].ProductType\" value =\"" + data.Data[0].ProductType + "\" />";
+                            str += "<input type=\"hidden\" name=\"ListBOM[" + idx + "].ProductName\" value =\"" + data.Data[0].ProductName + "\" />";
+                            str += "</tr>";
+
+                            var oldItem = $('.GetPrd').find('tr[data-prdcode="' + data.Data[0].ProductCode + '"]');
+                            if (oldItem != undefined && oldItem.length > 0) {
+                                oldItem.eq(1).replaceWith(str);
+                            } else {
+                                $('.GetPrd').append(str);
+                            }
+                            commonUtils.updateTableTrIdxbomdelete($('#table-tbodyID tr.getbom'), true);
+                        }
+                        else {
+                            $('.GetPrd').append(str);
+                        }
+
+                    }
+
+                });
+                commonUtils.updateTableTrIdxbomdelete($('#table-tbodyID tr.getbom'), true);
+            }
+            var x = document.getElementById("myInput");
+            Getkeyup(x.value);
+            function Getkeyup(prdid) {
+                var listData = [];
+                var url = '@Url.Action("SearchProduct", "Mst_Product")';
+                $.ajax({
+                    url: url,
+                    type: 'post',
+                    data: {
+                        prdid: prdid,
+                    },
+                    cache: false,
+                    dataType: 'json',
+                    traditional: true,
+                    success: function (data) {
+                        var arr = [];
+                        //debugger;
+                        if (data.length >0) {
+                            for (var i = 0; i < data.length; i++) {
+                                arr.push(data[i].ProductCodeUser);
+                                arr.push(data[i].ProductName);
+                            }
+                        }
+                        //debugger;
+                        autocomplete(document.getElementById("myInput"), arr);
+                    }
+                });
+
+            }
+        }
+    </script>
+    <script type="text/javascript">
+        $('input.multioptions').click(function () {
+            $('.div-multil-options').toggle();
+        });
+        function OnYes() {
+            $('.div-multil-options').css('display', 'none');
+
+            var arr = "";
+            $('#attribute-search').find('div[idx]').each(function () {
+                var idx = $(this).attr('idx');
+                var attributename = $('[name="ListMstAttribute[' + idx + '].AttributeName"]').html();
+                var attributevalue = $('[name="ListMstAttribute[' + idx + '].AttributeValue"]').val();
+                if (!commonUtils.isNullOrEmpty(attributevalue)) {
+                    if (arr.length > 0) {
+                        arr += "| " + attributename + ": " + attributevalue;
+                    }
+                    else {
+                        arr += attributename + ": " + attributevalue
+                    }
+                }
+            });
+
+            $('#multioptions').val(arr);
+        }
+        function CheckBoxRoot(thiz) {
+            debugger;
+            event.stopPropagation();
+            var idx = $(thiz).parent().parent().attr('idx');
+            var trRow = $(thiz).closest('td').closest('tr');
+            let productcode = $(trRow).find('input[name="ListProduct[' + idx + '].ProductCode"]').val();
+            let productlevelsys = $(trRow).find('input[name="ListProduct[' + idx + '].ProductLevelSys"]').val();
+            let data_root = 'trChild-' + productcode + '';
+            let children = $('#table-tbodyID.GetBom').find('tr[data-root="' + data_root + '"]');
+            if (children.length > 0) {
+                children.each(function () {
+                    var inputCkb = $(this).find('input[type="checkbox"]');
+                    var check = false;
+                    if ($(thiz).is(":checked")) {
+                        check = true;
+                    }
+                    $(inputCkb).prop("checked", check);
+                });
+            }
+        }
+        function CheckAll(thiz) {
+            debugger;
+            let trArr = $('#table-tbodyID.GetBom');
+            if (trArr !== null && trArr.length > 0) {
+                for (var i = 0; i < trArr.length; i++) {
+                    var trCur = trArr[i];
+                    if (trCur !== null && trCur !== undefined) {
+                        var inputCkb = $(trCur).find('input[type="checkbox"]');
+                        var check = false;
+                        if ($(thiz).is(":checked")) {
+                            check = true;
+                        }
+                        $(inputCkb).prop("checked", check);
+                    }
+                }
+            }
+        }
+        function PrdOnClick(thiz) {
+        //debugger;
+            var idx = $(thiz).attr('idx');
+            let rowShowChildren = $('#table-tbodyID').find('tr.child-show');
+            let productcode = $(thiz).find('input[name="ListProduct[' + idx + '].ProductCode"]').val();
+            let productcodebase = $(thiz).find('input[name="ListProduct[' + idx + '].ProductCodeBase"]').val();
+            let productlevelsys = $(thiz).find('input[name="ListProduct[' + idx + '].ProductLevelSys"]').val();
+            let data_root = 'trChild-' + productcode + '';
+            let children = $('#table-tbodyID.GetBom').find('tr[data-root="' + data_root + '"]');
+
+            if (children.length > 0) {
+                //children.toggle();
+
+                children.each(function () {
+                    if ($(this).hasClass('child-show')) {
+                        $(this).removeClass('child-show').addClass('child-none');
+                    } else {
+                        $(this).removeClass('child-none').addClass('child-show');
+                    }
+                });
+                rowShowChildren.removeClass('child-show').addClass('child-none');
+            }
+            else {
+                var token = $('.layout-table input[name=__RequestVerificationToken]').val();
+                var url = '@Url.Action("LoadData","Mst_Product")';
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: {
+                        __RequestVerificationToken: token
+                        , prcode: productcode
+                        , prbscode: productcodebase
+                        , prlv: productlevelsys
+                        , idx: idx
+                    },
+                    traditional: true,
+                    //contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    beforeSend: function () {
+
+                    }
+                }).done(function (data) {
+                    //debugger;
+                    if (data.Success) {
+                        if (data.Html != null && data.Html.length > 0) {
+                            rowShowChildren.removeClass('child-show').addClass('child-none');
+                            $(thiz).after(data.Html);
+                            //tablesort();
+                        } else {
+                            window.location.href = data.RedirectUrl;
+                        }
+                    } else {
+                        if (!commonUtils.isNullOrEmpty(data.Detail)) {
+                            _showErrorMsg123('Lỗi!', data.Detail);
+                        }
+                    }
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+
+                }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+                    //alert("complete");
+                });
+            }
+        }
+        function checkchoosePrd() {
+
+            var rows = $("tbody#table-tbodyID tr.GetBom").length;
+            var str = "";
+            //debugger;
+            if (rows > 0) {
+                //$('.modal-dialog').css('display', 'none');
+                //$('.fade.show').css('display', 'none');
+                $('#ModelSearchProduct').modal('hide');
+                var trArr = $('tbody#table-tbodyID tr.GetBom').has('input[name="ckb"]:checked');
+                if (trArr !== null && trArr.length > 0) {
+                    for (var i = 0; i < trArr.length; i++) {
+                        var trCur = trArr[i];
+                        if (trCur !== null && trCur !== undefined) {
+                            var str = "";
+                            var idx = $(trCur).attr('idx');
+                            var idxx = 0;
+                            var temDtlCur = {};
+                            temDtlCur.ProductCodeUser = $(trCur).find('input[type="hidden"][name="ListProduct[' + idx + '].ProductCodeUser"]').val();
+                            temDtlCur.ProductCode = $(trCur).find('input[type="hidden"][name="ListProduct[' + idx + '].ProductCode"]').val();
+                            temDtlCur.ProductName = $(trCur).find('input[type="hidden"][name="ListProduct[' + idx + '].ProductName"]').val();
+                            temDtlCur.UPBuy = $(trCur).find('input[type="hidden"][name="ListProduct[' + idx + '].UPBuy"]').val();
+                            temDtlCur.QtyEffSt = $(trCur).find('input[type="hidden"][name="ListProduct[' + idx + '].QtyEffSt"]').val();
+                            temDtlCur.UPSell = $(trCur).find('input[type="hidden"][name="ListProduct[' + idx + '].UPSell"]').val();
+                            if (temDtlCur.UPBuy === null) {
+                                temDtlCur.UPBuy = "";
+                            }
+                            if (temDtlCur.UPSell === null) {
+                                temDtlCur.UPSell = "";
+                            }
+                            if (temDtlCur.QtyEffSt != null && temDtlCur.QtyEffSt != undefined && temDtlCur.QtyEffSt > 0 && temDtlCur.QtyEffSt != "") {
+                                temDtlCur.QtyEffSt = temDtlCur.QtyEffSt;
+                            } else {
+                                temDtlCur.QtyEffSt = 1;
+                            }
+                            var UPBuyamount = temDtlCur.QtyEffSt * temDtlCur.UPBuy;
+                            var UPSellamount = temDtlCur.QtyEffSt * temDtlCur.UPSell;
+                            str += "<tr data-prdcode=\"" + temDtlCur.ProductCode + "\" class=\"data-item trdata getbom " + temDtlCur.ProductCode + "\" idx=\"xoa_" + idx + "\">";
+                            str += "<td class=\"text-center cell-50\" onclick=\"DeleleRowBom('" + temDtlCur.ProductCode + "')\"> <div class=\"action-buttons padding - top - 2\" ><i class=\"fa fa-trash-alt\"></i ></div ></td>";
+                            str += "<td fieldid=\"PRODUCTCODE\" sorttype=\"T\" class=\"text-center cell-50 xoa_'" + idx + "'\">" + idx + "</td>";
+                            str += "<td fieldid=\"PRODUCTCODE\" sorttype=\"T\" class=\"cell-100 xoa_'" + idx + "'\">" + temDtlCur.ProductCodeUser + "</td>";
+                            str += "<td fieldid=\"PRODUCTCODE\" sorttype=\"T\" class=\"cell-200 xoa_'" + idx + "'\">" + temDtlCur.ProductName + "</td>";
+                            str += "<td fieldid=\"CREATEDTIMEUTC\" sorttype=\"T\" class=\"text-center cell-75 xoa_'" + idx + "'\"><input style=\"width:75px\" class=\"text-right bom-qty\" id=\"qtybuysell_" + temDtlCur.ProductCode + "\" value=\"" + temDtlCur.QtyEffSt + "\" onchange=\"UpAmount('" + temDtlCur.ProductCode + "','" + temDtlCur.UPBuy + "','" + temDtlCur.UPSell + "')\" /></td>";
+                            str += "<td fieldid=\"APPRDTIMEUTC\" sorttype=\"T\" class=\"text-center cell-100 bom-upbuy xoa_\">" + temDtlCur.UPBuy + "</td>";
+                            str += "<td fieldid=\"APPRDTIMEUTC\" sorttype=\"T\" class=\"text-center cell-100 bom-sum-buy-amount xoa_\" id=\"uPBuyAmount_" + temDtlCur.ProductCode + "\">" + UPBuyamount + "</td>";
+                            str += "<td fieldid=\"APPRDTIMEUTC\" sorttype=\"T\" class=\"text-center cell-100 bom-upsell xoa_\">" + temDtlCur.UPSell + "</td>";
+                            str += "<td fieldid=\"APPRDTIMEUTC\" sorttype=\"T\" class=\"text-center cell-100 bom-sum-sell-amount xoa_\" id=\"uPSellAmount_" + temDtlCur.ProductCode + "\">" + UPSellamount + "</td>";
+                            str += "<input type=\"hidden\" name=\"ListBOM[" + idx + "].ProductCode\" value =\"" + temDtlCur.ProductCode + "\" />";
+                            str += "<input type=\"hidden\" name=\"ListBOM[" + idx + "].OrgID\" value =\"" + temDtlCur.OrgID + "\" />";
+                            str += "<input type=\"hidden\" name=\"ListBOM[" + idx + "].ProductCodeParent\" value =\"" + temDtlCur.ProductCodeParent + "\" />";
+                            str += "<input type=\"hidden\" name=\"ListBOM[" + idx + "].Qty\" value =\"" + temDtlCur.QtyEffSt + "\" />";
+                            str += "<input type=\"hidden\" name=\"ListBOM[" + idx + "].mp_UPSell\" value =\"" + temDtlCur.UPSell + "\" />";
+                            str += "<input type=\"hidden\" name=\"ListBOM[" + idx + "].mp_UPBuy\" value =\"" + temDtlCur.UPBuy + "\" />";
+                            str += "<input type=\"hidden\" name=\"ListBOM[" + idx + "].ProductType\" value =\"" + temDtlCur.ProductType + "\" />";
+                            str += "<input type=\"hidden\" name=\"ListBOM[" + idx + "].ProductName\" value =\"" + temDtlCur.ProductName + "\" />";
+                            str += "</tr>";
+                            //let trArrcheck = $('#table-tbodyID.GetPrd');
+                            //if (trArrcheck !== null && trArrcheck.length > 0) {
+                            //    for (var i = 0; i < trArrcheck.length; i++) {
+                            //        var trCurcheck = trArrcheck[i];
+                            //        if (trCurcheck !== null && trCurcheck !== undefined) {
+
+                            //            var checkprd = $(trCurcheck).find('input[type="hidden"][name="ListProduct[' + idx + '].ProductCode"]').val();
+                            //            if (checkprd != undefined && checkprd != null && checkprd === temDtlCur.ProductCode) {
+                            //                alert("Đã tồn tại hàng thành phẩn" + temDtlCur.ProductCodeUser);
+                            //                }
+                            //                else {
+                            //                    var oldItem = $('#table-tbodyID').find('tr[data-prdcode="' + temDtlCur.ProductCode + '"]');
+                            //                    if (oldItem != undefined && oldItem.length > 0) {
+                            //                        oldItem.eq(1).replaceWith(str);
+                            //                    } else {
+                            //                        $('.GetPrd').append(str);
+                            //                    }
+                            //                }
+                            //        }
+                            //    }
+                            //}
+                            var oldItem = $('#table-tbodyID').find('tr[data-prdcode="' + temDtlCur.ProductCode + '"]');
+                            if (oldItem != undefined && oldItem.length > 0) {
+                                oldItem.eq(1).replaceWith(str);
+                            } else {
+                                $('.GetPrd').append(str);
+                            }
+                            commonUtils.updateTableTrIdxbomdelete($('#table-tbodyID tr.getbom'), true);
+                        }
+                    }
+                    RefeshTable();
+                }
+                else {
+                    alert("Chưa chọn hàng thành phần!");
+                    return false;
+                }
+            }
+            else {
+                alert("Lưới hàng thành phần trống!");
+                return false;
+            }
+        }
+    </script>
+    <script>
+        function DeleleRowBom(idx) {
+            //debugger;
+            $('tr[data-prdcode="' + idx + '"]').remove();
+            commonUtils.updateTableTrIdxbomdelete($('#table-tbodyID tr.getbom'), true);
+        }
+        function UpAmount(prdcode, buy, sell) {
+            //debugger;
+
+            var Qty = "qtybuysell_" + prdcode;
+            var qty = document.getElementById(Qty).value;
+            var uPBuyAmount = buy * qty;
+            var uPSellAmount = sell * qty;
+            var buyamount = "uPBuyAmount_" + prdcode;
+            var sellamount = "uPSellAmount_" + prdcode;
+
+            document.getElementById(buyamount).innerHTML = uPBuyAmount;
+            document.getElementById(sellamount).innerHTML = uPSellAmount;
+            $('#' + buyamount).number(true, 2);
+            $('#' + sellamount).number(true, 2);
+
+
+        }
+    </script>
+    <script src="~/Content/tinymce/tinymce.min.js"></script>
+    <script>
+        // editor////////////
+        tinymce.init({
+            selector: '#ProductIntro',
+            //content_css: '//www.tiny.cloud/css/codepen.min.css',
+            height: 1000,
+            plugins: [
+                'image code advlist autolink lists link image charmap print preview anchor',
+                'insertdatetime media table paste code help wordcount'
+            ],
+            toolbar: 'preview | image | undo redo | formatselect | ' +
+                'bold italic backcolor | alignleft aligncenter ' +
+                'alignright alignjustify | bullist numlist outdent indent | ' +
+                'removeformat | help',
+
+            image_list: [
+                { title: 'QRCODE', value: 'images/qr.png' },
+            ],
+            /* without images_upload_url set, Upload tab won't show up*/
+            images_upload_url: '@Url.Action("uploadimage", "file")',
+            relative_urls: false,
+            remove_script_host: false,
+            document_base_url: "",
+            /* we override default upload handler to simulate successful upload*/
+            images_upload_handler: function(blobInfo, success, failure) {
+                var xhr, formData;
+                xhr = new XMLHttpRequest();
+                xhr.withCredentials = false;
+                xhr.open('POST', '@Url.Action("uploadimage", "file")');
+                xhr.onload = function() {
+                    var json;
+
+                    if (xhr.status != 200) {
+                        failure('HTTP Error: ' + xhr.status);
+                        return;
+                    }
+                    json = JSON.parse(xhr.responseText);
+
+                    if (!json || typeof json.Url != 'string' || json.Success != true) {
+                        failure('Invalid JSON: ' + xhr.responseText);
+                        return;
+                    }
+                    success(json.Url);
+                };
+
+                console.log(blobInfo);
+                formData = new FormData();
+                formData.append('file', blobInfo.blob(), blobInfo.filename());
+                xhr.send(formData);
+            },
+            setup: function (editor) {
+                //editor.on('init',
+                //    function(e) {
+                //        editor.setContent('<p>Hello world!</p>');
+                //    });
+
+                //editor.onSaveContent.add(function (editor, o) {
+                //    //o.content = editor.getContent({format : 'html'});
+                //    //o.content = o.content.replace(/</g, '< ');
+                //});
+            }
+        });
+
+
+        $('#btnTable').click(function() {
+            var html =
+                '<table style="width:100%;"><tr><td>1</td><td>1</td><td>1</td></tr><tr><td>1</td><td>1</td><td>1</td></tr><tr><td>1</td><td>1</td><td>1</td></tr><tr><td>1</td><td>1</td><td>1</td></tr></table>';
+            tinymce.activeEditor.insertContent(html);
+        });
+    </script>
+    <script>
+        // editor////////////
+        tinymce.init({
+            selector: '#ProductUserGuide',
+            //content_css: '//www.tiny.cloud/css/codepen.min.css',
+            height: 1000,
+            plugins: [
+                'image code advlist autolink lists link image charmap print preview anchor',
+                'insertdatetime media table paste code help wordcount'
+            ],
+            toolbar: 'preview | image | undo redo | formatselect | ' +
+                'bold italic backcolor | alignleft aligncenter ' +
+                'alignright alignjustify | bullist numlist outdent indent | ' +
+                'removeformat | help',
+
+            image_list: [
+                { title: 'QRCODE', value: 'images/qr.png' },
+            ],
+            /* without images_upload_url set, Upload tab won't show up*/
+            images_upload_url: '@Url.Action("uploadimage", "file")',
+            relative_urls: false,
+            remove_script_host: false,
+            document_base_url: "",
+            /* we override default upload handler to simulate successful upload*/
+            images_upload_handler: function(blobInfo, success, failure) {
+                var xhr, formData;
+                xhr = new XMLHttpRequest();
+                xhr.withCredentials = false;
+                xhr.open('POST', '@Url.Action("uploadimage", "file")');
+                xhr.onload = function() {
+                    var json;
+
+                    if (xhr.status != 200) {
+                        failure('HTTP Error: ' + xhr.status);
+                        return;
+                    }
+                    json = JSON.parse(xhr.responseText);
+
+                    if (!json || typeof json.Url != 'string' || json.Success != true) {
+                        failure('Invalid JSON: ' + xhr.responseText);
+                        return;
+                    }
+                    success(json.Url);
+                };
+
+                console.log(blobInfo);
+                formData = new FormData();
+                formData.append('file', blobInfo.blob(), blobInfo.filename());
+                xhr.send(formData);
+            },
+            setup: function (editor) {
+                //editor.on('init',
+                //    function(e) {
+                //        editor.setContent('<p>Hello world!</p>');
+                //    });
+
+                //editor.onSaveContent.add(function (editor, o) {
+                //    //o.content = editor.getContent({format : 'html'});
+                //    //o.content = o.content.replace(/</g, '< ');
+                //});
+            }
+        });
+
+
+        $('#btnTable').click(function() {
+            var html =
+                '<table style="width:100%;"><tr><td>1</td><td>1</td><td>1</td></tr><tr><td>1</td><td>1</td><td>1</td></tr><tr><td>1</td><td>1</td><td>1</td></tr><tr><td>1</td><td>1</td><td>1</td></tr></table>';
+            tinymce.activeEditor.insertContent(html);
+        });
+    </script>
+    <script>
+        // editor////////////
+        tinymce.init({
+            selector: '#ProductDrawing',
+            //content_css: '//www.tiny.cloud/css/codepen.min.css',
+            height: 1000,
+            plugins: [
+                'image code advlist autolink lists link image charmap print preview anchor',
+                'insertdatetime media table paste code help wordcount'
+            ],
+            toolbar: 'preview | image | undo redo | formatselect | ' +
+                'bold italic backcolor | alignleft aligncenter ' +
+                'alignright alignjustify | bullist numlist outdent indent | ' +
+                'removeformat | help',
+
+            image_list: [
+                { title: 'QRCODE', value: 'images/qr.png' },
+            ],
+            /* without images_upload_url set, Upload tab won't show up*/
+            images_upload_url: '@Url.Action("uploadimage", "file")',
+            relative_urls: false,
+            remove_script_host: false,
+            document_base_url: "",
+            /* we override default upload handler to simulate successful upload*/
+            images_upload_handler: function(blobInfo, success, failure) {
+                var xhr, formData;
+                xhr = new XMLHttpRequest();
+                xhr.withCredentials = false;
+                xhr.open('POST', '@Url.Action("uploadimage", "file")');
+                xhr.onload = function() {
+                    var json;
+
+                    if (xhr.status != 200) {
+                        failure('HTTP Error: ' + xhr.status);
+                        return;
+                    }
+                    json = JSON.parse(xhr.responseText);
+
+                    if (!json || typeof json.Url != 'string' || json.Success != true) {
+                        failure('Invalid JSON: ' + xhr.responseText);
+                        return;
+                    }
+                    success(json.Url);
+                };
+
+                console.log(blobInfo);
+                formData = new FormData();
+                formData.append('file', blobInfo.blob(), blobInfo.filename());
+                xhr.send(formData);
+            },
+            setup: function (editor) {
+                //editor.on('init',
+                //    function(e) {
+                //        editor.setContent('<p>Hello world!</p>');
+                //    });
+
+                //editor.onSaveContent.add(function (editor, o) {
+                //    //o.content = editor.getContent({format : 'html'});
+                //    //o.content = o.content.replace(/</g, '< ');
+                //});
+            }
+        });
+
+
+        $('#btnTable').click(function() {
+            var html =
+                '<table style="width:100%;"><tr><td>1</td><td>1</td><td>1</td></tr><tr><td>1</td><td>1</td><td>1</td></tr><tr><td>1</td><td>1</td><td>1</td></tr><tr><td>1</td><td>1</td><td>1</td></tr></table>';
+            tinymce.activeEditor.insertContent(html);
+        });
+    </script>
+
+}

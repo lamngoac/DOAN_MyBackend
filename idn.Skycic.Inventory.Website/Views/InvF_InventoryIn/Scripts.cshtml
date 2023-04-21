@@ -1,0 +1,48 @@
+﻿@model RT_InvF_InventoryIn
+@{
+    string viewType = CUtils.StrValue(ViewBag.ViewType);
+    var userState = ViewBag.UserState as UserState;
+    var objInvF_InventoryIn = new InvF_InventoryIn();
+    var iF_InvInStatus = "";
+    if (Model != null)
+    {
+        if (Model.Lst_InvF_InventoryIn != null && Model.Lst_InvF_InventoryIn.Count > 0)
+        {
+            objInvF_InventoryIn = Model.Lst_InvF_InventoryIn[0];
+            iF_InvInStatus = CUtils.StrValue(objInvF_InventoryIn.IF_InvInStatus);
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

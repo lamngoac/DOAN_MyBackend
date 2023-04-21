@@ -1,0 +1,170 @@
+﻿@model Mst_Dealer
+@{
+    var title = "TẠO MỚI ĐƠN VỊ";
+    Layout = "~/Views/Shared/_LayoutQuantri.cshtml";
+    var titleMng = "Danh mục đơn vị";
+    ViewBag.Title = title;
+    var listMst_Dealer = ViewBag.ListMst_Dealer as List<Mst_Dealer>;
+    var listMst_PartMaterialType = ViewBag.ListMst_PartMaterialType as List<Mst_PartMaterialType>;
+    var listMst_Inventory = ViewBag.ListMst_Inventory as List<Mst_Inventory>;
+}
+<script type="text/javascript">
+    var parents = new Array();
+    parents.push("@Url.Action("Index", "Mst_Dealer")");
+    parents.push("");
+    var parentsText = new Array();
+    parentsText.push("@MvcHtmlString.Create("titleMng")");
+    parentsText.push("@MvcHtmlString.Create("title")");
+    setAdminCurrentTag(parents, parentsText);
+</script>
+
+<div class="container">
+    <div class="col-xs-12 no-padding">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group no-padding" id="steps">
+            <div class="panel panel-info no-padding">
+                <div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>
+                <div class="panel-body no-padding" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="row no-margin box-shadow-tk">
+                        @using (Html.BeginForm("Create", "Mst_Dealer", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="col-sm-12 no-padding">
+                                <div class="col-xs-12 col-sm-6">
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="DLCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã đơn vị <span style=\"color: red \">*</span>")</label>
+                                        <div class="col-xs-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="DLCode" name="DLCode" class="col-xs-11 DLCode" onkeyup="locdau(this);" value="" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="DLName" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên đơn vị <span style=\"color: red \">*</span>")</label>
+                                        <div class="col-xs-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="DLName" name="DLName" class="col-xs-11 DLName" value="" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="DLCodeParent" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã đơn vị cha ")</label>
+                                        <div class="col-xs-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right">
+                                                <select id="DLCodeParent" name="DLCodeParent" class="col-xs-11">
+                                                    <option></option>
+                                                    @{
+                                                        if (listMst_Dealer != null && listMst_Dealer.Count > 0)
+                                                        {
+                                                            foreach (var it in listMst_Dealer)
+                                                            {
+                                                                <option value="@MvcHtmlString.Create(it.DLCode.ToString().Trim())" desc="@MvcHtmlString.Create(it.DLName.ToString().Trim())">@MvcHtmlString.Create(it.DLName.ToString().Trim())</option>
+                                                            }
+                                                        }
+                                                    }
+                                                </select>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-sm-6">
+
+                                    @*<div class="form-group margin-bottom-5">
+                                        <label for="InvCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Kho của đơn vị <span style=\"color: red \">*</span>")</label>
+                                        <div class="col-xs-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right">
+                                                <select id="InvCode" name="InvCode" class="col-xs-11">
+                                                    <option></option>
+                                                    @{
+                                                        if (listMst_Inventory != null && listMst_Inventory.Count > 0)
+                                                        {
+                                                            foreach (var it in listMst_Inventory)
+                                                            {
+                                                                <option value="@MvcHtmlString.Create(it.InvCode.ToString().Trim())" desc="@MvcHtmlString.Create(it.InvCode.ToString().Trim())">@MvcHtmlString.Create(it.InvName.ToString().Trim())</option>
+                                                            }
+                                                        }
+                                                    }
+                                                </select>
+                                            </span>
+                                        </div>
+                                    </div>*@
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="PMType" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Nhóm sản phẩm <span style=\"color: red \">*</span>")</label>
+                                        <div class="col-xs-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right">
+                                                <select id="PMType" name="PMType" class="col-xs-11">
+                                                    <option></option>
+                                                    @{
+                                                        if (listMst_PartMaterialType != null && listMst_PartMaterialType.Count > 0)
+                                                        {
+                                                            foreach (var it in listMst_PartMaterialType)
+                                                            {
+                                                                <option value="@MvcHtmlString.Create(it.PMType.ToString().Trim())" desc="@MvcHtmlString.Create(it.PMTypeName.ToString().Trim())">@MvcHtmlString.Create(it.PMTypeName.ToString().Trim())</option>
+                                                            }
+                                                        }
+                                                    }
+                                                </select>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="Remark" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Ghi chú")</label>
+                                        <div class="col-xs-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right">
+                                                <textarea id="Remark" name="Remark" class="col-xs-11 Remark" rows="5"></textarea>
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </aside>
+                    <div class="col-xs-12 text-center">
+                        <div class="clearfix">
+                            <div class="row no-margin text-center" style="float: right;">
+                                @RenderItemFormat("BTN_TAO_DON_VI_LUU", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px; margin-left: 10px; padding-left: 15px!important; padding-right: 15px!important; \" onclick=\"SaveData();\"><i class=\"ace-icon fa fa-floppy-o bigger-110\"></i>Lưu</a>", "", "")
+
+                                @*<a href="javascript:void();" class="btn font-color mybtn-Button" style="margin-left: 10px; padding-left: 15px!important; padding-right: 15px!important; " onclick="SaveData();"><i class="ace-icon fa fa-floppy-o bigger-110"></i>Lưu</a>*@
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Mst_Dealer.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "Mst_Dealer")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+        });
+        var _getForm = document.getElementById("manageForm");
+        _getForm.addEventListener('reset', function () {
+            document.getElementById("").focus()
+        });
+        
+        function SaveData() {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Create", "Mst_Dealer")';
+            var objMst_Dealer = new Mst_Dealer();
+            objMst_Dealer.ActionType = 'create';
+            objMst_Dealer.ajaxSettings = ajaxSettings;
+            objMst_Dealer.saveData();
+        }
+    </script>
+}

@@ -1,0 +1,140 @@
+﻿@{
+    var listMst_Inventory = ViewBag.ListMst_Inventory as List<Mst_Inventory>;
+    if (listMst_Inventory == null || listMst_Inventory.Count == 0)
+    {
+        listMst_Inventory = new List<Mst_Inventory>();
+    }
+    listMst_Inventory.Insert(0, new Mst_Inventory()
+    {
+        InvCode = "",
+        InvName = "--Chọn vị trí--",
+    });
+    var listInvF_InventoryCusReturnInstSerial = ViewBag.ListInvF_InventoryCusReturnInstSerial as List<InvF_InventoryCusReturnInstSerial>;
+    var iF_InvInStatus = CUtils.StrValue(ViewBag.IF_InvInStatus);
+    var viewType = CUtils.StrValue(ViewBag.ViewType);
+}
+<div class="modal-dialog" style="width: 500px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel"><b>Danh sách Serial</b></h2>
+            <a href="javascript:;" onclick="closePopupSerial()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body" style="">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupSerial" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class=" col-12" style="float: left;">
+                    <input type="hidden" class="ProductCode_Popup_InvCodeInActual_Serial" value="@MvcHtmlString.Create(CUtils.StrValue(ViewBag.ProductCode))" />
+                    <input type="hidden" class="ProductCodeRoot_popupSerial" value="@ViewBag.ProductCodeRoot"/>
+                    Hàng hóa:<input type="text" class="no-border col-12" value="@MvcHtmlString.Create(CUtils.StrValue(ViewBag.ProductName))" />
+                    @*@if (!viewType.Equals("detail") && iF_InvInStatus.Equals(Client_Status.PENDING))
+                {
+                    <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="product_InvF_InventoryCusReturnInstSerial_AddNewRow ()" style="float: left;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Thêm</a>
+                    <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="product_InvF_InventoryCusReturnInstSerial_Save()" style="float: left;font-size: 13px;margin-left: 10px"><i class="fa fa-save" aria-hidden="true"></i> OK</a>
+                }*@
+                </div>
+                <div class=" col-xs-12" style="float: left;">
+                    <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+                        <div style="width: 100%; float: left;">
+                            <table class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                                <thead>
+                                    <tr class="trthead">
+                                        <th class="text-center cell-50 action-buttons">
+                                        </th>
+                                        <th class="text-center cell-150">
+                                            @("Số serial".HtmlItemString("invf_inventoryin"))
+                                        </th>
+                                        <th class="text-center cell-150">
+                                            @("Vị trí".HtmlItemString("invf_inventoryin"))
+                                        </th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                            <table class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                                <tbody id="table-tbodyIDSerial"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12" style="float: left;">
+                    @if (!viewType.Equals("detail") && iF_InvInStatus.Equals(Client_Status.PENDING))
+                    {
+                        <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="product_InvF_InventoryCusReturnInstSerial_AddNewRow()" style="float: left;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Thêm</a>
+                    }
+                </div>
+            }
+        </div>
+        <div class="modal-footer" style="display:flex; align-items:center; justify-content: center">
+            @if (!viewType.Equals("detail") && iF_InvInStatus.Equals(Client_Status.PENDING))
+            {
+                <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="product_InvF_InventoryCusReturnInstSerial_Save()" style="float: left;font-size: 13px;margin-left: 10px"><i class="fa fa-save" aria-hidden="true"></i> OK</a>
+            }
+            <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="closePopupSerial()" style="float: left;font-size: 13px;margin-left: 10px"> Đóng</a>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $('select.InvCodeInActual_Serial').select2();
+    });
+</script>
+
+<script type="text/javascript">
+    var Lst_Mst_Inventory_Serial = []; @*Danh sách vị trí kho*@
+    @if(listMst_Inventory != null && listMst_Inventory.Count > 0)
+    {
+        foreach(var item in listMst_Inventory)
+        {
+            var invCode = CUtils.StrValue(item.InvCode);
+            var invName = CUtils.StrValue(item.InvName);
+            <text>
+                var objMst_Inventory = {
+                    InvCode: '@invCode',
+                    InvName: '@invName',
+                };
+                Lst_Mst_Inventory_Serial.push(objMst_Inventory);
+            </text>
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    var ListInvF_InventoryCusReturnInstSerial = [];
+    @if(listInvF_InventoryCusReturnInstSerial != null && listInvF_InventoryCusReturnInstSerial.Count > 0)
+    {
+        foreach(var item in listInvF_InventoryCusReturnInstSerial)
+        {
+            var invCodeInActual = CUtils.StrValue(item.InvCodeInActual);
+            var serialNo = CUtils.StrValue(item.SerialNo);
+            var productCodeRoot = CUtils.StrValue(item.ProductCodeRoot);
+            <text>
+                var objProduct_InvF_InventoryCusReturnInstSerial = {
+                    InvCodeInActual: '@invCodeInActual',
+                    SerialNo: '@serialNo',
+                    ProductCodeRoot: '@productCodeRoot',
+                }
+                ListInvF_InventoryCusReturnInstSerial.push(objProduct_InvF_InventoryCusReturnInstSerial);
+            </text>
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        @*Add danh sách serial vào Popup*@
+        if (ListInvF_InventoryCusReturnInstSerial !== undefined && ListInvF_InventoryCusReturnInstSerial !== null && ListInvF_InventoryCusReturnInstSerial.length > 0) {
+            for (var i = 0; i < ListInvF_InventoryCusReturnInstSerial.length; i++) {
+                var objProduct_InvF_InventoryCusReturnInstSerial_AddRow = {
+                    Product_InvF_InventoryCusReturnInstSerial: ListInvF_InventoryCusReturnInstSerial[i],
+                    Lst_Mst_Inventory: Lst_Mst_Inventory_Serial,
+                };
+
+                renderProductInvFInventoryInInstSerial(objProduct_InvF_InventoryCusReturnInstSerial_AddRow);
+            }
+        }
+    });
+</script>

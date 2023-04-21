@@ -1,0 +1,1046 @@
+﻿@using reCAPTCHA.MVC
+
+@model Mst_NNT
+@{
+    //27250
+    var title = "ĐĂNG KÝ";
+    var titleMng = "Danh mục khách hàng";
+    Layout = "~/Views/Shared/_LayoutRegister.cshtml";
+    ViewBag.Title = title;
+
+    var listMst_Province = ViewBag.ListMst_Province as List<Mst_Province>;
+    if (listMst_Province == null || listMst_Province.Count == 0)
+    {
+        listMst_Province = new List<Mst_Province>();
+    }
+
+    var listMst_District = ViewBag.ListMst_District as List<Mst_District>;
+    if (listMst_District == null || listMst_District.Count == 0)
+    {
+        listMst_District = new List<Mst_District>();
+    }
+
+    var listMst_GovTaxID = ViewBag.ListMst_GovTaxID as List<Mst_GovTaxID>;
+    if (listMst_GovTaxID == null || listMst_GovTaxID.Count == 0)
+    {
+        listMst_GovTaxID = new List<Mst_GovTaxID>();
+    }
+
+    var listiNOS_Mst_BizType = ViewBag.ListiNOS_Mst_BizType as List<iNOS_Mst_BizType>;
+    if (listiNOS_Mst_BizType == null || listiNOS_Mst_BizType.Count == 0)
+    {
+        listiNOS_Mst_BizType = new List<iNOS_Mst_BizType>();
+    }
+
+    var listiNOS_Mst_BizField = ViewBag.ListiNOS_Mst_BizField as List<iNOS_Mst_BizField>;
+    if (listiNOS_Mst_BizField == null || listiNOS_Mst_BizField.Count == 0)
+    {
+        listiNOS_Mst_BizField = new List<iNOS_Mst_BizField>();
+    }
+
+    var listiNOS_Mst_BizSize = ViewBag.ListiNOS_Mst_BizSize as List<iNOS_Mst_BizSize>;
+    if (listiNOS_Mst_BizSize == null || listiNOS_Mst_BizSize.Count == 0)
+    {
+        listiNOS_Mst_BizSize = new List<iNOS_Mst_BizSize>();
+    }
+
+    var listMst_GovIDType = ViewBag.ListMst_GovIDType as List<Mst_GovIDType>;
+    if (listMst_GovIDType == null || listMst_GovIDType.Count == 0)
+    {
+        listMst_GovIDType = new List<Mst_GovIDType>();
+    }
+
+    var listSys_Modules = ViewBag.ListSys_Modules as List<Sys_Modules>;
+    if (listSys_Modules == null || listSys_Modules.Count == 0)
+    {
+        listSys_Modules = new List<Sys_Modules>();
+    }
+
+    var listOS_Inos_Package = ViewBag.ListOS_Inos_Package as List<OS_Inos_Package>;
+    if (listOS_Inos_Package == null || listOS_Inos_Package.Count == 0)
+    {
+        listOS_Inos_Package = new List<OS_Inos_Package>();
+    }
+
+    var cacheNNT = ViewBag.CacheNNT as Mst_NNT;
+    if (cacheNNT == null)
+    {
+        cacheNNT = new Mst_NNT();
+    }
+
+    var cacheInos_Org = ViewBag.CacheInos_Org as OS_Inos_Org;
+    if (cacheInos_Org == null)
+    {
+        cacheInos_Org = new OS_Inos_Org();
+    }
+
+    var cacheShortName = ViewBag.CacheShortName as string;
+    if (CUtils.IsNullOrEmpty(cacheShortName))
+    {
+        cacheShortName = "";
+    }
+
+    var promote = ViewBag.Promote as string;
+    var mstnnt = "";
+    if (!CUtils.IsNullOrEmpty(ViewBag.MST))
+    {
+        mstnnt = ViewBag.MST;
+    }
+    var userCodeLogin = ViewBag.UserCodeLogin as string;
+    if (CUtils.IsNullOrEmpty(userCodeLogin))
+    {
+        userCodeLogin = "";
+    }
+}
+
+<link href="~/Content/search-select/select2.min.css" rel="stylesheet" />
+<script src="~/Content/search-select/select2.min.js"></script>
+<style>
+    table:before, table:after {
+        content: none !important;
+    }
+
+    table td {
+        padding: 5px 20px;
+    }
+
+    .bold-package {
+        margin: 5px 0;
+        font-weight: bold;
+    }
+
+    table input {
+        border: 1px solid #d8d8d8 !important;
+        padding: 5px 10px;
+        width: 70px;
+    }
+
+    .fee-row td:first-child {
+        padding: 20px 40px;
+    }
+
+    table tbody tr {
+        border: 1px solid #d8d8d8;
+    }
+
+    tr.trdata button {
+        width: 25px;
+    }
+
+    .btn {
+        font-size: 12px;
+    }
+
+    .step-content .step-pane {
+        min-height: 0;
+    }
+
+    /* The checkbox */
+    .checkbox {
+        display: block;
+        position: relative;
+        margin-bottom: 12px;
+        cursor: pointer;
+        font-size: 15px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+        /* Hide the browser's default checkbox */
+        .checkbox input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+    /* Create a custom checkbox */
+    .checkmark {
+        position: absolute;
+        top: 5px;
+        left: 0;
+        height: 25px;
+        width: 25px;
+        background-color: #eee;
+        border: 1px solid #007FC7;
+        border-radius: 20px;
+    }
+
+    /* On mouse-over, add a grey background color */
+    .checkbox:hover input ~ .checkmark {
+        background-color: #ccc;
+    }
+
+    /* When the checkbox is checked, add a blue background */
+    .checkbox input:checked ~ .checkmark {
+        background-color: #2196F3;
+        border-radius: 20px;
+    }
+
+    /* Create the checkmark/indicator (hidden when not checked) */
+    .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
+
+    /* Show the checkmark when checked */
+    .checkbox input:checked ~ .checkmark:after {
+        display: block;
+    }
+
+    /* Style the checkmark/indicator */
+    .checkbox .checkmark:after {
+        left: 8px;
+        top: 3px;
+        width: 7px;
+        height: 15px;
+        border: solid white;
+        border-width: 0 3px 3px 0;
+        -webkit-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        transform: rotate(45deg);
+    }
+
+    .select2-container {
+        width: 91% !important;
+    }
+
+    .select2-container--default .select2-selection--single {
+        border-color: #b5b5b5 !important;
+    }
+    .register {
+        margin: 20px 0;
+    }
+
+        .register img {
+            width: 15px;
+            display: inline;
+            margin-right: 15px;
+        }
+</style>
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+
+                    <aside class="row no-margin">
+                        <div class="row no-margin">
+                            <div id="fuelux-wizard-container" class="no-steps-container">
+                                <div class="row no-margin" style="margin-bottom: 10px !important">
+                                    <ul class="steps" style="margin-left: 0">
+                                        <li id="stepli1" data-step="1" class="active">
+                                            <span class="step">1</span>
+                                            <span class="title" style="padding-left: 0; margin-bottom: 0; border-left: none">Chọn gói giải pháp</span>
+                                        </li>
+
+                                        <li id="stepli2" data-step="2" class="">
+                                            <span class="step">2</span>
+                                            <span class="title" style="padding-left: 0; margin-bottom: 0; border-left: none">Thông tin tổ chức</span>
+                                        </li>
+
+                                        @*<li id="stepli3" data-step="3" class="">
+                                                <span class="step">3</span>
+                                                <span class="title" style="padding-left: 0; margin-bottom: 0; border-left: none">Thông tin tài khoản</span>
+                                            </li>*@
+
+                                        <li id="stepli3" data-step="3" class="">
+                                            <span class="step">3</span>
+                                            <span class="title" style="padding-left: 0; margin-bottom: 0; border-left: none">Thanh toán</span>
+                                        </li>
+                                    </ul>
+
+                                </div>
+
+
+                                @using (Html.BeginForm("", "", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.ValidationSummary(true)
+                                    <div class="step-content pos-rel">
+                                        <div id="step1" class="step-pane active" data-step="1">
+                                            <div class="container" style="width: 1026px;">
+                                                <table class="container" style="box-shadow: 0px 0px 8px #e2e2e2; width: 100%;">
+                                                    <tbody id="tbodyLicense">
+                                                        <tr>
+                                                            <td class="text-left bold-package">Tên gói</td>
+                                                            <td class="text-right bold-package">Đơn giá</td>
+                                                            <td class="text-center bold-package"></td>
+                                                            <td class="text-right bold-package">Thành tiền</td>
+                                                        </tr>
+                                                        @if (listOS_Inos_Package != null && listOS_Inos_Package.Count > 0)
+                                                        {
+                                                            var idx = 0;
+                                                            foreach (var item in listOS_Inos_Package)
+                                                            {
+                                                                var id = "";
+                                                                var name = "";
+                                                                var description = "";
+                                                                var price = "";
+                                                                var amount = "";
+                                                                var qty = 1.0;
+                                                                var isDiscountable = "";
+                                                                if (!CUtils.IsNullOrEmpty(item.Id))
+                                                                {
+                                                                    id = CUtils.StrValue(item.Id);
+                                                                }
+                                                                if (!CUtils.IsNullOrEmpty(item.Name))
+                                                                {
+                                                                    name = CUtils.StrValue(item.Name);
+                                                                }
+                                                                if (!CUtils.IsNullOrEmpty(item.Description))
+                                                                {
+                                                                    description = CUtils.StrValue(item.Description);
+                                                                }
+                                                                if (!CUtils.IsNullOrEmpty(item.Price))
+                                                                {
+                                                                    price = CUtils.StrValue(item.Price);
+                                                                    if (CUtils.IsNumeric(price))
+                                                                    {
+                                                                        amount = (qty * Convert.ToDouble(price)).ToString(CultureInfo.CurrentCulture).Trim();
+                                                                    }
+                                                                }
+                                                                if (!CUtils.IsNullOrEmpty(item.IsDiscountable))
+                                                                {
+                                                                    isDiscountable = CUtils.StrValue(item.IsDiscountable);
+                                                                }
+                                                                var strchecked = "";
+                                                                var strdisplay = "";
+                                                                if (idx == 0)
+                                                                {
+                                                                    strchecked = "true";
+                                                                }
+                                                                else
+                                                                {
+                                                                    strchecked = "false";
+                                                                    strdisplay = "display-none";
+                                                                }
+                                                                <tr idx="@idx" flagdiscount="@isDiscountable" class="trdata">
+                                                                    <input type="hidden" name="ListOS_Inos_Package[@idx].Id" value="@MvcHtmlString.Create(id)" />
+                                                                    <input type="hidden" name="ListOS_Inos_Package[@idx].Qty" value="@MvcHtmlString.Create("1")" />
+                                                                    <input type="hidden" name="ListOS_Inos_Package[@idx].Name" value="@MvcHtmlString.Create(name)" />
+                                                                    <input type="hidden" name="ListOS_Inos_Package[@idx].Description" value="@MvcHtmlString.Create(description)" />
+                                                                    <input type="hidden" name="ListOS_Inos_Package[@idx].Price" value="@MvcHtmlString.Create(price)" />
+                                                                    <td class="text-left">
+                                                                        <div class="bold-package">@MvcHtmlString.Create(name)</div>
+                                                                        <div>@MvcHtmlString.Create(description)</div>
+                                                                    </td>
+                                                                    <td class="text-right">
+                                                                        <div class="unitprice">@MvcHtmlString.Create(price)</div>
+                                                                    </td>
+                                                                    <td class="text-right">
+                                                                        <span class="block input-icon input-icon-right padding-top-5">
+                                                                            <label>
+                                                                                @if (idx == 0)
+                                                                                {
+                                                                                    <input name="ListOS_Inos_Package[@idx].FlagActive" class="ace ace-switch ace-switch-4 FlagActive" type="checkbox" value="1" checked onclick="ChangeCheckBoxPackage(this);" />
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    <input name="ListOS_Inos_Package[@idx].FlagActive" class="ace ace-switch ace-switch-4 FlagActive" type="checkbox" value="0" onclick="ChangeCheckBoxPackage(this);" />
+                                                                                }
+                                                                                <span class="lbl"></span>
+                                                                            </label>
+                                                                        </span>
+                                                                    </td>
+                                                                    <td class="text-right">
+                                                                        <div class="discountprice @strdisplay" name="discountprice[@idx]" style=""></div>
+                                                                        <div class="formatnumber @strdisplay" style="">@MvcHtmlString.Create(amount)</div>
+                                                                    </td>
+                                                                </tr>
+                                                                idx++;
+                                                            }
+                                                        }
+                                                    </tbody>
+                                                    <tfoot id="tfootLicense">
+                                                        <tr>
+                                                            <input type="hidden" id="TotalAmount" value="0" />
+                                                            <input type="hidden" id="TotalGiamGia" value="0" />
+                                                            <input type="hidden" id="TotalAmountActual" value="0" />
+                                                            <td class="text-left" rowspan="3" colspan="2">
+                                                                <div class="col-xs-6 no-padding">
+                                                                    <div class="form-group margin-bottom-5">
+                                                                        <label style="text-align: left" for="DLCode" class="col-xs-12 col-sm-4 control-label font-weight-500 ">@MvcHtmlString.Create("Mã đại lý <span style=\"color:red\">*</span>")</label>
+                                                                        <div class="col-xs-12 col-sm-8">
+                                                                            <span class="block input-icon input-icon-right">
+                                                                                <input type="text" id="DLCode" name="DLCode" class="col-xs-11 DLCode" value="@MvcHtmlString.Create("idocNet")" autocomplete="off" />
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <p for="DiscountCode" class="col-xs-12 col-sm-12 no-padding-right bold-package ">@MvcHtmlString.Create("Mã giảm giá <i class=\"fa fa-exclamation-circle\" title=\"Được idocNet cấp trong các chương trình khuyến mại hoặc mã người giới thiệu. Mã chỉ được sử dụng và có hiệu lực trong thời hạn sử dụng.\" style=\"font-size: 16px; color: #057d5a\" aria-hidden=\"true\"></i>")</p>
+                                                                    <div class="col-xs-12 col-sm-5">
+                                                                        <span class="block input-icon input-icon-right">
+
+                                                                            <input type="text" id="DiscountCode" name="DiscountCode" class="col-xs-12 DiscountCode" placeholder="Nhập mã giảm giá" autocomplete="off" value="@promote" />
+                                                                            <input type="text" style="z-index: -1000; height: 0" id="DiscountCode1" name="DiscountCode1" class="col-xs-12 DiscountCode1" placeholder="Nhập mã giảm giá" autocomplete="off" />
+
+                                                                        </span>
+                                                                    </div>
+                                                                    <div class="col-xs-12 col-sm-3 no-padding">
+                                                                        <button class="btn btn-success no-padding" href="javascript:;" onclick="Apdung()">
+                                                                            Áp dụng
+                                                                        </button>
+                                                                    </div>
+                                                                    <i><p for="" class="col-xs-12 col-sm-12 no-padding-right bold-package alert-discount" style="color: red"></p></i>
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="bold-package text-right">TỔNG TIỀN TẠM TÍNH (VND)</div>
+                                                            </td>
+                                                            <td class="text-right">
+                                                                <div class="bold-package totalamount"></div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-center">
+                                                                <div class="bold-package text-right">GIẢM GIÁ (VND)</div>
+                                                            </td>
+                                                            <td class="text-right">
+                                                                <div class="boThành tiềnld-package totalgiamgia">0</div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-center">
+                                                                <div class="bold-package text-right">TỔNG TIỀN THANH TOÁN (VND)</div>
+                                                            </td>
+                                                            <td class="text-right">
+                                                                <div class="bold-package totalamountactual">0</div>
+                                                            </td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                                <p class="text-center" style="margin-top: 10px">(Giá trên chưa bao gồm VAT)</p>
+                                            </div>
+                                        </div>
+
+                                        <div id="step2" class="step-pane box-shadow-tk" style="margin-top: 20px;" data-step="2">
+                                            <div class="row no-margin">
+                                                <div class="form-group margin-bottom-5" style="display: none;">
+                                                    <label for="MST" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã tổ chức <span style=\"color:red\">*</span>")</label>
+                                                    <div class="col-xs-12 col-sm-7">
+                                                        <span class="block input-icon input-icon-right">
+                                                            <input data-toggle="tooltip" title="Nhập mã tổ chức" type="text" id="MST" name="MST" class="col-xs-11 MST" value="@mstnnt" autocomplete="off" />
+                                                        </span>
+                                                    </div>
+
+                                                </div>
+                                                <div class="col-xs-4 no-padding">
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="ContactName" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Họ tên <span style=\"color:red\">*</span>")</label>
+                                                        <div class="col-xs-12 col-sm-7">
+                                                            <span class="block input-icon input-icon-right">
+                                                                <input data-toggle="tooltip" title="Ví dụ: Đỗ Thị Hòa" type="text" id="ContactName" name="ContactName" class="col-xs-11 ContactName" value="@if (cacheNNT != null && cacheNNT.ContactName != null){@MvcHtmlString.Create(cacheNNT.ContactName.ToString())} else { @("")}" autocomplete="off" />
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-4 no-padding">
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="NNTFullName" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên tổ chức <span style=\"color:red\">*</span>")</label>
+                                                        <div class="col-xs-12 col-sm-7">
+                                                            <span class="block input-icon input-icon-right">
+                                                                <input data-toggle="tooltip" title="Nhập tên tổ chức" type="text" id="NNTFullName" name="NNTFullName" class="col-xs-11 NNTFullName" value="@if (cacheNNT != null && cacheNNT.NNTFullName != null){@MvcHtmlString.Create(cacheNNT.NNTFullName.ToString())} else { @("")}" autocomplete="off" />
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-4 no-padding">
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="ContactEmail" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Email liên hệ <span style=\"color:red\">*</span>")</label>
+                                                        <div class="col-xs-12 col-sm-7">
+                                                            <span class="block input-icon input-icon-right">
+                                                                <input data-toggle="tooltip" title="Ví dụ: hoadt@idocnet.com" type="text" id="ContactEmail" name="ContactEmail" class="col-xs-11 ContactEmail disabled-fix" value="@userCodeLogin" autocomplete="off" />
+                                                            </span>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                @*<div class="col-xs-4 no-padding">
+                                                        <div class="form-group margin-bottom-5">
+                                                            <label for="NNTMobile" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("ĐT di động")</label>
+                                                            <div class="col-xs-12 col-sm-7">
+                                                                <span class="block input-icon input-icon-right">
+                                                                    <input data-toggle="tooltip" title="Ví dụ: 0967545388" type="text" id="NNTMobile" name="NNTMobile" class="col-xs-11 NNTMobile" value="@if (cacheNNT != null && cacheNNT.NNTMobile != null){@MvcHtmlString.Create(cacheNNT.NNTMobile.ToString())} else { @("")}" autocomplete="off"  />
+                                                                </span>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>*@
+                                            </div>
+
+                                            <div class="row no-margin">
+                                                <div class="col-xs-4 no-padding">
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="NNTMobile" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Điện thoại")</label>
+                                                        <div class="col-xs-12 col-sm-7">
+                                                            <span class="block input-icon input-icon-right">
+                                                                <input data-toggle="tooltip" title="Ví dụ: 0967545388" type="text" id="NNTMobile" name="NNTMobile" class="col-xs-11 NNTMobile" value="@if (cacheNNT != null && cacheNNT.NNTMobile != null){@MvcHtmlString.Create(cacheNNT.NNTMobile.ToString())} else { @("")}" autocomplete="off" />
+                                                            </span>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-4 no-padding">
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="BizFieldCode" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Lĩnh vực hoạt động")</label>
+                                                        <div class="col-xs-12 col-sm-7">
+                                                            <span class="block input-icon input-icon-right">
+                                                                @{
+                                                                    var bizFieldCode = "";
+                                                                    if (cacheNNT != null)
+                                                                    {
+                                                                        if (cacheNNT.BizFieldCode != null)
+                                                                        {
+                                                                            bizFieldCode = cacheNNT.BizFieldCode.ToString();
+                                                                        }
+                                                                    }
+                                                                }
+                                                                <select id="BizFieldCode" name="BizFieldCode" class="col-xs-11 BizFieldCode">
+                                                                    <option value=""></option>
+                                                                    @if (listiNOS_Mst_BizField != null && listiNOS_Mst_BizField.Count > 0)
+                                                                    {
+                                                                        foreach (var item in listiNOS_Mst_BizField)
+                                                                        {
+                                                                            <option value="@MvcHtmlString.Create(item.BizFieldCode.ToString().Trim())" desc="@MvcHtmlString.Create(item.BizFieldName.ToString().Trim())" @(item.BizFieldCode.ToString().Trim().Equals(bizFieldCode) ? "selected" : "")>@MvcHtmlString.Create(item.BizFieldName.ToString().Trim())</option>
+                                                                        }
+                                                                    }
+                                                                </select>
+                                                            </span>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-4 no-padding">
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="BizSizeCode" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Quy mô tổ chức")</label>
+                                                        <div class="col-xs-12 col-sm-7">
+                                                            <span class="block input-icon input-icon-right">
+                                                                @{
+                                                                    var bizSizeCode = "";
+                                                                    if (cacheNNT != null)
+                                                                    {
+                                                                        if (cacheNNT.BizSizeCode != null)
+                                                                        {
+                                                                            bizSizeCode = cacheNNT.BizSizeCode.ToString();
+                                                                        }
+                                                                    }
+                                                                }
+                                                                <select id="BizSizeCode" name="BizSizeCode" class="col-xs-11 BizSizeCode">
+                                                                    <option value=""></option>
+                                                                    @if (listiNOS_Mst_BizSize != null && listiNOS_Mst_BizSize.Count > 0)
+                                                                    {
+                                                                        foreach (var item in listiNOS_Mst_BizSize)
+                                                                        {
+                                                                            <option value="@MvcHtmlString.Create(item.BizSizeCode.ToString().Trim())" desc="@MvcHtmlString.Create(item.BizSizeName.ToString().Trim())" @(item.BizSizeCode.ToString().Trim().Equals(bizSizeCode) ? "selected" : "")>@MvcHtmlString.Create(item.BizSizeName.ToString().Trim())</option>
+                                                                        }
+                                                                    }
+                                                                </select>
+                                                            </span>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <div id="step3" class="step-pane box-shadow-tk" style="margin-top: 20px" data-step="4">
+                                            <div class="row no-margin" style="margin-bottom: 20px;">
+                                                <div class="col-xs-6">
+                                                    <h4 class="text-left"><b>HÌNH THỨC THANH TOÁN</b></h4>
+                                                </div>
+                                                <div class="col-xs-6">
+                                                    <h4 class="text-right"><b>TỔNG TIỀN THANH TOÁN (VNĐ)</b><b id="subtotal"></b></h4>
+                                                </div>
+                                            </div>
+                                            <div class="row no-margin">
+                                                <div class="col-xs-3" style="text-align: -webkit-center; text-align: -moz-center;padding-left: 95px;">
+                                                    <div class="col-xs-12" style="border: 1px solid #D0D0D0; border-radius: 8px; margin-bottom: 10px;">
+                                                        <img style="height: 90px;" class="img-responsive" src="@Url.Content("~/images/VNPay.svg")" alt="Vnpay">
+                                                    </div>
+                                                    <label class="checkbox">
+                                                        <input id="vnpayment" name="slPayment" type="radio" checked="checked" onchange="changeRadio();" value="true">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                                <div class="col-xs-3" style="text-align: -webkit-center; text-align: -moz-center; width: 220px;">
+                                                    <div class="col-xs-12" style="border: 1px solid #D0D0D0; border-radius: 8px; margin-bottom: 10px;">
+                                                        <img style="height: 90px;" class="img-responsive" src="@Url.Content("~/images/ThanhToanSau.svg")" alt="Thanh toán tiền mặt">
+                                                    </div>
+                                                    <label class="checkbox">
+                                                        <input id="tienmat" name="slPayment" type="radio" onchange="changeRadio();" value="true">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                                <div class="col-xs-3" style="text-align: -webkit-center; text-align: -moz-center;padding-right: 95px;">
+                                                    <div class="col-xs-12" style="border: 1px solid #D0D0D0; border-radius: 8px; margin-bottom: 10px;">
+                                                        <img style="height: 90px;" class="img-responsive" src="@Url.Content("~/images/Bank.svg")" alt="Bank">
+                                                    </div>
+                                                    <label class="checkbox">
+                                                        <input id="bank" name="slPayment" type="radio" onchange="changeRadio();" value="true" disabled>
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="row register">
+                                                <div class="col-md-12 col-xs-12">
+                                                    <p style="font-weight: bold;font-size: 14px;">CÔNG TY CỔ PHẦN QUỐC TẾ LONG QUANG</p>
+                                                    <p>Tên tài khoản: </p>
+                                                    <p>Số tài khoản: </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="wizard-actions" style="margin-top: 20px; text-align: center">
+                                <button class="btn btn-prev" href="javascript:;" onclick="Prev()" style="display: none" val="1">
+                                    Quay lại
+                                </button>
+
+                                <button class="btn btn-success btn-next" href="javascript:;" onclick="Next()" val="1">
+                                    Tiếp theo
+                                </button>
+
+                                <button class="btn btn-success btn-register-form" style="display: none" href="javascript:;" onclick="SaveData()">
+                                    Tiếp theo
+                                </button>
+
+                                <button class="btn btn-success btn-cancel-form" style="display: none" href="javascript:;" onclick="Later();">
+                                    Hoàn thành
+                                </button>
+
+                                <button class="btn btn-success btn-pay-form" style="display: none" href="javascript:;" onclick="CreatePayment();">
+                                        Hoàn thành
+                                    </button>
+                            </div>
+                        </div>
+
+                    </aside>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+<input type="hidden" id="Payment_Id" value="" />
+<input type="hidden" id="Payment_OrgID" value="" />
+<input type="hidden" id="Payment_PaymentCode" value="" />
+<input type="hidden" id="Payment_TotalCost" value="" />
+<input type="hidden" id="Payment_CreateDTime" value="" />
+<input type="hidden" id="Payment_Remark" value="" />
+<input type="hidden" id="Payment_PackageId" value="" />
+
+<div class="modal fade" id="GetCode" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 35%; margin-top: -60px !important">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="col-xs-6" style="font-size: 15px; font-weight: 600;">Xác nhận không phải robot</div>
+                <a href="javascript:;" onclick="CloseModalGetCode()" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </a>
+            </div>
+            <div class="modal-body" style="">
+                @Html.Recaptcha()
+                @Html.ValidationMessage("ReCaptcha")
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn mybtn-Button" onclick="ConfirmCode()" id="" style="padding-left: 10px!important; padding-right: 10px!important; font-size: 16px; font-weight: 500;">Xác nhận</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="GetCode" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+
+<input hidden id="orderstatus" />
+<div class="form-contact" id="Confirm" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 65%; margin-top: -10px !important;">
+        <div class="modal-content">
+            <div class="modal-header" style="padding: 10px 15px 5px 15px;">
+                <div class="col-xs-6" style="font-size: 15px; font-weight: 600;">Điều khoản và thỏa thuận sử dụng</div>
+                <a href="javascript:;" onclick="CloseModalConfirm()" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </a>
+            </div>
+            <div class="Confirmtitle">
+                <p class="com-title">Đề nghị đọc kỹ Thỏa thuận sử dụng dịch vụ và chấp thuận các điều khoản trước khi chuyển sang bước tiếp theo</p>
+            </div>
+
+            <div class="modal-scoll" style="">
+                <div class="col-xs-12">
+                    <div class="col-xs-3" style="margin-left:10px;">
+                        <img class="img-responsive" src="/Images/logo.svg" alt="Alternate Text" />
+
+                    </div>
+                    <div class="col-xs-6">
+                        <h4>
+                            THỎA THUẬN SỬ DỤNG DỊCH VỤ
+                            <br />
+                            INBRAND CLOUD
+                        </h4>
+                    </div>
+                </div>
+                <p>Điều khoản đang được cập nhật...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+            </div>
+            <div class="" style="width: 90%;margin: 0 auto;padding:20px 0;">
+                <div class="agree">
+                    <div class="col-xs-1" style="width: 3%;">
+                        <input type="checkbox" id="agree" onclick="agree()" name="agree" value="">
+                    </div>
+                    <div class="col-xs-7">
+                        <p>Tôi đã đọc và đồng ý với Thỏa thuận sử dụng dịch vụ của Inbrand</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn mybtn-Button" onclick="Confirmstep()" id="" style="padding-left: 10px!important; padding-right: 10px!important; font-size: 16px; font-weight: 500;">Tiếp theo</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="site-overlay" onclick="removePopupRequire()"></div>
+<style type="text/css">
+    .site-overlay {
+        background: rgba(0,0,0,.6);
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        width: 100vw;
+        z-index: -999;
+        opacity: 0;
+        transition: all .5s ease-out .2s;
+    }
+
+        .site-overlay.active {
+            opacity: 1;
+            z-index: 999;
+        }
+
+    .form-contact {
+        position: fixed;
+        top: 50%;
+        margin-top: -250px;
+        z-index: -9;
+        transform: scale(0,0);
+        transition: all .4s ease-out .2s;
+        opacity: 0;
+        width: 100%;
+    }
+
+        .form-contact.active {
+            transform: scale(1,1);
+            z-index: 99999;
+            opacity: 1;
+        }
+
+    .modal-scoll {
+        width: 90%;
+        height: 200px;
+        overflow: auto;
+        text-align: center;
+        margin: 0 auto;
+        border: 1px solid #d8d8d8;
+    }
+
+    #Confirm .mybtn-Button.active {
+        display: block;
+        background-color: #057d5a !important;
+        width: 120px;
+        float: right;
+    }
+
+    #Confirm .mybtn-Button:hover {
+        color: #fff !important;
+    }
+
+    #Confirm .modal-footer {
+        height: 45px;
+    }
+
+    .Confirmtitle .com-title {
+        font-weight: 700;
+        padding: 15px 0;
+        margin: 0;
+    }
+
+    .Confirmtitle {
+        width: 90%;
+        margin: 0 auto;
+    }
+
+    #Confirm .mybtn-Button {
+        display: none;
+    }
+
+    #Confirm .agree {
+        margin: 0 auto;
+        background: #fff;
+        padding-bottom: 20px;
+    }
+
+    .modal-scoll h4 {
+        line-height: 1.5em;
+    }
+
+    .modal-scoll p {
+        padding: 0 35px;
+        text-decoration: none;
+        text-align: justify;
+    }
+</style>
+
+@section Scripts{
+    <link href="https://pay.vnpay.vn/lib/vnpay/vnpay.css" rel="stylesheet" type="text/css" />
+    <script src="https://pay.vnpay.vn/lib/vnpay/vnpay.js"></script>
+    <script src="@Url.Content("~/Scripts/mine/Register.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "Register")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+        });
+
+        @* Set focus *@
+        var _getForm = document.getElementById("manageForm");
+        _getForm.addEventListener('reset',
+            function () {
+                document.getElementById("MST").focus();
+            });
+
+        $('.scrollable').each(function () {
+            var $this = $(this);
+            $(this).ace_scroll({
+                //size: 500,
+                size: $this.attr('data-size') || 1000,
+                mouseWheelLock: true
+                //styleClass: 'scroll-left scroll-margin scroll-thin scroll-dark scroll-light no-track scroll-visible'
+            });
+        });
+
+        @* keypress *@
+        $(document).on('keypress', function (e) {
+            if (e.which == 13) {
+                Search();
+            }
+        });
+
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+
+        $(document).ready(function () {
+            totalPrice();
+            $('.formatnumber, .unitprice').number(true, 0);
+        });
+        $("#ProvinceCode").select2({
+            placeholder: "",
+            allowClear: true
+        });
+        $("#DistrictCode").select2({
+            placeholder: "",
+            allowClear: true
+        });
+        function changeRadio() {
+            var radio = $('input[name=slPayment]:checked');
+            var id = $(radio).attr('id');
+            //alert(id);
+            if (id === 'vnpayment') {
+                $('button.btn-pay-form').css('display', 'inline-block');
+                $('button.btn-cancel-form').css('display', 'none');
+            } else if (id === 'tienmat') {
+                $('button.btn-cancel-form').css('display', 'inline-block');
+                $('button.btn-pay-form').css('display', 'none');
+            }
+        }
+        function UpdateTitle(thiz) {
+            var val = $(thiz).val();
+            $(thiz).attr('title', val);
+        }
+
+        function UpdateTitleSelect(thiz) {
+            var val = $(thiz).find('option').filter(":selected").attr('desc');
+            $(thiz).attr('title', val);
+        }
+
+        function agree() {
+            var checkbox = document.getElementById("agree").checked;
+            if (checkbox == false) {
+                $("#Confirm .mybtn-Button").removeClass("active");
+            }
+            else {
+                $("#Confirm .mybtn-Button").addClass("active");
+            }
+        }
+
+        function showPopupRequire() {
+            $("#popupRequire,.site-overlay").addClass("active");
+        }
+
+        function LoadMst_GovTaxID(thiz) {
+            var objRegister = new Register();
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("LoadMst_GovTaxID", "LoadData")';
+
+            objRegister.ajaxSettings = ajaxSettings;
+            objRegister.loadMst_GovTaxID(thiz);
+        }
+
+        function LoadDistrict(thiz) {
+            var objRegister = new Register();
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("LoadMst_District", "LoadData")';
+
+            objRegister.ajaxSettings = ajaxSettings;
+            objRegister.loadDistrict(thiz);
+        }
+
+        var objAccuracyEmail = new Object();
+        objAccuracyEmail.Email = '';
+        objAccuracyEmail.VerificationEmailCode = '';
+        objAccuracyEmail.FlagCheckReCaptcha = '0';
+        objAccuracyEmail.FlagVerifyEmail = '0';
+
+        var objMaGiamGia = new Object();
+        objMaGiamGia.MaGiamGia = '';
+        objMaGiamGia.LoaiGiamGia = '';
+        objMaGiamGia.DiscountAmount = '0';
+
+        function ChangeCheckBoxPackage(thiz) {
+            var objRegister = new Register();
+            objRegister.changeCheckBoxPackage(thiz);
+        }
+
+        function getvalue() {
+            var objRegister = new Register();
+            objRegister.getvalue();
+        }
+
+        function SaveData() {
+            var objRegister = new Register();
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("CreateNetwork", "Register")';
+
+            objRegister.ajaxSettings = ajaxSettings;
+            debugger;
+            objRegister.saveData2();
+        }
+        function Next() {
+            var objRegister = new Register();
+            objRegister.next1();
+        }
+        function Prev() {
+            var objRegister = new Register();
+            objRegister.prev();
+        }
+        function Confirmstep() {
+            var objRegister = new Register();
+            objRegister.confirmstep1();
+        }
+
+        function CloseModalConfirm() {
+
+            var objRegister = new Register();
+            objRegister.closeModalConfirm();
+        }
+
+        function totalPrice() {
+            var objRegister = new Register();
+            objRegister.totalPrice();
+        }
+
+        function ShowModalGetCode() {
+            var objRegister = new Register();
+            objRegister.showModalGetCode();
+        }
+
+        function CloseModalGetCode() {
+
+            var objRegister = new Register();
+            objRegister.closeModalGetCode();
+        }
+
+        function ConfirmCode() {
+
+            var objRegister = new Register();
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("ConfirmCode", "Register")';
+
+            objRegister.ajaxSettings = ajaxSettings;
+            objRegister.UrlSendEmail = '@Url.Action("SendEmailVerificationEmail", "Register")';
+            objRegister.confirmCode(objRegister);
+            CloseModalGetCode();
+        }
+
+        function VerifyEmail() {
+            var objRegister = new Register();
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("VerifyEmail", "Register")';
+
+            objRegister.ajaxSettings = ajaxSettings;
+            objRegister.verifyEmail(objRegister);
+        }
+
+        function CheckMaGiamGia() {
+            return false;
+        }
+
+        function Apdung() {
+            var objRegister = new Register();
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("OS_Inos_OrderService_GetDiscountCode", "Register")';
+
+            objRegister.ajaxSettings = ajaxSettings;
+            objRegister.apdung(objRegister);
+        }
+
+        function CreatePayment() {
+
+            var objRegister = new Register();
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("CreatePayment", "Register")';
+
+            objRegister.ajaxSettings = ajaxSettings;
+            objRegister.createPayment(objRegister);
+        }
+
+        function Later() {
+            var objRegister = new Register();
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Login", "Account")';
+
+            objRegister.Image_Message = "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO";
+            objRegister.Confirm_Message = "Cảm ơn Quý khách đã đăng ký sử dụng gói giải pháp của chúng tôi, vui lòng kiểm tra email xác nhận đơn hàng";
+            objRegister.ajaxSettings = ajaxSettings;
+            objRegister.later();
+        }
+    </script>
+}

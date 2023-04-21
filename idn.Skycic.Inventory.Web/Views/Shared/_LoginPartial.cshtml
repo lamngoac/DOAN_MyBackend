@@ -1,0 +1,86 @@
+﻿@{
+    var waUserCode = "";
+    if (!CUtils.IsNullOrEmpty(Session.UserState))
+    {
+        waUserCode = Session.UserState.SysUser.UserCode;
+    }
+}
+
+@if (Request.IsAuthenticated)
+{
+    <a data-toggle="dropdown" href="javascript:;" class="dropdown-toggle">
+        <i class="fas fa-user"></i>
+        Sysadmin
+    </a>
+    <ul class="user-menu dropdown-menu-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+        <li>
+            <a class="mybtn-Button-1" style=""><i class="fa fa-user" style="color: #057D5A; font-size: 15px;" aria-hidden="true"></i> @MvcHtmlString.Create(ViewBag.UserName)</a>
+        </li>
+        <li>
+            <a class="mybtn-Button-1" onclick="ShowPopupContact()" href="javascript:;" style=""><i class="fa fa-phone" style="color: #057D5A; font-size: 15px;" aria-hidden="true"></i> @MvcHtmlString.Create("Liên hệ")</a>
+        </li>
+        @if (!CUtils.IsNullOrEmpty(waUserCode))
+        {
+            <li>
+                <a class="mybtn-Button-1" onclick="ShowPopupChangePasswordCheckOld('@waUserCode')" href="javascript:;" style=""><i class="fa fa-lock" style="color: #057D5A; font-size: 15px;" aria-hidden="true"></i> @MvcHtmlString.Create("Đổi mật khẩu")</a>
+            </li>
+        }
+        <li>
+            <a class="mybtn-Button-1 logout" href="javascript:document.getElementById('logoutForm').submit()"><i class="fa fa-sign-out-alt" style="color: #057D5A; font-size: 15px;" aria-hidden="true"></i> @MvcHtmlString.Create("Log off")</a>
+        </li>
+    </ul>
+
+
+}
+
+@using (Html.BeginForm("LogOffNoLoginOS", "Account", FormMethod.Post, new { id = "logoutForm" }))
+{
+    @Html.AntiForgeryToken()
+}
+
+@*Change password*@
+<div class="modal fade" id="ShowPopupChangePasswordCheckOld" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+
+
+
+<script type="text/javascript">
+    function ShowPopupChangePasswordCheckOld(usercode) {
+        debugger;
+        if (!IsNullOrEmpty(usercode)) {
+            var url = '@Url.Action("ShowPopupChangePasswordCheckOld", "Sys_User")';
+            $.ajax({
+                url: url,
+                data: { usercode: usercode},
+                type: 'post',
+                dataType: 'json',
+                traditional: true,
+                success: function (data) {
+                    if (data.Success) {
+                        $('#ShowPopupChangePasswordCheckOld').modal({
+                            backdrop: false,
+                            keyboard: true
+                        });
+                        $("#ShowPopupChangePasswordCheckOld").html(data.Html); // truyen html vao #form
+                    } else {
+                        _showErrorMsg123('@MvcHtmlString.Create("Lỗi")', data.Detail);
+                    }
+
+                }
+            });
+        }
+        else {
+            alert('Mã người dùng trống!');
+            return;
+        }
+    }
+</script>
+
+<script>
+    function ShowPopupContact() {
+        $('#Contact').modal('show');
+    }
+
+    function CloseModalContact() {
+        $('#Contact').modal("hide");
+    }
+</script>

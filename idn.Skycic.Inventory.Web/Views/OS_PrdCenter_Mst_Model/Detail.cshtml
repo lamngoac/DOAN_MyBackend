@@ -1,0 +1,189 @@
+﻿@model Mst_Model
+@{
+    Layout = "~/Views/Shared/_LayoutQuantri.cshtml";
+    var title = "CHI TIẾT MODEL";
+    var titleMng = "Danh mục Model";
+    ViewBag.Title = title;
+    var listOS_PrdCenter_Mst_Brand = ViewBag.ListOS_PrdCenter_Mst_Brand as List<Mst_Brand>;
+    if (listOS_PrdCenter_Mst_Brand == null || listOS_PrdCenter_Mst_Brand.Count == 0)
+    {
+        listOS_PrdCenter_Mst_Brand = new List<Mst_Brand>();
+    }
+
+    var isparent = ViewBag.IsParent;
+    var waOrgID = ViewBag.WaOrgID as string;
+    if (CUtils.IsNullOrEmpty(waOrgID))
+    {
+        waOrgID = "";
+    }
+    var orgID = "";
+    if (Model != null && !CUtils.IsNullOrEmpty(Model.OrgID))
+    {
+        orgID = CUtils.StrValueOrNull(Model.OrgID);
+    }
+}
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="row no-margin box-shadow-tk">
+                        @using (Html.BeginForm("Update", "OS_PrdCenter_Mst_Model", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="OrgID" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã tổ chức <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="OrgID" name="OrgID" class="col-xs-11 OrgID" onkeyup="locdau(this);" value="@Model.OrgID" autocomplete="off" required readonly/>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="ModelCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã Model <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="ModelCode" name="ModelCode" class="col-xs-11 disabled-fix ModelCode" onkeyup="locdau(this);" value="@if (Model != null && Model.ModelCode != null){@MvcHtmlString.Create(Model.ModelCode.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                    </div>
+                                </div>
+                                @if (isparent && !waOrgID.Equals(orgID))
+                                {
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="NetworkModelCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã Model Chung")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="NetworkModelCode" name="NetworkModelCode" class="col-xs-11 NetworkModelCode" onkeyup="locdau(this);" value="@if (Model != null && Model.NetworkModelCode != null){@MvcHtmlString.Create(Model.NetworkModelCode.ToString())} else { @("")}" autocomplete="off" readonly />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                }
+                                else
+                                {
+                                    <input type="hidden" id="NetworkModelCode" name="NetworkModelCode" class="col-xs-11 NetworkModelCode" value="@if (Model != null && Model.NetworkModelCode != null){@MvcHtmlString.Create(Model.NetworkModelCode.ToString())} else { @("")}" />
+                                }
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="ModelName" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên Model <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="ModelName" name="ModelName" class="col-xs-11 disabled-fix ModelName" value="@if (Model != null && Model.ModelName != null){@MvcHtmlString.Create(Model.ModelName.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="OrgModelCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã OrgModel")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="OrgModelCode" name="OrgModelCode" class="col-xs-11 disabled-fix OrgModelCode" onkeyup="locdau(this);" value="@if (Model != null && Model.OrgModelCode != null){@MvcHtmlString.Create(Model.OrgModelCode.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="Remark" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mô tả")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            @{
+                                                var remark = "";
+                                                if (Model != null && !CUtils.IsNullOrEmpty(Model.Remark))
+                                                {
+                                                    remark = CUtils.StrValueOrNull(Model.Remark);
+                                                }
+                                            }
+                                            <textarea rows="3" cols="50" id="Remark" name="Remark" class="col-xs-11 disabled-fix Remark" maxlength="400" autocomplete="off">@MvcHtmlString.Create(remark)</textarea>
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="BrandCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã Brand <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            @{
+                                                var brandCode = "";
+                                                if (Model != null && !CUtils.IsNullOrEmpty(Model.BrandCode))
+                                                {
+                                                    brandCode = CUtils.StrValueOrNull(Model.BrandCode);
+                                                }
+                                            }
+                                            <select id="BrandCode" name="BrandCode" class="col-xs-11 disabled-fix" required>
+                                                <option></option>
+                                                @{
+                                                    if (listOS_PrdCenter_Mst_Brand != null && listOS_PrdCenter_Mst_Brand.Count > 0)
+                                                    {
+                                                        foreach (var it in listOS_PrdCenter_Mst_Brand)
+                                                        {
+                                                            <option value="@MvcHtmlString.Create(it.BrandCode.ToString().Trim())" desc="@MvcHtmlString.Create(it.BrandName.ToString().Trim())" @(brandCode.Equals(it.BrandCode.ToString().Trim()) ? "selected" : "")>@MvcHtmlString.Create(it.BrandCode.ToString().Trim())</option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    @{
+                                        var checkActive = "";
+                                        if (Model != null && Model.FlagActive.Equals("1"))
+                                        {
+                                            checkActive = "checked";
+                                        }
+                                        else
+                                        {
+                                            checkActive = "";
+                                        }
+                                    }
+                                    <label for="FlagActive" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 disabled-fix">Trạng thái</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right padding-top-5 disabled-checkbox-fix">
+                                            <label>
+                                                <input name="FlagActive" id="FlagActive" class="ace ace-switch ace-switch-4 FlagActive" type="checkbox" value="1" @checkActive />
+                                                <span class="lbl"></span>
+                                                <input name="FlagActive" type="hidden" value="0" />
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </aside>
+                    @*<div class="col-xs-12 no-padding">
+                        <div class="clearfix">
+                            <div class="row no-margin" style="float: right">
+                                @RenderItemFormat("BTN_SUA_OS_PRDCENTER_MST_MODEL_CAP_NHAT", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px; \" onclick=\"SaveData();\">Lưu</a>", "", "")
+                            </div>
+                        </div>
+                    </div>*@
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+@section Scripts{
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "OS_PrdCenter_Mst_Model")');
+
+        processAjaxForm($('#manageForm'), function (response) {
+        processAjaxFormResult(response);
+
+        });
+    </script>
+}

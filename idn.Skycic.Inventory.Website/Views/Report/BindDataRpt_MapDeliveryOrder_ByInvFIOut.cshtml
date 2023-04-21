@@ -1,0 +1,217 @@
+﻿@model List<Rpt_MapDeliveryOrder_ByInvFIOutUI>
+@{
+    /**/
+
+    var listDates = ViewBag.ListDates as List<DateTime>;
+    var today = ViewBag.Today as string;
+    var userState = ViewBag.UserState as UserState;
+    var todayCur = Convert.ToDateTime(today);
+}
+<style>
+    .hidden {
+        display: none;
+    }
+</style>
+
+<div class="col-xs-12 layout-bot-top-16" style="">
+    <div class="row">
+        <div class="col-6">
+            @if (CheckAccess("BTN_MNG_RPT_MAPDELIVERYORDER_BYINVFIOUT_EXPORT"))
+            {
+                <a class="btn btn-nc-button" href="javascript:;" onclick="Export()" style=""><i class="far fa-file-excel" aria-hidden="true"></i> Xuất Excel</a>
+            }
+        </div>
+    </div>
+</div>
+<div class="panel-body no-padding" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+    <aside class="col-xs-12 layout-table no-padding">
+        @Html.AntiForgeryToken()
+        <div class="scrollable-horizontal padding-left-0 padding-right-0" style="padding-top: 0!important;">
+            <div style="width: 100%; float: left;">
+                <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                    <thead>
+                        <tr class="trthead">
+                            <th fieldId="STT" fieldName="STT" fieldActive="0" class="text-center cell-50">
+                                @("STT".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="AREACODE" fieldName="Khu vực" fieldActive="0" class="text-center cell-100">
+                                @("Khu vực".HtmlItemString("inventory"))
+                            </th>
+                            @*<th fieldId="AREACODEUSER" fieldName="Khu vực" fieldActive="0" class="text-center cell-100">
+                                @("Mã khu vực".HtmlItemString("inventory"))
+                            </th>*@
+                            <th fieldId="CUSTOMERCODE" sorttype="T" fieldName="Mã KH" fieldActive="0" class="text-center cell-120">
+                                @("Mã KH".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="CUSTOMERNAME" sorttype="T" fieldName="Tên KH" fieldActive="0" class="text-center cell-120">
+                                @("Tên KH".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="IF_INVOUTNO" sorttype="T" fieldName="Số phiếu xuất" fieldActive="0" class="text-center cell-150">
+                                @("Số phiếu xuất".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="PRODUCTCODEUSER" sorttype="T" fieldName="Mã hàng" fieldActive="0" class="text-center cell-120">
+                                @("Mã hàng".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="UNITCODE" sorttype="T" fieldName="Đơn vị" fieldActive="0" class="text-center cell-100">
+                                @("Đơn vị".HtmlItemString("inventory"))
+                            </th>
+                            @if (listDates != null && listDates.Count > 0)
+                            {
+                                foreach (var item in listDates)
+                                {
+                                    var strDate = CUtils.StrValue(CUtils.FormatDate(item, Nonsense.DATE_TIME_DB_FORMAT));
+                                    var csshl = "";
+                                    if (strDate.Equals(today))
+                                    {
+                                        csshl = "high-line-today";
+                                    }
+                                    <th fieldId="@(strDate.ToUpper())" sorttype="T" fieldName="@strDate" fieldActive="0" class="text-center cell-100 @csshl">
+                                        @strDate
+                                    </th>
+                                }
+                            }
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div id="scrollable_1" class="scrollable">
+                <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                    <tbody id="table-tbodyID">
+                        @if (Model != null && Model.Count > 0)
+                        {
+                            int stt = 1;
+                            foreach (var item in Model)
+                            {
+                                var strMst_Area = "";
+                                if (item.ListMst_Area != null && item.ListMst_Area.Count > 0)
+                                {
+                                    strMst_Area = string.Join(",", item.ListMst_Area);
+                                }
+                                <tr class="data-item trdata">
+
+                                    <td fieldId="STT" fieldActive="0" class="text-center cell-50 text-center">
+                                        @stt
+                                    </td>
+                                    <td fieldId="AREACODE" fieldActive="0" class="text-left cell-100">
+                                        @*@strMst_Area*@
+                                        @item.AreaCode
+                                    </td>
+                                    @*<td fieldId="AREACODEUSER"  fieldActive="0" class="text-center cell-100">
+                                        @item.AreaCode
+                                    </td>*@
+                                    <td fieldId="CUSTOMERCODE" fieldActive="0" class="text-left cell-120">
+                                        @item.CustomerCode
+                                    </td>
+                                    <td fieldId="CUSTOMERNAME" fieldActive="0" class="text-left cell-120">
+                                        @item.CustomerName
+                                    </td>
+                                    <td fieldId="IF_INVOUTNO" fieldActive="0" class="text-left cell-150">
+                                        @item.IF_InvOutNo
+                                    </td>
+                                    <td fieldId="PRODUCTCODEUSER" fieldActive="0" class="text-left cell-120">
+                                        @item.ProductCodeUser
+                                    </td>
+                                    <td fieldId="UNITCODE" fieldActive="0" class="text-left cell-100">
+                                        @item.UnitCode
+                                    </td>
+                                    @if (listDates != null && listDates.Count > 0)
+                                    {
+                                        foreach (var itDate in listDates)
+                                        {
+                                            var strDate = CUtils.StrValue(CUtils.FormatDate(itDate, Nonsense.DATE_TIME_DB_FORMAT));
+                                            var csshl = "";
+                                            if (strDate.Equals(today))
+                                            {
+                                                csshl = "high-line-today";
+                                            }
+                                            //check xem có dữ liệu của ngày thuộc list ngày gen ra hay không
+                                            if (item.ListRpt_Date != null && item.ListRpt_Date.Count > 0)
+                                            {
+                                                var existDate = item.ListRpt_Date.Where(x => x.Rpt_Date.Equals(strDate)).FirstOrDefault();
+                                                var cssDelay = "";
+                                                //check phiếu xuất giao chậm phải tô màu lên
+                                                //điều kiện: phiếu trạng thái PENDING và ngày tạo <= today
+                                                var itCreatedDate = CUtils.ConvertToDateTime(CUtils.ReturnDateTimeUtcToLocalTime(CUtils.StrValue(item.CreateDTimeUTC), Nonsense.DATE_TIME_DB_FORMAT, userState.UtcOffset));
+
+                                                if (!CUtils.IsNullOrEmpty(item.IF_InvOutStatus) && item.IF_InvOutStatus.Equals("PENDING") && itCreatedDate <= todayCur && !CUtils.IsNullOrEmpty(existDate.Qty) && Convert.ToDouble(existDate.Qty) > 0)
+                                                {
+                                                    cssDelay = "high-line-delay";
+                                                }
+
+                                                if (existDate != null)
+                                                {
+                                                    <td fieldId="@(strDate.ToUpper())" sorttype="T" fieldName="@strDate" fieldActive="0" class="text-center cell-100 @csshl @cssDelay valQty">
+                                                        @existDate.Qty
+                                                    </td>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <td fieldId="@(strDate.ToUpper())" sorttype="T" fieldName="@strDate" fieldActive="0" class="text-center cell-100 @csshl"></td>
+                                            }
+                                        }
+                                    }
+                                </tr>
+
+                                stt++;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </aside>
+</div>
+
+<script>
+    $(document).ready(function () {
+        // tablesort();
+        $('.scrollable-horizontal').hScroll();
+    });
+    function tablesort() {
+        var listColumns = {
+            'PRODUCTCODE': [],
+            'PRODUCTNAME': [],
+            'QTY': [],
+            'BEGINPERIOD_INV_QTYBASE': [],
+            'BEGINPERIOD_VAL': [],
+            'INPERIOD_IN_QTYBASE': [],
+            'INPERIOD_IN_VAL': [],
+            'INPERIOD_OUT_QTYBASE': [],
+            'INPERIOD_OUT_VAL': [],
+            'ENDPERIOD_INV_QTYBASE': [],
+            'ENDPERIOD_VAL': [],
+            'INVCODE': []
+        };
+        var options = {};
+        options.Columns = listColumns;
+        $('#dynamic-table-thead').table_Sortable(options);
+    }
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('.select2-selection').select2({
+            minimumResultsForSearch: -1
+        });
+    })
+</script>
+
+<script>
+    function ChangeProduct(thiz) {
+        var targetPrdCode = $(thiz).find('option:selected').attr('productcode');
+        var currentRow = $(thiz).parent().parent();
+        var targetRow = $(thiz).closest('tbody').find('tr.trdata.hidden[productcode="' + targetPrdCode + '"]')
+        $(currentRow).addClass('hidden');
+        $(targetRow).find('select[name="UnitCode"]').val(targetPrdCode).prop('selected', true);
+        $(targetRow).find('select[name="UnitCode"]').select2({
+            minimumResultsForSearch: -1
+        });
+        $(targetRow).removeClass('hidden');
+    }
+</script>
+
+
+@*format number*@
+
+

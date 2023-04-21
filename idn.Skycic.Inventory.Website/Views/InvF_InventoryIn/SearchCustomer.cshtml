@@ -1,0 +1,75 @@
+﻿@{
+    Layout = null;
+    var listMstCustomer = ViewBag.List_Mst_Customer as List<Mst_Customer>;
+}
+
+<div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+    <div style="width: 100%; float: left;">
+        <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+            <thead>
+                <tr class="trthead">
+                    <th class="text-center cell-100">@("Mã khách hàng".HtmlItemString("invf_inventoryin"))</th>
+                    <th class="text-center cell-100">@("Tên khách hàng".HtmlItemString("invf_inventoryin"))</th>
+                    <th class="text-center cell-150">@("Địa chỉ".HtmlItemString("invf_inventoryin"))</th>
+                    <th class="text-center cell-100">@("Người liên hệ".HtmlItemString("invf_inventoryin"))</th>
+                    <th class="text-center cell-100">@("Điện thoại".HtmlItemString("invf_inventoryin"))</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+        <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+            <tbody id="tbodySearchCustomerNew">
+                @if (listMstCustomer != null && listMstCustomer.Count > 0)
+                {
+                    var i = 0;
+                    foreach (var item in listMstCustomer)
+                    {
+                        <tr idx="@i" class="data-item trdata" onclick="ClickCustomer(this)">
+                            <!-- Khách hàng -->
+                            <input type="hidden" name="CustomerPopUp[@i].CustomerCode" value="@item.CustomerCodeSys" />
+                            <input type="hidden" name="CustomerPopUp[@i].CustomerName" value="@item.CustomerName" />
+
+                            <td class="text-center cell-100">@item.CustomerCode</td>
+                            <td class="text-center cell-100">@item.CustomerName</td>
+                            <td class="text-center cell-150">@item.CustomerAddress</td>
+                            <td class="text-center cell-100">@item.ContactName</td>
+                            <td class="text-center cell-100">@item.CustomerPhoneNo</td>
+                        </tr>
+                        i++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function ClickCustomer(thiz) {
+        $('.selected').removeClass('selected');
+        $(thiz).addClass('selected');
+
+        var rows = $('tbody#tbodySearchCustomerNew tr').length;
+        if (rows > 0) {
+            var rowsSelected = $('tbody#tbodySearchCustomerNew tr.selected').length;
+            if(rowsSelected > 0) {
+                var tr = $('tbody#tbodySearchCustomerNew').find('tr.selected');
+                if (tr != null) {
+                    var idx = $(tr).attr('idx');
+                    var customerCode = $(tr).find('input[type="hidden"][name="CustomerPopUp[' + idx + '].CustomerCode"]').val();
+
+                    $('select#CustomerCode').val(customerCode);
+                    $('select#CustomerCode').trigger('change');
+                    ClosePopupCustomer();
+                }
+            }
+            else {
+                alert("@MvcHtmlString.Create("Chưa chọn nhà cung cấp!")");
+                return false;
+            }
+        } else {
+            alert("Lưới danh sách nhà cung cấp trống!");
+            return false;
+        }
+        return true;
+    }</script>

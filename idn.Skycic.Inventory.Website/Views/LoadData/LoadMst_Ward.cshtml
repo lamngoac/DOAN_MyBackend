@@ -1,0 +1,23 @@
+﻿@model List<Mst_Ward>
+@{
+    //Layout = null;
+    var provinceCode = CUtils.StrValue(ViewBag.ProvinceCode);
+    var districtCode = CUtils.StrValue(ViewBag.DistrictCode);
+    var wardCode = CUtils.StrValue(ViewBag.WardCode);
+}
+
+<option value="">&nbsp;</option>
+@if (Model != null && Model.Count > 0)
+{
+    foreach (var item in Model)
+    {
+        var provinceCodeCur = CUtils.StrValue(item.ProvinceCode);
+        var districtCodeCur = CUtils.StrValue(item.DistrictCode);
+        var wardCodeCur = CUtils.StrValue(item.WardCode);
+        var wardNameCur = CUtils.StrValue(item.WardName);
+        <option value="@MvcHtmlString.Create(wardCodeCur)" desc="@MvcHtmlString.Create(wardNameCur)" @((provinceCodeCur.Equals(provinceCode) && districtCodeCur.Equals(districtCode) && wardCodeCur.Equals(wardCode)) ? "selected" : "")>@MvcHtmlString.Create(wardNameCur)</option>
+    }
+}
+
+
+

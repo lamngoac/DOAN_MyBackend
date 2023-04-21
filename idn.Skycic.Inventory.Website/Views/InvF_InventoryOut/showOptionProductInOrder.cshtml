@@ -1,0 +1,37 @@
+﻿@using idn.Skycic.Inventory.Common.Models.DMS;
+
+@model List<Rpt_OrderSummary_TotalProductForInv>
+@{
+    ViewBag.Title = "showOptionProductInOrder";
+}
+
+@{
+    if (Model != null && Model.Count > 0)
+    {
+        <optgroup label="">
+            <option value="" >--Chọn hàng hóa--</option>
+            @foreach (var it in Model)
+            {
+                <option value="@it.ProductCode" 
+                        customercodesys ="@it.CustomerCodeSys" 
+                        ProductCodeBase="@it.ProductCodeBase" 
+                        ProductCodeUser="@it.ProductCodeUser"
+                        ProductCodeRoot="@it.ProductCodeRoot"
+                        ProductName="@it.ProductName" 
+                        UnitCode="@it.UnitCode" 
+                        UPSell="@(it.UPSell == null ? "0" : it.UPSell.ToString())" 
+                        QtyAppr="@(it.QtyAppr == null ? "0" : it.QtyAppr.ToString())"  
+                        QtyInvOutAvail ="@(it.QtyInvOutAvail == null ? "0" : it.QtyInvOutAvail.ToString())" 
+                        QtyTotalOK="@(it.QtyTotalOK == null ? "0" : it.QtyTotalOK.ToString())" 
+                        FlagLot="@it.FlagLo" 
+                        FlagSerial="@it.FlagSerial"
+                        FlagCombo="@it.FlagCombo" 
+                        ValConvert="@it.ValConvert"
+                        OrderNoSys ="@it.OrderNoSys"
+                        ProductCode ="@it.ProductCode">@it.ProductCodeUser - @it.ProductName</option>
+            }
+        </optgroup>
+        <option value="SEARCHDATA" >@("Tìm kiếm".HtmlItemString("invf_inventoryreturnsup"))</option>
+    }
+}
+

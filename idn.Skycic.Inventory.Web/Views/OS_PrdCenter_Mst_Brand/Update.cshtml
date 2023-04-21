@@ -1,0 +1,169 @@
+﻿@model Mst_Brand
+@{
+    Layout = "~/Views/Shared/_LayoutQuantri.cshtml";
+    var title = "SỬA BRAND";
+    var titleMng = "Danh mục Brand";
+    ViewBag.Title = title;
+
+    var isparent = ViewBag.IsParent;
+    var ischild = ViewBag.IsChild;
+    var waOrgID = ViewBag.WaOrgID as string;
+    if (CUtils.IsNullOrEmpty(waOrgID))
+    {
+        waOrgID = "";
+    }
+    var orgID = "";
+    if (Model != null && !CUtils.IsNullOrEmpty(Model.OrgID))
+    {
+        orgID = CUtils.StrValueOrNull(Model.OrgID);
+    }
+    var disabledfix = "";
+    var disabledcheckboxfix = "";
+    if (isparent && !waOrgID.Equals(orgID))
+    {
+        disabledfix = "disabled-fix";
+        disabledcheckboxfix = "disabled-checkbox-fix";
+    }
+}
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="row no-margin box-shadow-tk">
+                        @using (Html.BeginForm("Update", "OS_PrdCenter_Mst_Brand", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="OrgID" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã tổ chức <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="OrgID" name="OrgID" class="col-xs-11 OrgID disabled-fix" onkeyup="locdau(this);" value="@Model.OrgID" autocomplete="off" required />
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="BrandCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã Brand <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="BrandCode" name="BrandCode" class="col-xs-11 disabled-fix BrandCode" onkeyup="locdau(this);" value="@if (Model != null && Model.BrandCode != null){@MvcHtmlString.Create(Model.BrandCode.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            if (isparent && !waOrgID.Equals(orgID))
+                            {
+                                <div class="col-xs-3 no-padding">
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="NetworkBrandCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã Brand Chung")</label>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <!--Không check cha con nữa, khi nào cần sẽ bỏ ra-->
+                                                @{
+                                                    //var read = "";
+                                                    //if (!ischild)
+                                                    //{
+                                                    //    read = "";
+                                                    //}
+                                                }
+                                                <input type="text" id="NetworkBrandCode" name="NetworkBrandCode" class="col-xs-11 NetworkBrandCode" onkeyup="locdau(this);" value="@if (Model != null && Model.NetworkBrandCode != null){@MvcHtmlString.Create(Model.NetworkBrandCode.ToString())} else { @("")}" autocomplete="off" />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <input type="hidden" id="NetworkBrandCode" name="NetworkBrandCode" class="col-xs-11 NetworkBrandCode" value="@if (Model != null && Model.NetworkBrandCode != null){@MvcHtmlString.Create(Model.NetworkBrandCode.ToString())} else { @("")}" />
+                            }
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="BrandName" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên Brand <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="BrandName" name="BrandName" class="col-xs-12 @disabledfix BrandName" value="@if (Model != null && Model.BrandName != null){@MvcHtmlString.Create(Model.BrandName.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    @{
+                                        var checkActive = "";
+                                        if (Model != null && Model.FlagActive.Equals("1"))
+                                        {
+                                            checkActive = "checked";
+                                        }
+                                        else
+                                        {
+                                            checkActive = "";
+                                        }
+                                    }
+                                    <label for="FlagActive" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">Trạng thái</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right padding-top-5 @disabledcheckboxfix">
+                                            <label>
+                                                <input name="FlagActive" id="FlagActive" class="ace ace-switch ace-switch-4 FlagActive" type="checkbox" value="1" @checkActive />
+                                                <span class="lbl"></span>
+                                                <input name="FlagActive" type="hidden" value="0" />
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </aside>
+                    <div class="col-xs-12 no-padding">
+                        <div class="clearfix">
+                            <div class="row no-margin" style="float: right">
+                                @RenderItemFormat("BTN_SUA_OS_PRDCENTER_MST_BRAND_CAP_NHAT", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px; \" onclick=\"SaveData();\">Cập nhật</a>", "", "")
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/OS_PrdCenter_Mst_Brand.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "OS_PrdCenter_Mst_Brand")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+        });
+        @* Set focus *@
+        $(document).ready(function () {
+            $('#BrandCode').focus();
+        });
+        function SaveData() {
+            
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Edit", "OS_PrdCenter_Mst_Brand")';
+            var objOS_PrdCenter_Mst_Brand = new OS_PrdCenter_Mst_Brand();
+            objOS_PrdCenter_Mst_Brand.ActionType = 'edit';
+            objOS_PrdCenter_Mst_Brand.ajaxSettings = ajaxSettings;
+            debugger;
+            objOS_PrdCenter_Mst_Brand.saveData();
+        }
+    </script>
+}

@@ -1,0 +1,23 @@
+﻿@model List<Rpt_Inv_InventoryBalanceUI>
+@if(Model != null)
+{
+    var idx = 0;
+    foreach (var item in Model)
+    {
+        <tr class="data-item trdata" idx="@idx">
+            <td class="text-center cell-150" fieldName="ProductCode" style="vertical-align: middle">
+                @(item.mp_ProductCodeUser == null ? "" : item.mp_ProductCodeUser)
+            </td>
+            <td fieldId="mp_ProductName" fieldName="Tên sản phẩm" fieldActive="0" class="text-left cell-250">
+                @(item.mp_ProductName == null ? "" : item.mp_ProductName)
+            </td>
+            <td fieldId="mp_UnitCode" sorttype="T" fieldName="Đơn vị" fieldActive="0" class="text-left cell-150">
+                @(item.mp_UnitCode == null ? "" : item.mp_UnitCode)
+            </td>
+            <td fieldId="Qty" sorttype="T" fieldName="Số lượng" fieldActive="0" class="text-left cell-150">
+                @(item.QtyTotalOK == null ? "" : item.QtyTotalOK)
+            </td>
+        </tr>
+        idx++;
+    }
+}

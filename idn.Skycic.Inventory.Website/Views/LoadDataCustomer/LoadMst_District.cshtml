@@ -1,0 +1,21 @@
+﻿@model List<Mst_District>
+@{
+    //Layout = null;
+    var districtCode = CUtils.StrValue(ViewBag.DistrictCode);
+}
+
+<optgroup label="">
+    <option value="">&nbsp;</option>
+    @if (Model != null && Model.Count > 0)
+    {
+        foreach (var item in Model)
+        {
+            var provinceCodeCur = CUtils.StrValue(item.ProvinceCode);
+            var districtCodeCur = CUtils.StrValue(item.DistrictCode);
+            var districtNameCur = CUtils.StrValue(item.DistrictName);
+            <option value="@MvcHtmlString.Create(districtCodeCur)" provincecode="@MvcHtmlString.Create(provinceCodeCur)" desc="@MvcHtmlString.Create(districtNameCur)" @(districtCodeCur.Equals(districtCode) ? "selected" : "")>@MvcHtmlString.Create(districtNameCur)</option>
+        }
+    }
+</optgroup>
+<option value="ADDDATA">@("".HtmlItemString("product"))</option>
+

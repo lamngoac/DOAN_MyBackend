@@ -1,0 +1,138 @@
+﻿@model RT_InvF_InventoryIn
+@{
+    string viewType = CUtils.StrValue(ViewBag.ViewType);
+    var userState = ViewBag.UserState as UserState;
+    var objInvF_InventoryIn = new InvF_InventoryIn();
+    var iF_InvInStatus = "";
+    if (Model != null)
+    {
+        if (Model.Lst_InvF_InventoryIn != null && Model.Lst_InvF_InventoryIn.Count > 0)
+        {
+            objInvF_InventoryIn = Model.Lst_InvF_InventoryIn[0];
+            iF_InvInStatus = CUtils.StrValue(objInvF_InventoryIn.IF_InvInStatus);
+        }
+    }
+    var listInvF_InventoryInQR = ViewBag.Lst_InvF_InventoryInQR as List<InvF_InventoryInQR>;
+    if (listInvF_InventoryInQR == null || listInvF_InventoryInQR.Count == 0)
+    {
+        listInvF_InventoryInQR = new List<InvF_InventoryInQR>();
+    }
+    var disabled = "";
+    if (viewType.Equals("detail"))
+    {
+        disabled = "disabled-fix";
+    }
+}
+
+<div class="panel-body row no-margin no-padding @disabled" style="padding-left: 0px; padding-right: 0px;">
+    <div class="col-12 padding-left-0 padding-right-0 div-scrollable" style="padding-top: 0!important;">
+        <div style="width: 100%; float: left;">
+            <div class="margin-bottom-9" style="width: 60%; margin-top: 9px">
+                @if (!viewType.Equals("detail") && iF_InvInStatus.Equals(Client_Status.PENDING))
+                {
+                    <div class="autocomplete row col-10">
+                        <span class="block input-icon input-icon-right col-6">
+                            <select id="ProductCodeQR" name="ProductCodeQR" class="col-6" onchange="changeProductCodeQR(this)"></select>
+                        </span>
+                    </div>
+                    @*<input class="col-8" id="myInput" type="text" name="myInput" placeholder="@("Quét mã vạch hoặc nhập mã, tên để tìm kiếm".HtmlItemString("invf_inventoryin"))" />*@
+                    <input class="col-8 display-none" id="quetmavach" type="text" name="quetmavach" placeholder="@("Quét mã vạch".HtmlItemString("invf_inventoryin"))" />
+                    <div id="divPrdOrder" style="display: none" class="col-8">
+                        <span class="block input-icon input-icon-right">
+                            <select id="ordProductCode" name="ordProductCode" showpopup-control-searchdata="#ShowPopupProductInOrderSearch" class="col-12" onchange="AddProductToList(this);"></select>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="btn btn-nc-button" style="margin-left: 10px" id="btnScan" flagmavach="0" onclick="quetMaVach(this)" title="Quét mã vạch"><i class="fa fa-qrcode" aria-hidden="true"></i></a>
+                }
+            </div>
+            <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+                <div style="width: 100%; float: left;">
+                    <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                        <thead>
+                            <tr class="trthead">
+                                <th class="text-center cell-50">
+                                </th>
+                                <th class="text-left cell-100">
+                                    @("Mã hàng hóa".HtmlItemString("invf_inventoryin"))
+                                </th>
+                                <th class="text-left cell-200">
+                                    @("Tên hàng hóa".HtmlItemString("invf_inventoryin"))
+                                </th>
+                                <th class="text-left cell-100">
+                                    @("Mã xác thực".HtmlItemString("invf_inventoryin"))
+                                </th>
+                                <th class="text-left cell-100">
+                                    @("Mã hộp".HtmlItemString("invf_inventoryin"))
+                                </th>
+                                <th class="text-left cell-100">
+                                    @("Mã thùng".HtmlItemString("invf_inventoryin"))
+                                </th>
+                                <th class="text-left cell-100">
+                                    @("Lô sản xuất".HtmlItemString("invf_inventoryin"))
+                                </th>
+                                <th class="text-left cell-100">
+                                    @("Ca sản xuất".HtmlItemString("invf_inventoryin"))
+                                </th>
+                                <th class="text-left cell-100">
+                                    @("KCS".HtmlItemString("invf_inventoryin"))
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                    <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                        <tbody id="table-tbodyIDXacThuc">
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var objInventoryQR = {};
+    var listInventoryQR = [];
+
+    var lstInventoryQRDtl = [];
+    @if(listInvF_InventoryInQR != null && listInvF_InventoryInQR.Count > 0)
+    {
+        foreach(var item in listInvF_InventoryInQR)
+        {
+            <text>
+                objInventoryQR = {};
+                listInventoryQR = [];
+
+                objInventoryQR.ProductCode = '@CUtils.StrValue(item.ProductCode)';
+                objInventoryQR.ProductName = '@CUtils.StrValue(item.mp_Productname)';
+                objInventoryQR.ProductCodeUser = '@CUtils.StrValue(item.mp_ProductCodeUser)';
+                objInventoryQR.QRCode = '@CUtils.StrValue(item.QRCode)';
+                objInventoryQR.NetworkID = '@CUtils.StrValue(item.NetworkID)';
+                objInventoryQR.BoxNo = '@CUtils.StrValue(item.BoxNo)';
+                objInventoryQR.CanNo = '@CUtils.StrValue(item.CanNo)';
+                objInventoryQR.ProductLotNo = '@CUtils.StrValue(item.ProductLotNo)';
+                objInventoryQR.ShiftInCode = '@CUtils.StrValue(item.ShiftInCode)';
+                objInventoryQR.UserKCS = '@CUtils.StrValue(item.UserKCS)';
+                listInventoryQR.push(objInventoryQR);
+            </text>
+
+            <text>
+                var objQR = {
+                    InvF_InventoryInQR: objInventoryQR,
+                    Lst_InvF_InventoryInQR: listInventoryQR
+                };
+                lstInventoryQRDtl.push(objQR);
+            </text>
+        }
+    }
+    $(document).ready(function () {
+        if (lstInventoryQRDtl !== undefined && lstInventoryQRDtl !== null && lstInventoryQRDtl.length > 0) {
+            for (var i = 0; i < lstInventoryQRDtl.length; i++) {
+                renderInvF_InventoryInQRCode(lstInventoryQRDtl[i]);
+            }
+        }
+    });
+    
+</script>

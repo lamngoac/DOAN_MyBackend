@@ -1,0 +1,321 @@
+﻿@model  List<InvF_InvAuditDtl>
+@{
+    var lstProductCode = new List<string>();
+    if (Model != null && Model.Count != 0)
+    {
+        foreach (var it in Model)
+        {
+            if (lstProductCode.Contains(it.ProductCode) == false)
+            {
+                lstProductCode.Add(it.ProductCode.ToString());
+            }
+        }
+    }
+    var InvCodeAudit = "";
+    if (ViewBag.InvCodeAudit != null)
+    {
+        InvCodeAudit = ViewBag.InvCodeAudit;
+    }
+    var viewonly = "0";
+    if (ViewBag.viewonly != null)
+    {
+        viewonly = ViewBag.viewonly;
+    }
+
+    var disabled = "";
+    var hiddenElement = "";
+    if (viewonly == "1")
+    {
+        disabled = "disabled";
+        hiddenElement = "idn-hidden";
+    }
+
+    var IF_InvAuditStatus = "";
+    if (ViewBag.IF_InvAuditStatus != null)
+    {
+        IF_InvAuditStatus = ViewBag.IF_InvAuditStatus;
+    }
+}
+<div class="mt-3">
+    <div class="col-12">
+        <p class="text-bold">@("Danh mục hàng hoá".HtmlItemString("product"))<span style="color: red "> *</span></p>
+    </div>
+    <div class="col-12">
+        <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+            <div style="width: 100%; float: left;">
+                <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                    <thead>
+                        
+                        <tr class="trthead">
+                            <th class="text-center cell-50 cl-action">
+                            </th>
+                            <th class="text-center cell-50 stt">
+                                STT
+                            </th>
+                            <th fieldId="ProductCode" sorttype="T" fieldName="Mã hàng hóa" fieldActive="0" class="text-left cell-220">
+                                @("Mã hàng hóa".HtmlItemString("productcode"))
+                            </th>
+                            <th fieldId="INVNAME" sorttype="T" fieldName="Tên hàng hóa (TV)" fieldActive="0" class="text-left cell-200">
+                                @("Tên hàng hóa (TV)".HtmlItemString(""))
+                            </th>
+                            <th fieldId="INVCODEPARENT" sorttype="T" fieldName="Đơn vị tính" fieldActive="0" class="text-left cell-100">
+                                @("Đơn vị tính".HtmlItemString(""))
+                            </th>
+                            <th fieldId="INVADDRESS" sorttype="T" fieldName="Số lượng tồn kho" fieldActive="0" class="text-left cell-100">
+                                @("Số lượng tồn kho".HtmlItemString(""))
+                            </th>
+                            <th fieldId="" sorttype="T" fieldName="Số lượng thực tế" fieldActive="0" class="text-left cell-150">
+                                @("Số lượng thực tế".HtmlItemString(""))
+                            </th>
+                            <th fieldId="" sorttype="T" fieldName="Số lượng lệch" fieldActive="0" class="text-left cell-100">
+                                @("Số lượng lệch".HtmlItemString(""))
+                            </th>
+                            <th fieldId="" sorttype="T" fieldName="Vị trí xuất" fieldActive="0" class="text-left cell-150">
+                                @("Vị trí".HtmlItemString(""))
+                            </th>
+                            <th fieldId="" sorttype="T" fieldName="Trạng thái" fieldActive="0" class="text-left cell-100">
+                                @("Trạng thái".HtmlItemString(""))
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                    <tbody id="table-tbodyID" class="tbody-invaudit">
+                        
+                    </tbody>
+                    <tfoot>
+                        <tr class="tr-tfoot">
+                            <td colspan="5" class="cl-colspan"></td>
+                            <td id="tdSumQtyTotal" class="text-right"></td>
+                            <td id="tdSumQtyActual" class="text-right"></td>
+                            <td id="id1" class="text-right"></td>
+                            <td id="id2" class="text-right"></td>
+                            <td id="id3" class="text-right"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/template" id="tmptAddRenderRowProduct">
+    <tr class="trdata" rd="==rd==" productcodeuser="==mp_ProductCodeUser==" idx="==idx==" productcode="==ProductCode==" productcodebase="==mp_ProductCodeBase==" productname="==mp_ProductName==" flaglot="==FlagLo==" flagserial="==FlagSerial==" flagcombo="==FlagCombo==">
+        <td class="text-center cell-50 cl-action">
+            <a href="javascript:;" class="icon-delete @hiddenElement" title="Xóa" onclick="DeleteProduct(this)"><i class="fas fa-trash-alt"></i></a>
+            <div class="products-list">
+            </div>
+        </td>
+        <td class="text-center cell-50 stt">
+            ==idx==
+        </td>
+        <td class="text-left cell-220">
+            <span class="==productcodeuserCss==">==mp_ProductCodeUser==</span>
+            <input type="hidden" class="col-md-9 ==productcodeCss==" value="==ProductCode==" />
+            <input type="hidden" class="col-md-9 ==productcodeuserCss==" value="==mp_ProductCodeUser==" />
+            <input type="hidden" class="col-md-9 ==productcodebaseCss==" value="==mp_ProductCodeBase==" />
+            <input type="hidden" class="col-md-9 ==productnameCss==" value="==mp_ProductName==" />
+            <input type="hidden" class="col-md-9 ==invcodeinitCss==" value="" />
+            <input type="hidden" class="col-md-9 ==valconvertCss==" value="==ValConvert==" />
+            <input type="hidden" class="col-md-9 ==flaglotCss==" value="==FlagLo==" />
+            <input type="hidden" class="col-md-9 ==flagserialCss==" value="==FlagSerial==" />
+            <input type="hidden" class="col-md-9 ==flagcomboCss==" value="==FlagCombo==" />
+            <span class="serial-lot-text"></span>
+        </td>
+        <td class="text-left cell-200">
+            <span class="productnameCss">==mp_ProductName==</span>
+        </td>
+        <td class="text-left cell-100">
+            <select @disabled class="select2 col-12 no-border ==unitcodeCss== ==select2Css==" onchange="ChangeProduct(this)" initdata="==ProductCode==" ischange="0">
+                <optgroup></optgroup>
+            </select>
+        </td>
+        <td class="text-right cell-100">
+            <input readonly="readonly" value="==SumQty==" class="col-md-12 text-right ==qtytotalokCss==" />
+        </td>
+        <td class="text-left cell-150">
+            <input readonly="readonly" value="==SumQtyActual==" class="col-md-11 disabled-fix text-right ==qtyactualCss==" />
+            @*<span class="==showpopupCss==">
+            </span>*@
+        </td>
+        <td class="text-right cell-100">
+            <input readonly="readonly" value="==QtyRemain==" class="col-md-12 disabled-fix text-right ==qtyremainCss==" />
+        </td>
+        <td class="text-left cell-150">
+            <input readonly="readonly" class="col-md-11 ==invcodeCss==" value="==LstInvCode==" />
+            <span class="==showpopupCss==">
+
+            </span>
+        </td>
+        <td class="text-left cell-100">
+            <input readonly="readonly" class="col-md-12 ==statusCss==" value="==TrangThaiKK==" />
+        </td>
+        
+    </tr>
+</script>
+
+
+<script>
+    var Lst_Data = [];
+    @{
+        var sumqtyTotal = 0.0;
+        if (lstProductCode != null && lstProductCode.Count != 0)
+        {
+            var itFirst = new InvF_InvAuditDtl();
+            foreach (var productcode in lstProductCode)
+            {
+                var sumqty = 0.0;
+                var lstInvCode = "";
+                var InvCodeInit = "";
+                var ProductCode = "";
+                var ProductCodeUser = "";
+                var ProductName = "";
+                var ProductType = "";
+                var QtyTotalOK = 0.0;
+                var flaglo = "0";
+                var flagserial = "0";
+                var flagcombo = "0";
+                var sumqtyactual = 0.0;
+                var sumtotalOk = 0.0;
+                var trangthaikk = "Chưa kiểm";
+                var showTonKho = "";
+                var styleColor = "";
+
+                var lstInvF_InvAuditDtl = Model.Where(x => x.ProductCode.Equals(productcode)).ToList();
+                var QtyActual = 0.0;
+                if (lstInvF_InvAuditDtl != null)
+                {
+                    QtyActual = lstInvF_InvAuditDtl.Sum(x => x.QtyActual == null ? 0 : Convert.ToDouble(x.QtyActual));
+                }
+                if (lstInvF_InvAuditDtl != null && lstInvF_InvAuditDtl.Count != 0)
+                {
+                    itFirst = lstInvF_InvAuditDtl[0];
+                    InvCodeInit = itFirst.InvCodeInit == null ? "" : itFirst.InvCodeInit.ToString();
+                    ProductCode = itFirst.ProductCode == null ? "" : itFirst.ProductCode.ToString();
+                    QtyTotalOK = itFirst.QtyInit == null ? 0 : Convert.ToDouble(itFirst.QtyInit);
+                    //var QtyActual = itFirst.QtyActual == null ? 0 : Convert.ToDouble(itFirst.QtyActual);
+                    ProductName = itFirst.mp_ProductName == null ? "" : itFirst.mp_ProductName.ToString();
+                    ProductCodeUser = itFirst.mp_ProductCodeUser == null ? "" : itFirst.mp_ProductCodeUser.ToString();
+                    var flagAudit = CUtils.StrValue(itFirst.FlagAudit);
+                    if (itFirst.FlagAudit.ToString() == "1")
+                    {
+                        trangthaikk = "Đã kiểm";
+                        sumqtyactual += QtyActual;
+                    }
+                    if (CUtils.StrValue(itFirst.FlagExist) == "0")
+                    {
+                        styleColor = "color: red;";
+                    }
+                    if (itFirst.mp_FlagSerial != null && itFirst.mp_FlagSerial.ToString() == "1")
+                    {
+                        flagserial = "1";
+                    }
+                    else if (itFirst.mp_FlagLot != null && itFirst.mp_FlagLot.ToString() == "1")
+                    {
+                        flaglo = "1";
+                    }
+                    else if (itFirst.mp_ProductType != null && itFirst.mp_ProductType.ToString().ToUpper().Equals("COMBO"))
+                    {
+                        flagcombo = "1";
+                    }
+                    sumtotalOk += QtyTotalOK;
+                }
+                var productFirst = itFirst.lstUnitCodeUIByProduct.Where(x => x.ProductCode.Equals(itFirst.ProductCode)).FirstOrDefault();
+                foreach (var it in lstInvF_InvAuditDtl)
+                {
+                    var qty = it.QtyInit == null ? 0 : Convert.ToDouble(it.QtyInit);
+                    var qtyActual = it.QtyActual == null ? 0 : Convert.ToDouble(it.QtyActual);
+
+                    var invcode = it.InvCodeActual == null ? "" : it.InvCodeActual;
+                    if (IF_InvAuditStatus == "FINISH")
+                    {
+                        sumqty += qtyActual;
+                        sumqtyTotal += qtyActual;
+                    }
+                    else
+                    {
+                        sumqty += qty;
+                        sumqtyTotal += qty;
+                    }
+
+                    if (lstInvCode != "")
+                    {
+                        lstInvCode += ", " + invcode;
+                    }
+                    else
+                    {
+                        lstInvCode += invcode;
+                    }
+                }
+
+                if (flagserial == "1")
+                {
+                    if (itFirst.FlagAudit.ToString() != "1")
+                    {
+                        sumqtyactual = sumqty; // lúc vào màn hình kiểm kê set SLTT = Số lượng
+                    }
+                }
+                else if (flaglo == "1")
+                {
+                    if (itFirst.FlagAudit.ToString() != "1")
+                    {
+                        sumqtyactual = sumqty; // lúc vào màn hình kiểm kê set SLTT = Số lượng
+                    }
+                }
+                else
+                {
+                    if (itFirst.FlagAudit.ToString() != "1")
+                    {
+                        sumqtyactual = sumqty; // lúc vào màn hình kiểm kê set SLTT = Số lượng
+                    }
+                }
+
+                <text>
+                    var listUnitCode = JSON.parse('@Html.Raw(Json.Encode(itFirst.lstUnitCodeUIByProduct))');
+                var objProduct = {
+                        mp_ProductCodeUser: '@itFirst.mp_ProductCodeUser',
+                        ProductCode: '@productcode',
+                        mp_ProductCodeBase: '@itFirst.mp_ProductCodeBase',
+                        mp_ProductName: '@itFirst.mp_ProductName',
+                        ValConvert: '@productFirst.ValConvert',
+                        FlagLo: '@flaglo',
+                        FlagSerial: '@flagserial',
+                        FlagCombo: '@flagcombo',
+                        FlagExist: '@itFirst.FlagExist',
+                        FlagAudit: '@itFirst.FlagAudit',
+                        LstInvCode: '@lstInvCode',
+                        ProductType: '@itFirst.mp_ProductType',
+                        UnitCode: '@productFirst.UnitCode',
+                        ViewOnly: '@viewonly',
+                        SumQty: '@sumqty',
+                        SumQtyActual: '@sumqtyactual',
+                        //QtyRemain: '@(sumqty - sumqtyactual)', // 2023-01-06: HuongNV chốt
+                        QtyRemain: '@(sumqtyactual - sumqty)',
+                        TrangThaiKK: '@trangthaikk',
+                        LstUnitCode: listUnitCode,
+                    }
+            Lst_Data.push(objProduct);
+                </text>
+                }
+            }
+        }
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        debugger;
+        @*Add danh sách hàng hóa vào lưới*@
+        if (Lst_Data !== undefined && Lst_Data !== null && Lst_Data.length > 0) {
+            for (var i = 0; i < Lst_Data.length; i++) {
+                renderProductToTable(Lst_Data[i]);
+            }
+            $("#tdSumQtyTotal").text('@sumqtyTotal');
+            debugger
+            var tableName = 'InvF_InvAudit';
+            var sumqtyokformat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'QtyTotalOK');
+
+            $("#tdSumQtyTotal").number(true, sumqtyokformat);
+        }
+    });
+</script>

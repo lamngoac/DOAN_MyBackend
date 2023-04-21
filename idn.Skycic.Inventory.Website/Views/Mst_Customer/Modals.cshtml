@@ -1,0 +1,347 @@
+﻿
+@{
+    /**/
+
+    var listMst_CustomerGroup = ViewBag.ListMst_CustomerGroup as List<Mst_CustomerGroup>;
+    var listMst_CustomerSource = ViewBag.ListMst_CustomerSource as List<Mst_CustomerSource>;
+    var listMst_AreaExt = ViewBag.ListMst_AreaExt as List<Mst_AreaExt>;
+}
+
+<!--Model Add Information-->
+<div class="modal fade" id="ShowPopupAddInformation" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Thêm thông tin</b></h2>
+                <a href="javascript:;" onclick="ClosePopupAddInformation()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupAddInformation" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group margin-bottom-5 display-none">
+                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã <span style=\"color: red\">*</span>")</label>
+                        <div class="col-xs-12 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <input type="text" id="InformationCode" name="InformationCode" class="col-11 text-left InformationCode" value="" autocomplete="off" required />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group margin-bottom-5">
+                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên <span style=\"color: red\">*</span>")</label>
+                        <div class="col-xs-12 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <input type="text" id="InformationTitle" name="InformationTitle" class="col-11 text-left InformationTitle" onblur="GetValue()" value="" autocomplete="off" required />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group margin-bottom-5 display-none">
+                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("ControlType")</label>
+                        <div class="col-12 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <select id="InformationControlType" name="InformationControlType" class="InformationControlType col-11">
+                                    <option value="0">Default</option>
+                                    <option value="1">TextBox</option>
+                                    <option value="3">Select</option>
+                                </select>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group margin-bottom-5 display-none">
+                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("PrdDynamicFieldDataTypes")</label>
+                        <div class="col-12 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <select id="InformationPrdDynamicFieldDataTypes" name="InformationPrdDynamicFieldDataTypes" class="InformationPrdDynamicFieldDataTypes col-11">
+                                    <option value="1">String</option>
+                                    <option value="2">Int</option>
+                                    <option value="3">Double</option>
+                                    <option value="4">Bool</option>
+                                    <option value="5">DateTime</option>
+                                    <option value="6">Date</option>
+                                </select>
+                            </span>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="Create_Information()" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Thêm</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Model Update Information-->
+<div class="modal fade" id="ShowPopupUpdateInformation" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Sửa thông tin</b></h2>
+                <a href="javascript:;" onclick="ClosePopupUpdateInformation()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupUpdateInformation" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group margin-bottom-5">
+                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên thông tin <span style=\"color: red\">*</span>")</label>
+                        <div class="col-xs-12 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <input type="text" id="InformationCodeEdit" name="InformationCodeEdit" class="col-xs-11 text-left InformationCodeEdit" value="" hidden />
+                                <input type="text" id="InformationTitleEdit" name="InformationTitleEdit" class="col-xs-11 text-left InformationTitleEdit" value="" required />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group margin-bottom-5 display-none">
+                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("ControlType")</label>
+                        <div class="col-12 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <select id="InformationControlTypeEdit" name="InformationControlTypeEdit" class="InformationControlTypeEdit col-11">
+                                    <option value="0">Default</option>
+                                    <option value="1">TextBox</option>
+                                    <option value="3">Select</option>
+                                </select>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group margin-bottom-5 display-none">
+                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("PrdDynamicFieldDataTypes")</label>
+                        <div class="col-12 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <select id="InformationPrdDynamicFieldDataTypesEdit" name="InformationPrdDynamicFieldDataTypesEdit" class="InformationPrdDynamicFieldDataTypesEdit col-11">
+                                    <option value="1">String</option>
+                                    <option value="2">Int</option>
+                                    <option value="3">Double</option>
+                                    <option value="4">Bool</option>
+                                    <option value="5">DateTime</option>
+                                    <option value="6">Date</option>
+                                </select>
+                            </span>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="Update_Information()" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Cập nhật</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Model Warning-->
+<div class="modal fade" id="ShowPopupWarning" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Thông báo!</b></h2>
+                <a href="javascript:;" onclick="ClosePopupWarning()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupWarning" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group margin-bottom-5">
+                        <label for="" class="col-xs-12 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã hàng chứa ký tự đặc biệt, bạn chắc chắn muốn lưu?")</label>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <a class="btn font-color mybtn-Button" id="Confirm" onclick="OnConfirm(this)" href="javascript:void(0);" data-flag="" style="float: right;font-size: 13px;"><i class="fas fa-check icon-checked" aria-hidden="true"></i> Đồng ý</a>
+                <a class="btn btn-cancel" id="Cancel" onclick="ClosePopupWarning()" href="javascript:void(0);" style="float: right;font-size: 13px;"><i class="fas fa-ban" aria-hidden="true"></i> Bỏ qua</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Model Customer Check-->
+<div class="modal fade" id="ShowPopupCustomerCheck" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Thông báo!</b></h2>
+                <a href="javascript:;" onclick="ClosePopupCustomerCheck()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupCustomerCheck" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group margin-bottom-5">
+                        <input type="hidden" id="CustomerCode_CustomerCheck" name="CustomerCode_CustomerCheck" value="" />
+                        <p id="lblMessage"></p>
+                        @*<label id="lblMessage" for="" class="col-xs-12 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã hàng chứa ký tự đặc biệt, bạn chắc chắn muốn lưu?")</label>*@
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <a class="btn font-color mybtn-Button" id="ConfirmCustomerCheck" onclick="RedirectUrl(this)" href="javascript:void(0);" data-flag="" style="float: right;font-size: 13px;"><i class="fas fa-check icon-checked" aria-hidden="true"></i> Đồng ý</a>
+                <a class="btn btn-cancel" id="CancelCustomerCheck" data-flag="" onclick="CustomerCheck_Create()" href="javascript:void(0);" style="float: right;font-size: 13px;"><i class="fas fa-ban" aria-hidden="true"></i> Tiếp tục</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--CustomerGroup-->
+<div class="modal fade" id="ShowPopupAddCustomerGroup" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Thêm nhóm khách hàng</b></h2>
+                <a href="javascript:;" onclick="ClosePopup($('#ShowPopupAddCustomerGroup'))" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupAddCustomerGroup" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="row no-margin align-items-start">
+                        <div class="col-3 no-padding cusgrp-avatar">
+                            <div class="avatar-wrapper" id="div-cusgrp-avatar">
+                                <div class="avatar-img">
+                                    <input id="cusgrp-avatar-input" type="file" accept="image/*" hidden>
+                                    <input id="CustomerGrpAvatarImage" name="" value="" type="text" image-name="" image-type="" hidden> <!-- For save base64 src -->
+                                </div>
+                                <div class="overlay-customer">
+                                    <span id="change-avatar" class="change-delete-avatar">
+                                        <i class="fas fa-camera"></i>
+                                    </span>
+                                    <span id="delete-avatar" class="change-delete-avatar">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-9 no-padding row no-margin">
+                            <div class="col-6 no-padding form-group margin-bottom-9">
+                                <label for="ProdCode" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên nhóm KH <span style=\"color: red\">*</span>")</label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <input type="text" id="CustomerGrpName" name="CustomerGrpName" class="col-12 text-left CustomerGrpName" value="" autocomplete="off" required />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-12 no-padding form-group margin-bottom-9">
+                                <label for="" class="col-12 col-sm-2 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Ghi chú")</label>
+                                <div class="col-12 col-sm-10">
+                                    <span class="block input-icon input-icon-right">
+                                        <textarea id="CustomerGrpDesc" name="CustomerGrpDesc" class="col-12 text-left CustomerGrpDesc" rows="3"></textarea>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <a class="btn font-color mybtn-Button" onclick="AddCustomerGroup()" id="AddCustomerGroup" href="javascript:void(0);" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Thêm</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!--CustomerSource-->
+<div class="modal fade" id="ShowPopupAddCustomerSource" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Thêm nguồn khách</b></h2>
+                <a href="javascript:;" onclick="ClosePopup($('#ShowPopupAddCustomerSource'))" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupAddCustomerSource" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="row no-margin align-items-start">
+                        <div class="col-3 no-padding cussrc-avatar">
+                            <div class="avatar-wrapper" id="div-cussrc-avatar">
+                                <div class="avatar-img">
+                                    <input id="cussrc-avatar-input" type="file" accept="image/*" hidden>
+                                    <input id="CustomerSrcAvatarImage" name="" value="" type="text" image-name="" image-type="" hidden> <!-- For save base64 src -->
+                                </div>
+                                <div class="overlay-customer">
+                                    <span id="change-avatar" class="change-delete-avatar">
+                                        <i class="fas fa-camera"></i>
+                                    </span>
+                                    <span id="delete-avatar" class="change-delete-avatar">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-9 row no-margin no-padding">
+                            <div class="col-6 no-padding form-group row no-margin margin-bottom-9">
+                                <label for="ProdCode" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên nguồn<span style=\"color: red\">*</span>")</label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <input type="text" id="CustomerSourceName" name="CustomerSourceName" class="col-12 text-left CustomerSourceName" value="" autocomplete="off" required />
+                                    </span>
+                                </div>
+
+                            </div>
+                            <div class="col-12 no-padding form-group row no-margin margin-bottom-9">
+                                <label for="" class="col-12 col-sm-2 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Ghi chú")</label>
+                                <div class="col-12 col-sm-10">
+                                    <span class="block input-icon input-icon-right">
+                                        <textarea type="text" id="CustomerSourceDesc" name="CustomerSourceDesc" class="col-12 text-left " autocomplete="off"></textarea>
+                                    </span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <a class="btn font-color mybtn-Button" onclick="AddCustomerSource()" id="AddCustomerSource" href="javascript:void(0);" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Thêm</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Area-->
+<div class="modal fade" id="ShowPopupAddArea" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Thêm khu vực</b></h2>
+                <a href="javascript:;" onclick="ClosePopup($('#ShowPopupAddArea'))" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupAddArea" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group margin-bottom-5">
+                        <label for="ProdCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên khu vực <span style=\"color: red\">*</span>")</label>
+                        <div class="col-xs-12 col-sm-5">
+                            <span class="block input-icon input-icon-right">
+                                <input type="text" id="AreaName" name="AreaName" class="col-12 text-left AreaName" value="" autocomplete="off" required />
+                            </span>
+                        </div>
+
+                    </div>
+                    <div class="form-group margin-bottom-5">
+                        <label for="AreaCodeParent" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Khu vực cha")</label>
+                        <div class="col-xs-12 col-sm-5">
+                            <select id="AreaCodeParent" name="AreaCodeParent" class="col-12 AreaCodeParent">
+                                <optgroup label="">
+                                    <option value="">&nbsp;</option>
+                                    @if (listMst_AreaExt != null && listMst_AreaExt.Count > 0)
+                                    {
+                                        foreach (var item in listMst_AreaExt)
+                                        {
+                                            var areaCodeCur = CUtils.StrValue(item.AreaCode);
+                                            var areaLevelCur = CUtils.StrValue(item.AreaLevel);
+                                            var hlevelTitleCur = CUtils.StrValue(item.HlevelTitle);
+                                            <option value="@MvcHtmlString.Create(areaCodeCur)" area-level="@MvcHtmlString.Create(areaLevelCur)">@MvcHtmlString.Create(hlevelTitleCur)</option>
+                                        }
+                                    })
+                                </optgroup>
+                                <option value="ADDDATA">@("".HtmlItemString("product"))</option>
+                            </select>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <a class="btn font-color mybtn-Button" onclick="AddArea()" id="AddArea" href="javascript:void(0);" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Thêm</a>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,202 @@
+﻿
+@model Temp_PrintTemp
+@{
+    Layout = "~/Views/Shared/CoreLayoutIn_Tem.cshtml";
+    var title = "Sửa mẫu tem";
+    ViewBag.Title = title;
+    var linkPDF = CUtils.StrValue(ViewBag.LinkPDF);
+    var offset = ViewBag.Offset;
+    var printTempCode = "";
+    var printTempDesc = "";
+    var createDTimeUTC = "";
+    var apprDTimeUTC = "";
+    if (Model != null)
+    {
+        printTempCode = CUtils.StrValue(Model.PrintTempCode);
+        printTempDesc = CUtils.StrValue(Model.PrintTempDesc);
+        createDTimeUTC = CUtils.ReturnDateTimeUtcToLocalTime(CUtils.StrValue(Model.CreateDTimeUTC), Nonsense.DATE_TIME_FORMAT, offset);
+        apprDTimeUTC = CUtils.ReturnDateTimeUtcToLocalTime(CUtils.StrValue(Model.ApprDTimeUTC), Nonsense.DATE_TIME_FORMAT, offset);
+    }
+}
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                @*<div class="title">
+                        <p style="vertical-align: bottom; text-transform: uppercase;">@MvcHtmlString.Create(title)</p>
+                    </div>*@
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+
+                    <aside class="row no-margin box-shadow-tk">
+                        <div class="col-xs-12 widget-main no-padding">
+                            <div id="fuelux-wizard-container" class="no-steps-container">
+                                @using (Html.BeginForm("", "", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.ValidationSummary(true)
+                                    <div class="row no-margin">
+                                        <div class="col-xs-6 no-padding">
+                                            <div class="form-group margin-bottom-9">
+                                                <label for="PrintTempCode" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã mẫu in <span style=\"color: red\">*</span>")</label>
+                                                <div class="col-xs-12 col-sm-7">
+                                                    <span class="block input-icon input-icon-right">
+                                                        <input type="hidden" id="FilePath" name="FilePath" value="" />
+                                                        <input type="text" id="PrintTempCode" name="PrintTempCode" class="col-xs-11 disabled-fix" value="@MvcHtmlString.Create(printTempCode)" autocomplete="off" required />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group margin-bottom-9">
+                                                <label for="CreateDTimeUTC" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Ngày tạo")</label>
+                                                <div class="col-xs-12 col-sm-7">
+                                                    <div class="input-group date col-sm-11">
+                                                        <input type="text" id="CreateDTimeUTC" name="CreateDTimeUTC" class="col-xs-12 cl-date CreateDTimeUTC" data-date-format="yyyy-mm-dd" value="@MvcHtmlString.Create(ViewBag.ApprToDate)" autocomplete="off" />
+                                                        <span class="input-group-addon">
+                                                            <i class="far fa-calendar-alt"></i>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group margin-bottom-9">
+                                                <label for="ApprDTimeUTC" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Ngày duyệt")</label>
+                                                <div class="col-xs-12 col-sm-7">
+                                                    <div class="input-group date col-sm-11">
+                                                        <input type="text" id="dtfromDate" name="dtfromDate" class="col-xs-12 cl-date dtfromDate" data-date-format="yyyy-mm-dd" value="@MvcHtmlString.Create(ViewBag.ApprToDate)" autocomplete="off" />
+                                                        <span class="input-group-addon">
+                                                            <i class="far fa-calendar-alt"></i>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6 no-padding">
+                                            <div class="form-group margin-bottom-9">
+                                                <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mô tả")</label>
+                                                <div class="col-xs-12 col-sm-7">
+                                                    <span class="block input-icon input-icon-right">
+                                                        <textarea rows="3" type="text" id="PrintTempDesc" name="PrintTempDesc" class="col-xs-11 PrintTempDesc">@MvcHtmlString.Create(printTempDesc)</textarea>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row no-margin">
+                                        <div class="col-xs-6 no-padding">
+                                            <div class="form-group margin-bottom-9">
+                                                <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Thiết kế mẫu")</label>
+                                                <div class="col-xs-12 col-sm-7">
+                                                    <a href="javascript:;" class="btn font-color mybtn-Button" style="" onclick="ShowPopupImportFile();">Import mẫu temp</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                    </aside>
+
+                    <div id="btnShow" class="col-xs-12">
+                        <div class="clearfix">
+                            <div class="row no-margin" style="float: right">
+                                @RenderItemFormat("BTN_SUA_MAU_TEM_CAP_NHAT", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-left: 10px; padding-left: 15px!important; padding-right: 15px!important; margin-top: 20px;\" onclick=\"SaveData();\">Lưu</a>", "", "")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+<div class="modal fade" id="ImportTemp_PrintTemp" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+<div class="clearfix"></div>
+<div class="row no-margin" style="height: 650px;">
+    <div class="col-xs-12 col-md-12 col-lg-12" style="text-align: center" id="divView">
+        <object id="objPDF" data="@MvcHtmlString.Create(linkPDF)" type="application/pdf" style="width: 800px; height: 620px;"> </object>
+    </div>
+</div>
+<style>
+    html[dir="ltr"] #toolbarContainer ::before {
+        content: '';
+    }
+</style>
+@*Import File*@
+<div class="modal fade" id="ImportFileModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Temp_PrintTemp.js")"></script>
+    <script type="text/javascript">
+        @* Active Menu *@
+        commonUtils.setAdminCurrentUrl('@MvcHtmlString.Create(@Url.Action("Index", "Temp_PrintTemp"))');
+
+        var objTemp_PrintTemp = new Temp_PrintTemp();
+        var objVariablesInit = {
+            Id_FormMain: '',
+            Id_FormImportFile: 'manageFormImportFile',
+            Id_Modal: 'ImportFileModal',
+            Id_FileInput: 'file',
+        };
+        var ajaxSettings = {};
+        ajaxSettings.Type = 'post';
+        ajaxSettings.DataType = 'json';
+
+        function ShowPopupImportFile() {
+            ajaxSettings.Url = '@Url.Action("ShowPopupImportFile", "Temp_PrintTemp")';
+
+            objTemp_PrintTemp.ajaxSettingsInit();
+            objTemp_PrintTemp.ajaxSettings = ajaxSettings;
+            objTemp_PrintTemp.variablesInit(objVariablesInit);
+            objTemp_PrintTemp.showPopupImportFile();
+        }
+
+        function ImportFile() {
+            ajaxSettings.Url = '@Url.Action("ImportFileTemp_PrintTemp", "Temp_PrintTemp")';
+
+            objTemp_PrintTemp.ajaxSettingsInit();
+            objTemp_PrintTemp.ajaxSettings = ajaxSettings;
+            objTemp_PrintTemp.variablesInit(objVariablesInit);
+            objTemp_PrintTemp.importFile();
+        }
+
+        function SaveData() {
+            ajaxSettings.Url = '@Url.Action("Edit", "Temp_PrintTemp")';
+            objTemp_PrintTemp.ActionType = 'edit';
+            objTemp_PrintTemp.ajaxSettingsInit();
+            objTemp_PrintTemp.ajaxSettings = ajaxSettings;
+            objTemp_PrintTemp.variablesInit(objVariablesInit);
+            objTemp_PrintTemp.saveData();
+
+        }
+    </script>
+
+    <script>
+        $('#CreateDTimeUTC, #dtfromDate').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            dateFormat: 'yy-mm-dd'
+        })
+    </script>
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

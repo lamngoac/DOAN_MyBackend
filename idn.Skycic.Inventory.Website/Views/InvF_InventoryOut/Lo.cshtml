@@ -1,0 +1,679 @@
+﻿@{
+    var ProductCodeTonKho = ViewBag.ProductCode == null ? "" : ViewBag.ProductCode;
+    var lstInv_InventoryBalanceLot = new List<Inv_InventoryBalanceLot>();
+    if (ViewBag.lstInv_InventoryBalanceLot != null)
+    {
+        lstInv_InventoryBalanceLot = ViewBag.lstInv_InventoryBalanceLot as List<Inv_InventoryBalanceLot>;
+    }
+    var lstInvF_InventoryOutInstLot = new List<InvF_InventoryOutInstLot>();
+    if (ViewBag.lst_InvF_InventoryOutInstLot != null)
+    {
+        lstInvF_InventoryOutInstLot = ViewBag.lst_InvF_InventoryOutInstLot as List<InvF_InventoryOutInstLot>;
+    }
+    var viewonly = "0";
+    if (ViewBag.ViewOnly != null)
+    {
+        viewonly = ViewBag.ViewOnly as string;
+    }
+    var disabled = "";
+    if (viewonly == "1")
+    {
+        disabled = "disabled";
+    }
+    var IF_InvOutStatus = "";
+    if (ViewBag.IF_InvOutStatus != null)
+    {
+        IF_InvOutStatus = ViewBag.IF_InvOutStatus;
+    }
+
+    var viewType = ViewBag.ViewType == null ? "" : ViewBag.ViewType;
+
+
+    var  ProductCode = CUtils.StrValue(ViewBag.ProductCode);
+    var ProductCodeBase = CUtils.StrValue(ViewBag.ProductCodeBase);
+}
+<div class="modal-dialog" style="width: 900px; max-width: 900px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel"><b>POPUP danh sách Lô</b></h2>
+            <a href="javascript:;" onclick="ClosePopupLo()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body" style="">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupLo" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group margin-bottom-9">
+                    <div class="col-10 col-sm-8">
+                        <span class="block input-icon input-icon-right">
+                            @*<label>Mã hàng hóa: @ProductCodeUser - @ProductName</label>*@
+                            <label>Danh sách lô</label>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-xs-12">
+                    <input hidden id="mdLo_ProductCode" value="@(ViewBag.ProductCode == null ? "" : ViewBag.ProductCode)" />
+                    <div class="form-group margin-bottom-5">
+                        @*<label for="ParentCode" class="col-xs-3 col-sm-2 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tìm số lô <span style=\"color: red\">*</span>")</label>*@
+                        <div class="col-xs-3 col-sm-4">
+                            @*<select id="Lo" style="width: 150px;" multiple>
+                                    @{
+                                        foreach (var it in lstInv_InventoryBalanceLot)
+                                        {
+                                            <option ProductLotNo="@it.ProductLotNo" ProductionDate="@(CUtils.IsNullOrEmpty(it.ProductionDate) ? "" : Convert.ToDateTime(it.ProductionDate).ToString("yyyy-MM-dd"))" ExpiredDate="@(CUtils.IsNullOrEmpty(it.ExpiredDate) ? "" : Convert.ToDateTime(it.ExpiredDate).ToString("yyyy-MM-dd"))" QtyTotalOK="@it.QtyTotalOK" InvCode="@it.InvCode" value="@it.ProductLotNo">@it.ProductLotNo - @it.QtyTotalOK</option>
+                                        }
+                                    }
+                                </select>*@
+
+                            @*<select class="select2-selection" name="Lo" id="Lo" style="width: 150px;" onchange="SelectLo(this)">
+                                    <optgroup label="">
+                                        <option value="">-- Tìm số lô --</option>
+                                        @{
+                                            foreach (var it in lstInv_InventoryBalanceLot)
+                                            {
+                                                <option ProductLotNo="@it.ProductLotNo" ProductionDate="@(CUtils.IsNullOrEmpty(it.ProductionDate) ? "" : Convert.ToDateTime(it.ProductionDate).ToString("yyyy-MM-dd"))" ExpiredDate="@(CUtils.IsNullOrEmpty(it.ExpiredDate) ? "" : Convert.ToDateTime(it.ExpiredDate).ToString("yyyy-MM-dd"))" QtyTotalOK="@it.QtyTotalOK" InvCode="@it.InvCode" value="@it.ProductLotNo">@it.ProductLotNo - @it.QtyTotalOK</option>
+                                            }
+                                        }
+                                    </optgroup>
+                                </select>*@
+                            <input type="text" id="ProductLotNo" name="ProductLotNo" class="col-12 text-left ProductLotNo" placeholder="Tìm số lô" />
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+                <div style="width: 100%; float: left;">
+                    <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                        <thead>
+                            <tr class="trthead">
+                                <th class="text-center cell-50">
+                                </th>
+                                <th fieldId="INVCODE" sorttype="T" fieldName="Mã kho" fieldActive="0" class="text-left cell-150">
+                                    @("Số lô".HtmlItemString("ProductLotNo"))
+                                </th>
+                                <th fieldId="INVNAME" sorttype="T" fieldName="Tên kho" fieldActive="0" class="text-left cell-150">
+                                    @("Ngày sản xuất".HtmlItemString("inventory"))
+                                </th>
+                                <th fieldId="INVCODEPARENT" sorttype="T" fieldName="Mã kho cha" fieldActive="0" class="text-left cell-150">
+                                    @("Ngày hết hạn".HtmlItemString("inventory"))
+                                </th>
+                                <th fieldId="INVADDRESS" sorttype="T" fieldName="Địa chỉ" fieldActive="0" class="text-left cell-100">
+                                    @("Số lượng tồn".HtmlItemString("inventory"))
+                                </th>
+                                <th fieldId="INVLEVELTYPE" sorttype="T" fieldName="Tên cấp kho" fieldActive="0" class="text-left cell-100">
+                                    @("Số lượng xuất".HtmlItemString("Qty"))
+                                </th>
+                                <th fieldId="INVTYPE" sorttype="T" fieldName="Tên loại kho" fieldActive="0" class="text-left cell-150">
+                                    @("Vị trí".HtmlItemString("InvCodeOutActual"))
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div id="scrollable_1" class="scrollable" style="width: 100%; float: left;max-height:500px">
+                    <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                        <tbody id="table-tbodyIDLo">
+                            @{
+                                if (IF_InvOutStatus == "APPROVE")
+                                {
+                                    if (lstInvF_InventoryOutInstLot != null && lstInvF_InventoryOutInstLot.Count != 0)
+                                    {
+                                        var idx = 0;
+                                        foreach (var it in lstInvF_InventoryOutInstLot)
+                                        {
+                                            var qtyOut = it.Qty == null ? 0.0 : Convert.ToDouble(it.Qty);
+                                            <tr class="data-item trdata" idx="@idx" ProductLotNo="@it.ProductLotNo">
+                                                <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].ProductLotNo" value="@(it.ProductLotNo == null ? "" : it.ProductLotNo)" />
+                                                <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].ProductionDate" value="@(it.ProductionDate == null ? "" : it.ProductionDate)" />
+                                                <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].ExpiredDate" value="@(it.ExpiredDate == null ? "" : it.ExpiredDate)" />
+                                                <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].QtyTotalOK" value="@(it.QtyInv == null ? "" : it.QtyInv)" />
+                                                <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].InvCode" value="@(it.InvCodeOutActual == null ? "" : it.InvCodeOutActual)" />
+                                                <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].FlagExist" value="1" />
+                                                <td fieldId="CONTROL" fieldActive="0" class="text-center cell-50 action-buttons">
+                                                    <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteLo(this, '@it.ProductLotNo');"><i class="fas fa-trash-alt"></i></a>
+                                                </td>
+                                                <td fieldActive="ProductLotNo" class="text-left cell-150">
+                                                    @(it.ProductLotNo == null ? "" : it.ProductLotNo)
+                                                </td>
+                                                <td fieldId="ProductionDate" fieldActive="0" class="text-left cell-150">
+                                                    @(CUtils.IsNullOrEmpty(it.ProductionDate) ? "" : Convert.ToDateTime(it.ProductionDate).ToString("yyyy-MM-dd"))
+                                                </td>
+                                                <td fieldId="ValDateExpired" fieldActive="0" class="text-left cell-150">
+                                                    @(CUtils.IsNullOrEmpty(it.ExpiredDate) ? "" : Convert.ToDateTime(it.ExpiredDate).ToString("yyyy-MM-dd"))
+                                                </td>
+                                                <td fieldId="QtyTotalOK" fieldActive="0" class="text-right cell-100">
+                                                    @(it.QtyInv == null ? 0 : it.QtyInv)
+                                                </td>
+                                                <td fieldId="QtyOut" fieldActive="0" class="text-left cell-100">
+                                                    <input disabled class="qtyout col-md-12 text-right" name="Lst_InvF_InventoryOutLotDtl[@idx].Qty" value="@qtyOut" onchange="ChangeQtyOut(this);">
+                                                </td>
+                                                <td fieldId="InvCode" fieldActive="0" class="text-left cell-150">
+                                                    @(it.InvCodeOutActual == null ? "" : it.InvCodeOutActual)
+                                                </td>
+                                            </tr>
+                                            idx++;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    if (lstInv_InventoryBalanceLot != null && lstInv_InventoryBalanceLot.Count != 0)
+                                    {
+                                        var idx = 0;
+                                        foreach (var it in lstInv_InventoryBalanceLot)
+                                        {
+                                            var qtyOut = !CUtils.StrValue(it.LogLUBy).Equals("1") ? 0.0 : Convert.ToDouble(it.QtyAvailOK);
+                                            var itLotDtl = lstInvF_InventoryOutInstLot.Where(x => x.InvCodeOutActual.Equals(it.InvCode) && x.ProductLotNo.Equals(it.ProductLotNo)).FirstOrDefault();
+                                            if (itLotDtl != null)
+                                            {
+                                                qtyOut = itLotDtl.Qty == null ? 0.0 : Convert.ToDouble(itLotDtl.Qty);
+                                            }
+                                            <tr class="data-item trdata" idx="@idx" ProductLotNo="@it.ProductLotNo">
+                                                <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].ProductLotNo" value="@(it.ProductLotNo == null ? "" : it.ProductLotNo)" />
+                                                <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].ProductionDate" value="@(it.ProductionDate == null ? "" : it.ProductionDate)" />
+                                                <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].ExpiredDate" value="@(it.ExpiredDate == null ? "" : it.ExpiredDate)" />
+                                                <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].QtyTotalOK" value="@(it.QtyTotalOK == null ? "" : it.QtyTotalOK)" />
+                                                <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].InvCode" value="@(it.InvCode == null ? "" : it.InvCode)" />
+                                                <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].FlagExist" value="1" /> @*Dùng khi kiểm kê*@
+                                                <td fieldId="CONTROL" fieldActive="0" class="text-center cell-50 action-buttons">
+                                                    <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteLo(this, '@it.ProductLotNo');"><i class="fas fa-trash-alt"></i></a>
+                                                </td>
+                                                <td fieldActive="ProductLotNo" class="text-left cell-150">
+                                                    @(it.ProductLotNo == null ? "" : it.ProductLotNo)
+                                                </td>
+                                                <td fieldId="ProductionDate" fieldActive="0" class="text-left cell-150">
+                                                    @(CUtils.IsNullOrEmpty(it.ProductionDate) ? "" : Convert.ToDateTime(it.ProductionDate).ToString("yyyy-MM-dd"))
+                                                </td>
+                                                <td fieldId="ValDateExpired" fieldActive="0" class="text-left cell-150">
+                                                    @(CUtils.IsNullOrEmpty(it.ExpiredDate) ? "" : Convert.ToDateTime(it.ExpiredDate).ToString("yyyy-MM-dd"))
+                                                </td>
+                                                <td fieldId="QtyTotalOK" fieldActive="0" class="QtyTotalOKPopup text-right cell-100">
+                                                    @(it.QtyTotalOK == null ? 0 : it.QtyTotalOK)
+                                                </td>
+                                                <td fieldId="QtyOut" fieldActive="0" class="text-left cell-100">
+                                                    <input class="qtyoutPopup col-md-12 text-right" name="Lst_InvF_InventoryOutLotDtl[@idx].Qty" value="@qtyOut" onchange="ChangeQtyOut(this);">
+                                                </td>
+                                                <td fieldId="InvCode" fieldActive="0" class="text-left cell-150">
+                                                    @(it.InvCode == null ? "" : it.InvCode)
+                                                </td>
+                                            </tr>
+                                            idx++;
+                                        }
+                                    }
+                                }
+
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        @if (viewType != "detail" && viewType != "exportcross")
+        {
+            <div class="modal-footer" style="display:flex; align-items:center; justify-content: center">
+                @{
+                    if (viewonly == "1")
+                    {
+                        <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="ClosePopupLo();" style="float: right;font-size: 13px;">Đóng</a>
+                    }
+                    else
+                    {
+                        <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="ClosePopupLo();" style="float: right;font-size: 13px;">Đóng</a>
+                        @*<a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="SelectLo();" style="float: right;font-size: 13px;">Chọn</a>*@
+                        <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="product_InvF_InventoryOutInstLot_SaveUpdate('@ProductCodeTonKho');" style="float: right;font-size: 13px;"><i class="fas fa-save" aria-hidden="true"></i> Lưu</a>
+                    }
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('#Lo').select2({
+            closeOnSelect: false
+        });
+        //$('.qtyout').number(true, 2);
+        format_Number();
+    })
+</script>
+
+
+<script type="text/javascript">
+    function format_Number() {
+        //var tableName = 'Rpt_Inv_InventoryBalance_Extend';
+        var tableName = 'InvF_InventoryOut';
+        var QtyFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'Qty');
+        $('.QtyTotalOKPopup').number(true, QtyFormat);
+        $('.qtyoutPopup').number(true, QtyFormat);
+        //$('.SumQtyOut').number(true, QtyFormat);
+    }
+</script>
+
+<script>
+    function ChangeQtyOut(thiz) {
+        var strqty = $(thiz).val();
+        if (strqty == "") {
+            alert("Số lượng không đúng định dạng số.");
+            $(thiz).focus();
+            return;
+        }
+        var tr = $(thiz).parents('tr');
+        var idx = $(tr).attr("idx");
+        var strqtytotalOK = tr.find('input[name="Lst_InvF_InventoryOutLotDtl[' + idx + '].QtyTotalOK"]').val();
+        var qtytotalOK = parseFloat(strqtytotalOK);
+        var qty = parseFloat(strqty);
+        if (qty > qtytotalOK) {
+            $(thiz).focus();
+            alert("Số lượng không được lớn hơn số lượng tồn kho.");
+            return;
+        }
+    }
+
+    function SelectLo(thiz) {
+        debugger;
+        var length = $('#Lo').find("option:selected").length;
+        if (length == 0) {
+            alert("Không có lô nào được chọn");
+            return;
+        }
+        var lstLo = [];
+
+        for (var i = 0; i < length; i++) {
+            var Lo = new Object();
+            var optselect = $('#Lo').find("option:selected").eq(i);
+            Lo.ProductLotNo = optselect.attr("ProductLotNo");
+            Lo.ProductionDate = optselect.attr("ProductionDate");
+            Lo.ExpiredDate = optselect.attr("ExpiredDate");
+            Lo.QtyTotalOK = optselect.attr("QtyTotalOK");
+            Lo.InvCode = optselect.attr("InvCode");
+            lstLo.push(Lo);
+        }
+        var qtyLo = lstLo.length;
+        for (var i = 0; i < qtyLo; i++) {
+            var item = lstLo[i];
+            var strHtml = getHtmlFromTemplate($('#rowtemplateLo'), {
+                ProductLotNo: item.ProductLotNo,
+                ProductionDate: item.ProductionDate,
+                ExpiredDate: item.ExpiredDate,
+                QtyTotalOK: item.QtyTotalOK,
+                InvCode: item.InvCode,
+                idx: 999999
+            });
+
+            var trProductOld = $('#table-tbodyIDLo').find("tr.trdata[ProductLotNo='" + item.ProductLotNo + "'][InvCode='" + item.InvCode + "']");
+            if (trProductOld.length > 0) {
+                trProductOld.replaceWith(strHtml);
+            }
+            else {
+                $('#table-tbodyIDLo').append(strHtml);
+            }
+
+            updateTableTrIdx($('#table-tbodyIDLo tr'), false);
+        }
+    }
+
+    function DeleteLo(thiz, malo) {
+        //bootbox.confirm("Đồng ý xóa lô " + malo + " ?", function (result) {
+        //    if (result) {
+        //        var tr = $(thiz).parents('tr');
+        //        if (tr != undefined) {
+        //            tr.remove();
+        //            updateTableTrIdx($('#table-tbodyIDLo tr'), false);
+        //        }
+        //    }
+        //});
+
+        bootbox.confirm({
+            title: '<i class=\"fas fa-info-circle\"></i> THÔNG BÁO',
+            message: 'Đồng ý xoá lô' + malo + '?',
+            buttons: {
+                'cancel': {
+                    label: 'Thoát',
+                    className: 'btn mybtn-Button btnButton'
+                },
+                'confirm': {
+                    label: 'Đồng ý',
+                    className: 'btn mybtn-Button btnButton'
+                }
+            },
+            callback: function (result) {
+                if (result) {
+                    var tr = $(thiz).parents('tr');
+                    if (tr != undefined) {
+                        tr.remove();
+                        updateTableTrIdx($('#table-tbodyIDLo tr'), false);
+                        $('body').removeClass('modal-open');
+                    }
+                }
+            }
+        });
+    }
+
+    function SaveLo() {
+        debugger;
+        var length = $('#table-tbodyIDLo').length;
+        var productcode = $('#mdLo_ProductCode').val();
+        var check = true;
+        if (length > 0) {
+            var lenItem = $('#table-detailLot').find('tr[productcode="' + productcode + '"]').length;
+            if (lenItem > 0) {
+                $('#table-detailLot').find('tr[productcode="' + productcode + '"]').remove();
+            }
+            var sumqty = 0.0;
+            var sumqtytotalok = 0.0;
+            var arrayInvCode = [];
+            var lstVitri = "";
+            $("#table-tbodyIDLo tr.trdata").each(function () {
+                var tr = $(this);
+                var idx = $(tr).attr('idx');
+                var strqty = tr.find('input[name="Lst_InvF_InventoryOutLotDtl[' + idx + '].Qty"]').val();
+                if (strqty == "") {
+                    alert("Số lượng xuất không được trống");
+                    tr.find('input[name="Lst_InvF_InventoryOutLotDtl[' + idx + '].Qty"]').focus();
+                    check = false;
+                    return;
+                }
+                var qty = parseFloat(strqty);
+                sumqty += qty;
+
+                var strHtml;
+
+                var ProductLotNo = tr.find('input[name="Lst_InvF_InventoryOutLotDtl[' + idx + '].ProductLotNo"]').val();
+                var ProductionDate = tr.find('input[name="Lst_InvF_InventoryOutLotDtl[' + idx + '].ProductionDate"]').val();
+                var ExpiredDate = tr.find('input[name="Lst_InvF_InventoryOutLotDtl[' + idx + '].ExpiredDate"]').val();
+                var Qty = tr.find('input[name="Lst_InvF_InventoryOutLotDtl[' + idx + '].Qty"]').val();
+                var QtyTotalOK = tr.find('input[name="Lst_InvF_InventoryOutLotDtl[' + idx + '].QtyTotalOK"]').val();
+                var qtyok = parseFloat(QtyTotalOK);
+                sumqtytotalok += qtyok;
+                var InvCodeOutActual = tr.find('input[name="Lst_InvF_InventoryOutLotDtl[' + idx + '].InvCode"]').val();
+                if (InvCodeOutActual != null && (Qty != "0" && Qty != "")) {
+                    if (arrayInvCode.includes(InvCodeOutActual) == false) {
+                        arrayInvCode.push(InvCodeOutActual);
+                        if (lstVitri == "") {
+                            lstVitri += InvCodeOutActual;
+                        }
+                        else {
+                            lstVitri += ", " + InvCodeOutActual;
+                        }
+                    }
+                }
+                strHtml = getHtmlFromTemplate($('#rowtemplateLoDetail'), {
+                    ProductCode: productcode,
+                    ProductLotNo: ProductLotNo,
+                    ProductionDate: ProductionDate,
+                    ExpiredDate: ExpiredDate,
+                    Qty: Qty,
+                    InvCodeOutActual: InvCodeOutActual,
+                    QtyTotalOK: QtyTotalOK,
+                    idx: 999999
+                });
+
+                // Cập nhật lại số lượng theo sl lô
+                debugger;
+                var trProduct = $('#table-tbodyID').find('tr[productcode="' + productcode + '"]');
+                var ProductId = trProduct.attr('idx');
+
+                // Xuất kho
+                var lengthXuatKho = trProduct.find('input[name="Lst_InvF_InventoryOutDtl[' + ProductId + '].Qty"]').length;
+                if (lengthXuatKho != 0 && lengthXuatKho != undefined) {
+                    trProduct.find('input[name="Lst_InvF_InventoryOutDtl[' + ProductId + '].Qty"]').val(sumqty);
+                    trProduct.find('input[name="Lst_InvF_InventoryOutDtl[' + ProductId + '].InvCodeOutActual"]').val(lstVitri);
+                }
+                //
+
+                //Kiểm kê
+                //var lengthKiemKe = trProduct.find('input[name="Lst_InvF_InvAuditDtl[' + ProductId + '].QtyInit"]').length;
+                //if (lengthKiemKe != 0 && lengthKiemKe != undefined) {
+                //    trProduct.find('input[name="Lst_InvF_InvAuditDtl[' + ProductId + '].QtyInit"]').val(sumqtytotalok);
+                //    trProduct.find('input[name="Lst_InvF_InvAuditDtl[' + ProductId + '].InvCodeActual"]').val(lstVitri);
+                //    trProduct.find('input[name="Lst_InvF_InvAuditDtl[' + ProductId + '].InvCodeInit"]').val(lstVitri);
+                //}
+                //
+
+                TongTien();
+                //
+
+                var trLo_Old = $('#table-detailLot').find('tr[productcode="' + productcode + '"][ProductLotNo="' + ProductLotNo + '"][InvCode="' + InvCodeOutActual + '"]').eq(0);
+                if (trLo_Old.length > 0) {
+                    trLo_Old.replaceWith(strHtml);
+                }
+                else {
+                    $('#table-detailLot').append(strHtml);
+                }
+
+                //if (lenItem == 0) {
+                //    $('#table-detailLot').append(strHtml);
+                //}
+                //else {
+                //    debugger;
+
+
+                //}
+                updateTableTrIdx($('#table-detailLot tr'), false);
+                ClosePopupLo();
+            });
+        }
+        if (check == false) return;
+    }
+</script>
+
+
+<script>
+    function product_InvF_InventoryOutInstLot_SaveUpdate(productCode) {
+                    debugger
+                    var rows = $('tbody#table-tbodyIDLo tr.trdata').length;
+                    if (rows > 0) {
+                        var productCode = commonUtils.returnValueText('#manageFormShowPopupLo input#mdLo_ProductCode');
+                        if (!commonUtils.isNullOrEmpty(productCode)) {
+                @* Xóa LOT - hàng hóa đã lưu cache *@
+
+                var rowOlds = $('#table-detailLot').find('tr[productcode="' + productCode + '"]').length;
+                if (rowOlds > 0) {
+                    $('#table-detailLot').find('tr[productcode="' + productCode + '"]').each(function () {
+                        $(this).remove();
+                    });
+                }
+                @* Thêm LOT - hàng hóa vào cache *@
+                var strInvCodeInActual = '';
+                var fTotalQty = 0.0;
+                var arrayInvCode = [];
+                var lstVitri = "";
+                $("#table-tbodyIDLo tr.trdata").each(function () {
+                    debugger
+                    var $tr = $(this);
+                    var rd = $tr.attr('idx');
+                    var productlotno = $tr.attr('productlotno');
+
+                    var ProductLotNo = $tr.find('input[name="Lst_InvF_InventoryOutLotDtl[' + rd + '].ProductLotNo"]').val();
+                    var ProductionDate = $tr.find('input[name="Lst_InvF_InventoryOutLotDtl[' + rd + '].ProductionDate"]').val();
+                    var ExpiredDate = $tr.find('input[name="Lst_InvF_InventoryOutLotDtl[' + rd + '].ExpiredDate"]').val();
+                    var fQty = commonUtils.parseFloat(commonUtils.returnValue($tr.find('input[name="Lst_InvF_InventoryOutLotDtl[' + rd + '].Qty"]').val()));
+                    var QtyTotalOK = $tr.find('input[name="Lst_InvF_InventoryOutLotDtl[' + rd + '].QtyTotalOK"]').val();
+                    var InvCode = $tr.find('input[name="Lst_InvF_InventoryOutLotDtl[' + rd + '].InvCode"]').val();
+                    if (InvCode != null) {
+                        if (arrayInvCode.includes(InvCode) == false && fQty !== '0') {
+                            arrayInvCode.push(InvCode);
+                            if (lstVitri == "") {
+                                lstVitri += InvCode;
+                            }
+                            else {
+                                lstVitri += ", " + InvCode;
+                            }
+                        }
+
+                    }
+                    fTotalQty += fQty;
+                    var objProduct = {
+                        ProductCode: productCode,
+                        ProductLotNo: ProductLotNo,
+                        ProductionDate: ProductionDate,
+                        ExpiredDate: ExpiredDate,
+                        Qty: fQty,
+                        InvCodeInActual: InvCode,
+                        QtyTotalOK: QtyTotalOK,
+                    };
+
+                    var extData = {
+                        idx: 9999,
+                    };
+                    var $item = $(commonUtils.getHtmlFromTemplate($('#tmpl_Product_LOT'), objProduct, extData));
+                    $item.appendTo($('#table-detailLot'));
+                });
+                commonUtils.updateTableTrNotShowIdx($('#table-detailLot tr.trdata'), true);
+
+                debugger
+                @* Update lại vị trí, số lượng *@
+                    var $trInvF_InventoryInDtl = $('#table-tbodyID').find('tr[productcode="' + productCode + '"]');
+                if ($trInvF_InventoryInDtl !== undefined && $trInvF_InventoryInDtl !== null && $trInvF_InventoryInDtl.length > 0) {
+                    var rdInvF_InventoryInDtl = $trInvF_InventoryInDtl.attr('rd');
+                    var $inputQty = $trInvF_InventoryInDtl.find('input.qty-' + rdInvF_InventoryInDtl);
+                    if ($inputQty !== undefined && $inputQty !== null && $inputQty.length > 0) {
+                        $inputQty.val(fTotalQty);
+                    }
+
+                    var $inputInvCodeInActual = $trInvF_InventoryInDtl.find('input.invcodeinactual-' + rdInvF_InventoryInDtl);
+                    if ($inputInvCodeInActual !== undefined && $inputInvCodeInActual !== null && $inputInvCodeInActual.length > 0) {
+                        $inputInvCodeInActual.val(lstVitri);
+                    }
+
+                    tongTienHang();
+
+                }
+                ClosePopupLo();
+
+            }
+        }
+    }
+</script>
+
+
+
+<script type="text/javascript">
+       $(document).ready(function () {
+           $('#ProductLotNo').autocomplete({
+               source: function (request, response) {
+                   debugger
+                   var keyword = request.term;
+                   if (!commonUtils.isNullOrEmpty(keyword)) {
+                       debugger
+                       if (keyword.toString().trim().length > 1) {
+                           var url = '@Url.Action("SearchLo", "InvF_InventoryOut")';
+                           var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+
+                           var invBUPattern = "";
+                           var selectKho = $('select.mstinventory').eq(0);
+                           var optionSelect = $(selectKho).find('option:selected');
+                           invBUPattern = optionSelect.attr("invBUPattern");
+                           $.ajax({
+                               url: url,
+                               type: 'post',
+                               data: {
+                                   productCode: '@ProductCode',
+                                   productCodeBase: '@ProductCodeBase',
+                                   invBUPattern: invBUPattern,
+                                   productLotNo: keyword,
+                                   __RequestVerificationToken: token
+                               },
+                               cache: false,
+                               dataType: 'json',
+                               async: true,
+                               success: function (objResult) {
+                                   debugger
+                                   var listItems = [];
+                                   if (objResult.Success) {
+                                       debugger
+                                       var listItems = $.map(objResult.LstInv_InventoryBalanceLot, function (data, id) {
+                                           return {
+                                               value: data.ProductLotNo,
+                                               label: data.ProductLotNo,
+                                               //
+                                               data: data
+                                           };
+                                       })
+                                       listItems.push({ label: "", value: "", isShowAll: true })
+                                       response(listItems);
+                                   }
+                                   else {
+                                       if (!commonUtils.isNullOrEmpty(objResult.Messages)) {
+                                           commonUtils.showAlert(objResult.Messages[0]);
+                                       }
+                                       if (!commonUtils.isNullOrEmpty(objResult.Detail)) {
+                                           _showErrorMsg123('Lỗi!', objResult.Detail);
+                                       }
+                                       response(listItems);
+                                   }
+
+                               },
+                               error: function (xmlHttpRequest, textStatus, errorThrown) {
+                                   console.log('some error occured', textStatus, errorThrown);
+                               }
+                           });
+                       }
+                   }
+               },
+               minLength: 1,
+               open: function () {
+                   setTimeout(function () {
+                       $('.ui-autocomplete').css('z-index', 99999999999999);
+                   }, 0);
+               },
+               select: function (event, ui) {
+                   debugger;
+                   var _objProduct = ui.item;
+
+                   var data = _objProduct.data;
+
+
+                   var lstLo = [];
+
+                   //for (var i = 0; i < length; i++) {
+                   //    var Lo = new Object();
+                   //    var optselect = $('#Lo').find("option:selected").eq(i);
+                   //    Lo.ProductLotNo = optselect.attr("ProductLotNo");
+                   //    Lo.ProductionDate = optselect.attr("ProductionDate");
+                   //    Lo.ExpiredDate = optselect.attr("ExpiredDate");
+                   //    Lo.QtyTotalOK = optselect.attr("QtyTotalOK");
+                   //    Lo.InvCode = optselect.attr("InvCode");
+                   //    lstLo.push(Lo);
+                   //}
+                   var Lo = new Object();
+                   Lo.ProductLotNo = data.ProductLotNo;
+                   Lo.ProductionDate = data.ProductionDate;
+                   Lo.ExpiredDate = data.ExpiredDate;
+                   Lo.QtyTotalOK = data.QtyTotalOK;
+                   Lo.InvCode = data.InvCode;
+                       lstLo.push(Lo);
+
+
+
+                   var qtyLo = lstLo.length;
+                   for (var i = 0; i < qtyLo; i++) {
+                       var item = lstLo[i];
+                       var strHtml = getHtmlFromTemplate($('#rowtemplateLo'), {
+                           ProductLotNo: item.ProductLotNo,
+                           ProductionDate: item.ProductionDate,
+                           ExpiredDate: item.ExpiredDate,
+                           QtyTotalOK: item.QtyTotalOK,
+                           InvCode: item.InvCode,
+                           idx: 999999
+                       });
+
+                       var trProductOld = $('#table-tbodyIDLo').find("tr.trdata[ProductLotNo='" + item.ProductLotNo + "'][InvCode='" + item.InvCode + "']");
+                       if (trProductOld.length > 0) {
+                           trProductOld.replaceWith(strHtml);
+                       }
+                       else {
+                           $('#table-tbodyIDLo').append(strHtml);
+                       }
+                       $('.qtyout').number(true, 2);
+
+                       updateTableTrIdx($('#table-tbodyIDLo tr'), false);
+                   }
+
+
+                   return false;
+
+               }
+           });
+    });
+</script>

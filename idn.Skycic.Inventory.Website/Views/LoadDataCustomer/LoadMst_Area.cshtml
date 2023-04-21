@@ -1,0 +1,28 @@
+﻿@model List<Mst_AreaExt>
+@{
+    //Layout = null;
+    var areaCode = CUtils.StrValue(ViewBag.AreaCode);
+}
+
+<optgroup label="">
+    <option value="">&nbsp;</option>
+    @if (Model != null && Model.Count > 0)
+    {
+        foreach (var item in Model)
+        {
+            var areaCodeCur = CUtils.StrValue(item.AreaCode);
+            //var areaNameCur = CUtils.StrValue(item.AreaName);
+            var areaNameCur = item.HlevelTitle;
+            if (CUtils.IsNullOrEmpty(areaNameCur))
+            {
+                areaNameCur = "";
+            }
+            var areaLevelCur = CUtils.StrValue(item.AreaLevel);
+            <option value="@MvcHtmlString.Create(areaCodeCur)" area-level="@MvcHtmlString.Create(areaLevelCur)" desc="@MvcHtmlString.Create(areaNameCur)" @(areaCodeCur.Equals(areaCode) ? "selected" : "")>@MvcHtmlString.Create(areaNameCur)</option>
+        }
+    }
+</optgroup>
+<option value="ADDDATA">@("Thêm".HtmlItemString("product"))</option>
+
+
+

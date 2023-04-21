@@ -1,0 +1,82 @@
+﻿@model Mst_CustomerSource
+
+@{ 
+    var objMst_CustomerSource = new Mst_CustomerSource();
+    if (Model != null)
+    {
+        objMst_CustomerSource = Model;
+    }
+    var viewType = ViewBag.ViewType as string;
+
+    var disabled = "";
+    if(CUtils.StrValue(viewType).Equals("detail"))
+    {
+        disabled = "disabled-fix";
+    }
+}
+
+<div class="modal-dialog" style="width: 500px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            @if (CUtils.StrValue(viewType).Equals("CREATE"))
+            {
+                <h3 class="modal-title" id="exampleModalLabel">Tạo mới nguồn khách hàng</h3>
+            }
+            else
+            {
+                <h3 class="modal-title" id="exampleModalLabel">Chi tiết nguồn khách hàng</h3>
+            }
+            <a href="javascript:;" onclick="ClosePopup()" class="close" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </a>
+        </div>
+        <div class="modal-body">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "manageFrm" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="row form-group margin-bottom-9 @disabled">
+                    <label for="CustomerSourceName" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Mã nguồn khách hàng".HtmlItemString("customersourcename"))</label>
+                    <div class="col-12 col-sm-8">
+                        <span class="block input-icon input-icon-right">
+                            <input type="text" id="CustomerSourceName" name="CustomerSourceName" class="col-12 CustomerSourceName" value="@CUtils.StrValue(objMst_CustomerSource.CustomerSourceName)" autocomplete="off">
+                            <input type="hidden" id="CustomerSourceCode" name="CustomerSourceCode" class="col-12 CustomerSourceCode" value="@CUtils.StrValue(objMst_CustomerSource.CustomerSourceCode)" autocomplete="off">
+                        </span>
+                    </div>
+                </div>
+
+                <div class="row form-group margin-bottom-9 @disabled">
+                    <label for="CustomerSourceDesc" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Tên nguồn khách hàng".HtmlItemString("customersourcedesc"))</label>
+                    <div class="col-12 col-sm-8">
+                        <span class="block input-icon input-icon-right">
+                            <input type="text" id="CustomerSourceDesc" name="CustomerSourceDesc" class="col-12" value="@CUtils.StrValue(objMst_CustomerSource.CustomerSourceDesc)" autocomplete="off">
+                        </span>
+                    </div>
+                </div>
+                if(CUtils.StrValue(viewType).Equals("edit") || CUtils.StrValue(viewType).Equals("detail"))
+                {
+                    <div class="row form-group margin-bottom-9 @disabled">
+                    <label for="FlagActive" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Trạng thái".HtmlItemString("flagactive"))</label>
+                    <div class="col-12 col-sm-8">
+                        <span class="block input-icon input-icon-right">
+                            <select type="text" id="FlagActive" name="FlagActive" class="col-12 FlagActive">
+                                <option value="1" @(CUtils.StrValue(objMst_CustomerSource.FlagActive).Equals(Client_Flag.Active) ? "selected" : "")>Active</option>
+                                <option value="0" @(CUtils.StrValue(objMst_CustomerSource.FlagActive).Equals(Client_Flag.Inactive) ? "selected" : "")>Inactive</option>
+                            </select>
+                        </span>
+                    </div>
+                </div>
+                }
+            }
+        </div>
+        <div class="modal-footer">
+            @if (CUtils.StrValue(viewType).Equals("edit"))
+            {
+                @RenderItemFormat("BTN_LUU_NGUON_KH", "<a href=\"javascript:void(0);\" class=\"btn mybtn-Button\" onclick=\"SaveData('0')\" id=\"btnCreate\" style=\"padding-left: 10px!important; padding-right: 10px!important; font-size: 16px; font-weight: 500;\">Lưu</a>", "", "")
+            }
+            else if (CUtils.StrValue(viewType).Equals("create"))
+            {
+                @RenderItemFormat("BTN_LUU_NGUON_KH", "<a href=\"javascript:void(0);\" class=\"btn mybtn-Button\" onclick=\"SaveData('1')\" id=\"btnCreate\" style=\"padding-left: 10px!important; padding-right: 10px!important; font-size: 16px; font-weight: 500;\">Lưu</a>", "", "")
+            }
+        </div>
+    </div>
+</div>

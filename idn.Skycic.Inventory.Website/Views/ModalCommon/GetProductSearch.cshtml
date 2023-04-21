@@ -1,0 +1,274 @@
+﻿@model List<Mst_ProductUI>
+<div class="modal-dialog" style="width: 700px; max-width: 700px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel"><b>Tìm kiếm hàng hóa không qua đơn hàng</b></h2>
+            <a href="javascript:;" onclick="ClosePopupProduct()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body" style="">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupProduct" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="col-xs-10">
+                    <div class="form-group margin-bottom-5">
+                        <label for="ParentCode" class="col-xs-3 col-sm-3 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tìm hàng hóa ")</label>
+                        <div class="col-xs-3 col-sm-4">
+                            <input class="col-md-12" placeholder="Nhập mã/tên hàng hóa" style="height: 30px" id="productkey" value="@(Request["productkey"] == null ? "" : Request["productkey"])" />
+                        </div>
+                        <div class="col-xs-2">
+                            <a href="javascript:void(0);" class="btn btn-nc-button" id="btnSave" onclick="SearchProduct();">Tìm kiếm</a>
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+                <div style="width: 100%; float: left;">
+                    <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                        <thead>
+                            <tr class="trthead">
+                                <th class="text-center cell-50">
+                                </th>
+                                <th fieldId="ProductCode" sorttype="T" fieldName="Mã hàng hóa" fieldActive="0" class="text-left cell-150">
+                                    @("Mã hàng hóa".HtmlItemString("productcode"))
+                                </th>
+                                <th fieldId="ProductName" sorttype="T" fieldName="Tên hàng hóa" fieldActive="0" class="text-left cell-150">
+                                    @("Tên hàng hóa".HtmlItemString("inventory"))
+                                </th>
+                                <th fieldId="UnitCode" sorttype="T" fieldName="Mã kho cha" fieldActive="0" class="text-left cell-150">
+                                    @("Đơn vị".HtmlItemString("unitcode"))
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                    <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                        <tbody id="table-tbodyIDProduct">
+                            @{
+                                if (Model != null && Model.Count != 0)
+                                {
+                                    var idx = 0;
+                                    foreach (var it in Model)
+                                    {
+                            <tr class="data-item trdata" idx="@idx">
+                                <input type="hidden" name="Lst_Mst_Product[@idx].ProductCode" value="@(it.ProductCode == null ? "" : it.ProductCode)" />
+                                <input type="hidden" name="Lst_Mst_Product[@idx].ProductCodeBase" value="@(it.ProductCodeBase == null ? "" : it.ProductCodeBase)" />
+                                <input type="hidden" name="Lst_Mst_Product[@idx].ProductCodeRoot" value="@(it.ProductCodeRoot == null ? "" : it.ProductCodeRoot)" />
+                                <input type="hidden" name="Lst_Mst_Product[@idx].ValConvert" value="@(it.ValConvert == null ? "" : it.ValConvert)" />
+                                <input type="hidden" name="Lst_Mst_Product[@idx].ProductCodeUser" value="@(it.ProductCodeUser == null ? "" : it.ProductCodeUser)" />
+                                <input type="hidden" name="Lst_Mst_Product[@idx].ProductName" value="@(it.ProductName == null ? "" : it.ProductName)" />
+                                <input type="hidden" name="Lst_Mst_Product[@idx].UnitCode" value="@(it.UnitCode == null ? "" : it.UnitCode)" />
+                                <input type="hidden" name="Lst_Mst_Product[@idx].SellPrice" value="@(it.SellPrice == null ? "" : it.SellPrice)" />
+                                <input type="hidden" name="Lst_Mst_Product[@idx].QtyTotalOK" value="@(it.QtyTotalOK == null ? "0" : it.QtyTotalOK)" />
+                                <input type="hidden" name="Lst_Mst_Product[@idx].DiscountPrice" value="@(it.DiscountPrice == null ? "0" : it.DiscountPrice)" />
+                                <input type="hidden" name="Lst_Mst_Product[@idx].InvCode" value="@(it.InvCode == null ? "" : it.InvCode)" />
+                                <input type="hidden" name="Lst_Mst_Product[@idx].FlagCombo" value="@(it.FlagCombo == null ? "" : it.FlagCombo)" />
+                                <input type="hidden" name="Lst_Mst_Product[@idx].FlagSerial" value="@(it.FlagSerial == null ? "" : it.FlagSerial)" />
+                                <input type="hidden" name="Lst_Mst_Product[@idx].FlagLo" value="@(it.FlagLo == null ? "" : it.FlagLo)" />
+                                <input type="hidden" name="Lst_Mst_Product[@idx].ValConvert" value="@(it.ValConvert == null ? "" : it.ValConvert)" />
+                                <input type="hidden" name="Lst_Mst_Product[@idx].UPOutput" value="@(it.SellPrice == null ? "" : it.SellPrice)" />
+                                <td fieldId="CONTROL" fieldActive="0" class="text-center cell-50 action-buttons">
+                                    <input type="checkbox" class="checkProduct" />
+                                </td>
+                                <td fieldActive="ProductCode" class="text-left cell-150">
+                                    @(it.ProductCodeUser == null ? "" : it.ProductCodeUser)
+                                </td>
+                                <td fieldId="ProductName" fieldActive="0" class="text-left cell-150">
+                                    @(it.ProductName == null ? "" : it.ProductName)
+                                </td>
+                                <td fieldId="UnitCode" fieldActive="0" class="text-left cell-150">
+                                    @(it.UnitCode == null ? "" : it.UnitCode)
+                                </td>
+                            </tr>
+                                        idx++;
+                                    }
+
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="SelectProduct()" style="float: right;font-size: 13px;">Chọn</a>
+            @*<a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="SaveProduct()" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i>Lưu</a>*@
+        </div>
+    </div>
+</div>
+
+<script>
+    function SelectProduct() {
+        debugger;
+        //GetProductSearch.cshtml
+        var length = $("tbody#table-tbodyIDProduct tr.trdata input:checked").length;
+        if (length == 0) {
+            alert("Không có hàng hóa nào được chọn");
+            return;
+        }
+        $("tbody#table-tbodyIDProduct tr.trdata input:checked").each(function () {
+            debugger
+            var tr = $(this).parents('tr');
+            var idx = $(tr).attr('idx');
+            var strProductCode = tr.find('input[name="Lst_Mst_Product[' + idx + '].ProductCode"]').val();
+            var strProductCodeBase = tr.find('input[name="Lst_Mst_Product[' + idx + '].ProductCodeBase"]').val();
+            var strProductCodeRoot = tr.find('input[name="Lst_Mst_Product[' + idx + '].ProductCodeRoot"]').val();
+            var strProductCodeUser = tr.find('input[name="Lst_Mst_Product[' + idx + '].ProductCodeUser"]').val();
+            var strValConvert = tr.find('input[name="Lst_Mst_Product[' + idx + '].ValConvert"]').val();
+            var strProductName = tr.find('input[name="Lst_Mst_Product[' + idx + '].ProductName"]').val();
+            var strUnitCodeSP = tr.find('input[name="Lst_Mst_Product[' + idx + '].UnitCode"]').val();
+            var strSellPrice = tr.find('input[name="Lst_Mst_Product[' + idx + '].SellPrice"]').val();
+            var strQtyTotalOK = tr.find('input[name="Lst_Mst_Product[' + idx + '].QtyTotalOK"]').val();
+            var strDiscountPrice = tr.find('input[name="Lst_Mst_Product[' + idx + '].DiscountPrice"]').val();
+            var strInvCode = tr.find('input[name="Lst_Mst_Product[' + idx + '].InvCode"]').val();
+            var strFlagCombo = tr.find('input[name="Lst_Mst_Product[' + idx + '].FlagCombo"]').val();
+            var strFlagSerial = tr.find('input[name="Lst_Mst_Product[' + idx + '].FlagSerial"]').val();
+            var strFlagLo = tr.find('input[name="Lst_Mst_Product[' + idx + '].FlagLo"]').val();
+            var valConvert = tr.find('input[name="Lst_Mst_Product[' + idx + '].ValConvert"]').val();
+            var strUPOuput = tr.find('input[name="Lst_Mst_Product[' + idx + '].UPOutput"]').val();
+            var strSellProduct = 0.0;
+            var showTonKho = "";
+            var checkOrder = $('#FlagXuatTuDH').prop('checked');
+            if (checkOrder == true) {
+                strSellProduct = 0;
+            }
+            else {
+                strSellProduct = strSellPrice;
+            }
+            var ValAmount = 0;
+
+            var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+            var invBUPattern = "";
+            var selectKho = $('select.mstinventory').eq(0);
+            var optionSelect = $(selectKho).find('option:selected');
+            invBUPattern = optionSelect.attr("invBUPattern");
+            var qTy = '1';
+            var DiscountPrice = '0';
+            var dataInput = {
+                productCode: strProductCode,
+                InvBUPattern: invBUPattern,
+                productCodeBase: strProductCodeBase,
+                valconvert: valConvert,
+                Qty: qTy,
+                FlagSerial: strFlagSerial,
+                FlagLo: strFlagLo,
+
+                __RequestVerificationToken: token,
+                    };
+                     $.ajax({
+                        type: 'post',
+                        data: dataInput,
+                        url: '@Url.Action("GetProductExactly", "ModalCommon")',
+                        dataType: 'json',
+                        beforeSend: function () {
+                        }
+                    }).done(function (objResult) {
+                        debugger;
+                        if (objResult.Success) {
+                            debugger
+                            ValAmount = Math.round(parseFloat(qTy) * (parseFloat(objResult.objMST_ProductUI.SellPrice) - parseFloat(DiscountPrice)), 2);
+                            var Lst_InvF_InventoryOutDtl = [];
+
+                            var objInvF_InventoryOutDtl = {
+                                ProductCode: strProductCode,
+                                ProductCodeUser: strProductCodeUser,
+                                ProductCodeBase: strProductCodeBase,
+                                ProductCodeRoot: strProductCodeRoot,
+                                ProductName: strProductName,
+                                UnitCode: strUnitCodeSP,
+                                UPOUT: strUPOuput,
+                                QtyTotalOK: objResult.qtytotalok,
+                                UPOUTDesc: DiscountPrice,
+                                InvCodeInActual: objResult.invCodeMax,
+                                Qty: qTy,
+                                ValOUTAfterDesc: ValAmount,
+                                FlagLot: strFlagLo,
+                                FlagSerial: strFlagSerial,
+                                FlagCombo: strFlagCombo,
+                                Remark: '',
+
+
+                            };
+                            Lst_InvF_InventoryOutDtl.push(objInvF_InventoryOutDtl);
+                            var Lst_ProductBase = objResult.Data;
+                            var Lst_PhanBo = objResult.List;
+                            debugger
+                            var ValOUTAfterDesc = 0;
+                            objBase = {
+                                ValOUTAfterDesc: ValOUTAfterDesc,
+                                Qty: qTy
+                            }
+
+
+                            //Lst_ProductBase.map(item => item.objBase);
+                            //for (var i = 0; i < Lst_ProductBase.length; i++) {
+                            //    (Lst_ProductBase[i]).push(objBase);
+                            //}
+                            Lst_ProductBase.map(function (e) {
+                                e.ValOUTAfterDesc = ValOUTAfterDesc;
+                                e.Qty = qTy;
+                                //e.InvCodeInActual = objResult.invCodeMax;
+                            });
+
+                            var objInvF_InventoryOutDtlRender = {
+                                InventoryOutDtl: Lst_InvF_InventoryOutDtl[0],
+                                Lst_ProductBase: Lst_ProductBase,
+                                Lst_PhanBo: Lst_PhanBo,
+                                Lst_PhanBoLot: objResult.List_PhanBoLot,
+                                Lst_PhanBoSerial: objResult.List_PhanBoSerial
+                            };
+
+                            renderInvF_InventoryOutDtl(objInvF_InventoryOutDtlRender);
+                            tongTienHang();
+                            $('#InvCodeOut').prop('disabled', true);
+                            $('#myInput').val('');
+                            commonUtils.setFocus('InvCodeOut');
+                            return false;
+
+
+                        }
+                        else {
+                            if (!commonUtils.isNullOrEmpty(objResult.Detail)) {
+                                _showErrorMsg123('Lỗi!', objResult.Detail);
+                            }
+                        }
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                    }).always(function () {
+                    });
+            //ClosePopupProduct();
+
+        });
+        ClosePopupProduct();
+        $('#InvCodeOut').prop('disabled', true);
+    }
+</script>
+
+<script>
+    function SearchProduct() {
+        var productkey = $('#productkey').val();
+         $.ajax({
+                url: '@Url.Action("GetProductSearch", "ModalCommon")',
+                data: {
+                    productkey: productkey
+                },
+                type: 'post',
+                dataType: 'json',
+                traditional: true,
+                success: function (data) {
+                    if (data.Success) {
+                        $('#ShowPopupProduct').modal({
+                            backdrop: false,
+                            keyboard: true,
+                        });
+                        $("#ShowPopupProduct").html(data.Html);
+                        var display = $("#ShowPopupProduct").css('display');
+                        if (display == "none") {
+                            $("#ShowPopupProduct").show();
+                        }
+                    } else {
+                        showErrorDialog(data.Detail);
+                    }
+                }
+            });
+    }
+</script>

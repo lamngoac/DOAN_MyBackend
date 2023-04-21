@@ -1,0 +1,407 @@
+﻿
+@using System.Diagnostics;
+@model PageInfo<Inv_InventoryCarton>
+@{
+    /**/
+
+
+    Layout = "~/Views/Shared/CoreLayoutIn_Tem.cshtml";
+    var title = "QUẢN LÝ MÃ THÙNG";
+    ViewBag.Title = title;
+    var startCount = 0;
+    var fromdate = ViewBag.FromDate as string;
+    var strStartCount = ViewBag.StartCount as string;
+    if (!CUtils.IsNullOrEmpty(strStartCount))
+    {
+        startCount = Convert.ToInt32(strStartCount);
+    }
+    var offset = ViewBag.Offset;
+    var Orgid = ViewBag.OrgID as string;
+
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+    var showtext = "";
+    if (Model.ItemCount > 0)
+    {
+        var recordstart = (Model.PageIndex) * Model.PageSize + 1;
+        var recordend = (Model.PageIndex + 1) * Model.PageSize;
+        if (recordend > Model.ItemCount)
+        {
+            recordend = Model.ItemCount;
+        }
+        showtext = recordstart + "-" + recordend + " trong số " + Model.ItemCount;
+    }
+}
+<script src="~/Scripts/mine/invoice.js"></script>
+<script src="~/Scripts/mine/download.js"></script>
+
+<div class="row no-margin">
+    <div class="row no-margin">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="panel-group" id="steps">
+                <div class="panel panel-info">
+                    <div class="title" style="display:none">
+                        <p style="vertical-align: bottom">@title</p>
+                    </div>
+                    <div class="panel-body no-padding" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                        @using (Html.BeginForm(null, null, FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            <aside class="col-xs-12 layout-search layout-bot-top-16">
+
+
+                                <input type="hidden" value="search" name="init" id="init" />
+                                <div class="col-xs-11 ">
+                                    <aside class="col-xs-4">
+
+                                        <div class="form-group margin-bottom-9">
+                                            <label for="org" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Tổ chức</label>
+                                            <div class="col-xs-12 col-sm-7">
+                                                <input type="text" id="orgid" name="orgid" class="col-xs-11" value="@Orgid" autocomplete="off" disabled>
+                                            </div>
+                                        </div>
+                                        <div class="form-group margin-bottom-9">
+                                            <label for="qty" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Số lượng</label>
+                                            <div class="col-xs-12 col-sm-7">
+                                                <input type="text" id="qty" name="qty" class="col-xs-11 text-right qtysearch" value="@ViewBag.Qty" autocomplete="off">
+                                            </div>
+                                        </div>
+
+
+                                    </aside>
+                                    <aside class="col-xs-4">
+                                        <div class="form-group margin-bottom-9">
+
+                                            <label for="fromdate" class="col-xs-12 col-sm-5 fromdate control-label no-padding-right font-weight-500 ">Ngày tạo từ</label>
+                                            <div class="col-xs-12 col-sm-6">
+                                                <div class="input-group" id="dtnhdt">
+                                                    <input type="text" id="fromdate" name="fromdate" class="col-xs-12 fromdate" data-date-format="yyyy-mm-dd" value="@MvcHtmlString.Create(fromdate)" autocomplete="off" />
+                                                    <span class="input-group-addon">
+                                                        <i class="far fa-calendar-alt"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group margin-bottom-9">
+                                            <label for="todate" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Đến</label>
+                                            <div class="col-xs-12 col-sm-6">
+                                                <div class="input-group" id="dtnhdd">
+                                                    <input type="text" id="todate" name="todate" class="col-xs-12 todate" data-date-format="yyyy-mm-dd" value="@MvcHtmlString.Create(ViewBag.ToDate)" autocomplete="off" />
+                                                    <span class="input-group-addon">
+                                                        <i class="far fa-calendar-alt"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </aside>
+                                    <aside class="col-xs-4">
+                                        <div class="form-group margin-bottom-9">
+                                            <label for="tt" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Trạng thái in</label>
+                                            <div class="col-xs-12 col-sm-7">
+                                                @{
+                                                    var tt = "";
+                                                    if (!CUtils.IsNullOrEmpty(ViewBag.FlagUsed))
+                                                    {
+                                                        tt = ViewBag.FlagUsed.ToString(CultureInfo.InvariantCulture).Trim();
+                                                    }
+                                                }
+                                                <select id="tt" name="tt" class="col-xs-11">
+                                                    <option value="">Tất cả</option>
+                                                    <option value="0" @(tt == "0" ? "selected" : "")>Chưa in</option>
+                                                    <option value="1" @(tt == "1" ? "selected" : "")>Đã in</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group margin-bottom-9">
+                                            <label for="tt" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Trạng thái nhập kho</label>
+                                            <div class="col-xs-12 col-sm-7">
+                                                @{
+                                                    var ttnk = "";
+
+                                                    if (!CUtils.IsNullOrEmpty(ViewBag.FlagMap))
+                                                    {
+                                                        ttnk = ViewBag.FlagMap.ToString(CultureInfo.InvariantCulture).Trim();
+                                                    }
+                                                }
+                                                <select id="ttnk" name="ttnk" class="col-xs-11">
+                                                    <option value="">Tất cả</option>
+                                                    <option value="0" @(ttnk == "0" ? "selected" : "")>Chưa nhập kho</option>
+                                                    <option value="1" @(ttnk == "1" ? "selected" : "")>Đã nhập kho</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group margin-bottom-9">
+                                            <label for="qr_thung" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Mã QR Thùng</label>
+                                            <div class="col-xs-12 col-sm-7">
+                                                <input type="text" id="qr_thung" name="qr_thung" class="col-xs-11 qr_thung" value="@ViewBag.QR_CanNo" autocomplete="off">
+                                            </div>
+                                        </div>
+                                    </aside>
+
+                                </div>
+                                <div class="col-xs-1">
+                                    <div class="form-group margin-bottom-9">
+                                        <div class="col-xs-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right">
+                                                @RenderItemFormat("BTN_QL_MA_THUNG_TK", "<a class=\"btn font-color mybtn-Button\" onclick=\"Search()\" href=\"javascript:void(0);\" style=\" \"><img class=\"img-button\" src='" + Url.Content("~/Images/search.svg") + "'></a>", "", "")
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </aside>
+                            <div class="col-xs-12 layout-bot-top-16" style="">
+                                @RenderItemFormat("BTN_QL_MA_THUNG_TAO_MOI", "<a class=\"btn btn-nc-button\" onclick=\"ShowPopupCreate('" + Orgid + "')\" href=\"javascript:void(0);\"><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i>Tạo</a>", "", "")
+                                @RenderItemFormat("BTN_QL_MA_THUNG_XUAT_EXCEL", "<a class=\"btn btn-nc-button\" onclick=\"Export()\" href=\"javascript:void(0);\" style=\"box-shadow: 0 2px 4px rgba(0,0,0,.2);color:#057d5a\" title=\"Xuất excel\"><i class=\"fa fa-upload\" aria-hidden=\"true\"></i> Xuất excel</a>", "", "")
+                                <span class="search-bar">
+                                    <input type="text" id="dynamic-table-thead-search" class="quicksearch txtSearchObj" name="search">
+                                    <input type="text" class="quicksearch1 txtSearchObj1" name="search" style="z-index: -1000; height: 0; padding: 0; margin: 0; border: 0">
+                                </span>
+                                @if (!CheckAccess("BTN_QL_MA_THUNG_TK"))
+                                {
+                                    @Html.Partial("Pagination", null, new ViewDataDictionary() { { "PageCur", MvcHtmlString.Create("1") }, { "PageCount", MvcHtmlString.Create(Model.PageCount.ToString()) }, { "recordcount", MvcHtmlString.Create(Model.PageSize.ToString()) }, { "orgid", Request["orgid"] }, { "qty", Request["qty"] }, { "fromdate", Request["fromdate"] }, { "todate", Request["todate"] }, { "tt", Request["tt"] }, { "qr_thung", Request["qr_thung"] }, { "ttnk", Request["ttnk"] }, { "init", Request["init"] }, { "ShowText", showtext } })
+                                }
+                            </div>
+                            <input type="hidden" value="@MvcHtmlString.Create(pageCur)" name="page" id="page" />
+                            <input type="hidden" value="@MvcHtmlString.Create(Model.PageCount.ToString())" name="totalpage" id="totalpage" />
+                        }
+                    </div>
+
+                </div>
+
+                <div class="panel panel-info">
+                    <div class="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                        <aside class="col-xs-12">
+                            <div class="scrollable-horizontal padding-left-0 padding-right-0 div-scrollable" data-size="800" style="padding-top: 0!important;">
+                                <div style="width: 100%; float: left;">
+                                    <table id="dynamic-table" class="table table-bordered table-thead table-cus table-bottom-0">
+                                        <thead>
+
+                                            <tr>
+
+                                                <th class="text-center cell-50">@MvcHtmlString.Create("TT")</th>
+
+                                                <th class="text-center cell-200">
+                                                    @MvcHtmlString.Create("Mã QR Thùng")
+                                                </th>
+                                                <th class="text-center cell-200">
+                                                    @MvcHtmlString.Create("Ngày tạo")
+                                                </th>
+                                                <th class="text-center cell-75">
+                                                    @MvcHtmlString.Create("Trạng thái nhập kho")
+                                                </th>
+                                                <th class="text-center cell-75">
+                                                    @MvcHtmlString.Create("Trạng thái in")
+                                                </th>
+
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                                <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                                    <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody">
+                                        <tbody id="table-tbodyID">
+
+                                            @if (Model != null && Model.DataList != null && Model.DataList.Count > 0)
+                                            {
+                                                var idx = 0;
+
+                                                foreach (var it in Model.DataList)
+                                                {
+                                                    var iindex = startCount + (idx + 1);
+                                                    var status = it.FlagUsed;
+                                                    var createDTimeUTC = CUtils.ReturnDateTimeUtcToLocalTime(CUtils.StrValue(it.LogLUDTimeUTC), Nonsense.DATE_TIME_FORMAT, offset);
+
+                                                    <tr idx="@idx" class="data-item trdata">
+                                                        <td class="text-center cell-50" style="background: #D3EDE4;">@iindex.ToString()</td>
+
+
+                                                        <td class="text-center cell-200">@it.QR_CanNo</td>
+                                                        <td class="text-center cell-200">@createDTimeUTC</td>
+                                                        <td class="text-center cell-75">
+                                                            @if (it.FlagMap.ToString().Equals("0"))
+                                                            {
+                                                                <span>Chưa nhập kho</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span>Đã nhập kho</span>
+                                                            }
+                                                        </td>
+                                                        <td class="text-center cell-75">
+                                                            @if (it.FlagUsed.ToString().Equals("0"))
+                                                            {
+                                                                <span>Chưa in</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span>Đã in</span>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                    idx++;
+                                                }
+
+                                            }
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+                        </aside>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+        </div>
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+<div class="modal fade" id="ImportExcelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Inv_InventoryCarton.js")"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            debugger;
+            //datepicker plugin
+            $('#fromdate, #todate').datepicker({
+                autoclose: true,
+                todayHighlight: true,
+                dateFormat: 'yy-mm-dd'
+
+            })
+                //show datepicker when clicking on the icon
+                .next().on(ace.click_event, function () {
+                    $(this).prev().focus();
+                });
+        });
+        $(document).ready(function () {
+            $('.scrollable-horizontal-esign').each(function () {
+                var $this = $(this);
+                $(this).ace_scroll(
+                    {
+                        horizontal: true,
+                        //styleClass: 'scroll-top',//show the scrollbars on top(default is bottom)
+                        size: $this.attr('data-size') || 6500,
+                        mouseWheelLock: true
+                    }
+                ).css({ 'padding-top': 0 });
+            });
+            $('.scrollable-horizontal-esignsendmail').each(function () {
+                var $this = $(this);
+                $(this).ace_scroll(
+                    {
+                        horizontal: true,
+                        //styleClass: 'scroll-top',//show the scrollbars on top(default is bottom)
+                        size: $this.attr('data-size') || 6500,
+                        mouseWheelLock: true
+                    }
+                ).css({ 'padding-top': 0 });
+            });
+        });
+
+        $('#StartInvoiceNo').number(true, 0);
+        $('#EndInvoiceNo').number(true, 0);
+
+        $('.scrollable').each(function () {
+            var $this = $(this);
+            $(this).ace_scroll({
+                //size: 500,
+                size: $this.attr('data-size') || 1000,
+                mouseWheelLock: true,
+                //styleClass: 'scroll-left scroll-margin scroll-thin scroll-dark scroll-light no-track scroll-visible'
+            });
+        });
+    </script>
+    <script type="text/javascript">
+
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "Inv_InventoryCarton")');
+        function Search()
+        {
+            $('#manageForm').attr('action', '@Url.Action("Index", "Inv_InventoryCarton")').submit();
+        }
+        var _getForm = document.getElementById("manageForm");
+        _getForm.addEventListener('reset', function () {
+            document.getElementById("CanNo").focus()
+        })
+         var objInv_InventoryCarton = new Inv_InventoryCarton();
+
+        var objCommonExcel = new CommonExcel();
+        var objVariablesInit = {
+            Id_FormMain: '',
+            Id_FormImportExcel: 'manageFormImportExcel',
+            Id_Modal: 'ImportExcelModal',
+            Id_FileInput: 'file',
+        };
+
+        var ajaxSettings_Excel = {};
+        ajaxSettings_Excel.Type = 'post';
+        ajaxSettings_Excel.DataType = 'json';
+
+        function ShowPopupCreate(Orgid) {
+            debugger;
+            ajaxSettings_Excel.Url = '@Url.Action("ShowPopupCreate", "Inv_InventoryCarton")';
+            //ajaxSettings_Excel.Check = check;
+
+            objInv_InventoryCarton.ajaxSettingsInit();
+            objInv_InventoryCarton.ajaxSettings = ajaxSettings_Excel;
+            objInv_InventoryCarton.variablesInit(objVariablesInit);
+            objInv_InventoryCarton.ShowPopupCreate(Orgid);
+        }
+
+        function Export() {
+            ajaxSettings_Excel.Url = '@Url.Action("Export", "Inv_InventoryCarton")';
+            debugger;
+            var trArr = $('tbody#table-tbodyID tr.trdata');
+            if (trArr !== null && trArr.length > 0) {
+                var orgid = $('#orgid').val();
+                var qty = $('#qty').val();
+                var fromdate = $('#fromdate').val();
+                var todate = $('#todate').val();
+                var tt = $('#tt').val();
+                var qr_thung = $('#qr_thung').val();
+                var ttnk = $('#ttnk').val();
+
+
+                var ListSearchInput = [
+                    { Key: 'orgid', Value: orgid },
+                    { Key: 'qty', Value: qty },
+                    { Key: 'fromdate', Value: fromdate },
+                    { Key: 'todate', Value: todate },
+                    { Key: 'tt', Value: tt },
+                    { Key: 'qr_thung', Value: qr_thung },
+                    { Key: 'ttnk', Value: ttnk },
+
+                ];
+
+                objCommonExcel.ajaxSettingsInit();
+                objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+                objCommonExcel.exportExcel(ListSearchInput);
+            }
+            else {
+                alert("Lưới dữ liệu trống!");
+                return false;
+            }
+        }
+
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#selectedFile").bind('click', function () {
+                $('#fileBienBan').click();
+            });
+        });
+    </script>
+}
+
+
+
+
+
+
+

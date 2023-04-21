@@ -1,0 +1,121 @@
+﻿@model List<Sys_Object>
+@{
+    var selectedList = ViewBag.SelectedList as List<string>;
+    if (selectedList == null || selectedList.Count == 0)
+    {
+        selectedList = new List<string>();
+    }
+    var objectCode = ViewBag.ObjectCode as string;
+    var totalRow = 0;
+    if (Model != null && Model.Count > 0)
+    {
+        totalRow = Model.Count;
+    }
+}
+
+<style>
+    .modal-dialog-selected {
+        width: 800px !important;
+        max-width: 800px !important;
+    }
+</style>
+<div class="modal-dialog modal-dialog-selected">
+    @using (Html.BeginForm(null, null, FormMethod.Get, new { id = "manageFormPopupOfSysGroup", @class = "form-horizontal" }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="modal-content" style="height: auto">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Gán FUNC vào Menu: @MvcHtmlString.Create(objectCode)</b></h2>
+                <a href="javascript:void();" onclick="ClosePopup()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                <div class="container-fluid" style="padding-left: 0; padding-right: 0;">
+                    <div class="row">
+                        <div class="no-padding-left-right" style="width: 100%;">
+                            <div style="margin-top: 5px;">
+                                <div class="panel panel-info" style="height: 430px; margin-bottom: 5px;">
+                                    <div class="panel-heading">
+                                        <h1 class="panel-title">
+                                            @MvcHtmlString.Create("Danh sách Menu - Button")
+                                        </h1>
+                                    </div>
+                                    <div class="panel-body" id="panel-body" style="padding-bottom: 5px;">
+                                        @Html.Partial("_SearchTablePopup", new ViewDataDictionary() { { "TotalRow", totalRow.ToString().Trim() } })
+                                        <div class="scrollable-horizontal-popup padding-left-0 padding-right-0 div-scrollable" data-size="760" style="padding-top: 0!important;max-height: 300px;overflow-x:hidden;">
+                                            <div style="width: 100%; float: left;">
+                                                <input type="hidden" name="ObjectCodePU" id="ObjectCodePU" value="@objectCode" />
+                                                <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center cell-30">
+                                                                <label class="pos-rel">
+                                                                    <input type="checkbox" class="cl-check" onclick="commonUtils.checkAll_CheckBox(this,'#table-tbodyID-popup input');" />
+                                                                </label>
+                                                            </th>
+                                                            <th class="text-center cell-200">
+                                                                Object Code
+                                                            </th>
+                                                            <th class="text-center cell-250">
+                                                                Object Name
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                </table>
+                                            </div>
+                                            <div class="scrollable-popup" style="width: 100%; float: left;">
+                                                <table id="dynamic-table2" class="table table-striped table-bordered table-hover table-tbody">
+                                                    <tbody id="table-tbodyID-popup">
+                                                        @if (Model != null && Model.Count > 0)
+                                                        {
+                                                            var idx = 0;
+                                                            var checkuser = "";
+                                                            foreach (var item in Model)
+                                                            {
+                                                                checkuser = "";
+                                                                if (selectedList.Contains(item.ObjectCode))
+                                                                {
+                                                                    checkuser = "checked";
+                                                                }
+                                                                <tr class="data-item trdata" idx="@idx">
+                                                                    <input type="hidden" name="ListSysObject[@idx].ObjectCode" value="@MvcHtmlString.Create(item.ObjectCode)" />
+                                                                    <td class="text-center cell-30">
+                                                                        <label class="pos-rel">
+                                                                            <input type="checkbox" class="cl-check" name="ckbpopup" onclick="commonUtils.checkBox(this)" @checkuser />
+                                                                        </label>
+                                                                    </td>
+                                                                    <td class="text-left cell-200">
+                                                                        @MvcHtmlString.Create(item.ObjectCode)
+                                                                    </td>
+                                                                    <td class="text-left cell-250">
+                                                                        @MvcHtmlString.Create(item.ObjectName)
+                                                                    </td>
+                                                                </tr>
+                                                                idx++;
+                                                            }
+                                                        }
+
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                @*<a class="btn mybtn-Button" href="javascript:void();" onclick="SaveData()" style="margin-left: 10px;">
+                        Cập nhật
+                    </a>*@
+                @RenderItemFormat("BTN_LUU_QUYEN", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-left: 10px;\" onclick=\"SaveData();\">Lưu</a>", "", "")
+            </div>
+        </div>
+    }
+</div>
+
+<script type="text/javascript">
+
+
+</script>

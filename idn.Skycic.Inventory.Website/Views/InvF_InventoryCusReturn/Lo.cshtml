@@ -1,0 +1,181 @@
+﻿@{ 
+    var listInvCodeIn = ViewBag.ListInvCodeIn as List<Mst_Inventory>;
+    var listMst_Inventory = ViewBag.ListMst_Inventory as List<Mst_Inventory>;
+    if (listMst_Inventory == null || listMst_Inventory.Count == 0)
+    {
+        listMst_Inventory = new List<Mst_Inventory>();
+    }
+    listMst_Inventory.Insert(0, new Mst_Inventory()
+    {
+        InvCode = "",
+        InvName = "--Chọn vị trí--",
+    });
+    var listInvF_InventoryCusReturnInstLot = ViewBag.ListInvF_InventoryCusReturnInstLot as List<InvF_InventoryCusReturnInstLot>;
+    var invCodeMax = ViewBag.InvCodeMax as string;
+    var iF_InvCusReturnStatus = CUtils.StrValue(ViewBag.If_InvCusReturnStatus);
+    var viewType = CUtils.StrValue(ViewBag.ViewType);
+}
+
+<div class="modal-dialog" style="width: 815px; max-width: 815px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel"><b>Danh sách Lô</b></h2>
+            <a href="javascript:;" onclick="closePopupLo()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+
+        <div class="modal-body" style="">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupLo" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class=" col-xs-12" style="float: left;">
+                    <input type="hidden" class="ProductCode_Popup_InvCodeInActual_LOT" value="@MvcHtmlString.Create(CUtils.StrValue(ViewBag.ProductCode))" />
+                    <input type="hidden" class="ProductCodeRoot_Popup_InvCodeInActual_LOT" value="@MvcHtmlString.Create(CUtils.StrValue(ViewBag.ProductCodeRoot))" />
+                    @*@if (!viewType.Equals("detail") && iF_InvCusReturnStatus.Equals(Client_Status.PENDING))
+                    {
+                        <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="product_InvF_InventoryCusReturnInstLot_AddNewRow()" style="float: left;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Thêm</a>
+                        <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="product_InvF_InventoryCusReturnInstLot_Save()" style="float: left;font-size: 13px;margin-left: 10px"><i class="fa fa-save" aria-hidden="true"></i> OK</a>
+                    }*@
+                </div>
+                <div class=" col-xs-12" style="float: left;">
+                    <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+                        <div style="width: 100%; float: left;">
+                            <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                                <thead>
+                                    <tr class="trthead">
+                                        <th class="text-center cell-50 action-buttons">
+                                        </th>
+                                        <th class="text-center cell-150">
+                                            @("Số lô".HtmlItemString("inventory"))
+                                        </th>
+                                        <th class="text-center cell-100">
+                                            @("Ngày sản xuất".HtmlItemString("inventory"))
+                                        </th>
+                                        <th class="text-center cell-100">
+                                            @("Ngày hết hạn".HtmlItemString("inventory"))
+                                        </th>
+                                        <th class="text-center cell-150">
+                                            @("Số lượng".HtmlItemString("inventory"))
+                                        </th>
+                                        <th class="text-left cell-150">
+                                            @("Vị trí".HtmlItemString("inventory"))
+                                        </th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                            <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                                <tbody id="table-tbodyIDLo"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12" style="float: left;">
+                    @if (!viewType.Equals("detail") && iF_InvCusReturnStatus.Equals(Client_Status.PENDING))
+                    {
+                        <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="product_InvF_InventoryCusReturnInstLot_AddNewRow()" style="float: left;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Thêm</a>
+                    }
+                </div>
+            }
+
+
+        </div>
+        <div class="modal-footer" style="display:flex; align-items:center; justify-content: center">
+            @if (!viewType.Equals("detail") && iF_InvCusReturnStatus.Equals(Client_Status.PENDING))
+                {
+                    <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="product_InvF_InventoryCusReturnInstLot_Save()" style="float: left;font-size: 13px;margin-left: 10px"><i class="fa fa-save" aria-hidden="true"></i> Lưu</a>
+                }
+            <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="closePopupLo()" style="float: left;font-size: 13px;margin-left: 10px"> Đóng</a>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    $(document).ready(function () {
+        $('select.InvCodeInActual_Lot').select2();
+        if ($('.numberQty').length) {
+            //$('.numberQty').number(true, 2);
+    format_Number();
+        }
+
+        $('.DateInput').datepicker({
+            autoclose: true,
+            format: 'yyyy-mm-dd'
+        })
+    });
+    
+</script>
+<script type="text/javascript">
+    function format_Number(){
+        var tableName = 'InvF_InventoryCusReturn';
+        var qtyFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'Qty');
+        $('.numberQty').number(true, qtyFormat);
+    }
+
+</script>
+
+<script type="text/javascript">
+    var Lst_Mst_Inventory_LOT = []; @*Danh sách vị trí kho*@
+    @if(listMst_Inventory != null && listMst_Inventory.Count > 0)
+    {
+        foreach(var item in listMst_Inventory)
+        {
+            var invCode = CUtils.StrValue(item.InvCode);
+            var invName = CUtils.StrValue(item.InvName);
+            <text>
+                var objMst_Inventory = {
+                    InvCode: '@invCode',
+                    InvName: '@invName',
+                };
+            Lst_Mst_Inventory_LOT.push(objMst_Inventory);
+            </text>
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    var ListInvF_InventoryCusReturnInstLot = [];
+    @if(listInvF_InventoryCusReturnInstLot != null && listInvF_InventoryCusReturnInstLot.Count > 0)
+    {
+        foreach(var item in listInvF_InventoryCusReturnInstLot)
+        {
+            var invCodeInActual = CUtils.StrValue(item.InvCodeInActual);
+            var productLotNo = CUtils.StrValue(item.ProductLotNo);
+            var productionDate = CUtils.StrValue(item.ProductionDate);
+            var expiredDate = CUtils.StrValue(item.ExpiredDate);
+            var qty = CUtils.StrValue(item.Qty);
+            if (CUtils.IsNullOrEmpty(qty))
+            {
+                qty = "0";
+            }
+            <text>
+                var objProduct_InvF_InventoryCusReturnInstLot = {
+                    InvCodeInActual: '@invCodeInActual',
+                    ProductLotNo: '@productLotNo',
+                    ProductionDate: '@productionDate',
+                    ExpiredDate: '@expiredDate',
+                    Qty: '@qty',
+                }
+                ListInvF_InventoryCusReturnInstLot.push(objProduct_InvF_InventoryCusReturnInstLot);
+            </text>
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        @*Add danh sách LOT vào Popup*@
+        if (ListInvF_InventoryCusReturnInstLot !== undefined && ListInvF_InventoryCusReturnInstLot !== null && ListInvF_InventoryCusReturnInstLot.length > 0) {
+            for (var i = 0; i < ListInvF_InventoryCusReturnInstLot.length; i++) {
+                var objProduct_InvF_InventoryCusReturnInstLot_AddRow = {
+                    Product_InvF_InventoryCusReturnInstLot: ListInvF_InventoryCusReturnInstLot[i],
+                    Lst_Mst_Inventory: Lst_Mst_Inventory_LOT,
+                };
+
+                renderProductInvFInventoryCusReturnInstLot(objProduct_InvF_InventoryCusReturnInstLot_AddRow);
+            }
+        }
+    });
+</script>

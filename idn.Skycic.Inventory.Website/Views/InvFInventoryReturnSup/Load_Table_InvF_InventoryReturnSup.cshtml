@@ -1,0 +1,486 @@
+﻿
+@{
+    ViewBag.Title = "Load_Table_InvF_InventoryReturnSup";
+
+
+    var init = CUtils.StrValue(ViewBag.init);
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+    var pageCount = CUtils.StrValue(ViewBag.PageCount);
+    var lst_Mst_ProductUI = new List<Mst_ProductUI>();
+    if (ViewBag.lst_Mst_ProductUI != null)
+    {
+        lst_Mst_ProductUI = ViewBag.lst_Mst_ProductUI as List<Mst_ProductUI>;
+    }
+
+
+    //them
+
+    string viewType = CUtils.StrValue(ViewBag.ViewType);
+    var userState = ViewBag.UserState as UserState;
+    var Lst_InvF_InventoryReturnSupInstLot = new List<InvF_InventoryReturnSupInstLot>();
+    if (ViewBag.Lst_InvF_InventoryReturnSupInstLot != null)
+    {
+        Lst_InvF_InventoryReturnSupInstLot = ViewBag.Lst_InvF_InventoryReturnSupInstLot;
+    }
+
+    var Lst_InvF_InventoryReturnSupInstSerial = new List<InvF_InventoryReturnSupInstSerial>();
+    if (ViewBag.Lst_InvF_InventoryReturnSupInstSerial != null)
+    {
+        Lst_InvF_InventoryReturnSupInstSerial = ViewBag.Lst_InvF_InventoryReturnSupInstSerial;
+    }
+
+    var Lst_ProductUI = new List<Mst_ProductUI>();
+    if (ViewBag.lst_InvF_InventoryReturnSupDtl != null)
+    {
+        Lst_ProductUI = ViewBag.lst_InvF_InventoryReturnSupDtl;
+    }
+
+    var Lst_InvF_InventoryReturnSupDtlChild = new List<InvF_InventoryReturnSupDtl>();
+    if (ViewBag.Lst_InvF_InventoryReturnSupDtlChild != null)
+    {
+        Lst_InvF_InventoryReturnSupDtlChild = ViewBag.Lst_InvF_InventoryReturnSupDtlChild;
+    }
+
+    foreach (var item in Lst_ProductUI)
+    {
+        var productCodecur = item.ProductCode;
+        var listUI = item.lstUnitCodeUIByProduct;
+        var listobjUI = listUI.Where(it => !CUtils.IsNullOrEmpty(it.ProductCode) && CUtils.StrValue(it.ProductCode).Equals(productCodecur)).ToList();
+        item.QtyTotalOK = listobjUI[0].QtyTotalOK;
+    }
+
+    var flagActive = "0";
+    var flagdisplaynone = "";
+
+    if (userState.RT_Mst_Sys_Config != null && userState.RT_Mst_Sys_Config.Lst_Mst_Sys_Config != null && userState.RT_Mst_Sys_Config.Lst_Mst_Sys_Config.Count > 0)
+    {
+        foreach (var item in userState.RT_Mst_Sys_Config.Lst_Mst_Sys_Config)
+        {
+            if (item.SysConfigID.Equals("IF_InvReturnSup"))
+            {
+                flagActive = CUtils.StrValue(item.FlagActive);
+            }
+        }
+    }
+
+    if (flagActive.Equals("0"))
+    {
+        flagdisplaynone = "display-none";
+    }
+
+
+
+}
+
+
+<div class="panel-body row no-margin no-padding" style="padding-left: 0px; padding-right: 0px;">
+    <div class="col-12 padding-left-0 padding-right-0 div-scrollable" style="padding-top: 0!important;">
+        <div style="width: 100%; float: left;">
+            <div class="row no-margin margin-bottom-9" style="margin-top: 9px!important;">
+                <div class="autocomplete row col-6">
+                    @if (!viewType.Equals("detail"))
+                    {
+                        <label class="control-label" style="margin-right: 20px;">
+                            @("Hàng hóa".HtmlItemString("invf_inventoryin"))
+                        </label>
+                        <div id="divPrdInvIn" style="display: none" class="col-8">
+                            <span class="block input-icon input-icon-right">
+                                <select id="invinProductCode" name="invinProductCode" showpopup-control-searchdata="#ShowPopupProductInInvInSearch" class="col-12" onchange="AddProductToList(this);"></select>
+                            </span>
+                        </div>
+                        <input class="col-8" id="myInput" type="text" name="myInput" placeholder="Quét mã vạch hoặc nhập mã, tên để tìm kiếm">
+                        <input class="col-8" style="display: none" id="quetmavach" type="text" name="quetmavach" placeholder="Quét mã vạch">
+                        <a href="javascript:void(0);" class="btn btn-nc-button" style="margin-left: 10px" id="btnScan" onclick="StartScan()" title="Quét"><i class="fa fa-qrcode" aria-hidden="true"></i></a>
+                        <a class="btn font-color btn-nc-button" data-toggle="dropdown" aria-expanded="false" style="font-size: 13px; position: relative;"><i class="fas fa-ellipsis-h"></i></a>
+                        <ul class="dropdown-menu dropdown-action" role="menu" style="">
+                            <li style="padding: 5px">Export template</li>
+                            <li style="padding: 5px">
+                                <a class="row no-margin col-12 no-padding" onclick="ExportTemplate('@Url.Action("ExportTemplateSerial", "ModalCommon")')" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" aria-hidden="true"></i> Xuất Excel Template Serial</a>
+                            </li>
+                            <li style="padding: 5px">
+                                <a class="row no-margin col-12 no-padding" onclick="ExportTemplate('@Url.Action("ExportTemplateLo1", "ModalCommon")')" data-toggle="modal" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" aria-hidden="true"></i> Xuất Excel Template lô</a>
+                            </li>
+                            @*<li style="padding: 5px">
+                                    <a class="row no-margin col-12 no-padding" onclick="ExportTemplate('@Url.Action("ExportTemplateQR", "ModalCommon")')" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" aria-hidden="true"></i> Xuất Excel xác thực</a>
+                                </li>*@
+                            <li style="padding: 5px">
+                                <a class="row no-margin col-12 no-padding" onclick="ExportTemplate('@Url.Action("ExportTemplateProduct", "InvFInventoryReturnSup")')" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" aria-hidden="true"></i> Xuất Excel Template hàng hóa</a>
+                            </li>
+                            <li style="padding: 5px">Import excel</li>
+                            <li style="padding: 5px">
+                                <a class="row no-margin col-12 no-padding" onclick="ImportSerial()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-upload" aria-hidden="true"></i> Nhập Excel Serial</a>
+                            </li>
+                            <li style="padding: 5px">
+                                <a class="row no-margin col-12 no-padding" onclick="ImportLot()" data-toggle="modal" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-upload" aria-hidden="true"></i> Nhập Excel lô</a>
+                            </li>
+                            @*<li style="padding: 5px">
+                                    <a class="row no-margin col-12 no-padding" onclick="ImportQR('@Url.Action("ImportQR", "ModalCommon")')" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-upload" aria-hidden="true"></i> Nhập Excel xác thực</a>
+                                </li>*@
+                            <li style="padding: 5px">
+                                <a class="row no-margin col-12 no-padding" onclick="ImportProducts()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-upload" style="margin-right: 7px" aria-hidden="true"></i> Nhập hàng hóa</a>
+                            </li>
+                        </ul>
+                    }
+
+                </div>
+                <div class="col-6 text-right" style="margin-top: 9px;padding-right:50px">
+                    <span style="font-weight: bold">Tổng: </span><span id="spanTotalPrd" style="font-weight: bold">0</span>
+                </div>
+            </div>
+            <table id="dynamic-table-thead" class="table table-striped table-bordered table-hover table-cus table-bottom-0 no-margin">
+                <thead>
+                    <tr class="trthead">
+                        <th class="text-center cell-50">
+                        </th>
+                        <th fieldId="ProductCode" sorttype="T" fieldName="Mã hàng hóa" fieldActive="0" class="text-left cell-100">
+                            @("Mã hàng hóa".HtmlItemString("productcode"))
+                        </th>
+                        <th fieldId="INVNAME" sorttype="T" fieldName="Tên hàng hóa (TV)" fieldActive="0" class="text-left cell-150">
+                            @("Tên hàng hóa (TV)".HtmlItemString(""))
+                        </th>
+                        <th fieldId="INVCODEPARENT" sorttype="T" fieldName="Đơn vị tính" fieldActive="0" class="text-left cell-100">
+                            @("Đơn vị tính".HtmlItemString(""))
+                        </th>
+                        <th fieldId="INVADDRESS" sorttype="T" fieldName="Tồn kho" fieldActive="0" class="text-left cell-100">
+                            @("Tồn kho".HtmlItemString(""))
+                        </th>
+                        <th fieldId="" sorttype="T" fieldName="Số lượng" fieldActive="0" class="text-left cell-100">
+                            @("Số lượng".HtmlItemString(""))
+                        </th>
+                        <th fieldId="INVTYPE" sorttype="T" fieldName="Vị trí xuất" fieldActive="0" class="text-left cell-200">
+                            @("Vị trí xuất".HtmlItemString(""))
+                        </th>
+                        <th fieldId="INVTYPE" sorttype="T" fieldName="Giá nhập" fieldActive="0" class="text-left cell-100 @flagdisplaynone">
+                            @("Giá nhập".HtmlItemString(""))
+                        </th>
+                        <th fieldId="INVTYPE" sorttype="T" fieldName="Giá trả hàng" fieldActive="0" class="text-left cell-100 @flagdisplaynone">
+                            @("Giá trả hàng".HtmlItemString(""))
+                        </th>
+                        <th fieldId="INVTYPE" sorttype="T" fieldName="Thành tiền" fieldActive="0" class="text-left cell-150 @flagdisplaynone">
+                            @("Thành tiền".HtmlItemString(""))
+                        </th>
+                        <th fieldId="INVTYPE" sorttype="T" fieldName="Ghi chú" fieldActive="0" class="text-left cell-150">
+                            @("Ghi chú".HtmlItemString(""))
+                        </th>
+                    </tr>
+                </thead>
+            </table>
+            <div id="" class="scrollable" style="width: 100%; float: left">
+                <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody">
+                    <tbody id="table-tbodyID" class="GetPrd"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@*Thông tin chi tiết LOT của hàng hóa*@
+<table class="display-none">
+    <tbody id="table-detailLot"></tbody>
+</table>
+
+
+@*Thông tin chi tiết Serial của hàng hóa*@
+<table class="display-none">
+    <tbody id="table-detailSerial"></tbody>
+</table>
+
+@*Thông tin số lượng hàng hóa theo vị trí (Hiện tại mới thấy hàng hóa "thường" sử dụng)*@
+<table class="display-none">
+    <tbody id="table-detailInvCodeReturnSupActual"></tbody>
+</table>
+
+@*Thông tin số lượng hàng hóa theo vị trí (khi nhập excell)*@
+
+<table class="display-none">
+    <tbody id="table-productImportExcell"></tbody>
+</table>
+
+
+
+<script type="text/javascript">
+    var objLotAutoSearch = {};
+    var listLotAutoSearch = [];
+    var listLot = [];
+
+    @if(Lst_InvF_InventoryReturnSupInstLot != null && Lst_InvF_InventoryReturnSupInstLot.Count > 0)
+    {
+        foreach(var item in Lst_InvF_InventoryReturnSupInstLot)
+        {
+            <text>
+    debugger
+            objLotAutoSearch = {};
+    listLotAutoSearch = [];
+    objLotAutoSearch.InvCodeInActual = '@CUtils.StrValue(item.InvCodeOutActual)';
+    objLotAutoSearch.ProductCode = '@CUtils.StrValue(item.ProductCode)';
+    objLotAutoSearch.ProductLotNo = '@CUtils.StrValue(item.ProductLotNo)';
+    objLotAutoSearch.ProductionDate = '';
+    objLotAutoSearch.ExpiredDate = '';
+    objLotAutoSearch.Qty = '@CUtils.StrValue(item.Qty)';
+    objLotAutoSearch.QtyTotalOK = '';
+    listLotAutoSearch.push(objLotAutoSearch);
+
+    var objLot = {
+        Product_InvF_InventoryOutInstLot: objLotAutoSearch,
+        Lst_Mst_Inventory: listLotAutoSearch
+    };
+    listLot.push(objLot);
+
+             </text>
+        }
+    }
+
+    //$(document).ready(function () {
+    //    debugger
+    //    if (listLot != null && listLot !== undefined && listLot.length > 0) {
+    //        for (var i = 0; i < listLot.length; i++) {
+    //            renderProductInvFInventoryOutInstLot(listLot[i]);
+    //        }
+    //    }
+    //});
+</script>
+
+<script type="text/javascript">
+    debugger
+    var objSerialAutoSearch = {};
+    var listSerialAutoSearch = [];
+
+    var listSerial = [];
+
+    @if(Lst_InvF_InventoryReturnSupInstSerial != null && Lst_InvF_InventoryReturnSupInstSerial.Count > 0)
+    {
+        foreach(var item in Lst_InvF_InventoryReturnSupInstSerial)
+        {
+            <text>
+    objSerialAutoSearch = {};
+    listSerialAutoSearch = [];
+    objSerialAutoSearch.InvCodeInActual = '@CUtils.StrValue(item.InvCodeOutActual)';
+    objSerialAutoSearch.ProductCode = '@CUtils.StrValue(item.ProductCode)';
+    objSerialAutoSearch.SerialNo = '@CUtils.StrValue(item.SerialNo)';
+    listSerialAutoSearch.push(objSerialAutoSearch);
+
+    var objSerial = {
+        Product_InvF_InventoryInInstSerial: objSerialAutoSearch,
+        Lst_Mst_Inventory: listSerialAutoSearch
+    };
+    listSerial.push(objSerial);
+
+    </text>
+
+        }
+    }
+
+
+</script>
+
+<script>
+    var objProductAutoSearch = {};
+    var listProductAutoSearch = [];
+
+    var listInventoryDtlAutoSearch = [];
+
+    var listProductAutoSearchBase = [];
+    var objProductAutoSearchBase = {};
+
+    var List_PrdBase = [];
+
+
+    @if(Lst_ProductUI != null && Lst_ProductUI.Count > 0)
+    {
+        foreach(var item in Lst_ProductUI)
+        {
+            var QtyTotalOK = "";
+            if (!CUtils.IsNullOrEmpty(item.QtyTotalOK))
+            {
+                QtyTotalOK = CUtils.StrValue(item.QtyTotalOK);
+            }
+            else
+            {
+                QtyTotalOK = "0";
+            }
+            <text>
+    List_PrdBase = [];// chú ý chỗ này đc khởi tạo lại để khi gen dữ liệu cache (code ban đầu ko khở tạo => List_PrdBase là tập hợp của toàn bộ sản phẩm, sp base trên lưới)
+    objProductAutoSearch = {};
+            listProductAutoSearch = [];
+            objProductAutoSearch.ProductCodeRoot = '@CUtils.StrValue(item.ProductCodeRoot)';
+            objProductAutoSearch.ProductCodeBase = '@CUtils.StrValue(item.ProductCodeBase)';
+            objProductAutoSearch.ProductCode = '@CUtils.StrValue(item.ProductCode)';
+            objProductAutoSearch.ProductCodeUser = '@CUtils.StrValue(item.ProductCodeUser)';
+            objProductAutoSearch.ProductName = '@CUtils.StrValue(item.ProductName)';
+            objProductAutoSearch.FlagSerial = '@CUtils.StrValue(item.FlagSerial)';
+            objProductAutoSearch.FlagLot = '@CUtils.StrValue(item.FlagLot)';
+            objProductAutoSearch.UnitCode = '@CUtils.StrValue(item.UnitCode)';
+            objProductAutoSearch.InvCodeInActual = '@CUtils.StrValue(item.InvCodeInActual)';
+            objProductAutoSearch.Qty = '@CUtils.StrValue(item.Qty)';
+            objProductAutoSearch.QtyTotalOK = '@QtyTotalOK';
+            objProductAutoSearch.UPIn = '@CUtils.StrValue(item.UPIn)';
+            objProductAutoSearch.UPReturnSup = '@CUtils.StrValue(item.UPReturnSup)';
+            objProductAutoSearch.ValReturnSup = '@CUtils.StrValue(item.ValReturnSup)';
+            objProductAutoSearch.Remark = '@CUtils.StrValue(item.Remark)';
+    objProductAutoSearch.ValConvert = '@CUtils.StrValue(item.ValConvert)';
+    objProductAutoSearch.UPInv = '@CUtils.StrValue(item.UPInv)';
+            listProductAutoSearch.push(objProductAutoSearch);
+    </text>
+            var productCodeBaseCur = CUtils.StrValue(item.ProductCodeBase);
+            var listProductBaseUI = item.lstUnitCodeUIByProduct.Where(it => !CUtils.IsNullOrEmpty(it.ProductCodeBase) && CUtils.StrValue(it.ProductCodeBase).Equals(productCodeBaseCur)).ToList();
+            foreach (var ite in listProductBaseUI)
+            {
+                <text>
+    objProductAutoSearchBase = {};
+                listProductAutoSearchBase = [];
+                objProductAutoSearchBase.ProductCodeRoot = '@CUtils.StrValue(ite.ProductCodeRoot)';
+                objProductAutoSearchBase.ProductCodeBase = '@CUtils.StrValue(ite.ProductCodeBase)';
+                objProductAutoSearchBase.ProductCode = '@CUtils.StrValue(ite.ProductCode)';
+                objProductAutoSearchBase.ProductCodeUser = '@CUtils.StrValue(ite.ProductCodeUser)';
+                objProductAutoSearchBase.ProductName = '@CUtils.StrValue(ite.ProductName)';
+                objProductAutoSearchBase.FlagSerial = '@CUtils.StrValue(ite.FlagSerial)';
+                objProductAutoSearchBase.FlagLot = '@CUtils.StrValue(ite.FlagSerial)';
+                objProductAutoSearchBase.UnitCode = '@CUtils.StrValue(ite.UnitCode)';
+                objProductAutoSearchBase.InvCodeInActual = '@CUtils.StrValue(ite.InvCodeInActual)';
+                objProductAutoSearchBase.Qty = '@CUtils.StrValue(ite.Qty)';
+                objProductAutoSearchBase.QtyTotalOK = '@CUtils.StrValue(ite.QtyTotalOK)';
+                objProductAutoSearchBase.UPIn = '@CUtils.StrValue(ite.UPIn)';
+                objProductAutoSearchBase.UPReturnSup = '@CUtils.StrValue(ite.UPReturnSup)';
+                objProductAutoSearchBase.ValReturnSup = '@CUtils.StrValue(ite.ValReturnSup)';
+                objProductAutoSearchBase.Remark = '@CUtils.StrValue(ite.Remark)';
+    objProductAutoSearchBase.ValConvert = '@CUtils.StrValue(ite.ValConvert)';
+    objProductAutoSearchBase.UPInv = '@CUtils.StrValue(ite.UPInv)';
+                listProductAutoSearchBase.push(objProductAutoSearchBase);
+                var objProductBase = {
+        LstProductAutoSearchBase: objProductAutoSearchBase
+    };
+
+            List_PrdBase.push(objProductBase);
+    </text>
+
+            }
+            <text>
+    var objProduct = {
+            InvF_InventoryOutDtl: objProductAutoSearch,
+        Lst_InvF_InventoryOutDtl: listProductAutoSearch,
+        Lst_InvF_InventoryOutBase: List_PrdBase
+    };
+    listInventoryDtlAutoSearch.push(objProduct);
+    console.log(listInventoryDtlAutoSearch);
+    </text>
+
+
+        }
+    }
+</script>
+
+
+<script>
+    var objProductDtlChild = {};
+    var listProductDtlChild= [];
+    var listChild = [];
+    var $tableProduct_InvCodeInActual_Cache = $('#table-detailInvCodeOutActual'); @* Cache hàng hóa - vị trí *@
+    @if(Lst_InvF_InventoryReturnSupDtlChild != null && Lst_InvF_InventoryReturnSupDtlChild.Count > 0)
+    {
+        foreach(var item in Lst_InvF_InventoryReturnSupDtlChild)
+        {
+            <text>
+    objProductDtlChild = {};
+    listProductDtlChild = [];
+    var flagLot = '@CUtils.StrValue(item.mp_FlagLot)';
+    var flagSerial = '@CUtils.StrValue(item.mp_FlagSerial)';
+    var productCode = '@CUtils.StrValue(item.ProductCode)';
+
+
+    if (flagLot === '0' && flagSerial === '0') {
+        objProductDtlChild.ProductCode = productCode;
+        objProductDtlChild.InvCodeInActual = '@CUtils.StrValue(item.InvCodeOutActual)';
+        objProductDtlChild.Qty = '@CUtils.StrValue(item.Qty)';
+        objProductDtlChild.QtyTotalOK = '';
+        listProductDtlChild.push(objProductDtlChild);
+        var objSerial = {
+            Product_InvF_InventoryReturnSupDtlChild: objProductDtlChild,
+            Lst_Mst_Inventory: listSerialAutoSearch
+        };
+        listChild.push(objSerial);
+    }
+    </text>
+
+        }
+    }
+
+</script>
+
+<script>
+    $(document).ready(function () {
+        debugger
+        if (listInventoryDtlAutoSearch != null && listInventoryDtlAutoSearch != undefined && listInventoryDtlAutoSearch.length > 0) {
+            debugger
+            for (var i = 0; i < listInventoryDtlAutoSearch.length; i++) {
+                renderInvF_InventoryOutDtl_Multi(listInventoryDtlAutoSearch[i]);
+            }
+            //commonUtils.updateTableTrNotShowIdx($('#table-tbodyID tr.trdata'), true);
+            //commonUtils.updateTableTrNotShowIdx($('#table-detailInvCodeReturnSupActual tr.trdata'), true);
+
+            var tongsl = 0.0;
+            var rows = $('tbody#table-tbodyID tr').length;
+            if (rows > 0) {
+                $('#table-tbodyID tr.trdata').each(function () {
+                    var $tr = $(this);
+                    var rd = $tr.attr('rd');
+                    var fQty = commonUtils.parseFloat(commonUtils.returnValue($tr.find('input.qty-' + rd).val()));
+
+
+                    tongsl += fQty;
+                });
+                document.getElementById('spanTotalPrd').textContent = tongsl;
+
+            }
+        }
+
+        if (listLot != null && listLot !== undefined && listLot.length > 0) {
+            debugger
+            for (var i = 0; i < listLot.length; i++) {
+                renderProductInvFInventoryOutInstLot(listLot[i]);
+            }
+            commonUtils.updateTableTrNotShowIdx($('#table-detailLot tr.trdata'), true);
+        }
+
+        if (listSerial != null && listSerial != undefined && listSerial.length > 0) {
+
+            debugger
+            for (var i = 0; i < listSerial.length; i++) {
+                renderProductInvFInventoryOutInstSerial(listSerial[i]);
+            }
+            commonUtils.updateTableTrNotShowIdx($('#table-detailSerial tr.trdata'), true);
+        }
+        if (listChild != null && listChild != undefined && listChild.length > 0) {
+            debugger
+
+            for (var i = 0; i < listChild.length; i++) {
+                var $tableProduct_InvCodeInActual_Cache = $('#table-detailInvCodeReturnSupActual');
+                var productCode = listChild[i].Product_InvF_InventoryReturnSupDtlChild.ProductCode;
+                var rowOlds = $tableProduct_InvCodeInActual_Cache.find('tr[productcode="' + productCode + '"]').length;
+                if (rowOlds > 0) {
+                    $tableProduct_InvCodeInActual_Cache.find('tr[productcode="' + productCode + '"]').each(function () {
+                        var $tr = $(this);
+                        var $divList_Product_InvCodeInActual = $tr.find('div.products-list-cache');
+                        if ($divList_Product_InvCodeInActual !== undefined && $divList_Product_InvCodeInActual !== null) {
+
+                            $divList_Product_InvCodeInActual.find('div.result[productcode="' + productCode + '"]').each(function () {
+                                var $div = $(this);
+                                $div.remove();
+
+                            });
+                        }
+
+                    });
+                }
+            }
+
+            for (var i = 0; i < listChild.length; i++) {
+                renderProductInventoryReturnSupDtlChild(listChild[i]);
+            }
+            commonUtils.updateTableTrNotShowIdx($('#table-detailInvCodeReturnSupActual tr.trdata'), true);
+        }
+
+
+    });
+</script>
+

@@ -1,0 +1,152 @@
+﻿@model List<Mst_SpecCustomField>
+@{
+    Layout = "~/Views/Shared/_LayoutQuantri.cshtml";
+    var title = "DANH SÁCH SPECFIELD";
+    var titleMng = "Danh sách SpecField";
+    ViewBag.Title = title;
+}
+<script type="text/javascript">
+    var parents = new Array();
+    parents.push("@Url.Action("Index", "OS_PrdCenter_Mst_SpecCustomField")");
+    //parents.push("");
+    var parentsText = new Array();
+    parentsText.push("@MvcHtmlString.Create(titleMng)");
+    //parentsText.push("@MvcHtmlString.Create(title)");
+    setAdminCurrentTag(parents, parentsText);
+</script>
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="col-xs-12 row no-margin box-shadow-tk">
+                        @using (Html.BeginForm("Edit", "OS_PrdCenter_Mst_SpecCustomField", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="col-sm-8">
+                                @if (Model != null && Model.Count > 0)
+                                {
+                                    var i = 0;
+                                    foreach (var item in Model)
+                                    {
+                                        var checkActive = "";
+                                        var flagActive = "0";
+                                        if (item != null && item.FlagActive.Equals("1"))
+                                        {
+                                            flagActive = item.FlagActive.ToString().Trim();
+                                        }
+                                        checkActive = flagActive.Equals("1") ? "checked" : "";
+                                        var specCustomFieldCode = "";
+                                        var specCustomFieldName = "";
+                                        if (!CUtils.IsNullOrEmpty(item.SpecCustomFieldCode))
+                                        {
+                                            specCustomFieldCode = item.SpecCustomFieldCode.ToString().Trim();
+                                        }
+                                        if (!CUtils.IsNullOrEmpty(item.SpecCustomFieldName))
+                                        {
+                                            specCustomFieldName = item.SpecCustomFieldName.ToString().Trim();
+                                        }
+                                        <div class="form-group margin-bottom-5 divcusfield" idx="@i">
+                                            <label for="" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create(specCustomFieldCode)</label>
+                                            <div class="col-xs-12 col-sm-8">
+                                                <div class="col-xs-2">
+                                                    <span class="block input-icon input-icon-right padding-top-5">
+                                                        <label>
+                                                            <input id="FlagActive_@i" name="ListMst_SpecCustomField[@i].FlagActive" class="ace ace-switch ace-switch-4" onclick="SetValueCheckBox(this)" type="checkbox" value="@MvcHtmlString.Create(flagActive)" @checkActive />
+                                                            <span class="lbl"></span>
+                                                        </label>
+                                                    </span>
+                                                </div>
+                                                <span class="block input-icon input-icon-right">
+                                                    <input type="hidden" name="ListMst_SpecCustomField[@i].SpecCustomFieldCode" id="SpecCustomFieldCode_@i" value="@MvcHtmlString.Create(specCustomFieldCode)" />
+                                                    <input type="text" id="SpecCustomFieldName_@i" name="ListMst_SpecCustomField[@i].SpecCustomFieldName" class="col-xs-9" value="@MvcHtmlString.Create(specCustomFieldName)" autocomplete="off" />
+                                                </span>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+
+
+                        }
+                    </aside>
+                    <div class="col-xs-12 no-padding">
+                        <div class="clearfix">
+                            <div class="row no-margin" style="float: right">
+                                @RenderItemFormat("BTN_SUA_OS_PRDCENTER_MST_SPECCUSTOMFIELD_CAP_NHAT", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px; \" onclick=\"SaveData();\">Lưu</a>", "", "")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/OS_PrdCenter_Mst_SpecCustomField.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "OS_PrdCenter_Mst_SpecCustomField")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+        });
+        
+        $(document).ready(function () {
+            $('.date').datepicker({
+                autoclose: true,
+                todayHighlight: true,
+                format: 'yyyy-mm-dd'
+            })
+                //show datepicker when clicking on the icon
+                .next().on(ace.click_event, function () {
+                    $(this).prev().focus();
+                });
+        });
+        
+
+        function SaveData() {
+            debugger;
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Edit", "OS_PrdCenter_Mst_SpecCustomField")';
+
+            var objOS_PrdCenter_Mst_SpecCustomField = new OS_PrdCenter_Mst_SpecCustomField();
+            objOS_PrdCenter_Mst_SpecCustomField.ActionType = 'edit';
+            objOS_PrdCenter_Mst_SpecCustomField.ajaxSettings = ajaxSettings;
+            objOS_PrdCenter_Mst_SpecCustomField.saveData();
+        }
+        function SetValueCheckBox(thiz) {
+            var checkbox = false;
+            if ($(thiz).is(":checked")) {
+                checkbox = true;
+                $(thiz).val('1');
+            } else {
+                $(thiz).val('0');
+            }
+        }
+    </script>
+}
+<script>
+    $(document).on('keypress', function (e) {
+        if (e.which == 13) {
+            Search();
+        }
+    });
+</script>
+
+
+
+
+
+
+

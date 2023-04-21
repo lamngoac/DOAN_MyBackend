@@ -1,0 +1,432 @@
+﻿@model List<Inv_InventoryBalance>
+@{
+    var ProductCodeTonKho = ViewBag.ProductCode == null ? "" : ViewBag.ProductCode;
+    var ProductCodeBase = ViewBag.ProductCodeBase == null ? "" : ViewBag.ProductCodeBase;
+
+    var ProductCodeUser = ViewBag.ProductCodeUser == null ? "" : ViewBag.ProductCodeUser;
+    var ProductName = ViewBag.ProductName == null ? "" : ViewBag.ProductName;
+    decimal fQty = 0;
+    var qty = CUtils.StrValue(ViewBag.Qty);
+    if (!CUtils.IsNullOrEmpty(qty))
+    {
+        fQty = Convert.ToDecimal(qty);
+    }
+}
+<div class="modal-dialog" style="width: 500px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel"><b>Danh sách tồn kho</b></h2>
+            <a href="javascript:;" onclick="ClosePopupShowTonKho()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body" style="">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupVTNhap" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group margin-bottom-9">
+                    <div class="col-10 col-sm-8">
+                        <span class="block input-icon input-icon-right">
+                            <label>Mã hàng hóa: @ProductCodeUser - @ProductName</label>
+                            @*<label type="text" style="font-weight: bold" class="col-6" readonly="readonly">@ProductCodeTonKho</label>*@
+                            <label type="text" hidden id="ProductCodeTonKho" name="ProductCodeTonKho" style="font-weight: bold" class="col-6" readonly="readonly">@ProductCodeTonKho</label>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-12 margin-bottom-9">
+                    <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+                        <div style="width: 100%; float: left;">
+                            <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                                <thead>
+                                    <tr class="trthead">
+                                        <th fieldId="InvOut" fieldName="InvOut" fieldActive="0" class="text-center cell-100">
+                                            Vị trí
+                                        </th>
+                                        <th fieldId="QtyTotalOk" sorttype="T" fieldName="Số phiếu xuất" fieldActive="0" class="text-left cell-100">
+                                            Số lượng tồn
+                                        </th>
+                                        <th fieldId="QtyOut" sorttype="T" fieldName="Thời gian xuất" fieldActive="0" class="text-left cell-100">
+                                            Số lượng xuất
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                        <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                            <tbody id="table-tbodyIDTonKho">
+                                @{
+                                    var idx = 0;
+                                    if (Model != null && Model.Count != 0)
+                                    {
+                                        foreach (var it in Model)
+                                        {
+                                            <tr class="data-item trdata" idx="@idx" invcode="@(it.InvCode == null ? "" : it.InvCode)">
+                                                <th fieldId="InvOut" fieldName="InvOut" fieldActive="0" class="text-center cell-100">
+                                                    <input readonly="readonly" name="DtlTonKho[@idx].InvCode" class="InvCode col-md-12" value="@(it.InvCode == null ? "" : it.InvCode)" />
+                                                </th>
+                                                <th fieldId="QtyTotalOk" sorttype="T" fieldName="Số phiếu xuất" fieldActive="0" class="text-left cell-100">
+                                                    <input name="DtlTonKho[@idx].QtyTotalOK" readonly="readonly" class="QtyTotalOK12 col-md-12 text-right" value="@(it.QtyTotalOK == null ? "0" : it.QtyTotalOK)" />
+                                                </th>
+                                                <th fieldId="QtyOut" sorttype="T" fieldName="Thời gian xuất" fieldActive="0" class="text-left cell-100">
+                                                    <input name="DtlTonKho[@idx].QtyOut" class="QtyOut12 col-md-12 text-right" value="@(it.QtyAvailOK == null ? "0" : it.QtyAvailOK)" />
+                                                </th>
+                                            </tr>
+                                            idx++;
+                                        }
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="modal-footer">
+            <a href="javascript:void(0);" class="btn btn-nc-button" style="margin-left: 10px" id="btnSaveViTri" onclick="product_InvCodeInActual_Save('@ProductCodeTonKho', '@ProductCodeBase');">Lưu</a>
+        </div>
+    </div>
+</div>
+<table hidden>
+    <tbody id="rowtemplateTonKhoPhanBo">
+        <tr class="data-item trdata" idx="==idx==" invcode="==InvCode==">
+            <th fieldId="InvOut" fieldName="InvOut" fieldActive="0" class="text-center cell-100">
+                <input readonly="readonly" name="DtlTonKho[==idx==].InvCode" class="InvCode col-md-12" value="==InvCode==" />
+            </th>
+            <th fieldId="QtyTotalOk" sorttype="T" fieldName="Số phiếu xuất" fieldActive="0" class="text-left cell-100">
+                <input name="DtlTonKho[==idx==].QtyTotalOK" readonly="readonly" class="QtyTotalOK12 col-md-12 text-right" value="==QtyTotalOK==" />
+            </th>
+            <th fieldId="QtyOut" sorttype="T" fieldName="Thời gian xuất" fieldActive="0" class="text-left cell-100">
+                <input name="DtlTonKho[==idx==].QtyOut" class="QtyOut12 col-md-12 text-right" value="==QtyOut==" />
+            </th>
+        </tr>
+    </tbody>
+</table>
+
+<script>
+
+    $(document).ready(function () {
+       
+    format_Number();
+    })
+
+
+    function format_Number(){
+        var tableName = 'InvF_InventoryOut';
+        var qtyFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'Qty');
+         $('.QtyTotalOK12').number(true, qtyFormat);
+         $('.QtyOut12').number(true, qtyFormat);
+    
+    
+    }
+
+    function SaveViTri(productcode) {
+        debugger
+        //$('#table-detailCombo').html("");
+        if (productcode == "") {
+            alert("Không tồn tại hàng hóa trong lưới.");
+            return;
+        }
+        
+        debugger;
+        var trLo_Old1 = $('#table-detailCombo').find('tr[productcode="' + productcode + '"]').eq(0);
+        var trLo_Old2 = $('#table-detailCombo').find('tr[productcode="' + productcode + '"]');
+
+        //var trDetailproduct = $("#table-tbodyID tr.trdata[productcode=" + productcode + "]");
+
+        var $trDetailproduct = $('tbody#table-tbodyID tr[productcode = "' + productcode + '"]');
+        var rd = $trDetailproduct.attr('rd');
+        var idxDtl = 0;
+        if ($trDetailproduct.length == 0) {
+            alert("Không tìm thấy hàng hóa trong lưới.");
+            return;
+        }
+        idxDtl = $trDetailproduct.attr('idx');
+        var check = true;
+        var lstVitri = "";
+        var sumqtyout = 0;
+
+        //// Check sl xuất <= sl đơn hàng
+        //var OrderNo = $('#OrderNo').val();
+        //var sumQtyDetail = 0;
+        //if (OrderNo != null && OrderNo != "") {
+        //    var strqtyOrder = trDetailproduct.attr("qtyOrder");
+        //    var qtyOrder = parseFloat(strqtyOrder);
+        //    if ($.isNumeric(strqtyOrder)) {
+        //        qtyOrder = parseFloat(strqtyOrder);
+        //    }
+        //    if (qtyOrder == 0) {
+        //        alert("Số lượng đơn hàng = 0. Không thể thực hiện xuất kho.");
+        //        return;
+        //    }
+
+        //    $("#table-tbodyIDTonKho tr.trdata").each(function () {
+        //        var tr = $(this);
+        //        var idx = tr.attr('idx');
+        //        var strqtyout = tr.find('input[name="DtlTonKho[' + idx + '].QtyOut"]').val();
+        //        var f_qtyout = parseFloat(strqtyout);
+        //        sumQtyDetail += f_qtyout;
+        //    });
+
+        //    if (sumQtyDetail > qtyOrder) {
+        //        alert("Số lượng sản phẩm vượt quá số lượng trong đơn hàng. (Số lượng đơn hàng: " + qtyOrder+ ")");
+        //        return;
+        //    }
+        //}
+        ////
+
+
+        $("#table-tbodyIDTonKho tr.trdata").each(function () {
+            debugger
+            var tr = $(this);
+            var idx = tr.attr('idx');
+            var strqtytotalok = tr.find('input[name="DtlTonKho[' + idx + '].QtyTotalOK"]').val();
+            var strqtyout = tr.find('input[name="DtlTonKho[' + idx + '].QtyOut"]').val();
+            var strinvcode = tr.find('input[name="DtlTonKho[' + idx + '].InvCode"]').val();
+            if (strinvcode != "" && (strqtyout != "0" && strqtyout != "")) {
+                if (lstVitri == "") {
+                    lstVitri += strinvcode;
+                }
+                else {
+                    lstVitri += ", " + strinvcode;
+                }
+            }
+
+            if ($.isNumeric(qtyout) == true) {
+                alert("Số lượng xuất phải phải là số.");
+                tr.find('input[name="DtlTonKho[' + idx + '].QtyOut"]').focus();
+                return;
+            }
+
+            var qtytotalok = parseFloat(strqtytotalok);
+            var qtyout = parseFloat(strqtyout);
+            if (qtyout > qtytotalok) {
+                alert("Số lượng xuất không được lớn hơn số lượng tồn kho.");
+                check = false;
+                return;
+            }
+            if (qtyout > 0) {
+                sumqtyout += qtyout;
+
+            //    var strUnitCode = trDetailproduct.find('select[name="Lst_InvF_InventoryOutDtl[' + idxDtl + '].UnitCode"]').val();
+            //    if (strUnitCode == undefined || strUnitCode == "") {
+            //        strUnitCode = trDetailproduct.find('select.UnitCode').val();
+            //    }
+            //    // Gom chung vào bảng table-detailCombo
+            //    var strHtml = getHtmlFromTemplate($('#rowtemplateComboDetail'), {
+            //        ProductCodeRoot: productcode,
+            //        ProductCode: productcode,
+            //        UnitCode: strUnitCode,
+            //        Remark: "",
+            //        InvCodeOutActual: strinvcode,
+            //        Qty: qtyout,
+            //        idx: 999999
+            //    });
+
+            //     //Các vị trí không giống nhau
+            //    $('#table-detailCombo').append(strHtml);
+
+            //    var lenItem = $('#table-detailCombo tr.trdata').length;
+            //    if (lenItem == 0) {
+            //        $('#table-detailCombo').append(strHtml);
+            //    }
+            //    else {
+            //        var trLo_Old = $('#table-detailCombo').find('tr[productcode="' + productcode + '"][invcode="' + strinvcode + '"]').eq(0);
+            //        if (trLo_Old.length != 0) {
+            //            trLo_Old.replaceWith(strHtml);
+            //        }
+            //        else {
+            //            $('#table-detailCombo').append(strHtml);
+            //        }
+            //    }
+            //}
+            //else {
+            //    var $trProduct_Qty_0 = $('#table-detailCombo').find('tr[productcode="' + productcode + '"][invcode="' + strinvcode + '"]');
+            //    if ($trProduct_Qty_0 !== undefined && $trProduct_Qty_0 !== null) {
+            //        $trProduct_Qty_0.remove();
+            //    }
+            }
+        });
+        //updateTableTrIdx($('#table-detailCombo tr'), false);
+        //if (check == false) return;
+
+        // Tìm hàng hóa và gán lại số lượgn  suất
+        debugger
+        //trDetailproduct.find('input[name="Lst_InvF_InventoryOutDtl[' + idxDtl + '].Qty"]').val(sumqtyout);
+        //trDetailproduct.find('input[name="Lst_InvF_InventoryOutDtl[' + idxDtl + '].InvCodeOutActual"]').val(lstVitri);
+        $trDetailproduct.find('input.qty-' + rd).val(sumqtyout);
+
+
+        // Gán lại nếu không thuộc xuất kho
+        //trDetailproduct.find('input.InvCode').val(lstVitri);
+        //trDetailproduct.find('input.Qty').val(sumqtyout);
+        //
+        debugger
+        //cap nhat lai so luong trong bang luu cache
+
+        var $divProducts = $trDetailproduct.find('div.products-list');
+        var $divProductOld = $divProducts.find('div[productcode="' + productcode + '"]');
+        if ($divProductOld !== undefined && $divProductOld !== null && $divProductOld.length > 0) {
+            var remarkOld = $trDetailproduct.find('input.qty-' + rd).val();
+            $divProductOld.find('input.Qty').val(remarkOld);
+        }
+        tongTienHang();
+        ClosePopupShowTonKho();
+    }
+
+</script>
+
+
+
+<script type="text/javascript">
+    function product_InvCodeInActual_Save(productcode, productCodeBase) {
+        debugger
+        var rows = $('tbody#table-tbodyIDTonKho tr.trdata').length;
+        if (rows > 0) {
+            if (!commonUtils.isNullOrEmpty(productcode)) {
+                @* Xóa hàng hóa - vị trí đã lưu cache *@
+                var $tableProduct_InvCodeInActual_Cache = $('#table-detailInvCodeOutActual'); @* Cache hàng hóa - vị trí *@
+                var rowOlds = $tableProduct_InvCodeInActual_Cache.find('tr[productcodebase="' + productCodeBase + '"]').length;
+                if (rowOlds > 0) {
+                    $tableProduct_InvCodeInActual_Cache.find('tr[productcodebase="' + productCodeBase + '"]').each(function () {
+                        var $tr = $(this);
+                        var $divList_Product_InvCodeInActual = $tr.find('div.products-list-cache');
+                        if ($divList_Product_InvCodeInActual !== undefined && $divList_Product_InvCodeInActual !== null) {
+
+                            $divList_Product_InvCodeInActual.find('div.result[productcode="' + productcode + '"]').each(function () {
+                                var $div = $(this);
+                                $div.remove();
+
+                            });
+                        }
+
+                    });
+                }
+
+
+                @* Xóa hàng hóa - vị trí đã lưu cache impport excell *@
+
+                var rowOlds1 = $('#table-detailProductImport').find('tr[productcode="' + productcode + '"]').length;
+                if (rowOlds1 > 0) {
+                    $('#table-detailProductImport').find('tr[productcode="' + productcode + '"]').each(function () {
+                        $(this).remove();
+                    });
+                }
+
+                @* Thêm hàng hóa - vị trí vào cache *@
+
+                debugger;
+
+                var $trInvCodeInActual = $tableProduct_InvCodeInActual_Cache.find('tr[productcodebase="' + productCodeBase + '"]');
+
+                var $divList_Product_InvCodeInActual_Cache = $trInvCodeInActual.find('div.products-list-cache');
+
+                var strInvCodeInActual = '';
+                var totalQty = 0.0;
+                var fTotalQty = 0.0;
+                var arrayInvCode = [];
+                var lstVitri = "";
+                var listError = [];
+                var stop = false;
+                $("#table-tbodyIDTonKho tr.trdata").each(function () {
+                    debugger;
+                    var $tr = $(this);
+                    var rd = $tr.attr('idx');
+
+                    var InvCode = $tr.find('input[name="DtlTonKho[' + rd + '].InvCode"]').val();
+                    var QtyTotalOK = $tr.find('input[name="DtlTonKho[' + rd + '].QtyTotalOK"]').val();
+                    var QtyOut = commonUtils.parseFloat(commonUtils.returnValue($tr.find('input[name="DtlTonKho[' + rd + '].QtyOut"]').val()));
+
+                    var qtytotalok = parseFloat(QtyTotalOK);
+
+                    //if ($.isNumeric(QtyOut) == true) {
+                    //    alert("Số lượng xuất phải phải là số.");
+                    //    tr.find('input[name="DtlTonKho[' + idx + '].QtyOut"]').focus();
+                    //    check = false;
+                    //    return;
+                    //}
+
+                    if (QtyOut > qtytotalok) {
+                        var objToastr = {
+                            ToastrType: 'error',
+                            ToastrMessage: 'Sô lượng xuất không được lớn hơn số lượng tồn!'
+                        };
+                        listError.push(objToastr);
+                        commonUtils.showToastr(listError);
+                        stop = true;
+                        return false;
+                    }
+
+                    if (stop === true) return;
+
+                    if (InvCode != null) {
+                        if (arrayInvCode.includes(InvCode) == false && QtyOut !== 0) {
+                            arrayInvCode.push(InvCode);
+                            if (lstVitri == "") {
+                                lstVitri += InvCode;
+                            }
+                            else {
+                                lstVitri += ", " + InvCode;
+                            }
+                        }
+
+                    }
+                    debugger
+                    fTotalQty += QtyOut;
+                    //if (QtyOut > 0) {
+                        if ($divList_Product_InvCodeInActual_Cache !== undefined && $divList_Product_InvCodeInActual_Cache !== null && $divList_Product_InvCodeInActual_Cache.length > 0) {
+                            var objProduct = {
+                                ProductCode: productcode,
+                                InvCodeInActual: InvCode,
+                                Qty: QtyOut,
+                                QtyTotalOK: QtyTotalOK,
+                            };
+
+                            var extData = {
+                                idx: 9999,
+                            };
+
+                            var $divProduct_InvCodeInActual = $(commonUtils.getHtmlFromTemplate($('#tmpl_product_invcodeinactual_list_cache'), objProduct, extData));
+                            $divProduct_InvCodeInActual.appendTo($divList_Product_InvCodeInActual_Cache);
+
+
+                            var $item = $(commonUtils.getHtmlFromTemplate($('#tmpl_Product_Import_Excel'), objProduct, extData));
+                            $item.appendTo($('#table-detailProductImport'));
+                        }
+                    //}
+                });
+                //if (check == false) return;
+
+
+
+
+                if (stop === true) return;
+
+                commonUtils.updateTableTrNotShowIdx($('#table-detailInvCodeOutActual tr.trdata'), true);
+                commonUtils.updateTableTrNotShowIdx($('#table-detailProductImport tr.trdata'), true);
+                debugger
+                @* Update lại vị trí, số lượng *@
+                var $trInvF_InventoryInDtl = $('#table-tbodyID').find('tr[productcode="' + productcode + '"]');
+                if ($trInvF_InventoryInDtl !== undefined && $trInvF_InventoryInDtl !== null && $trInvF_InventoryInDtl.length > 0) {
+                    var rdInvF_InventoryInDtl = $trInvF_InventoryInDtl.attr('rd');
+                    var $inputQty = $trInvF_InventoryInDtl.find('input.qty-' + rdInvF_InventoryInDtl);
+                    if ($inputQty !== undefined && $inputQty !== null && $inputQty.length > 0) {
+                        $inputQty.val(fTotalQty);
+                    }
+
+                    var $inputInvCodeInActual = $trInvF_InventoryInDtl.find('input.invcodeinactual-' + rdInvF_InventoryInDtl);
+                    if ($inputInvCodeInActual !== undefined && $inputInvCodeInActual !== null && $inputInvCodeInActual.length > 0) {
+                        $inputInvCodeInActual.val(lstVitri);
+                    }
+
+                    tongTienHang();
+
+                }
+                ClosePopupShowTonKho();
+
+            }
+        }
+
+    }
+</script>

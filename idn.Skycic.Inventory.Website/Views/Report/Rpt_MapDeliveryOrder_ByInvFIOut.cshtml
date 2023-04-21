@@ -1,0 +1,247 @@
+﻿@model List<Rpt_MapDeliveryOrder_ByInvFIOutUI>
+@{
+
+    ViewBag.Title = "Bản đồ lệnh giao hàng";
+    var listDates = ViewBag.ListDates as List<DateTime>;
+    var today = ViewBag.Today as string;
+    var userState = ViewBag.UserState as UserState;
+}
+<script>
+    setAdminCurrentUrl('@Url.Action("Rpt_MapDeliveryOrder_ByInvFIOut", "Report")');
+</script>
+<style>
+    a[target="_blank"] {
+        display: none;
+    }
+
+    .selection--multiple:before {
+        display: inline-block;
+        font-style: normal;
+        font-variant: normal;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        content: "\f0d7";
+        position: absolute;
+        top: 15%;
+        left: 92%;
+        color: #787878;
+        font-size: 16px;
+        z-index: 9;
+    }
+
+    #myInput {
+        border: 1px solid #d5d5d5;
+    }
+
+    .high-line-today {
+        background-color: #D8E4BC;
+    }
+
+    .high-line-delay {
+        background-color: #FFC000 !important;
+    }
+</style>
+
+<div class="row no-margin">
+    <div class="col-sm-12">
+        <aside class="row no-margin">
+            @using (Html.BeginForm("Rpt_MapDeliveryOrder_ByInvFIOut", "Report", FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <input hidden id="init" name="init" value="search" />
+                <div class="row layout-search layout-bot-top-16">
+                    <div class="col-11 row no-margin">
+                        <div class="col-5 no-padding">
+                            <div class="row form-group margin-bottom-9">
+                                <label for="datefrom" class="col-12 col-sm-2 control-label no-padding-right font-weight-500 ">@("Ngày từ".HtmlItemString("inventory")) <span style="color: red;">*</span></label>
+                                <div class="col-sm-9 row date-input-group no-margin">
+                                    <div class="row col-5 no-margin">
+                                        <div class="col-12 no-padding">
+                                            <div class="input-group form-group" id="dtdatefrom">
+                                                <input type="text" id="datefrom" name="datefrom" class="col-9 cl-date datefrom hasDatepicker" data-date-format="yyyy-mm-dd" value="@CUtils.StrValue(ViewBag.DateFrom)" autocomplete="off">
+                                                <span class="input-group-addon col-3">
+                                                    <i class="far fa-calendar-alt"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <label for="dateto" class="col-2 control-label no-padding-right font-weight-500 text-center">@("đến".HtmlItemString("inventory"))</label>
+                                    <div class="row col-5 no-margin">
+                                        <div class="col-12 no-padding">
+                                            <div class="input-group form-group" id="dtdateto">
+                                                <input type="text" id="dateto" name="dateto" class="col-9 cl-date dateto hasDatepicker" data-date-format="yyyy-mm-dd" value="@CUtils.StrValue(ViewBag.DateTo)" autocomplete="off">
+                                                <span class="input-group-addon col-3">
+                                                    <i class="far fa-calendar-alt"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-1 row no-margin">
+                        <div class="form-group margin-bottom-9">
+                            <div class="row no-margin">
+                                <span class="block input-icon input-icon-right">
+                                    @if (CheckAccess("BTN_MNG_RPT_MAPDELIVERYORDER_BYINVFIOUT_TK"))
+                                    {
+                                        <a class="btn btn-nc-button" onclick="SearchData()" href="javascript:void(0);" style=""><img class="img-button-search" src="@Url.Content("~/Images/search.svg")"></a>
+                                    }
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </aside>
+        <div class="row no-margin">
+            <div class="col-sm-12 no-padding">
+                <div id="BindDataRpt_MapDeliveryOrder_ByInvFIOut" class="conten-table">
+                    @Html.Partial("BindDataRpt_MapDeliveryOrder_ByInvFIOut", Model, new ViewDataDictionary() {
+                        {"ListDates", listDates },
+                        {"Today", today },
+                        {"UserState", userState },
+
+                    })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search -->
+<script>
+
+    $(document).ready(function () {
+        $('.hasDatepicker').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: 'yyyy-mm-dd'
+        })
+            ////show datepicker when clicking on the icon
+            .next().on('click', function () {
+                $(this).prev().focus();
+            });
+    });
+    function DaysBetween(StartDate, EndDate) {
+        //debugger;
+        // The number of milliseconds in all UTC days (no DST)
+        const oneDay = 1000 * 60 * 60 * 24;
+
+        // A day in UTC always lasts 24 hours (unlike in other time formats)
+        const start = Date.UTC(EndDate.getFullYear(), EndDate.getMonth(), EndDate.getDate());
+        const end = Date.UTC(StartDate.getFullYear(), StartDate.getMonth(), StartDate.getDate());
+        var y = ((start - end) / oneDay);
+        // so it's safe to divide by 24 hours
+        return ((start - end) / oneDay) + 1;
+    }
+    function CheckFormSearch() {
+        var listError = [];
+        listError = commonUtils.checkElementIsNullOrEmpty_AddListError(listError, '#manageForm #datefrom', 'has-error-fix', 'Ngày từ không được trống!');
+        listError = commonUtils.checkElementIsNullOrEmpty_AddListError(listError, '#manageForm #dateto', 'has-error-fix', 'Ngày đến không được trống!');
+        //debugger;
+        var datefrom = new Date($("#datefrom").val() + " 00:00:00");
+        var dateto = new Date($("#dateto").val() + " 23:59:59");
+        var days = DaysBetween(datefrom, dateto);
+        if (days > 31) {
+            var objToastr = {
+                ToastrType: 'error',
+                ToastrMessage: 'Số ngày không được vượt quá 31 ngày!'
+            };
+            listError.push(objToastr);
+        }
+        if (listError !== undefined && listError !== null && listError.length > 0) {
+            commonUtils.showToastr(listError);
+            return false;
+        }
+        return true;
+    }
+    function SearchData() {
+        var datefrom = commonUtils.returnValueTextOrNull('#datefrom');
+        var dateto = commonUtils.returnValueTextOrNull('#dateto');
+
+        var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+        var url = '@Url.Action("DoSearch_Rpt_MapDeliveryOrder_ByInvFIOut", "Report")';
+        if (CheckFormSearch()) {
+            $.ajax({
+                type: "post",
+                data: {
+                    __RequestVerificationToken: token,
+                    datefrom: datefrom,
+                    dateto: dateto,
+                },
+                url: url,
+                dataType: 'json',
+                beforeSend: function () { }
+            }).done(function (result) {
+                if (result.Success) {
+                    $('#BindDataRpt_MapDeliveryOrder_ByInvFIOut').html('');
+                    $("#BindDataRpt_MapDeliveryOrder_ByInvFIOut").html(result.Html);
+    format_Number();
+                    //initDefault();
+                } else {
+                    if (!commonUtils.isNullOrEmpty(result.Detail)) {
+                        showErrorDialog(result.Detail);
+                    }
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+
+            }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+                //alert("complete");
+            });
+        }
+    }
+</script>
+<!-- Excel -->
+<script>
+    var objCommonExcel = new CommonExcel();
+    var objVariablesInit = {
+        Id_FormMain: '',
+        Id_FormImportExcel: 'manageFormImportExcel',
+        Id_Modal: 'ImportExcelModal',
+        Id_FileInput: 'file',
+    };
+
+    var ajaxSettings_Excel = {};
+    ajaxSettings_Excel.Type = 'post';
+    ajaxSettings_Excel.DataType = 'json';
+
+    function Export() {
+        if ($("#table-tbodyID tr.trdata").length > 0) {
+            ajaxSettings_Excel.Url = '@Url.Action("Rpt_MapDeliveryOrder_ByInvFIOut_Export", "Report")';
+            var token = $('input[name=__RequestVerificationToken]').val();
+            var url = '@Url.Action("Export", "Rpt_MapDeliveryOrder_ByInvFIOut")';
+
+            var datefrom = commonUtils.returnValueTextOrNull('#datefrom');
+            var dateto = commonUtils.returnValueTextOrNull('#dateto');
+
+            var listParams = [
+                { "Key": 'datefrom', "Value": datefrom },
+                { "Key": 'dateto', "Value": dateto },
+            ];
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.exportExcel(listParams);
+        }
+        else {
+            var listToastr = [];
+            objToastr = { ToastrType: 'error', ToastrMessage: "Lưới dữ liệu trống!" };
+            listToastr.push(objToastr);
+            commonUtils.showToastr(listToastr);
+        }
+    }
+
+</script>
+
+
+<script type="text/javascript">
+    function format_Number(){
+        var tableName = 'Rpt_MapDeliveryOrder_ByInvFIOut_Date';
+          var qtyFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'Qty');
+                $('.valQty').number(true, qtyFormat);
+    }
+</script>

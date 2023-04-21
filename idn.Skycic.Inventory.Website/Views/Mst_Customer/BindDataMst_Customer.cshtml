@@ -1,0 +1,455 @@
+﻿@model PageInfo<Mst_Customer>
+@{
+    var init = CUtils.StrValue(ViewBag.init);
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+    var recordCount = CUtils.StrValue(ViewBag.RecordCount);
+    var totalPage = "0";
+    if (Model != null)
+    {
+        totalPage = CUtils.StrValue(Model.PageCount);
+    }
+
+
+    var showtext = "";
+    if (Model.ItemCount > 0)
+    {
+        var recordstart = (Model.PageIndex) * Model.PageSize + 1;
+        var recordend = (Model.PageIndex + 1) * Model.PageSize;
+        if (recordend > Model.ItemCount)
+        {
+            recordend = Model.ItemCount;
+        }
+        showtext = recordstart + "-" + recordend + " trong số " + Model.ItemCount;
+    }
+}
+
+<style>
+    #togglecolumn {
+        top: 55px !important;
+        left: -40px !important;
+        height: 500px !important;
+        overflow-y: scroll !important;
+        column-count: initial !important;
+    }
+</style>
+
+
+<input type="hidden" id="page" value="@ViewBag.PageCur" />
+<input type="hidden" id="totalpage" value="@Model.PageCount" />
+
+<div class="col-xs-12 layout-bot-top-16" style="">
+    <div class="row">
+        <div class="col-6">
+            @{
+                var createLink = Url.Action("Create", "Mst_Customer");
+            }
+
+
+
+            @RenderItemFormat("BTN_MST_CUSTOMER_CREATE", "<a class=\"btn btn-nc-button\" href=\"" + createLink + "\"><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i> Tạo</a>", "", "")
+            @RenderItemFormat("BTN_MST_CUSTOMER_IMPORT", "<a class=\"btn btn-nc-button\" data-target=\"#ImportModal\" data-toggle=\"modal\" href=\"javascript:void(0);\"><i class=\"fas fa-upload\" aria-hidden=\"true\"></i> Nhập Excel</a>", "", "")
+            @RenderItemFormat("BTN_MST_CUSTOMER_EXPORT", "<a class=\"btn btn-nc-button\" onclick=\"Export()\" href=\"javascript: void(0); \"><i class=\"fas fa-download\" aria-hidden=\"true\"></i> Xuất Excel</a>", "", "")
+
+            @*<a class="btn btn-nc-button" href="@Url.Action("Create", "Mst_Customer" )" style=""><i class="fa fa-plus-circle" aria-hidden="true"></i> Tạo</a>
+                <a class="btn btn-nc-button" data-target="#ImportModal" data-toggle="modal" href="javascript:void(0);" style=""><i class="fas fa-upload" aria-hidden="true"></i> Nhập Excel</a>
+                <a class="btn btn-nc-button" onclick="Export()" href="javascript:void(0);" style=""><i class="fas fa-download" aria-hidden="true"></i> Xuất Excel</a>*@
+
+            <a class="btn font-color mybtn-Button" data-toggle="dropdown" aria-expanded="false" style="font-size: 13px; position: relative;"><i class="fas fa-ellipsis-h"></i></a>
+            <ul class="dropdown-menu dropdown-action" role="menu" style="">
+                <li style="padding: 5px">
+                    @RenderItemFormat("BTN_MST_CUSTOMER_DELETE", "<a class=\"row no-margin col-12 no-padding\" onclick=\"DeleteCustomers()\" href=\"javascript: void(0);\" style=\"line-height: 13px; color: #000000\"><i class=\"far fa-trash-alt\" aria-hidden=\"true\"></i> Xóa khách hàng</a>", "", "")
+                    @*<a class="row no-margin col-12 no-padding" onclick="DeleteCustomers()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="far fa-trash-alt" aria-hidden="true"></i> Xóa khách hàng</a>*@
+                </li>
+                <li style="padding: 5px">
+                    @RenderItemFormat("BTN_MST_CUSTOMER_EXPORT_TEMPLATE", "<a class=\"row no-margin col-12 no-padding\" onclick=\"ExportTemplate()\" href=\"javascript: void(0); \" style=\"line-height: 13px; color: #000000\"><i class=\"fas fa-download\" aria-hidden=\"true\"></i> Xuất Excel template</a>", "", "")
+                    @*<a class="row no-margin col-12 no-padding" onclick="ExportTemplate()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" aria-hidden="true"></i> Xuất Excel template</a>*@
+                </li>
+            </ul>
+            <span class="search-bar" style="margin-left:5px;margin-top:3px;">
+                <input type="text" id="dynamic-table-thead-search" class="quicksearch txtSearchObj" name="search">
+                <input type="text" class="quicksearch1 txtSearchObj1" name="search" style="z-index: -1000; height: 0; padding: 0; margin: 0; border: 0">
+            </span>
+        </div>
+        <div class="col-6">
+            @Html.Partial("Pagination", null, new ViewDataDictionary() { { "PageCur", MvcHtmlString.Create(pageCur) }, { "RecordCount", MvcHtmlString.Create(recordCount) }, { "ShowText", showtext } })
+        </div>
+    </div>
+</div>
+
+<div class="panel-body no-padding" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+    <aside class="col-xs-12 layout-table no-padding">
+        @Html.AntiForgeryToken()
+        <div class="scrollable-horizontal padding-left-0 padding-right-0" style="padding-top: 0!important; max-height: 600px;">
+            <div style="width: 100%; float: left;">
+                <table id="dynamic-table-thead" idn-datatable-id="dynamic-table-thead-tbody" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                    <thead>
+                        <tr class="trthead" filterroot="" bfilter="0">
+                            <th fieldId="CONTROL" fieldName="CONTROL" fieldActive="0" class="text-center cell-50">
+                                <input type="checkbox" class="cl-check" onclick="CheckAll(this);" name="check-box-all" />
+                            </th>
+                            <th fieldId="STT" fieldName="STT" fieldActive="0" class="text-left cell-50">@MvcHtmlString.Create("STT")</th>
+                            <th fieldId="CUSTOMERCODE" fieldName="Mã khách hàng" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-200">
+                                @("Mã khách hàng".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="CUSTOMERNAME" fieldName="Tên khách hàng" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-250">
+                                @("Tên khách hàng".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="MP_PROVINCENAME" fieldName="Tỉnh/Thành" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-250 idn-hidden">
+                                @("Tỉnh thành".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="MD_DISTRICTNAME" fieldName="Quận/Huyện" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-250 idn-hidden">
+                                @("Quận/Huyện".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="MW_WARDNAME" fieldName="Phường/Xã" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-250 idn-hidden">
+                                @("Phường/Xã".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="MA_AREANAME" fieldName="Khu vực" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-250 idn-hidden">
+                                @("Khu vực".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="CUSTOMERGENDER" fieldName="Giới tính" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-200 idn-hidden">
+                                @("Giới tính".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="FLAGACTIVE" fieldName="Trạng thái" fieldActive="1" class="text-left cell-150 idn-hidden">
+                                @("Trạng thái".HtmlItemString("customer"))
+                            </th>
+                            @*<th fieldId="CUSTOMEREMAIL" fieldName="Email" fieldActive="1" sorttype="T" class="text-left cell-250">
+                                    @("Email".HtmlItemString("customer"))
+                                </th>*@
+                            <th fieldId="CUSTOMERPHONENO" fieldName="Điện thoại cố định" fieldActive="1" idn-data-type="N" idn-data-sort="1" idn-data-filter="1" class="text-left cell-250 idn-hidden">
+                                @("Điện thoại cố định".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="MCT_CUSTOMERTYPENAME" fieldName="Loại khách hàng" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-200">
+                                @("Loại khách hàng".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="MCS_CUSTOMERSOURCENAME" fieldName="Nguồn khách" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-200">
+                                @("Nguồn khách".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="MCG_CUSTOMERGRPNAME" fieldName="Nhóm khách hàng" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-200">
+                                @("Nhóm khách hàng".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="CUSTOMERMOBILEPHONE" fieldName="ĐT di động" fieldActive="0" idn-data-type="N" idn-data-sort="1" idn-data-filter="1" class="text-left cell-200">
+                                @("ĐT di động".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="CONTACTEMAIL" fieldName="Email liên hệ" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-250">
+                                @("Email liên hệ".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="CUSTOMERADDRESS" fieldName="Địa chỉ" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-200">
+                                @("Địa chỉ".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="CUSTOMEROWNER" fieldName="Sở hữu" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-100 idn-hidden">
+                                @("Sở hữu".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="REPRESENTNAME" fieldName="Người đại diện" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-150 idn-hidden">
+                                @("Người đại diện".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="REPRESENTPOSITION" fieldName="Chức vụ" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-120 idn-hidden">
+                                @("Chức vụ".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="GOVIDCARDNO" fieldName="Số giấy tờ" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-120 idn-hidden">
+                                @("Số giấy tờ".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="MG_GOVIDTYPENAME" fieldName="Loại giấy tờ" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-120 idn-hidden">
+                                @("Loại giấy tờ".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="BANKACCOUNTNO" fieldName="Số tài khoản" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-150 idn-hidden">
+                                @("Số tài khoản".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="BANKNAME" fieldName="Tên ngân hàng" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-200 idn-hidden">
+                                @("Tên ngân hàng".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="CONTACTNAME" fieldName="Người liên hệ" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-150 idn-hidden">
+                                @("Người liên hệ".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="CONTACTPHONE" fieldName="ĐT liên hệ" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-100 idn-hidden">
+                                @("ĐT liên hệ".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="FAX" fieldName="Fax" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-100 idn-hidden">
+                                @("Fax".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="CUSTOMERDATEOFBIRTH" fieldName="Ngày sinh/Ngày thành lập" fieldActive="1" idn-data-type="D" idn-data-sort="1" idn-data-filter="1" class="text-left cell-175 idn-hidden">
+                                @("Ngày sinh/Ngày thành lập".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="FACEBOOK" fieldName="Facebook" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-150 idn-hidden">
+                                @("Facebook".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="INVOICECUSTOMERNAME" fieldName="Người mua hàng" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-150 idn-hidden">
+                                @("Người mua hàng".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="INVOICEORGNAME" fieldName="Tên tổ chức" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-150 idn-hidden">
+                                @("Tên tổ chức".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="MST" fieldName="MST" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-120 idn-hidden">
+                                @("MST".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="INVOICECUSTOMERADDRESS" fieldName="Địa chỉ nhận hợp đồng" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-200 idn-hidden">
+                                @("Địa chỉ".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="INVOICEEMAILSEND" fieldName="Email nhận hợp đồng" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-200 idn-hidden">
+                                @("Email nhận hợp đồng".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="ORGID" fieldName="OrgID" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-200 idn-hidden">
+                                @("OrgID".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="NETWORKID" fieldName="NetworkID" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-200 idn-hidden">
+                                @("NetworkID".HtmlItemString("customer"))
+                            </th>
+                            <th fieldId="USERID" fieldName="UserID" fieldActive="1" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-200 idn-hidden">
+                                @("UserID".HtmlItemString("customer"))
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                    <tbody id="table-tbodyID">
+                        @if (Model != null && Model.DataList != null && Model.DataList.Count > 0)
+                        {
+                            var i = 1;
+                            foreach (var item in Model.DataList)
+                            {
+                                <tr idx="@(i)" class="data-item trdata" productcode="@item.CustomerCode" ondblclick="location.href='@Url.Action("Update", "Mst_Customer", new { customercode = item.CustomerCode, customercodesys = item.CustomerCodeSys })'">
+                                    <input type="hidden" name="ListCustomer[@i].CustomerCode" value="@item.CustomerCode" />
+                                    <input type="hidden" name="ListCustomer[@i].CustomerCodeSys" value="@item.CustomerCodeSys" />
+                                    <input type="hidden" name="ListCustomer[@i].CustomerName" value="@item.CustomerName" />
+                                    <input type="hidden" name="ListCustomer[@i].CustomerType" value="@item.CustomerType" />
+                                    <input type="hidden" name="ListCustomer[@i].CustomerSourceCode" value="@item.CustomerSourceCode" />
+                                    <input type="hidden" name="ListCustomer[@i].CustomerGrpCode" value="@item.CustomerGrpCode" />
+                                    <input type="hidden" name="ListCustomer[@i].CustomerMobilePhone" value="@item.CustomerMobilePhone" />
+                                    <input type="hidden" name="ListCustomer[@i].CustomerEmail" value="@item.CustomerEmail" />
+                                    <input type="hidden" name="ListCustomer[@i].CustomerAddress" value="@item.CustomerAddress" />
+                                    <input type="hidden" name="ListCustomer[@i].OrgID" value="@item.OrgID" />
+                                    <input type="hidden" name="ListCustomer[@i].CustomerPhoneNo" value="@item.CustomerPhoneNo" />
+                                    <input type="hidden" name="ListCustomer[@i].CustomerGender" value="@item.CustomerGender" />
+                                    <input type="hidden" name="ListCustomer[@i].ProvinceCode" value="@item.ProvinceCode" />
+                                    <input type="hidden" name="ListCustomer[@i].DistrictCode" value="@item.DistrictCode" />
+                                    <input type="hidden" name="ListCustomer[@i].WardCode" value="@item.WardCode" />
+                                    <input type="hidden" name="ListCustomer[@i].AreaCode" value="@item.AreaCode" />
+                                    <input type="hidden" name="ListCustomer[@i].FlagActive" value="@item.FlagActive" />
+                                    <input type="hidden" name="ListCustomer[@i].UserCodeOwner" value="@item.UserCodeOwner" />
+                                    <input type="hidden" name="ListCustomer[@i].NetworkID" value="@item.NetworkID" />
+                                    <input type="hidden" name="ListCustomer[@i].RepresentName" value="@item.RepresentName" />
+                                    <input type="hidden" name="ListCustomer[@i].RepresentPosition" value="@item.RepresentPosition" />
+                                    <input type="hidden" name="ListCustomer[@i].GovIDCardNo" value="@item.GovIDCardNo" />
+                                    <input type="hidden" name="ListCustomer[@i].GovIDType" value="@item.GovIDType" />
+                                    <input type="hidden" name="ListCustomer[@i].BankAccountNo" value="@item.BankAccountNo" />
+                                    <input type="hidden" name="ListCustomer[@i].BankName" value="@item.BankName" />
+                                    <input type="hidden" name="ListCustomer[@i].ContactName" value="@item.ContactName" />
+                                    <input type="hidden" name="ListCustomer[@i].ContactPhone" value="@item.ContactPhone" />
+                                    <input type="hidden" name="ListCustomer[@i].ContactEmail" value="@item.ContactEmail" />
+                                    <input type="hidden" name="ListCustomer[@i].Fax" value="@item.Fax" />
+                                    <input type="hidden" name="ListCustomer[@i].CustomerDateOfBirth" value="@item.CustomerDateOfBirth" />
+                                    <input type="hidden" name="ListCustomer[@i].Facebook" value="@item.Facebook" />
+                                    <input type="hidden" name="ListCustomer[@i].InvoiceCustomerName" value="@item.InvoiceCustomerName" />
+                                    <input type="hidden" name="ListCustomer[@i].InvoiceOrgName" value="@item.InvoiceOrgName" />
+                                    <input type="hidden" name="ListCustomer[@i].MST" value="@item.MST" />
+                                    <input type="hidden" name="ListCustomer[@i].InvoiceCustomerAddress" value="@item.InvoiceCustomerAddress" />
+                                    <input type="hidden" name="ListCustomer[@i].InvoiceEmailSend" value="@item.InvoiceEmailSend" />
+
+                                    <td fieldId="CONTROL" class="text-center cell-50">
+                                        <input type="checkbox" class="cl-check" name="ckb" />
+                                    </td>
+                                    <td fieldId="STT" class="text-center cell-50" style="">
+                                        @(i++)
+                                    </td>
+                                    <td fieldId="CUSTOMERCODE" class="text-left cell-200">
+                                        @item.CustomerCode
+                                    </td>
+                                    <td fieldId="CUSTOMERNAME" class="text-left cell-250">
+                                        @item.CustomerName
+                                    </td>
+                                    <td fieldId="MP_PROVINCENAME" class="text-left cell-250 idn-hidden">
+                                        @item.mp_ProvinceName
+                                    </td>
+                                    <td fieldId="MD_DISTRICTNAME" class="text-left cell-250 idn-hidden">
+                                        @item.md_DistrictName
+                                    </td>
+                                    <td fieldId="MW_WARDNAME" class="text-left cell-250 idn-hidden">
+                                        @item.mw_WardName
+                                    </td>
+                                    <td fieldId="MA_AREANAME" class="text-left cell-250 idn-hidden">
+                                        @item.ma_AreaName
+                                    </td>
+                                    <td fieldId="CUSTOMERGENDER" class="text-left cell-200 idn-hidden">
+                                        @{
+                                            var gender = "";
+                                            if (!CUtils.IsNullOrEmpty(item.CustomerGender))
+                                            {
+                                                gender = item.CustomerGender.ToString().Trim().ToLower().Equals("male")
+                                                ? "Nam"
+                                                : item.CustomerGender.ToString().Trim().ToLower().Equals("female")
+                                                ? "Nữ" : "Khác";
+                                            }
+                                        }
+                                        @gender
+                                    </td>
+                                    <td fieldId="FLAGACTIVE" fieldName="Trạng thái" fieldActive="1" class="text-center cell-150 idn-hidden">
+                                        @if (item.FlagActive.Equals("1"))
+                                        {
+                                            <div class="status approve">Đang hoạt động</div>
+                                        }
+                                        else
+                                        {
+                                            <div class="status cancel">Ngừng hoạt động</div>
+                                        }
+                                    </td>
+                                    @*<td fieldId="CUSTOMEREMAIL" class="text-left cell-250">
+                                            @item.CustomerEmail
+                                        </td>*@
+                                    <td fieldId="CUSTOMERPHONENO" class="text-left cell-250 idn-hidden">
+                                        @item.CustomerPhoneNo
+                                    </td>
+                                    <td fieldId="MCT_CUSTOMERTYPENAME" class="text-left cell-200">
+                                        @item.mct_CustomerTypeName
+                                    </td>
+                                    <td fieldId="MCS_CUSTOMERSOURCENAME" class="text-left cell-200">
+                                        @item.mcs_CustomerSourceName
+                                    </td>
+                                    <td fieldId="MCG_CUSTOMERGRPNAME" class="text-left cell-200">
+                                        @item.mcg_CustomerGrpName
+                                    </td>
+                                    <td fieldId="CUSTOMERMOBILEPHONE" class="text-left cell-200">
+                                        @item.CustomerMobilePhone
+                                    </td>
+                                    <td fieldId="CONTACTEMAIL" class="text-left cell-250">
+                                        @item.ContactEmail
+                                    </td>
+                                    <td fieldId="CUSTOMERADDRESS" class="text-center cell-200">
+                                        @item.CustomerAddress
+                                    </td>
+                                    <td fieldId="CUSTOMEROWNER" class="text-left cell-100 idn-hidden">
+                                        @item.UserCodeOwner
+                                    </td>
+                                    <td fieldId="REPRESENTNAME" class="text-left cell-150 idn-hidden">
+                                        @item.RepresentName
+                                    </td>
+                                    <td fieldId="REPRESENTPOSITION" class="text-left cell-120 idn-hidden">
+                                        @item.RepresentPosition
+                                    </td>
+                                    <td fieldId="GOVIDCARDNO" class="text-left cell-120 idn-hidden">
+                                        @item.GovIDCardNo
+                                    </td>
+                                    <td fieldId="MG_GOVIDTYPENAME" class="text-left cell-120 idn-hidden">
+                                        @item.mg_GovIDTypeName
+                                    </td>
+                                    <td fieldId="BANKACCOUNTNO" class="text-left cell-150 idn-hidden">
+                                        @item.BankAccountNo
+                                    </td>
+                                    <td fieldId="BANKNAME" class="text-left cell-200 idn-hidden">
+                                        @item.BankName
+                                    </td>
+                                    <td fieldId="CONTACTNAME" class="text-left cell-150 idn-hidden">
+                                        @item.ContactName
+                                    </td>
+                                    <td fieldId="CONTACTPHONE" class="text-left cell-100 idn-hidden">
+                                        @item.ContactPhone
+                                    </td>
+                                    <td fieldId="FAX" class="text-left cell-100 idn-hidden">
+                                        @item.Fax
+                                    </td>
+                                    <td fieldId="CUSTOMERDATEOFBIRTH" class="text-left cell-175 idn-hidden">
+                                        @item.CustomerDateOfBirth
+                                    </td>
+                                    <td fieldId="FACEBOOK" class="text-left cell-150 idn-hidden">
+                                        @item.Facebook
+                                    </td>
+                                    <td fieldId="INVOICECUSTOMERNAME" class="text-left cell-150 idn-hidden">
+                                        @item.InvoiceCustomerName
+                                    </td>
+                                    <td fieldId="INVOICEORGNAME" class="text-left cell-150 idn-hidden">
+                                        @item.InvoiceOrgName
+                                    </td>
+                                    <td fieldId="MST" class="text-left cell-120 idn-hidden">
+                                        @item.MST
+                                    </td>
+                                    <td fieldId="INVOICECUSTOMERADDRESS" class="text-left cell-200 idn-hidden">
+                                        @item.InvoiceCustomerAddress
+                                    </td>
+                                    <td fieldId="INVOICEEMAILSEND" class="text-left cell-200 idn-hidden">
+                                        @item.InvoiceEmailSend
+                                    </td>
+
+
+                                    <td fieldId="ORGID"  class="text-left cell-200 idn-hidden">
+                                        @item.OrgID
+                                    </td>
+                                    <td fieldId="NETWORKID"  class="text-left cell-200 idn-hidden">
+                                        @item.NetworkID
+                                    </td>
+                                    <td fieldId="USERID"  class="text-left cell-200 idn-hidden">
+                                        @item.NetworkID
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </aside>
+</div>
+
+<script>
+    //$(document).ready(function () {
+    //    tablesort();
+    //});
+
+    //function tablesort() {
+    //    var listColumns = {
+    //        //'STT': [],//['abc', 'def'],
+    //        'CUSTOMERCODE': [],//['ghi', 'klm'],
+    //        'CUSTOMERNAME': [],
+    //        'MCT_CUSTOMERTYPENAME': [],
+    //        'MCS_CUSTOMERSOURCENAME': [],
+    //        'MCG_CUSTOMERGRPNAME': [],
+    //        'CUSTOMERMOBILEPHONE': [],
+    //        //'CUSTOMEREMAIL': [],
+    //        'CUSTOMERADDRESS': [],
+    //        'MP_PROVINCENAME': [],
+    //        'MD_DISTRICTNAME': [],
+    //        'MW_WARDNAME': [],
+    //        'MA_AREANAME': [],
+    //        'CUSTOMERGENDER': [],
+    //        'CUSTOMERPHONENO': [],
+    //        'CUSTOMEROWNER': [],
+    //        'REPRESENTNAME': [],
+    //        'REPRESENTPOSITION': [],
+    //        'GOVIDCARDNO': [],
+    //        'MG_GOVIDTYPENAME': [],
+    //        'BANKACCOUNTNO': [],
+    //        'BANKNAME': [],
+    //        'CONTACTNAME': [],
+    //        'CONTACTPHONE': [],
+    //        'CONTACTEMAIL': [],
+    //        'FAX': [],
+    //        'CUSTOMERDATEOFBIRTH': [],
+    //        'FACEBOOK': [],
+    //        'INVOICECUSTOMERNAME': [],
+    //        'INVOICEORGNAME': [],
+    //        'MST': [],
+    //        'INVOICECUSTOMERADDRESS': [],
+    //        'INVOICEEMAILSEND': [],
+    //    };
+    //    var options = {};
+    //    options.Columns = listColumns;
+    //    $('#dynamic-table-thead').table_Sortable(options);
+    //}
+
+    function CheckAll(thiz) {
+        debugger;
+        let trArr = $('#table-tbodyID');
+        if (trArr !== null && trArr.length > 0) {
+            for (var i = 0; i < trArr.length; i++) {
+                var trCur = trArr[i];
+                if (trCur !== null && trCur !== undefined) {
+                    var inputCkb = $(trCur).find('input[type="checkbox"]');
+                    var check = false;
+                    if ($(thiz).is(":checked")) {
+                        check = true;
+                    }
+                    $(inputCkb).prop("checked", check);
+                }
+            }
+        }
+    }
+</script>

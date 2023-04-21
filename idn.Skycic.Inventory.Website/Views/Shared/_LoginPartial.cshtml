@@ -1,0 +1,558 @@
+﻿@using inos.common.Model
+@{
+    var waUserCode = "";
+    var userState = new InosUser();
+    if (!CUtils.IsNullOrEmpty(Session.UserState))
+    {
+        waUserCode = Session.UserState.SysUser.UserCode;
+        userState = Session.UserState.InosUser;
+    }
+    var inosUrl = "";
+    if (!CUtils.IsNullOrEmpty(ViewBag.InosBaseUrl))
+    {
+        inosUrl = ViewBag.InosBaseUrl as string;
+    }
+    else
+    {
+        inosUrl = System.Configuration.ConfigurationManager.AppSettings["InosBaseUrl"];
+    }
+    var passold = "";
+    var passnew = "";
+    var confpass = "";
+}
+@*@if (Request.IsAuthenticated)*@
+@if (true)
+{
+    <a data-toggle="dropdown" aria-haspopup="false" aria-expanded="false" href="javascript:;" class="dropdown-toggle">
+        <i class="fas fa-user"></i>
+        @MvcHtmlString.Create(userState.Name)
+    </a>
+    <ul class="user-menu dropdown-menu-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close" aria-labelledby="dropdownMenuButton">
+        <li>
+            <a class="mybtn-Button-1" style="color: #098850" onclick="ShowPopupInfo();" href="javascript:;"><i class="fa fa-user" style="color: #057D5A; font-size: 15px;" aria-hidden="true"></i> @MvcHtmlString.Create(userState.Name)</a>
+        </li>
+        @*<li>
+                <a class="mybtn-Button-1" onclick="ShowPopupContact()" href="javascript:;" style=""><i class="fa fa-phone" style="color: #057D5A; font-size: 15px;" aria-hidden="true"></i> @MvcHtmlString.Create("Liên hệ")</a>
+            </li>*@
+        @*@if (!CUtils.IsNullOrEmpty(waUserCode))
+            {
+                <li>
+                    <a class="mybtn-Button-1" onclick="ShowPopupChangePasswordCheckOld('@waUserCode')" href="javascript:;" style="color: #098850"><i class="fa fa-lock" style="color: #057D5A; font-size: 15px;" aria-hidden="true"></i> @MvcHtmlString.Create("Đổi mật khẩu")</a>
+                </li>
+            }*@
+        <li>
+            <a class="mybtn-Button-1 logout" href="javascript:document.getElementById('logoutForm').submit()" style="color: #098850"><i class="fa fa-sign-out-alt" style="color: #057D5A; font-size: 15px;" aria-hidden="true"></i> @MvcHtmlString.Create("Log off")</a>
+        </li>
+    </ul>
+
+
+}
+
+@using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" }))
+{
+    @Html.AntiForgeryToken()
+}
+
+@*Change password*@
+<div class="modal fade" id="ShowPopupChangePasswordCheckOld" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+@* Model information user *@
+
+<div class="modal fade" id="ShowPopupInfo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 800px;max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Thông tin cá nhân</b></h2>
+                <a href="javascript:;" onclick="ClosePopupInfo()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupInfo" }))
+                {
+                @Html.AntiForgeryToken()
+                <div class="form-group margin-bottom-5">
+                    <div class="row col-12">
+                        <div class="col-3 no-padding">
+                            <div class="avatar-user">
+                                <div class="popup-avatar-user-img">
+                                    @{
+                                    var avartarImg = "";
+                                    var imageFlag = "0";
+                                    if (!CUtils.IsNullOrEmpty(userState.Avatar))
+                                    {
+                                    avartarImg = @CUtils.StrValue(inosUrl.ToString() + userState.Avatar.Split('~')[1].ToString());
+                                    //imageFlag = "1";
+                                    }
+                                    else
+                                    {
+                                    avartarImg = Url.Content("~/Images/no-image.png");
+                                    //imageFlag = "0";
+                                    }
+                                    }
+                                    <input type="file" name="AvatarImagePopup" id="AvatarImagePopup" value="" onchange="setFileCom(this);" style="display: none;" image-flag="@imageFlag" image-src="" image-type="" />
+                                    <img class="img-avatar-popup" id="img-avatar" src="@CUtils.StrValue(avartarImg)" />
+                                </div>
+                                <div id="div-avatar" class="popup-overlay-avatar">
+                                    <span id="change-img-avatar" class="change-img-avatar">
+                                        <i class="fas fa-camera"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-9 no-padding">
+                            <div class="form-group margin-bottom-9">
+                                <label for="" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Họ tên")</label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <input type="text" id="UserName" name="UserName" class="col-12  UserName" value="@if (!CUtils.IsNullOrEmpty(userState.Name) && !CUtils.IsNullOrEmpty(userState)){@MvcHtmlString.Create(userState.Name.ToString())} else { @(" ")}" autocomplete="off" required />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label for="" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Email")</label>
+                                <div class="col-12 col-sm-8 disabled-fix">
+                                    <span class="block input-icon input-icon-right">
+                                        <input type="text" id="EMail" name="EMail" class="col-12  EMail" value="@if (!CUtils.IsNullOrEmpty(userState.Email) && !CUtils.IsNullOrEmpty(userState)){@MvcHtmlString.Create(userState.Email.ToString())} else { @(" ")}" autocomplete="off" required />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label for="" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Điện thoại")</label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <input type="text" maxlength="11" id="PhoneNo" name="PhoneNo" class="col-12 PhoneNo" onKeyPress="return commonUtils.isNumberKey(event)" value="@if (!CUtils.IsNullOrEmpty(userState.Phone) && !CUtils.IsNullOrEmpty(userState)){@MvcHtmlString.Create(userState.Phone.ToString())} else { @(" ")}" autocomplete="off" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label for="" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("User ID")</label>
+                                <div class="col-12 col-sm-8 disabled-fix">
+                                    <span class="block input-icon input-icon-right">
+                                        <input type="text" id="UserID" name="UserID" class="col-12 UserID disabled-fix" value="@if (!CUtils.IsNullOrEmpty(userState.Id) && !CUtils.IsNullOrEmpty(userState)){@MvcHtmlString.Create(userState.Id.ToString())} else { @(" ")}" autocomplete="off" required />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label for="" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Ngôn ngữ")</label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <select id="Language" name="Language" class="col-12" required>
+                                            <optgroup label="">
+                                                @*
+                                                <option value="">Chọn</option>*@
+                                                <option value="vi" @(!CUtils.IsNullOrEmpty(userState.Language) && userState.Language.Equals("vi") ? "selected" : "" )>Tiếng Việt</option>
+                                                <option value="en" @(!CUtils.IsNullOrEmpty(userState.Language) && userState.Language.Equals("en") ? "selected" : "" )>English</option>
+                                            </optgroup>
+                                        </select>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label for="" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Múi giờ")</label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <select id="TimeZone" name="TimeZone" class="col-12" required>
+                                            <optgroup label="">
+                                                @*
+                                                <option value="">Chọn</option>*@
+                                                @for (int i = -12; i <= 12; ++i)
+                                                {
+                                                string titleTimeZone = i.ToString();
+                                                if (i > 0) { titleTimeZone = "+ " + titleTimeZone; }
+                                                <option value="@i" @((!CUtils.IsNullOrEmpty(userState.TimeZone) && userState.TimeZone == i) ? "selected" : "" )>UTC @(titleTimeZone)</option>
+                                                }
+                                            </optgroup>
+                                        </select>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label for="" class="col-12 col-sm-3 control-label no-padding-right font-weight-500"></label>
+                                <div class="col-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <a class="btn btn-nc-button btn-yes" id="btnChangePass">Đổi mật khẩu</a>
+                                    </span>
+                                </div>
+                            </div>
+                            <div id="changePassword" class="col-12 no-padding" style="display: none;" change-pass-flag="0">
+                                <div class="form-group margin-bottom-9">
+                                    <label for="UserPassNew" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500">Mật khẩu mới</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="password" id="UserPassNew" name="UserPassNew" class="col-12 UserPassNew" value="@MvcHtmlString.Create(passnew)" autocomplete="off" required />
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group margin-bottom-9">
+                                    <label for="UserConFPass" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500">Nhập lại mật khẩu mới</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="password" id="UserConFPass" name="UserConFPass" class="col-12 UserConFPass" value="@MvcHtmlString.Create(confpass)" autocomplete="off" required />
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group margin-bottom-9">
+                                    <label for="UserPassOld" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500">Mật khẩu hiện tại</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="password" id="UserPassOld" name="UserPassOld" class="col-12 UserPassOld" value="@MvcHtmlString.Create(passold)" autocomplete="off" required />
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-nc-button btn-yes" id="ConfirmInfo" onclick="SaveInfo(this)" href="javascript:void(0);" data-flag="" style=""><i class="fas fa-check icon-checked" aria-hidden="true"></i> Cập nhật</a>
+                <a class="btn btn-cancel" id="Cancel" onclick="ClosePopupInfo()" href="javascript:void(0);" data-flag="" style=""><i class="fas fa-ban icon-checked" aria-hidden="true"></i> Bỏ qua</a>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function ShowPopupChangePasswordCheckOld(usercode) {
+        if (!commonUtils.isNullOrEmpty(usercode)) {
+            var url = '@Url.Action("ShowPopupChangePasswordCheckOld", "Sys_User")';
+            $.ajax({
+                url: url,
+                data: { usercode: usercode},
+                type: 'post',
+                dataType: 'json',
+                traditional: true,
+                success: function (data) {
+                    if (data.Success) {
+                        $('#ShowPopupChangePasswordCheckOld').modal({
+                            backdrop: false,
+                            keyboard: true
+                        });
+                        $("#ShowPopupChangePasswordCheckOld").css('display','block');
+                        $("#ShowPopupChangePasswordCheckOld").html(data.Html); // truyen html vao #form
+                    } else {
+                        _showErrorMsg123('@MvcHtmlString.Create("Lỗi")', data.Detail);
+                    }
+
+                }
+            });
+        }
+        else {
+            alert('Mã người dùng trống!');
+            return;
+        }
+    }
+</script>
+
+<script>
+    $('#ShowPopupInfo #TimeZone').select2();
+    $('#ShowPopupInfo #Language').select2();
+
+    var maxImageWidth = 800,
+        totalFiles = 0,
+        currentTotalFiles = 0,
+        fileTypeError = false,
+        fileSizeError = false,
+        ListImages = [],
+        ListFiles = [],
+        ImgId = 0,
+        FileId = 0;
+    $(document).ready(function () {
+        $("#div-avatar").bind('click', function () {
+            $('#AvatarImagePopup').click();
+        });
+        $("#img-avatar").bind('click', function () {
+            $('#AvatarImagePopup').click();
+        });
+    });
+    document.getElementById("img-avatar").addEventListener('change', setFileCom, false);
+
+    var base64 = "";
+    function renderFileInfo(file) {
+        var name = file.name;
+        var size = file.size;
+        var type = file.type;
+
+        var classtypefile = '';
+        if (name.match(/(?:gif|jpg|jpeg|png|bmp)$/)) {
+            classtypefile = 'far fa-file-image';
+        }
+
+        var fileReader = new FileReader();
+
+        fileReader.onload = function (event) {
+            base64 = event.target.result;
+            $('#img-avatar').attr('src', base64);
+            $('#AvatarImagePopup').attr('image-src', base64);
+            $('#AvatarImagePopup').attr('image-type', type);
+            $('#AvatarImagePopup').attr('image-name', name);
+            $('#AvatarImagePopup').attr('image-flag', '1');
+        }
+        fileReader.readAsDataURL(file);
+    }
+    function setFileCom(input) {
+        if (input.files && input.files[0]) {
+            var name = input.files[0].name.toLowerCase();
+            if (!name.match(/(?:gif|jpeg|bmp|png|jpg)$/)) {
+                alert("File upload phải thuộc các định dạng sau: \" gif|jpeg|bmp|png|jpg \"!");
+                return false;
+            }
+            var fsize = input.files[0].size;
+            if (fsize > 4194304) {
+                alert("File có dung lượng lớn hơn 4mb");
+                return false;
+            }
+            renderFileInfo(input.files[0])
+        }
+    }
+    $("#btnChangePass").click(function () {
+        $("#changePassword").toggle();
+        if ($("#changePassword").is(":visible")) {
+            $("#changePassword").attr('change-pass-flag', '1');
+        } else {
+            $("#changePassword").attr('change-pass-flag', '0');
+        }
+    });
+    function ShowPopupInfo() {
+        $("#ShowPopupInfo").css('display', 'block');
+        //$('#ShowPopupInfo').modal('show');
+        $('#ShowPopupInfo').modal({
+            backdrop: false,
+            keyboard: true,
+        });
+    }
+    function ClosePopupInfo() {
+        $("#ShowPopupInfo").css('display','none');
+        $('#ShowPopupInfo').modal('hide');
+    }
+    function validationForm() {
+        var listError = [];
+        listError = commonUtils.checkElementIsNullOrEmpty_AddListError(listError, '#UserName', 'has-error-fix', 'Họ tên không được trống!');
+        if ($("#changePassword").is(":visible")) {
+            listError = commonUtils.checkElementIsNullOrEmpty_AddListError(listError, '#UserPassNew', 'has-error-fix', 'Mật khẩu mới trống!');
+            listError = commonUtils.checkElementIsNullOrEmpty_AddListError(listError, '#UserConFPass', 'has-error-fix', 'Nhập lại khẩu mới trống!');
+            listError = commonUtils.checkElementIsNullOrEmpty_AddListError(listError, '#UserPassOld', 'has-error-fix', 'Mật khẩu hiện tại trống!');
+            var password = commonUtils.returnValueText('#UserPassNew');
+            if (password.trim().length < 6) {
+                var objToastr = {
+                    ToastrType: 'error',
+                    ToastrMessage: 'Mật khẩu mới > 5 ký tự!'
+                };
+                listError.push(objToastr);
+            }
+            else {
+                commonUtils.removeClassCss('#UserPassNew', 'has-error-fix');
+            }
+
+            var confirmpassword = commonUtils.returnValueText('#UserConFPass');
+
+            if (password !== confirmpassword) {
+                var objToastr = {
+                    ToastrType: 'error',
+                    ToastrMessage: 'Nhập lại mật khẩu không đúng, xin vui lòng nhập lại!'
+                };
+                listError.push(objToastr);
+            }
+            else {
+                commonUtils.removeClassCss('#ConfirmPassword', 'has-error-fix');
+            }
+            if (confirmpassword.trim().length < 6) {
+                var objToastr = {
+                    ToastrType: 'error',
+                    ToastrMessage: 'Nhập lại mật khẩu mới > 5 ký tự!'
+                };
+                listError.push(objToastr);
+            }
+            else {
+                commonUtils.removeClassCss('#UserConFPass', 'has-error-fix');
+            }
+        }
+
+        if (listError !== undefined && listError !== null && listError.length > 0) {
+            commonUtils.showToastr(listError);
+            return false;
+        }
+        return true;
+    }
+
+    function SaveInfo(thiz) {
+        var check = validationForm();
+        if (check)
+        {
+            var avatar = "";
+            var flagAvatar = $('#AvatarImagePopup').attr('image-flag');
+            var changeAvatar = false;
+            if (flagAvatar === '1') {
+                changeAvatar = true;
+                avatar = $('#AvatarImagePopup').attr('image-src');
+                var imageType = commonUtils.returnValueOrNull($("#AvatarImagePopup").attr('image-type'));
+                var strReplace = "data:" + imageType + ";base64,";
+                avatar = avatar.replace(strReplace, "");
+            } else {
+                avatar = $('#img-avatar').attr('src');
+                changeAvatar = false;
+            }
+            var flagChangePass = $("#changePassword").attr('change-pass-flag');
+            var changePass = false;
+            if (flagChangePass === '0') {
+                changePass = false;
+            } else {
+                changePass = true;
+            }
+            var username = commonUtils.returnValueTextOrNull("#UserName");
+            var usercode = commonUtils.returnValueTextOrNull("#UserCode");
+            var phoneno = commonUtils.returnValueTextOrNull("#PhoneNo");
+            var email = commonUtils.returnValueTextOrNull("#EMail");
+            var language = commonUtils.returnValueTextOrNull("#Language");
+            var timezone = commonUtils.returnValueTextOrNull("#TimeZone");
+            var passold = commonUtils.returnValueTextOrNull('#UserPassOld');
+            var passnew = commonUtils.returnValueTextOrNull('#UserPassNew');
+
+            var url = '@Url.Action("ChangeInfo", "Sys_User")';
+            var token = $('#manageFormShowPopupInfo input[name=__RequestVerificationToken]').val();
+
+            var model = new Object();
+            model.UserCode = usercode;
+            model.Name = username;
+            model.Phone = phoneno;
+            model.EMail = email;
+            model.Language = language;
+            model.TimeZone = timezone;
+            model.OldPassword = passold;
+            model.NewPassword = passnew;
+            model.ChangeAvatar = changeAvatar;
+            model.ChangePassword = changePass;
+            model.AvatarBase64 = avatar;
+
+            var modelSys_User = new Object();
+            modelSys_User.UserCode = usercode;
+            modelSys_User.UserName = username;
+            modelSys_User.EMail = email;
+            modelSys_User.PhoneNo = phoneno;
+
+            var modelCur = commonUtils.returnJSONValue(model);
+            var modelCurSys_User = commonUtils.returnJSONValue(modelSys_User);
+
+            $.ajax({
+                url: url,
+                data: {
+                    __RequestVerificationToken: token
+                    , model: modelCur
+                    , modelSys_User: modelCurSys_User
+                },
+                type: 'post',
+                dataType: 'json',
+                traditional: true,
+                success: function (data) {
+                    if (data.Success) {
+                        if (data.Messages !== null && data.Messages !== undefined && data.Messages.length > 0) {
+                            alert(data.Messages[0]);
+                            ClosePopupInfo();
+                        }
+                        if (!commonUtils.isNullOrEmpty(data.RedirectUrl)) {
+                            window.location.href = data.RedirectUrl;
+                        } else {
+                            window.location.href = window.location.href;
+                        }
+                        //document.getElementById('logoutForm').submit();
+                    }
+                    else {
+                        if (!commonUtils.isNullOrEmpty(data.Detail)) {
+                            _showErrorMsg123("Lỗi!", data.Detail);
+                        }
+                        if (data.Messages !== null && data.Messages !== undefined && data.Messages.length > 0) {
+                            alert(data.Messages[0]);
+                            ClosePopupInfo();
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    function SaveInfobk(thiz) {
+        debugger;
+        var check = validationForm();
+        if (check)
+        {
+            var avatar = "";
+            var flagAvatar = $('#AvatarImagePopup').attr('image-flag');
+            var changeAvatar = false;
+            if (flagAvatar === '1') {
+                changeAvatar = true;
+                avatar = $('#AvatarImagePopup').attr('image-src');
+                var imageType = commonUtils.returnValueOrNull($("#AvatarImagePopup").attr('image-type'));
+                var strReplace = "data:" + imageType + ";base64,";
+                avatar = avatar.replace(strReplace, "");
+            } else {
+                avatar = $('#img-avatar').attr('src');
+                changeAvatar = false;
+            }
+            var flagChangePass = $("#changePassword").attr('change-pass-flag');
+            var changePass = false;
+            if (flagChangePass === '0') {
+                changePass = false;
+            } else {
+                changePass = true;
+            }
+            var username = commonUtils.returnValueTextOrNull("#UserName");
+            var usercode = commonUtils.returnValueTextOrNull("#UserCode");
+            var phoneno = commonUtils.returnValueTextOrNull("#PhoneNo");
+            var email = commonUtils.returnValueTextOrNull("#EMail");
+            var language = commonUtils.returnValueTextOrNull("#Language");
+            var timezone = commonUtils.returnValueTextOrNull("#TimeZone");
+            var passold = commonUtils.returnValueTextOrNull('#UserPassOld');
+            var passnew = commonUtils.returnValueTextOrNull('#UserPassNew');
+
+            var url = '@Url.Action("ChangeInfo", "Sys_User")';
+            var token = $('#manageFormShowPopupInfo input[name=__RequestVerificationToken]').val();
+
+            var model = new Object();
+            model.UserCode = usercode;
+            model.Name = username;
+            model.Phone = phoneno;
+            model.EMail = email;
+            model.Language = language;
+            model.TimeZone = timezone;
+            model.OldPassword = passold;
+            model.NewPassword = passnew;
+            model.ChangeAvatar = changeAvatar;
+            model.ChangePassword = changePass;
+            model.AvatarBase64 = avatar;
+
+            var modelCur = commonUtils.returnJSONValue(model);
+
+            $.ajax({
+                url: url,
+                data: {
+                    __RequestVerificationToken: token
+                    , model: modelCur
+                },
+                type: 'post',
+                dataType: 'json',
+                traditional: true,
+                success: function (data) {
+                    if (data.Success) {
+                        if (data.Messages !== null && data.Messages !== undefined && data.Messages.length > 0) {
+                            alert(data.Messages[0]);
+                            ClosePopupInfo();
+                        }
+                        if (!commonUtils.isNullOrEmpty(data.RedirectUrl)) {
+                            window.location.href = data.RedirectUrl;
+                        } else {
+                            window.location.href = window.location.href;
+                        }
+                        //document.getElementById('logoutForm').submit();
+                    }
+                    else {
+                        if (!commonUtils.isNullOrEmpty(data.Detail)) {
+                            _showErrorMsg123("Lỗi!", data.Detail);
+                        }
+                        if (data.Messages !== null && data.Messages !== undefined && data.Messages.length > 0) {
+                            alert(data.Messages[0]);
+                            ClosePopupInfo();
+                        }
+                    }
+                }
+            });
+        }
+    }
+</script>

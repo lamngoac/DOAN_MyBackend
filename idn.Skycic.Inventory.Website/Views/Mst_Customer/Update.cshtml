@@ -1,0 +1,641 @@
+﻿@model Mst_Customer
+@{
+    var list_Mst_CustomerType = ViewBag.List_Mst_CustomerType as List<Mst_CustomerType>;
+    var listMst_CustomerGroup = ViewBag.ListMst_CustomerGroup as List<Mst_CustomerGroup>;
+    var listMst_CustomerSource = ViewBag.ListMst_CustomerSource as List<Mst_CustomerSource>;
+    var listMst_Province = ViewBag.ListMst_Province as List<Mst_Province>;
+    var listMst_District = ViewBag.ListMst_District as List<Mst_District>;
+    var listMst_Ward = ViewBag.ListMst_Ward as List<Mst_Ward>;
+    var listMst_AreaExt = ViewBag.ListMst_AreaExt as List<Mst_AreaExt>;
+    var listMst_GovIDType = ViewBag.ListMst_GovIDType as List<Mst_GovIDType>;
+    var listCustomer_DynamicField = ViewBag.ListCustomer_DynamicField as List<Customer_DynamicField>;
+    var list_CustomerDynamicFieldParamType = new List<CustomerDynamicFieldParamType>();
+    var lst_Mst_CustomerInArea = ViewBag.Lst_Mst_CustomerInArea as List<Mst_CustomerInArea>;
+    string sJSONResponse_Customer_DynamicField = "";
+    if (listCustomer_DynamicField != null && listCustomer_DynamicField.Count > 0)
+    {
+        foreach (var item in listCustomer_DynamicField[0].ParamTypes)
+        {
+            if (list_CustomerDynamicFieldParamType.Where(x => x.Code.Equals(item.Code)).ToList().Count == 0)
+            {
+                list_CustomerDynamicFieldParamType.Add(item);
+            }
+        }
+
+        listCustomer_DynamicField[0].ParamTypes = list_CustomerDynamicFieldParamType;
+
+        sJSONResponse_Customer_DynamicField = JsonConvert.SerializeObject(list_CustomerDynamicFieldParamType);
+    }
+    var avatar = "";
+    if (Model != null)
+    {
+        avatar = CUtils.StrValue(Model.CustomerAvatarPath);
+    }
+}
+<script>
+    setAdminCurrentUrl('@Url.Action("Index", "Mst_Customer")');
+</script>
+@section StyleSheet{
+    <style>
+        input[type=checkbox].icon-flag {
+            z-index: -100 !important;
+            width: 1px !important;
+            height: 1px !important;
+            clip: rect(1px,1px,1px,1px);
+            position: absolute;
+        }
+
+        .lbl-flag .lbl {
+            margin: 0 4px;
+            min-height: 24px;
+            position: relative;
+            display: inline-block;
+            margin: 0;
+            line-height: 20px;
+            min-height: 18px;
+            min-width: 18px;
+            font-weight: 400;
+            cursor: pointer;
+        }
+
+        .lbl-flag input[type=checkbox].icon-flag + .lbl::before {
+            text-indent: -24px;
+            content: "ON\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0OFF";
+            font-size: 12px;
+            line-height: 21px;
+            height: 24px;
+            overflow: hidden;
+            border-radius: 12px;
+            background-color: #8B9AA3;
+            border: 1px solid #8B9AA3;
+            color: #FFF;
+            width: 56px;
+            text-shadow: 0 0 0 #FFF;
+            display: inline-block;
+            position: relative;
+            box-shadow: none;
+            -webkit-transition: all .25s ease;
+            -o-transition: all .25s ease;
+            transition: all .25s ease;
+        }
+
+        .lbl-flag .lbl::after {
+            font-family: 'Open Sans';
+            content: 'III';
+            font-size: 12px;
+            font-weight: 400;
+            letter-spacing: 0;
+            color: #AAA;
+            text-shadow: none;
+            background-color: #FFF;
+            border-radius: 100%;
+            width: 22px;
+            height: 22px;
+            line-height: 22px;
+            text-align: center;
+            position: absolute;
+            top: -2px;
+            left: -3px;
+            -webkit-box-shadow: 0 1px 1px 1px rgba(0,0,0,.3);
+            /* box-shadow: 0 1px 1px 1px rgba(0,0,0,.3); */
+            -webkit-transition: left .25s ease;
+            -o-transition: left .25s ease;
+            transition: left .25s ease;
+        }
+
+        .lbl-flag .lbl::after {
+            content: 'III';
+            font-size: 11px;
+            position: absolute;
+            top: 2px;
+            left: 1px;
+            letter-spacing: 0;
+            width: 20px;
+            height: 20px;
+            line-height: 19px;
+            text-shadow: none !important;
+            color: #939393;
+            background-color: #FFF;
+            -webkit-transition: all .25s ease;
+            -o-transition: all .25s ease;
+            transition: all .25s ease;
+        }
+
+        .lbl-flag input[type=checkbox].icon-flag:checked + .lbl::before {
+            background-color: #057d5a;
+            border-color: #057d5a;
+            text-indent: 7px;
+        }
+
+        .lbl-flag input[type=checkbox].icon-flag:checked + .lbl::after {
+            left: 35px;
+            background-color: #FFF;
+            color: #848484;
+        }
+    </style>
+}
+
+<div class="col-12">
+    <div class="clearfix">
+        <div class="row no-margin">
+            @if (CheckAccess("BTN_MST_CUSTOMER_UPDATE_SAVE"))
+            {
+                <div class="no-padding" id="div-edit">
+                    <a href="javascript: void(0); " class="btn font-color mybtn-Button" style="margin-top: 20px; padding-left: 15px!important; padding-right: 15px!important;" onclick="Update();">
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i>@("Cập nhật".HtmlItemString("customer"))
+                    </a>
+                </div>
+            }
+            @if (CheckAccess("BTN_MST_CUSTOMER_UPDATE_SAVE"))
+            {
+                <div class="no-padding display-none" id="div-update">
+                    <a href="javascript: void(0); " class="btn font-color mybtn-Button" style="margin-top: 20px; padding-left: 15px!important; padding-right: 15px!important;" onclick="CheckData(0);">
+                        @("Lưu".HtmlItemString("customer"))
+                    </a>
+                </div>
+            }
+            @if (CheckAccess("BTN_MST_CUSTOMER_UPDATE_SAVEANDUPDATE"))
+            {
+                <div class="col-2 display-none" id="div-update-save">
+                    <a href="javascript: void(0); " class="btn font-color mybtn-Button" style="margin-top: 20px; padding-left: 15px!important; padding-right: 15px!important;" onclick="CheckData(1);">
+                        @("Lưu và reload".HtmlItemString("customer"))
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<div class="mt-3">
+    @using (Html.BeginForm("Edit", "Mst_Customer", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#MainInformation">@("Thông tin chính".HtmlItemString("customer"))</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#AdditionalInformation">@("Thông tin bổ sung".HtmlItemString("customer"))</a>
+            </li>
+        </ul>
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div id="MainInformation" class="container-fluid padding-left-right-15 tab-pane active">
+                @Html.Partial("MainInformation", Model, new ViewDataDictionary()
+                {
+                    { "List_Mst_CustomerType", list_Mst_CustomerType },
+                    { "ListMst_CustomerGroup", listMst_CustomerGroup },
+                    { "ListMst_CustomerSource", listMst_CustomerSource },
+                    { "ListMst_Province", listMst_Province },
+                    { "ListMst_District", listMst_District },
+                    { "ListMst_Ward", listMst_Ward },
+                    { "ListMst_AreaExt", listMst_AreaExt },
+                       {"Lst_Mst_CustomerInArea", lst_Mst_CustomerInArea },
+                    { "View", "update" },
+
+                })
+            </div>
+            <div id="AdditionalInformation" class="container-fluid padding-left-right-15 tab-pane">
+                <br>
+                @Html.Partial("AdditionalInformation", Model, new ViewDataDictionary()
+                {
+                    { "ListMst_GovIDType", listMst_GovIDType },
+                    { "ListCustomer_DynamicField", listCustomer_DynamicField },
+                    { "View", "update" },
+                })
+            </div>
+        </div>
+    }
+</div>
+
+@Html.Partial("Modals", null, new ViewDataDictionary()
+{
+    { "ListMst_CustomerGroup", listMst_CustomerGroup },
+    { "ListMst_CustomerSource", listMst_CustomerSource },
+    { "ListMst_AreaExt", listMst_AreaExt },
+})
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Mst_Customer.js")"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+
+            $('.CustomerGrpCode, .CustomerSourceCode, .AreaCode')
+                .select2()
+                .on('select2:close', function () { commonUtils.showPopup(this); });
+
+            $('.CustomerGrpCode, .CustomerSourceCode, .ProvinceCode, .DistrictCode, .WardCode, .AreaCode, .GovIDType').select2();
+            $('.select-information').select2();
+            // Modal
+            $('.CustomerGrpCodeParent, .CustomerSourceCodeParent, .AreaCodeParent').select2();
+        });
+        function Toggle(thiz) {
+            var objMst_Customer = new Mst_Customer();
+            objMst_Customer.toggle(thiz);
+        }
+
+        function Blur_Element(thiz) {
+            var objMst_Customer = new Mst_Customer();
+            objMst_Customer.blur_Element(thiz);
+        }
+    </script>
+    @if (!CUtils.IsNullOrEmpty(sJSONResponse_Customer_DynamicField))
+    {
+        <script type="text/javascript">
+            ListDataInformation = @MvcHtmlString.Create(sJSONResponse_Customer_DynamicField);
+        </script>
+    }
+    <script type="text/javascript">
+        function LoadMst_District(thiz) {
+            debugger;
+            var objMst_Customer = new Mst_Customer();
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("LoadMst_District", "LoadData")';
+
+            objMst_Customer.ajaxSettings = ajaxSettings;
+            objMst_Customer.loadMst_District(thiz);
+        }
+        function LoadMst_Ward(thiz) {
+            var objMst_Customer = new Mst_Customer();
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("LoadMst_Ward", "LoadData")';
+
+            objMst_Customer.ajaxSettings = ajaxSettings;
+            objMst_Customer.loadMst_Ward(thiz);
+        }
+        @*function LoadMst_District(thiz) {
+            debugger;
+            var objMst_Customer = new Mst_Customer();
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("LoadMst_District", "LoadDataCustomer")';
+
+            objMst_Customer.ajaxSettings = ajaxSettings;
+            objMst_Customer.loadMst_District(thiz);
+        }
+        function LoadMst_Ward(thiz) {
+            var objMst_Customer = new Mst_Customer();
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("LoadMst_Ward", "LoadDataCustomer")';
+
+            objMst_Customer.ajaxSettings = ajaxSettings;
+            objMst_Customer.loadMst_Ward(thiz);
+        }*@
+    </script>
+    <script type="text/javascript">
+        function ShowPopup(input) {
+            var objMst_Customer = new Mst_Customer();
+            objMst_Customer.showPopup(input);
+        }
+
+        function ClosePopup(input) {
+            var objMst_Customer = new Mst_Customer();
+            objMst_Customer.closePopup(input);
+        }
+
+        function AddCustomerGroup() {
+            debugger;
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("AddCustomerGroup", "Mst_Customer")';
+            var objMst_Customer = new Mst_Customer();
+            objMst_Customer.ActionType = 'create';
+            objMst_Customer.ajaxSettings = ajaxSettings;
+            objMst_Customer.addCustomerGroup();
+        }
+        function AddCustomerSource() {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("AddCustomerSource", "Mst_Customer")';
+            var objMst_Customer = new Mst_Customer();
+            objMst_Customer.ActionType = 'create';
+            objMst_Customer.ajaxSettings = ajaxSettings;
+            objMst_Customer.addCustomerSource();
+        }
+        function AddArea() {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("AddArea", "Mst_Customer")';
+            var objMst_Customer = new Mst_Customer();
+            objMst_Customer.ActionType = 'create';
+            objMst_Customer.ajaxSettings = ajaxSettings;
+            objMst_Customer.addArea();
+        }
+
+    </script>
+    <script type="text/javascript">
+        // Information
+        function AddRow_Information(thiz) {
+            var objMst_Customer = new Mst_Customer();
+            objMst_Customer.addRow_Information();
+        }
+
+        function GetValue() {
+            var objMst_Customer = new Mst_Customer();
+            objMst_Customer.getValue();
+        }
+
+        function ClosePopupAddInformation() {
+            var objMst_Customer = new Mst_Customer();
+            objMst_Customer.closePopup_AddInformation();
+        }
+
+        function ClosePopupUpdateInformation() {
+            var objMst_Customer = new Mst_Customer();
+            objMst_Customer.closePopup_UpdateInformation();
+        }
+
+        function AddInformation() {
+            var objMst_Customer = new Mst_Customer();
+            objMst_Customer.addInformation();
+        }
+
+        function DeleteRow_Information(thiz) {
+            var objMst_Customer = new Mst_Customer();
+            objMst_Customer.deleteRowInformation(thiz);
+        }
+
+        function ShowPopup_Edit_Information(thiz) {
+            var objMst_Customer = new Mst_Customer();
+            objMst_Customer.showPopupEdit_Information(thiz);
+        }
+        function Create_Information() {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Customer_DynamicField_Create", "Mst_Customer")';
+            var objMst_Customer = new Mst_Customer();
+            objMst_Customer.ActionType = 'create';
+            objMst_Customer.ajaxSettings = ajaxSettings;
+            objMst_Customer.addInformation();
+        }
+
+        function Update_Information() {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Customer_DynamicField_Update", "Mst_Customer")';
+            var objMst_Customer = new Mst_Customer();
+            objMst_Customer.ActionType = 'edit'; // create
+            objMst_Customer.ajaxSettings = ajaxSettings;
+            objMst_Customer.editInformation();
+        }
+
+        function CheckData(flagRedirect) {
+            var objMst_Customer = new Mst_Customer();
+            var customerCode = commonUtils.returnValueTextOrNull('#CustomerCode');
+            if (commonUtils.checkCharSpecial(customerCode) === false) {
+                debugger;
+                objMst_Customer.showPopupWarning(flagRedirect);
+
+            } else {
+                var ajaxSettings = {};
+                ajaxSettings.Type = 'post';
+                ajaxSettings.DataType = 'json';
+                ajaxSettings.Url = '@Url.Action("Customer_Check", "Mst_Customer")';
+                var objMst_Customer = new Mst_Customer();
+                objMst_Customer.ActionType = 'customer_check'; // create
+                objMst_Customer.ajaxSettings = ajaxSettings;
+                objMst_Customer.customerCheck(flagRedirect);
+            }
+        }
+
+        function ClosePopupWarning() {
+            var objMst_Customer = new Mst_Customer();
+            objMst_Customer.closePopupWarning();
+        }
+
+        function OnConfirm(thiz) {
+            //var objMst_Customer = new Mst_Customer();
+            //objMst_Customer.onConfirm(thiz);
+            debugger;
+            var flagRedirect = $(thiz).attr('data-flag');
+            SaveData(flagRedirect);
+        }
+
+        function ClosePopupCustomerCheck() {
+            var objMst_Customer = new Mst_Customer();
+            objMst_Customer.closePopupCustomerCheck();
+        }
+
+        function RedirectUrl(thiz) {
+            var flagRedirect = $(thiz).attr('data-flag');
+            var customerCode = commonUtils.returnValueText('#CustomerCode_CustomerCheck');
+            if (!commonUtils.isNullOrEmpty(customerCode)) {
+                var url = '@Url.Action("Update", "Mst_Customer")' + '?customercode=' + customerCode + '&flagexsist=1';
+                commonUtils.window_location_href(url);
+            }
+        }
+
+        function CustomerCheck_Create(thiz) {
+            var flagRedirect = $(thiz).attr('data-flag');
+            SaveData(flagRedirect);
+        }
+
+        function SaveData(flagRedirect) {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Edit", "Mst_Customer")';
+            var objMst_Customer = new Mst_Customer();
+            objMst_Customer.ActionType = 'create'; // create
+            objMst_Customer.ajaxSettings = ajaxSettings;
+            objMst_Customer.saveDataUpd(flagRedirect);
+        }
+
+        function Update() {
+            $('input[name="ckb-customertype"]').each(function () {
+                commonUtils.removeClassCss($(this), 'disabled-fix')
+            })
+            commonUtils.removeClassCss('#div-CustomerGrpCode', 'disabled-fix');
+            commonUtils.removeClassCss('#div-CustomerGrpCode', 'disabled-fix');
+            commonUtils.removeClassCss('#div-CustomerSourceCode', 'disabled-fix');
+            commonUtils.removeClassCss('#CustomerName', 'disabled-fix');
+            commonUtils.removeClassCss('#CustomerPhoneNo', 'disabled-fix');
+            commonUtils.removeClassCss('#CustomerMobilePhone', 'disabled-fix');
+            commonUtils.removeClassCss('#CustomerAddress', 'disabled-fix');
+            commonUtils.removeClassCss('#div-ProvinceCode', 'disabled-fix');
+            commonUtils.removeClassCss('#div-DistrictCode', 'disabled-fix');
+            commonUtils.removeClassCss('#div-WardCode', 'disabled-fix');
+            commonUtils.removeClassCss('#div-AreaCode', 'disabled-fix');
+            commonUtils.removeClassCss('#FlagDealer', 'disabled-fix');
+            commonUtils.removeClassCss('#FlagShipper', 'disabled-fix');
+            commonUtils.removeClassCss('#FlagSupplier', 'disabled-fix');
+            commonUtils.removeClassCss('#FlagEndUser', 'disabled-fix');
+            commonUtils.removeClassCss('#FlagBank', 'disabled-fix');
+            commonUtils.removeClassCss('#FlagInsurrance', 'disabled-fix');
+            commonUtils.removeClassCss('#Remark', 'disabled-fix');
+            commonUtils.removeClassCss('.lbl-flag.FlagActive', 'disabled-fix'); // FlagActive
+            commonUtils.removeClassCss('#RepresentName', 'disabled-fix');
+            commonUtils.removeClassCss('#RepresentPosition', 'disabled-fix');
+            commonUtils.removeClassCss('#GovIDCardNo', 'disabled-fix');
+            commonUtils.removeClassCss('#div-GovIDType', 'disabled-fix');
+            commonUtils.removeClassCss('#BankAccountNo', 'disabled-fix');
+            commonUtils.removeClassCss('#BankName', 'disabled-fix');
+            commonUtils.removeClassCss('#ContactName', 'disabled-fix');
+            commonUtils.removeClassCss('#ContactPhone', 'disabled-fix');
+            commonUtils.removeClassCss('#ContactEmail', 'disabled-fix');
+            commonUtils.removeClassCss('#Fax', 'disabled-fix');
+            commonUtils.removeClassCss('#CustomerDateOfBirth', 'disabled-fix');
+            commonUtils.removeClassCss('#Facebook', 'disabled-fix');
+            commonUtils.removeClassCss('#InvoiceCustomerName', 'disabled-fix');
+            commonUtils.removeClassCss('#InvoiceOrgName', 'disabled-fix');
+            commonUtils.removeClassCss('#MST', 'disabled-fix');
+            commonUtils.removeClassCss('#InvoiceCustomerAddress', 'disabled-fix');
+            commonUtils.removeClassCss('#InvoiceEmailSend', 'disabled-fix');
+            // danh sách trường động
+            commonUtils.removeClassCss('#AddRow_Information', 'display-none');
+            commonUtils.addClassCss('#div-Customer_DynamicField_View', 'display-none');
+            commonUtils.removeClassCss('#div-Customer_DynamicField', 'display-none');
+            // avatar
+            commonUtils.removeClassCss('#div-button-avatar', 'display-none');
+            // show popup
+            commonUtils.removeClassCss('#div-show-popup-cus-group', 'display-none');
+            commonUtils.removeClassCss('#div-show-popup-cus-source', 'display-none');
+            commonUtils.removeClassCss('#div-show-popup-area-code', 'display-none');
+            // show button
+            commonUtils.removeClassCss('#div-update', 'display-none');
+            commonUtils.removeClassCss('#div-update-save', 'display-none');
+            commonUtils.addClassCss('#div-edit', 'display-none');
+        }
+    </script>
+    <!-- Hiển thị/ Ẩn thông thin với loại khách hàng tổ chức -->
+    <script>
+        $(document).ready(function () {
+            if ($('input[name="ckb-customertype"]:checked').val().trim().toLowerCase() == 'tochuc') {
+                if ($('#thongtintochuc').hasClass('d-none')) {
+                    $('#thongtintochuc').removeClass('d-none');
+                }
+            }
+        })
+        $('input[name="ckb-customertype"]').change(function () {
+            if (this.value.trim().toLowerCase() == 'tochuc') {
+                if ($('#thongtintochuc').hasClass('d-none')) {
+                    $('#thongtintochuc').removeClass('d-none');
+                }
+            }
+            else {
+                if (!$('#thongtintochuc').hasClass('d-none')) {
+                    $('#thongtintochuc').addClass('d-none');
+                }
+            }
+        });
+    </script>
+    <!-- Script avatar image -->
+    <script type="text/javascript">
+        var noImgSrc = "@Url.Content("/Images/no-image.png")";
+        var imgGetFromDb = '@avatar'  ? "@avatar" : "";
+
+        var initAvatarSrc = noImgSrc;
+        if (!commonUtils.isNullOrEmpty(imgGetFromDb)) {
+            initAvatarSrc = imgGetFromDb;
+        }
+        const initAvatarInputVal = @*@Model.Avatar ??*@ "";
+
+        // Initial avatar image
+        $(document).ready(function () {
+            // Initial avatar background image
+            initialAvatar(initAvatarSrc, initAvatarInputVal);
+        })
+
+        function initialAvatar(initAvatarSrc, initAvatarInputVal) {
+            document.querySelector('.avatar-wrapper').style.backgroundImage = "url(" + initAvatarSrc + ")";
+
+            // Init Customer Avatar Img
+            document.querySelector('input#AvatarImage').value = initAvatarInputVal;
+            document.getElementById('change-avatar').addEventListener('click', function () {
+                document.getElementById('avatar-input').click();
+            });
+            document.getElementById('avatar-input').addEventListener('change', readFile);
+
+            // Init Customer Group Avatar Img
+            document.querySelector('.cusgrp-avatar input#CustomerGrpAvatarImage').value = initAvatarInputVal;
+            document.querySelector('.cusgrp-avatar #change-avatar').addEventListener('click', function () {
+                document.getElementById('cusgrp-avatar-input').click();
+            });
+            document.getElementById('cusgrp-avatar-input').addEventListener('change', readFile);
+
+            // Init Customer Source Avatar Img
+            document.querySelector('.cussrc-avatar input#CustomerSrcAvatarImage').value = initAvatarInputVal;
+            document.querySelector('.cussrc-avatar #change-avatar').addEventListener('click', function () {
+                document.getElementById('cussrc-avatar-input').click();
+            });
+            document.getElementById('cussrc-avatar-input').addEventListener('change', readFile);
+        }
+
+        // Delete avatar image
+        document.getElementById('delete-avatar').addEventListener('click', function () {
+            document.querySelector('.avatar-wrapper').style.backgroundImage = "url(" + noImgSrc + ")";
+            document.querySelector('input#AvatarImage').value = "";
+        })
+
+        // Delete Customer Group avatar image
+        document.querySelector('.cusgrp-avatar #delete-avatar').addEventListener('click', function () {
+            document.querySelector('.cusgrp-avatar .avatar-wrapper').style.backgroundImage = "url(" + noImgSrc + ")";
+            document.querySelector('input#CustomerGrpAvatarImage').value = "";
+        })
+
+        // Delete Customer Group avatar image
+        document.querySelector('.cussrc-avatar #delete-avatar').addEventListener('click', function () {
+            document.querySelector('.cussrc-avatar .avatar-wrapper').style.backgroundImage = "url(" + noImgSrc + ")";
+            document.querySelector('input#CustomerSrcAvatarImage').value = "";
+        })
+
+        // Read file imported and show it on avatar
+        function readFile() {
+            if (this.files && this.files[0]) {
+                debugger;
+                var eleId = this.id;
+                var _fileCur = this.files[0];
+                var _name = _fileCur.name;
+                var _type = _fileCur.type;
+                var FR = new FileReader();
+                FR.addEventListener("load", function (e) {
+                    debugger;
+                    if (eleId === 'avatar-input') {
+                        const avatarBground = document.querySelector('.avatar-wrapper');
+                        const avatarBase64 = document.querySelector('input#AvatarImage');
+                        avatarBground.style.backgroundImage = "url(" + e.target.result + ")";
+                        avatarBase64.value = e.target.result;
+                        $('input#AvatarImage').attr('image-name', _name);
+                        $('input#AvatarImage').attr('image-type', _type);
+                    }
+                    if (eleId === 'cusgrp-avatar-input') {
+                        const cusGrpAvatarBground = document.querySelector('.cusgrp-avatar .avatar-wrapper');
+                        const cusgrpAvatarBase64 = document.querySelector('.cusgrp-avatar input#CustomerGrpAvatarImage');
+                        cusGrpAvatarBground.style.backgroundImage = "url(" + e.target.result + ")";
+                        cusgrpAvatarBase64.value = e.target.result;
+                        $('input#CustomerGrpAvatarImage').attr('image-name', _name);
+                        $('input#CustomerGrpAvatarImage').attr('image-type', _type);
+                    }
+
+                    if (eleId === 'cussrc-avatar-input') {
+                        const cusGrpAvatarBground = document.querySelector('.cussrc-avatar .avatar-wrapper');
+                        const cusgrpAvatarBase64 = document.querySelector('.cussrc-avatar input#CustomerSrcAvatarImage');
+                        cusGrpAvatarBground.style.backgroundImage = "url(" + e.target.result + ")";
+                        cusgrpAvatarBase64.value = e.target.result;
+                        $('input#CustomerSrcAvatarImage').attr('image-name', _name);
+                        $('input#CustomerSrcAvatarImage').attr('image-type', _type);
+                    }
+                    //
+                });
+                FR.readAsDataURL(this.files[0]);
+                this.value = '';
+            }
+        }
+    </script>
+}
+
+

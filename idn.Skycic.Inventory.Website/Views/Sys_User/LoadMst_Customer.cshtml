@@ -1,0 +1,15 @@
+﻿@model List<Mst_Customer>
+@{
+    var orgID = CUtils.StrValue(ViewBag.OrgID);
+}
+
+<optgroup label="">
+    <option value="ALL">Tất cả</option>
+    @if (Model != null && Model.Count > 0)
+    {
+        foreach (var it in Model)
+        {
+            <option value="@MvcHtmlString.Create(it.CustomerCodeSys.ToString().Trim())">@MvcHtmlString.Create(it.CustomerName.ToString().Trim())</option>
+        }
+    }
+</optgroup>

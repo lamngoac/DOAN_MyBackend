@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{44D1E3CB-3335-458D-B014-A72C482342E4}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>idn.Skycic.Inventory.Utils</RootNamespace>
+    <AssemblyName>idn.Skycic.Inventory.Utils</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CommonUtils">
+      <HintPath>..\05.Refs\Libs\Common\CommonUtils.dll</HintPath>
+    </Reference>
+    <Reference Include="EncryptionLib">
+      <HintPath>..\05.Refs\Libs\Common\EncryptionLib.dll</HintPath>
+    </Reference>
+    <Reference Include="EPPlus">
+      <HintPath>..\05.Refs\Libs\ExcelDLL\EPPlus.dll</HintPath>
+    </Reference>
+    <Reference Include="EzDAL, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\05.Refs\Libs\EzSql\EzDAL.dll</HintPath>
+    </Reference>
+    <Reference Include="EzSql, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\05.Refs\Libs\EzSql\EzSql.dll</HintPath>
+    </Reference>
+    <Reference Include="EzSqlServer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\05.Refs\Libs\EzSql\EzSqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="RestSharp">
+      <HintPath>..\05.Refs\Libs\RestSharp\RestSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="TLog.Core">
+      <HintPath>..\05.Refs\Libs\Common\TLog.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="TSession.Core">
+      <HintPath>..\05.Refs\Libs\Common\TSession.Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Base64.cs" />
+    <Compile Include="CmUtilsV30.cs" />
+    <Compile Include="ErrorCodes.cs" />
+    <Compile Include="ExcelBase.cs" />
+    <Compile Include="ExcelUtils.cs" />
+    <Compile Include="JsonResultUtil.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SendMailUtil.cs" />
+    <Compile Include="SqlStringExtensions.cs" />
+    <Compile Include="Utils.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\idn.Skycic.Inventory.Common\idn.Skycic.Inventory.Common.csproj">
+      <Project>{f95f377c-72c1-4bb7-b07c-cb7b090a15d1}</Project>
+      <Name>idn.Skycic.Inventory.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\idn.Skycic.Inventory.Constants\idn.Skycic.Inventory.Constants.csproj">
+      <Project>{050fc41b-8a80-4d6e-9d6e-0126cf0a0ad5}</Project>
+      <Name>idn.Skycic.Inventory.Constants</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

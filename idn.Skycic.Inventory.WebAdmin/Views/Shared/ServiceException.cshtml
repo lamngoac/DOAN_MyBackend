@@ -1,0 +1,47 @@
+﻿@using idn.Skycic.Inventory.Common.Models;
+@using idn.Skycic.Inventory.WebAdmin.Extensions;
+@model idn.Skycic.Inventory.Common.Models.ClientException
+@{
+    Layout = null;
+    //var serviceException = Model;
+    //var errorMessage = "";
+    var exception = ViewBag.Exception;
+    var ex = ViewBag.Exception as ClientException;
+    var message = "";
+    var detail = "";
+    var isClientException = false;
+    if (exception is ClientException)
+    {
+        isClientException = true;
+    }
+    else
+    {
+        var exc = exception as Exception;
+        message = exc.Message;
+        detail = exc.StackTrace.Replace("\n", "<br/>");
+    }
+}
+@if (!isClientException)
+{
+    <div style='width: 100%; padding: 5px 0 10px 0; float: left;'>
+        <span style='font-size: 17px; line-height: 20px; font-family:  arial; color: #e00;'>
+            @MvcHtmlString.Create(message)
+        </span>
+    </div>
+    <div class='error_detail_panel' style='width: 100%; float: left; border-top:solid 1px #efefef;'>
+        <p style='font-size: 12px; line-height: 20px; font-family:  arial;'>@MvcHtmlString.Create(detail)</p>
+    </div>
+}
+else
+{
+    var cex = exception as ClientException;
+    <div style='width: 100%; padding: 5px 0 10px 0; float: left;'>
+        <span style='font-size: 17px; line-height: 20px; font-family:  arial; color: #e00;'>
+            @MvcHtmlString.Create(message)
+        </span>
+    </div>
+    <div class='error_detail_panel' style='width: 100%; float: left; border-top:solid 1px #efefef;'>
+        <p style='font-size: 12px; line-height: 20px; font-family:  arial;'>@cex.ToHtml()</p>
+    </div>
+}
+

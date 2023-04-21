@@ -1,0 +1,167 @@
+﻿@model idn.Skycic.Inventory.Web.Models.LoginModel
+
+@{
+    var title = "RESET PASSWORD";
+    ViewBag.Title = "RESET PASSWORD";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+
+<style>
+    body {
+        overflow: hidden;
+    }
+    /* The checkbox */
+    .checkbox {
+        display: block;
+        position: relative;
+        padding-left: 35px;
+        margin-bottom: 12px;
+        cursor: pointer;
+        font-size: 15px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+        /* Hide the browser's default checkbox */
+        .checkbox input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+    /* Create a custom checkbox */
+    .checkmark {
+        position: absolute;
+        top: 5px;
+        left: 0;
+        height: 25px;
+        width: 25px;
+        background-color: #eee;
+        border: 1px solid #ddd;
+    }
+
+    /* On mouse-over, add a grey background color */
+    .checkbox:hover input ~ .checkmark {
+        background-color: #ccc;
+    }
+
+    /* When the checkbox is checked, add a blue background */
+    .checkbox input:checked ~ .checkmark {
+        background-color: #2196F3;
+    }
+
+    /* Create the checkmark/indicator (hidden when not checked) */
+    .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
+
+    /* Show the checkmark when checked */
+    .checkbox input:checked ~ .checkmark:after {
+        display: block;
+    }
+
+    /* Style the checkmark/indicator */
+    .checkbox .checkmark:after {
+        left: 8px;
+        top: 3px;
+        width: 7px;
+        height: 15px;
+        border: solid white;
+        border-width: 0 3px 3px 0;
+        -webkit-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        transform: rotate(45deg);
+    }
+</style>
+
+<div class="" style="position: relative">
+    <img src="@Url.Content("~/Images/background.png")" class="img-responsive" />
+    <div class="col-xs-7" style="position: absolute; top: 2%;text-align: center; color: #fff; font-weight: bold">
+        <h1 style="font-family: OpenSans-Bold; font-size: 28px">PHẦN MỀM HÓA ĐƠN ĐIỆN TỬ Q-INVOICE</h1>
+        <h3>Đơn giản - Nhanh chóng - Tin cậy</h3>
+    </div>
+    <div class="col-xs-4" style="position: absolute; top: 9%; right: 5%">
+        <div id="login-box" class="login-box visible widget-box no-border">
+            <div class="widget-body">
+                <div class="widget-main no-padding">
+                    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageForm", @class = "form-horizontal", redirectUrl = ViewBag.RedirectUrl }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="RedirectUrl" id="RedirectUrl" value="@ViewBag.RedirectUrl" />
+                        <input type="hidden" name="IPAddress" id="IPAddress" value="@ViewBag.IPAddress" />
+                        <input type="hidden" name="MyHost" id="MyHost" value="@ViewBag.MyHost" />
+                        <div class="modal-body no-padding" style="max-height: 800px">
+                            <div class="container-fluid" style="padding-left: 0; padding-right: 0;">
+                                <div class="header-left-bottom agileinfo">
+                                    <center><h3 style="margin-bottom: 20px; margin-top: 0px; font-weight: bold; color: #005B9B">RESET PASSWORD</h3></center>
+
+
+                                    <input type="text" id="Email" value="" class="ip-enter" name="Email" onfocus="this.value = '';" onblur="if (this.value === '') { this.value = 'Email'; }" />
+
+                                    <input type="password" id="PasswordNew" value="" class="ip-enter" name="PasswordNew" onfocus="this.value = '';" onblur="if (this.value === '') { this.value = 'Mật khẩu mới'; }" />
+
+                                    <input type="password" id="PasswordConfirm" value="" class="ip-enter" name="PasswordConfirm" onfocus="this.value = '';" onblur="if (this.value === '') { this.value = 'Xác nhận mật khẩu'; }" />
+
+
+                                    <div class="col-xs-12" style="margin-bottom: 20px; padding: 0;">
+                                        <a href="javascript:void(0)" onclick="" class="btn btn-login" style="">Thay đổi</a>
+                                    </div>
+                                    <div class="col-xs-12" style="text-align: center; font-size: 15px;">
+                                        <a href="@Url.Action("Login", "Account")" class="" style="">Đăng nhập</a>
+                                        <p style="color: #858585; margin: 10px 0;">Bạn chưa có tài khoản?</p>
+                                        <a href="@Url.Action("Create", "Register")" class="" style="">Đăng ký</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                </div><!-- /.widget-main -->
+            </div><!-- /.widget-body -->
+        </div><!-- /.login-box -->
+    </div>
+
+</div><!-- /.position-relative -->
+
+
+
+<script type="text/javascript">
+
+    processAjaxForm($('#manageForm'), function (response) {
+        processAjaxFormResult(response);
+    });
+</script>
+
+<script>
+
+    $(document).ready(function() {
+        $('.ip-enter').bind("enterKey",function(e){
+            Login();
+        });
+        $('.ip-enter').keyup(function(e){
+            if(e.keyCode === 13)
+            {
+                $(this).trigger("enterKey");
+            }
+        });
+    });
+
+    function CheckFormLogin() {
+        if (!CheckIsNullOrEmpty('#Email', 'has-error-fix', '@MvcHtmlString.Create("Email không được trống!")'))
+        {
+            return false;
+        }
+        return true;
+    }
+
+</script>
+
+
+
+

@@ -1,0 +1,456 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+@{
+    var title = "Tạo mới các trường tùy chỉnh";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var lstCustomField = ViewBag.LstCustomField as List<Invoice_CustomField>;
+    if (lstCustomField == null || lstCustomField.Count == 0)
+    {
+        lstCustomField = new List<Invoice_CustomField>();
+    }
+    var lstDtlCustomField = ViewBag.LstDtlCustomField as List<Invoice_DtlCustomField>;
+    if (lstDtlCustomField == null || lstDtlCustomField.Count == 0)
+    {
+        lstDtlCustomField = new List<Invoice_DtlCustomField>();
+    }
+    var listMst_NNT = ViewBag.ListMst_NNT as List<Mst_NNT>;
+    if (listMst_NNT == null || listMst_NNT.Count == 0)
+    {
+        listMst_NNT = new List<Mst_NNT>();
+    }
+}
+<script src="~/Scripts/mine/invoice_CustomField.js"></script>
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+
+                    <aside class="row no-margin box-shadow-tk">
+                        <div class="row no-margin">
+                            @using (Html.BeginForm(null, null, FormMethod.Get, new { id = "manageForm-search", @class = "form-horizontal" }))
+                            {
+                                <input type="hidden" value="search" name="init" id="init" />
+                                <div class="col-xs-3">
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="netWorkID" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">NetWork ID</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <input type="text" id="netWorkID" name="netWorkID" class="col-xs-11 netWorkID" value="@MvcHtmlString.Create(ViewBag.netWorkID)" onblur="LoadOrgID(this)" autocomplete="off" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3">
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="orgid" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Mã tổ chức</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <select id="orgid" name="orgid" class="col-xs-11 orgid" onchange="GetNameOrg(this)" required>
+                                                @{
+                                                    var orgid = Request["orgid"] == null ? "" : Request["orgid"].ToString();
+                                                }
+                                                @if (listMst_NNT != null && listMst_NNT.Count > 0)
+                                                {
+                                                    foreach (var item in listMst_NNT)
+                                                    {
+                                                        <option value="@MvcHtmlString.Create(item.OrgID.ToString().Trim())" desc="@MvcHtmlString.Create(item.NNTFullName.ToString().Trim())" @(orgid == item.OrgID.ToString() ? "selected" : "")>@MvcHtmlString.Create(item.OrgID.ToString().Trim())</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3">
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="nameorg" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Tên tổ chức</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            @{
+                                                var nameorg = Request["nameorg"] == null ? "" : Request["nameorg"].ToString();
+                                            }
+                                            <input type="text" id="nameorg" name="nameorg" class="col-xs-11 nameorg" value="@nameorg" autocomplete="off" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="button-tk">
+                                    <div class="form-group margin-bottom-5">
+                                        <div class="col-xs-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right">
+
+                                                <a class="btn font-color mybtn-Button" onclick="Search()" href="javascript:void(0);" style="">
+                                                    <img class="img-button" src="/Images/search.svg">
+                                                </a>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <div class="widget-main no-padding">
+                            <div id="fuelux-wizard-container" class="no-steps-container">
+                                <div class="scrollable-horizontal no-sc padding-left-0 padding-right-0 div-scrollable" style="padding-top: 0!important;">
+                                    <div style="width: 100%; float: left;">
+                                        <aside class="col-xs-12">
+                                            @using (Html.BeginForm("Edit", "Invoice_CustomField", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                                            {
+                                                @Html.AntiForgeryToken()
+                                                @Html.ValidationSummary(true)
+                                                <div class="title">
+                                                    <p style="vertical-align: bottom">@MvcHtmlString.Create("Tùy chỉnh các trường dữ liệu Master hóa đơn")</p>
+                                                </div>
+                                                if (lstCustomField != null && lstCustomField.Count > 0)
+                                                {
+                                                    var i = 0;
+                                                    foreach (var it in lstCustomField)
+                                                    {
+                                                        var checkActive = "";
+                                                        var flagActive = "0";
+                                                        if (it != null && it.FlagActive.Equals("1"))
+                                                        {
+                                                            flagActive = it.FlagActive.ToString().Trim();
+                                                        }
+                                                        checkActive = flagActive.Equals("1") ? "checked" : "";
+                                                        <div class="row no-margin customfield" idx="@i">
+                                                            <div class="col-xs-6 no-padding">
+                                                                <div class="form-group margin-bottom-5">
+                                                                    <label for="" class="col-xs-12 col-sm-2 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create(it.InvoiceCustomFieldCode.ToString())</label>
+                                                                    <div class="col-xs-12 col-sm-8">
+                                                                        <div class="col-xs-3">
+                                                                            <span class="block input-icon input-icon-right padding-top-5">
+                                                                                <label>
+                                                                                    <input id="FlagActive_0" name="ListInvoice_CustomField[@i].FlagActive" class="ace ace-switch ace-switch-4" onclick="SetValueCheckBox(this)" type="checkbox" value="@MvcHtmlString.Create(flagActive)" @checkActive>
+                                                                                    <span class="lbl"></span>
+                                                                                </label>
+                                                                            </span>
+                                                                        </div>
+                                                                        <span class="block input-icon input-icon-right">
+                                                                            <input type="hidden" name="ListInvoice_CustomField[@i].InvoiceCustomFieldCode" id="" value="@it.InvoiceCustomFieldCode.ToString()">
+                                                                            <input type="text" id="" name="ListInvoice_CustomField[@i].InvoiceCustomFieldName" class="col-xs-9 " value="@it.InvoiceCustomFieldName.ToString()" autocomplete="off" required />
+                                                                        </span>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-xs-6 no-padding">
+                                                                <div class="form-group margin-bottom-5">
+                                                                    <label for="" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500 ">Kiểu dữ liệu </label>
+                                                                    <div class="col-xs-12 col-sm-5">
+                                                                        <span class="block input-icon input-icon-right">
+                                                                            <select id="" name="ListInvoice_CustomField[@i].DBPhysicalType" class="col-xs-11 " required="">
+                                                                                @{
+                                                                                    var typedata = it.DBPhysicalType == null ? "" : it.DBPhysicalType.ToString();
+                                                                                }
+                                                                                <option value=""></option>
+                                                                                <option value="DATETIME" @(typedata == "DATETIME" ? "selected" : "")>@MvcHtmlString.Create(CLientTypeData_NameVN.DATETIME)</option>
+                                                                                <option value="DATE" @(typedata == "DATE" ? "selected" : "")>@MvcHtmlString.Create(CLientTypeData_NameVN.DATE)</option>
+                                                                                <option value="REALNUMBER" @(typedata == "REALNUMBER" ? "selected" : "")>@MvcHtmlString.Create(CLientTypeData_NameVN.REALNUMBER)</option>
+                                                                                <option value="INTEGERNUMBER" @(typedata == "INTEGERNUMBER" ? "selected" : "")>@MvcHtmlString.Create(CLientTypeData_NameVN.INTEGERNUMBER)</option>
+                                                                                <option value="TEXT" @(typedata == "TEXT" ? "selected" : "")>@MvcHtmlString.Create(CLientTypeData_NameVN.TEXT)</option>
+                                                                            </select>
+                                                                        </span>
+
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        i++;
+                                                    }
+                                                }
+
+                                                <div class="title">
+                                                    <p style="vertical-align: bottom">@MvcHtmlString.Create("Tùy chỉnh các trường thông tin hàng hóa trong hóa đơn")</p>
+                                                </div>
+                                                if (lstDtlCustomField != null && lstDtlCustomField.Count > 0)
+                                                {
+                                                    var i = 0;
+                                                    foreach (var itdtl in lstDtlCustomField)
+                                                    {
+                                                        var checkActive = "";
+                                                        var flagActive = "0";
+                                                        if (itdtl != null && itdtl.FlagActive.Equals("1"))
+                                                        {
+                                                            flagActive = itdtl.FlagActive.ToString().Trim();
+                                                        }
+                                                        checkActive = flagActive.Equals("1") ? "checked" : "";
+                                                        <div class="row no-margin dtlcustomfield" idx="@i">
+                                                            <div class="col-xs-6 no-padding">
+                                                                <div class="form-group margin-bottom-5">
+                                                                    <label for="" class="col-xs-12 col-sm-2 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create(itdtl.InvoiceDtlCustomFieldCode.ToString())</label>
+                                                                    <div class="col-xs-12 col-sm-8">
+                                                                        <div class="col-xs-3">
+                                                                            <span class="block input-icon input-icon-right padding-top-5">
+                                                                                <label>
+                                                                                    <input id="FlagActive_0" name="ListInvoice_DtlCustomField[@i].FlagActive" class="ace ace-switch ace-switch-4" onclick="SetValueCheckBox(this)" type="checkbox" value="@MvcHtmlString.Create(flagActive)" @checkActive>
+                                                                                    <span class="lbl"></span>
+                                                                                </label>
+                                                                            </span>
+                                                                        </div>
+                                                                        <span class="block input-icon input-icon-right">
+                                                                            <input type="hidden" name="ListInvoice_DtlCustomField[@i].InvoiceDtlCustomFieldCode" id="" value="@itdtl.InvoiceDtlCustomFieldCode.ToString()">
+                                                                            <input type="text" id="" name="ListInvoice_DtlCustomField[@i].InvoiceDtlCustomFieldName" class="col-xs-9 " value="@itdtl.InvoiceDtlCustomFieldName.ToString()" autocomplete="off" required />
+                                                                        </span>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-xs-6 no-padding">
+                                                                <div class="form-group margin-bottom-5">
+                                                                    <label for="" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500 ">Kiểu dữ liệu </label>
+                                                                    <div class="col-xs-12 col-sm-5">
+                                                                        <span class="block input-icon input-icon-right">
+                                                                            <select id="" name="ListInvoice_DtlCustomField[@i].DBPhysicalType" class="col-xs-11 " required="">
+                                                                                @{
+                                                                                    var typedata = itdtl.DBPhysicalType == null ? "" : itdtl.DBPhysicalType.ToString();
+                                                                                }
+                                                                                <option value=""></option>
+                                                                                <option value="@CLientTypeData.DATETIME" @(typedata == CLientTypeData.DATETIME ? "selected" : "")>@MvcHtmlString.Create(CLientTypeData_NameVN.DATETIME)</option>
+                                                                                <option value="@CLientTypeData.DATE" @(typedata == CLientTypeData.DATE ? "selected" : "")>@MvcHtmlString.Create(CLientTypeData_NameVN.DATE)</option>
+                                                                                <option value="@CLientTypeData.REALNUMBER" @(typedata == CLientTypeData.REALNUMBER ? "selected" : "")>@MvcHtmlString.Create(CLientTypeData_NameVN.REALNUMBER)</option>
+                                                                                <option value="@CLientTypeData.INTEGERNUMBER" @(typedata == CLientTypeData.INTEGERNUMBER ? "selected" : "")>@MvcHtmlString.Create(CLientTypeData_NameVN.INTEGERNUMBER)</option>
+                                                                                <option value="@CLientTypeData.TEXT" @(typedata == CLientTypeData.TEXT ? "selected" : "")>@MvcHtmlString.Create(CLientTypeData_NameVN.TEXT)</option>
+                                                                            </select>
+                                                                        </span>
+
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        i++;
+                                                    }
+                                                }
+
+                                            }
+                                        </aside>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </aside>
+
+                    <div class="col-xs-12 text-center">
+                        <div class="clearfix">
+                            <div class="row no-margin text-center">
+                                <a href="javascript:void();" class="btn font-color mybtn-Button" style="margin-left: 10px; margin-top: 10px; padding-left: 15px!important; padding-right: 15px!important; " onclick="SaveData();">Lưu</a>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+
+<script>
+    function Delete(orgID, invoiceCustomField) {
+        if (!IsNullOrEmpty(invoiceCustomField)) {
+            bootbox.confirm({
+                title: "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO",
+                message: "Đồng ý xóa trường '" + invoiceCustomField + "' của tổ chức '" + orgID + "' ?",
+                buttons: {
+                    'cancel': {
+                        label: 'Thoát',
+                        className: 'btn mybtn-Button btnButton'
+                    },
+                    'confirm': {
+                        label: 'Đồng ý',
+                        className: 'btn mybtn-Button btnButton'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+
+                        var url = '@Url.Action("Delete", "Invoice_CustomField")';
+                        var token = $('input[name=__RequestVerificationToken]').val();
+                        $.ajax({
+                            url: url,
+                            data: {
+                                orgID: orgID,
+                                invoiceCustomFieldCode: invoiceCustomField,
+                                __RequestVerificationToken: token
+                            },
+                            type: 'post',
+                            dataType: 'json',
+                            success: function (data) {
+                                if (data.Success) {
+                                    debugger;
+                                    if (data.Messages != null && data.Messages !== undefined && data.Messages.length > 0) {
+                                        alert(data.Messages[0]);
+                                    }
+                                    window.location.href = window.location.href;
+                                } else {
+                                    _showErrorMsg123("Lỗi!",data.Detail);
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        } else {
+            alert("Chưa chọn bản ghi cần xóa!");
+            return;
+        }
+    }
+</script>
+
+<script>
+    function SetValueCheckBox(thiz) {
+        var checkbox = false;
+        if ($(thiz).is(":checked")) {
+            checkbox = true;
+            $(thiz).val('1');
+        } else {
+            $(thiz).val('0');
+        }
+    }
+
+    function Search()
+    {
+        $('#manageForm-search').attr('action', '@Url.Action("Index", "Invoice_CustomField")').submit();
+    }
+</script>
+
+<script>
+    function LoadOrgID(thiz) {
+        debugger
+        var networkid = $(thiz).val();
+        if (!IsNullOrEmpty(networkid)) {
+            debugger;
+            var url = '@Url.Action("LoadOrgID", "LoadData")';
+            var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+            $.ajax({
+                url: url,
+                data: {
+                    __RequestVerificationToken: token
+                    , networkid: networkid
+                },
+                type: 'post',
+                dataType: 'json',
+                traditional: true,
+                success: function (data) {
+                    if (data.Success) {
+                        $("#orgid").html(data.Html);
+                        var desc = $('#orgid').find('option:checked').attr('desc');
+                        $('#nameorg').val(desc);
+                    } else {
+                        if (!IsNullOrEmpty(data.Detail))
+                        {
+                            _showErrorMsg123('Lỗi!', data.Detail);
+                        }
+                        else {
+                            _showErrorMsg123('Lỗi!', data.Title[0]);
+                        }
+                    }
+                }
+            });
+        }
+        else {
+            $("#orgid").html('');
+            $('#nameorg').val('');
+        }
+    }
+</script>
+
+<script>
+    function GetNameOrg(thiz) {
+        debugger
+        var desc = $(thiz).find('option:checked').attr('desc');
+        $('#nameorg').val(desc);
+    }
+</script>
+
+<script>
+    function SaveData() {
+        var netWorkID = $('#netWorkID').val();
+        var orgid = $('#orgid').val();
+
+        var lstInvoice_CustomField = [];
+        var idx = 0;
+        $('div.customfield').each(function () {
+            debugger
+            idx = $(this).attr('idx');
+            var flagActive = ReturnValue($(this).find('input[type="checkbox"][name="ListInvoice_CustomField[' + idx + '].FlagActive"]').val());
+            var invoiceCustomFieldCode = ReturnValue($(this).find('input[type="hidden"][name="ListInvoice_CustomField[' + idx + '].InvoiceCustomFieldCode"]').val());
+            var invoiceCustomFieldName = ReturnValue($(this).find('input[type="text"][name="ListInvoice_CustomField[' + idx + '].InvoiceCustomFieldName"]').val());
+            var dBPhysicalType = ReturnValue($(this).find('select[name="ListInvoice_CustomField[' + idx + '].DBPhysicalType"]').val());
+            var objlstInvoice_CustomField = {};
+
+            objlstInvoice_CustomField.FlagActive = flagActive;
+            objlstInvoice_CustomField.InvoiceCustomFieldCode = invoiceCustomFieldCode;
+            objlstInvoice_CustomField.InvoiceCustomFieldName = invoiceCustomFieldName;
+            objlstInvoice_CustomField.DBPhysicalType = dBPhysicalType;
+            objlstInvoice_CustomField.NetworkID = netWorkID;
+            objlstInvoice_CustomField.OrgID = orgid;
+
+            lstInvoice_CustomField.push(objlstInvoice_CustomField);
+        });
+
+        var lstInvoice_DtlCustomField = [];
+
+        $('div.dtlcustomfield').each(function () {
+            idx = $(this).attr('idx');
+            var flagActive = ReturnValue($(this).find('input[type="checkbox"][name="ListInvoice_DtlCustomField[' + idx + '].FlagActive"]').val());
+            var invoiceDtlCustomFieldCode = ReturnValue($(this).find('input[type="hidden"][name="ListInvoice_DtlCustomField[' + idx + '].InvoiceDtlCustomFieldCode"]').val());
+            var invoiceDtlCustomFieldName = ReturnValue($(this).find('input[type="text"][name="ListInvoice_DtlCustomField[' + idx + '].InvoiceDtlCustomFieldName"]').val());
+            var dBPhysicalType = ReturnValue($(this).find('select[name="ListInvoice_DtlCustomField[' + idx + '].DBPhysicalType"]').val());
+            var objlstInvoice_DtlCustomField = {};
+
+            objlstInvoice_DtlCustomField.FlagActive = flagActive;
+            objlstInvoice_DtlCustomField.InvoiceDtlCustomFieldCode = invoiceDtlCustomFieldCode;
+            objlstInvoice_DtlCustomField.InvoiceDtlCustomFieldName = invoiceDtlCustomFieldName;
+            objlstInvoice_DtlCustomField.DBPhysicalType = dBPhysicalType;
+            objlstInvoice_DtlCustomField.NetworkID = netWorkID;
+            objlstInvoice_DtlCustomField.OrgID = orgid;
+
+            lstInvoice_DtlCustomField.push(objlstInvoice_DtlCustomField);
+        });
+
+        var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+        var url = '@Url.ActionLocalized("Edit", "Invoice_CustomField")';
+        var modelCur = JSON.stringify(lstInvoice_CustomField);
+        var modelDtlCur = JSON.stringify(lstInvoice_DtlCustomField);
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: {
+                __RequestVerificationToken: token
+                , model: modelCur
+                , modeldtl: modelDtlCur
+                , netWorkID: netWorkID
+            },
+            traditional: true,
+            //contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                if (data.Success) {
+                    if (data.Messages != null && data.Messages !== undefined && data.Messages.length > 0) {
+                        alert(data.Messages[0]);
+                    }
+                    window.location.href = data.RedirectUrl;
+                }
+                else {
+                    if (data.Detail != null) {
+                        _showErrorMsg123("Lỗi!", data.Detail);
+                    }
+                }
+            }, error: function (xmlHttpRequest, textStatus, errorThrown) {
+                debugger;
+                if (textStatus === 'Unauthorized') {
+                    alert('custom message. Error: ' + errorThrown);
+                } else {
+                    //alert('custom message. Error2: ' + errorThrown);
+                }
+            }
+        });
+    }
+</script>

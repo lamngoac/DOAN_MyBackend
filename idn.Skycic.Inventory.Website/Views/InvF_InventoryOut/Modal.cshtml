@@ -1,0 +1,171 @@
+﻿
+@{
+
+}
+<div class="modal fade" id="ShowProductByOrder" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalProductByOrder"><b>Danh sách hàng hóa</b></h2>
+                <a href="javascript:;" onclick="ClosePopupShowProductByOrder()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowProductByOrder" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group margin-bottom-9">
+                        <div class="col-10 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <label>Danh sách hàng hóa của đơn hàng <span class="OrderName"></span></label>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-12 margin-bottom-9">
+                        <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+                            <div style="width: 100%; float: left;">
+                                <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                                    <thead>
+                                        <tr class="thead-selectdata">
+                                            <th fieldId="CONTROL" fieldName="CONTROL" fieldActive="0" class="text-center cell-50">
+                                                <input type="checkbox" class="cl-check idn-checkbox" onclick="CheckAll(this);" name="check-box-all" id="check-box-all" />
+                                                <label for="check-box-all"><span></span></label>
+                                            </th>
+                                            <th fieldId="ProductCodeUser" fieldName="Mã hàng hóa" fieldActive="0" class="text-center cell-130">
+                                                Mã hàng hóa
+                                            </th>
+                                            <th fieldId="ProductName" sorttype="T" fieldName="Tên hàng hóa" fieldActive="0" class="text-left cell-200">
+                                                Tên hàng hóa
+                                            </th>
+                                        </tr>
+                                    </thead>
+
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                            <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                                <tbody id="table-tbodyIDProductsByOrder"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn btn-nc-button" style="margin-left: 10px" id="btnProductsAdd" onclick="productByOrderAdd();">Chọn</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/template" id="tmpl_productsbyorder_popup">
+    <tr class="data-item trdata" idx="==idx==">
+        <td fieldId="CONTROL" class="text-center cell-50">
+            <input type="checkbox" class="cl-check idn-checkbox" name="ckb" id="check-box-==idx==" onclick="checkBox_PopupSelectData(this, $('.thead-selectdata'), $('#table-tbodyIDProductsByOrder'));" />
+            <label for="check-box-==idx=="><span></span></label>
+        </td>
+        <td class="text-left cell-130 productcodeuser">
+            <input type="text" class="col-12 no-border text-left disabled-fix ProductCodeUser ==productcodeuserCss==" style="border: none!important;" value="==ProductCodeUser==" />
+            <input type="hidden" name="CustomerCodeSys" class="CustomerCodeSys" value="==CustomerCodeSys==" />
+            <input type="hidden" name="ProductCodeRoot" class="ProductCodeRoot" value="==ProductCodeRoot==" />
+            <input type="hidden" name="ProductCodeBase" class="ProductCodeBase" value="==ProductCodeBase==" />
+            <input type="hidden" name="OrderNoSys" class="OrderNoSys" value="==OrderNoSys==" />
+            <input type="hidden" name="UnitCode" class="UnitCode" value="==UnitCode==" />
+            <input type="hidden" name="UPSell" class="UPSell" value="==UPSell==" />
+            <input type="hidden" name="QtyAppr" class="QtyAppr" value="==QtyAppr==" />
+            <input type="hidden" name="QtyInvOutAvail" class="QtyInvOutAvail" value="==QtyInvOutAvail==" />
+            <input type="hidden" name="QtyTotalOK" class="QtyTotalOK" value="==QtyTotalOK==" />
+            <input type="hidden" name="FlagLo" class="FlagLo" value="==FlagLo==" />
+            <input type="hidden" name="FlagSerial" class="FlagSerial" value="==FlagSerial==" />
+            <input type="hidden" name="FlagCombo" class="FlagCombo" value="==FlagCombo==" />
+            <input type="hidden" name="ValConvert" class="ValConvert" value="==ValConvert==" />
+        </td>
+        <td class="text-left cell-200 productname">
+            <input type="text" class="col-12 no-border text-left disabled-fix ProductName ==productnameCss==" style="border: none!important;" value="==ProductName==" />
+        </td>
+    </tr>
+</script>
+
+<script type="text/javascript">
+    function ClosePopupShowProductByOrder() {
+        $('#ShowProductByOrder').hide();
+        $('body').removeClass('modal-open');
+    }
+</script>
+
+<script type="text/javascript">
+    function CheckAll(thiz) {
+        debugger;
+        let trArr = $('#table-tbodyIDProductsByOrder');
+        if (trArr !== null && trArr.length > 0) {
+            for (var i = 0; i < trArr.length; i++) {
+                var trCur = trArr[i];
+                if (trCur !== null && trCur !== undefined) {
+                    var inputCkb = $(trCur).find('input[type="checkbox"]');
+                    var check = false;
+                    if ($(thiz).is(":checked")) {
+                        check = true;
+                    }
+                    $(inputCkb).prop("checked", check);
+                }
+            }
+        }
+    }
+</script>
+<script type="text/javascript">
+    function checkBox_PopupSelectData(thiz, $thead, $tbody) {
+        debugger;
+        var c_all = false;
+        if ($(thiz).is(":checked")) {
+            c_all = true;
+        }
+        if (!c_all) {
+            var $inputCheckBox_CheckAll = $thead.find('input.idn-checkbox');
+            if ($inputCheckBox_CheckAll !== undefined && $inputCheckBox_CheckAll !== null) {
+                $inputCheckBox_CheckAll.prop("checked", c_all);
+            }
+        }
+        else {
+            var rows = $tbody.find('tr.trdata').length;
+            if (rows > 0) {
+                var trArr = $tbody.find('tr.trdata').has('input[type=checkbox]:checked');
+                if (trArr !== null) {
+                    var trLength = trArr.length;
+                    if (trLength === rows) {
+                        $thead.find('input.idn-checkbox').prop("checked", c_all);
+                    }
+                    else {
+                        $thead.find('input.idn-checkbox').prop("checked", !c_all);
+                    }
+                }
+                else {
+                    $thead.find('input.idn-checkbox').prop("checked", !c_all);
+                }
+            }
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    function showPopupProductsByOrder() {
+        $('#ShowProductByOrder').modal({
+            backdrop: false,
+            keyboard: true,
+        });
+        var display = $("#ShowProductByOrder").css('display');
+        if (display == "none") {
+            $("#ShowProductByOrder").show();
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    function productByOrderAdd() {
+        var rows = $('#table-tbodyIDProductsByOrder').find('tr.trdata').find().length;
+        if (rows > 0) {
+            var 
+        }
+    }
+</script>
+

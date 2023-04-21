@@ -1,0 +1,160 @@
+﻿@model Mst_PartUnit
+@{
+    Layout = "~/Views/Shared/CoreLayoutQuanTri.cshtml";
+    var title = "SỬA ĐƠN VỊ SẢN PHẨM";
+    var titleMng = "Danh mục đơn vị sản phẩm";
+    ViewBag.Title = title;
+    var chked = "checked=\"checked\"";
+}
+@{
+
+}
+<script type="text/javascript">
+    var parents = new Array();
+    parents.push("@Url.Action("Index", "Mst_PartUnit")");
+    parents.push("");
+    var parentsText = new Array();
+    parentsText.push("@MvcHtmlString.Create("titleMng")");
+    parentsText.push("@MvcHtmlString.Create("title")");
+    setAdminCurrentTag(parents, parentsText);
+</script>
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                @*<div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>*@
+                <div class="panel-body no-padding" id="panel-body">
+                    <aside class="col-xs-12 no-padding">
+                        @using (Html.BeginForm("Create", "Mst_PaymentType", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                        <div class="col-xs-12 layout-search layout-bot-top-16">
+                            <aside class="col-xs-4 no-padding">
+                                <div class="form-group margin-bottom-9">
+                                    <label for="PartUnitCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã đơn vị sản phẩm <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="PartUnitCode" name="PartUnitCode" class="col-xs-12 PartUnitCode" onkeyup="locdau(this);" value="@if (Model != null && Model.PartUnitCode != null){@MvcHtmlString.Create(Model.PartUnitCode.ToString())} else { @("")}" autocomplete="off" disabled />
+                                        </span>
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group margin-bottom-9">
+                                    @{
+                                        var flagUnitStd = "";
+                                        if (Model.FlagUnitStd != null && Model.FlagUnitStd.Equals("1"))
+                                        {
+                                            flagUnitStd = "checked";
+                                        }
+                                        else
+                                        {
+                                            flagUnitStd = "";
+                                        }
+                                    }
+                                    <label for="FlagUnitStd" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Đơn vị cơ bản <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right padding-top-5">
+                                            <label>
+                                                <input name="FlagUnitStd" id="FlagUnitStd" class="ace ace-switch ace-switch-4 FlagUnitStd" type="checkbox" value="1" @flagUnitStd />
+                                                <span class="lbl"></span>
+                                                <input name="FlagUnitStd" type="hidden" value="0" />
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+
+                            </aside>
+
+                            <aside class="col-xs-4 no-padding">
+                                <div class="form-group margin-bottom-9">
+                                    <label for="FlagActive" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên đơn vị sản phẩm <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="PartUnitName" name="PartUnitName" class="col-xs-12 Code PartUnitName" value="@if (Model != null && Model.PartUnitName != null){@MvcHtmlString.Create(Model.PartUnitName.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-9">
+                                    @{
+                                        var checkActive = "";
+                                        if (Model.FlagActive != null && Model.FlagActive.Equals("1"))
+                                        {
+                                            checkActive = "checked";
+                                        }
+                                        else
+                                        {
+                                            checkActive = "";
+                                        }
+                                    }
+                                    <label for="FlagActive" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">Trạng thái</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right padding-top-5">
+                                            <label>
+                                                <input name="FlagActive" id="FlagActive" class="ace ace-switch ace-switch-4 FlagActive" type="checkbox" value="1" @checkActive />
+                                                <span class="lbl"></span>
+                                                <input name="FlagActive" type="hidden" value="0" />
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+                            </aside>
+
+                        </div>
+                        }
+                    </aside>
+                    <div class="col-xs-12 layout-search layout-bot-top-16">
+                        @RenderItemFormat("BTN_SUA_DON_VI_SP_LUU", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px\" onclick=\"SaveData();\">Lưu</a>", "", "")
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE CONTENT ENDS -->
+</div><!-- /.col -->
+</div><!-- /.row -->
+
+<script type="text/javascript">
+    processAjaxForm($('#manageForm'), function (response) {
+        processAjaxFormResult(response);
+
+    });
+</script>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Mst_PartUnit.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "Mst_PartUnit")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+        });
+        @* Set focus *@
+        var _getForm = document.getElementById("manageForm");
+        _getForm.addEventListener('reset', function () {
+            document.getElementById("PartUnitCode").focus()
+        })
+        function SaveData() {
+            debugger;
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Edit", "Mst_PartUnit")';
+            var objMst_PartUnit = new Mst_PartUnit();
+            objMst_PartUnit.ActionType = 'edit';
+            objMst_PartUnit.ajaxSettings = ajaxSettings;
+            objMst_PartUnit.saveData();
+        }
+    </script>
+}
+
+
+
+

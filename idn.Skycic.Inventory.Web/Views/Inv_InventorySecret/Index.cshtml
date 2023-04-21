@@ -1,0 +1,305 @@
+﻿@model PageInfo<Inv_InventorySecret>
+@{
+    Layout = "~/Views/Shared/CoreLayoutIn_Tem.cshtml";
+    var title = "QUẢN LÝ CẤP SỐ IN TEM";
+    ViewBag.Title = title;
+    ViewBag.OverflowX = true;
+    var startCount = 0;
+    var strStartCount = CUtils.StrValue(ViewBag.StartCount);
+    if (!CUtils.IsNullOrEmpty(strStartCount) && CUtils.IsNumeric(strStartCount))
+    {
+        startCount = Convert.ToInt32(strStartCount);
+    }
+    //var datasize = 1200;
+    var offset = ViewBag.Offset;
+    var totalQty = 0.0;
+    var totalQtyIssued = 0.0;
+    var totalQtyUsed = 0.0;
+    var tongSoLuongConLai = 0.0;
+    if (!CUtils.IsNullOrEmpty(ViewBag.TongSoLuongConLai))
+    {
+        if (CUtils.IsNumeric(ViewBag.TongSoLuongConLai))
+        {
+            tongSoLuongConLai = Convert.ToDouble(ViewBag.TongSoLuongConLai);
+        }
+    }
+    if (!CUtils.IsNullOrEmpty(ViewBag.TotalQty))
+    {
+        if (CUtils.IsNumeric(ViewBag.TotalQty))
+        {
+            totalQty = Convert.ToDouble(ViewBag.TotalQty);
+        }
+    }
+    if (!CUtils.IsNullOrEmpty(ViewBag.TotalQtyIssued))
+    {
+        if (CUtils.IsNumeric(ViewBag.TotalQtyIssued))
+        {
+            totalQtyIssued = Convert.ToDouble(ViewBag.TotalQtyIssued);
+        }
+    }
+    if (!CUtils.IsNullOrEmpty(ViewBag.TotalQtyUsed))
+    {
+        if (CUtils.IsNumeric(ViewBag.TotalQtyUsed))
+        {
+            totalQtyUsed = Convert.ToDouble(ViewBag.TotalQtyUsed);
+        }
+    }
+
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+
+    var showtext = "";
+    if (Model.ItemCount > 0)
+    {
+        var recordstart = (Model.PageIndex) * Model.PageSize + 1;
+        var recordend = (Model.PageIndex + 1) * Model.PageSize;
+        if (recordend > Model.ItemCount)
+        {
+            recordend = Model.ItemCount;
+        }
+        showtext = recordstart + "-" + recordend + " trong số " + Model.ItemCount;
+    }
+}
+<script src="@Url.Content("~/Core.Content/lte/plugins/jquery/jquery.min.js")"></script>
+
+<style>
+    .ace-scroll, .scroll-content {
+        overflow: hidden !important;
+    }
+</style>
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="panel-body no-padding" id="panel-body" style="">
+                    <aside class="col-xs-12 no-padding layout-tk">
+                        @using (Html.BeginForm(null, null, FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            <input type="hidden" value="search" name="init" id="init" />
+                            <div class="col-xs-9 box-shadow-tk">
+                                <aside class="col-xs-5">
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="PrintTempCode" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Chọn số lượng in </label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <input type="text" id="qtysearch" name="qtysearch" class="col-xs-11 text-right qtysearch" value="@MvcHtmlString.Create(ViewBag.Qty)" autocomplete="off">
+                                            <input type="hidden" id="tongsoluongconlai" name="tongsoluongconlai" value="@MvcHtmlString.Create(tongSoLuongConLai.ToString())" />
+                                            <input type="hidden" id="qty" name="qty" value="@MvcHtmlString.Create(ViewBag.Qty)">
+                                        </div>
+                                    </div>
+                                </aside>
+                                <div class="button-tk">
+                                    <div class="form-group margin-bottom-5">
+                                        <div class="col-xs-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right">
+                                                @RenderItemFormat("BTN_QL_CAP_SO_IN_TEM_TK", "<a class=\"btn font-color button-search\" onclick=\"Search()\" href=\"javascript: void(0);\"><img class=\"img-search\" src=" + @Url.Content("~/Images/search.svg") + "></a>", "", "")
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 left-ton no-padding-right" style="margin-top: 4px;">
+                                <div class="row no-margin">
+                                    <div class="col-xs-7 no-padding ton-1" style="">
+                                        <p>Đã mua @MvcHtmlString.Create(CUtils.formatNumeric(totalQty, Nonsense.INTEGER_DB_FORMAT).ToString())</p>
+                                    </div>
+                                    <div class="col-xs-5 no-padding ton-2" style="">
+                                        <p>Đã dùng @MvcHtmlString.Create(CUtils.formatNumeric(totalQtyUsed, Nonsense.INTEGER_DB_FORMAT).ToString())</p>
+                                    </div>
+                                </div>
+                                <div class="row no-margin">
+                                    <div class="col-xs-7 no-padding ton-3" style="">
+                                        <p>Đã phát hành @MvcHtmlString.Create(CUtils.formatNumeric(totalQtyIssued, Nonsense.INTEGER_DB_FORMAT).ToString())</p>
+                                    </div>
+                                    <div class="col-xs-5 no-padding ton-4" style="">
+                                        <p>Còn lại @MvcHtmlString.Create(CUtils.formatNumeric(tongSoLuongConLai, Nonsense.INTEGER_DB_FORMAT).ToString())</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12" style="margin:10px 0">
+                                <a class="btn btn-nc-button" data-toggle="dropdown" aria-expanded="false">...</a>
+                                <ul class="dropdown-menu" role="menu" style="">
+                                    <li>
+                                        @RenderItemFormat("BTN_QL_CAP_SO_IN_TEM_XUAT_EXCEL", "<a class=\"mybtn-Button-1\" onclick=\"Export()\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/export.svg") + "'>Export Excel</a>", "", "")
+                                    </li>
+                                </ul>
+                                <span class="search-bar">
+                                    <input type="text" class="quicksearch txtSearchObj" name="search" id="dynamic-table-thead-search">
+                                    <input type="text" class="quicksearch1 txtSearchObj1" name="search" style="z-index: -1000; height: 0; padding: 0; margin: 0; border: 0">
+                                </span>
+                                @Html.Partial("Pagination", null, new ViewDataDictionary() { { "PageCur", MvcHtmlString.Create("1") }, { "RecordCount", MvcHtmlString.Create(Model.PageSize.ToString()) }, { "ShowText", showtext }, { "qtysearch", Request["qtysearch"] } })
+                            </div>
+                            <input type="hidden" value="@MvcHtmlString.Create(pageCur)" name="page" id="page" />
+                        }
+                        <input type="hidden" value="@MvcHtmlString.Create(Model.PageCount.ToString())" name="totalpage" id="totalpage" />
+                    </aside>
+                </div>
+            </div>
+            <div class="panel panel-info no-margin">
+                <div class="panel-body no-padding" id="panel-body">
+                    @Html.AntiForgeryToken()
+                    <aside class="col-xs-12 no-padding">
+                        <div class="scrollable-horizontal padding-left-0 padding-right-0 div-scrollable" data-size="1150">
+                            <div style="width: 100%; float: left;">
+                                <table id="dynamic-table-thead" class="table table-striped table-bordered table-hover table-cus table-bottom-0 no-margin">
+                                    <thead>
+                                        <tr class="trthead">
+                                            <th class="text-center cell-30">@MvcHtmlString.Create("STT")</th>
+                                            <th fieldId="QR_SERIALNO" sorttype="T" class="text-center cell-400">
+                                                @MvcHtmlString.Create("Số Serial")
+                                            </th>
+                                            <th fieldId="GENTIMESNO" sorttype="T" class="text-center cell-300">
+                                                @MvcHtmlString.Create("Mã lần sinh")
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                            <div data-size="1150" style="width: 100%; float: left;">
+                                <table id="dynamic-table-thead-tbody" class="table table-striped table-bordered table-hover table-cus table-bottom-0">
+                                    <tbody id="table-tbodyID">
+                                        @if (Model.DataList != null && Model.DataList.Count > 0)
+                                        {
+                                            var idx = 0;
+                                            foreach (var item in Model.DataList)
+                                            {
+                                                var iindex = startCount + (idx + 1);
+                                                var serialNo = CUtils.StrValue(item.SerialNo);
+                                                var qR_SerialNo = CUtils.StrValue(item.QR_SerialNo);
+                                                var genTimesNo = CUtils.StrValue(item.GenTimesNo);
+                                                var flagUsed = CUtils.StrValue(item.FlagUsed);
+                                                var flagMap = CUtils.StrValue(item.FlagMap);
+
+                                                <tr idx="@idx" serialno="@MvcHtmlString.Create(serialNo)" class="data-item trdata">
+                                                    <td class="text-center cell-30">
+                                                        @MvcHtmlString.Create(iindex.ToString())
+                                                    </td>
+                                                    <td fieldId="QR_SERIALNO" sorttype="T" class="text-left cell-400">@MvcHtmlString.Create(qR_SerialNo)</td>
+                                                    <td fieldId="GENTIMESNO" sorttype="T" class="text-left cell-300">@MvcHtmlString.Create(genTimesNo)</td>
+                                                </tr>
+                                                idx++;
+                                            }
+                                        }
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </aside>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- PAGE CONTENT ENDS -->
+</div><!-- /.col -->
+@*Import Excel*@
+<div class="modal fade" id="ImportExcelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Inv_InventorySecret.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "Inv_InventorySecret")');
+        @* Scroll *@
+        $(document).ready(function () {
+            $('.scrollable-horizontal').each(function () {
+                var $this = $(this);
+                $(this).ace_scroll(
+                    {
+                        horizontal: true,
+                        //styleClass: 'scroll-top',//show the scrollbars on top(default is bottom)
+                        size: $this.attr('data-size') || 6500,
+                        mouseWheelLock: true
+                    }
+                ).css({ 'padding-top': 0 });
+            });
+            $('.scrollable').each(function () {
+                var $this = $(this);
+                $(this).ace_scroll({
+                    //size: 500,
+                    size: $this.attr('data-size') || 1000,
+                    mouseWheelLock: true
+                    //styleClass: 'scroll-left scroll-margin scroll-thin scroll-dark scroll-light no-track scroll-visible'
+                });
+            });
+        });
+
+
+        @* keypress *@
+        $(document).on('keypress', function (e) {
+            if (e.which == 13) {
+                Search();
+            }
+        });
+        function Search() {
+            var qtysearch = $('#qtysearch').val();
+            if (!commonUtils.checkElementIsNullOrEmpty('#qtysearch', 'has-error-fix', 'Chưa nhập số lượng in!')) {
+                return false;
+            }
+            if (qtysearch > 100000)
+            {
+                alert('số lượng nhập <= 100000')
+                return false;
+            }
+            else {
+                var tongsoluongconlai = commonUtils.returnValueFloat('#tongsoluongconlai');
+                if (qtysearch <= tongsoluongconlai) {
+                    $('#qty').val(qtysearch);
+                    $('#manageForm').attr('action', '@Url.Action("Index", "Inv_InventorySecret")').submit();
+                } else {
+                    commonUtils.showAlert('Chọn số lượng in <= Số lượng còn lại (' + commonUtils.formatNumber(tongsoluongconlai, 0) + ')');
+                    commonUtils.setFocus('qtysearch');
+                    commonUtils.addClassCss('#qtysearch', 'has-error-fix');
+                }
+            }
+        }
+
+        var objInv_InventorySecret = new Inv_InventorySecret();
+
+        var ajaxSettings = {};
+        ajaxSettings.Type = 'post';
+        ajaxSettings.DataType = 'json';
+
+        function Export() {
+            ajaxSettings.Url = '@Url.Action("Export", "Inv_InventorySecret")';
+            var qtysearch = $('#qtysearch').val();
+            if (!commonUtils.checkElementIsNullOrEmpty('#qtysearch', 'has-error-fix', 'Chưa nhập số lượng in!')) {
+                return false;
+            } else {
+
+                var tongsoluongconlai = commonUtils.returnValueFloat('#tongsoluongconlai');
+                if (qtysearch <= tongsoluongconlai) {
+                    commonUtils.removeClassCss('#qtysearch', 'has-error-fix');
+                    //$('#qty').val(qtysearch);
+                    //var qty = commonUtils.returnValueTextOrNull('#qty');
+                    var ListSearchInput = [
+                        //{ Key: 'qty', Value: qty },
+                        { Key: 'qty', Value: qtysearch },
+                    ];
+
+                    objInv_InventorySecret.ajaxSettingsInit();
+                    objInv_InventorySecret.ajaxSettings = ajaxSettings;
+                    objInv_InventorySecret.exportExcel(ListSearchInput);
+                } else {
+                    commonUtils.showAlert('Chọn số lượng in <= Số lượng còn lại (' + commonUtils.formatNumber(tongsoluongconlai, 0) + ')');
+                    commonUtils.setFocus('qtysearch');
+                    commonUtils.addClassCss('#qtysearch', 'has-error-fix');
+                }
+            }
+        }
+    </script>
+}
+
+@* Script Sortable *@
+<script type="text/javascript" src="@Url.Content("~/Scripts/js/table-sortable-v3.js")"></script>
+<script type="text/javascript">
+    var listColumns = {
+        'QR_SERIALNO': [],
+        'GENTIMESNO': [],
+    };
+    var options = {};
+    options.Columns = listColumns;
+    $('#dynamic-table-thead').table_Sortable(options);
+</script>

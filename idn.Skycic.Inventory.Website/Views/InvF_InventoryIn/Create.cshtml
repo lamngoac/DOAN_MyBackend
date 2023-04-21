@@ -1,0 +1,248 @@
+﻿@model RT_InvF_InventoryIn
+@{
+    /**/
+
+
+    ViewBag.Title = "Tạo mới phiếu nhập kho";
+    var listMst_InvInType = ViewBag.ListMst_InvInType as List<Mst_InvInType>;
+    var listMst_Inventory = ViewBag.ListMst_Inventory as List<Mst_Inventory>;
+    var listMst_Customer = ViewBag.ListMst_Customer as List<Mst_Customer>;
+
+    string viewType = "create";
+    var userState = ViewBag.UserState as UserState;
+
+    var objInvF_InventoryIn = new InvF_InventoryIn();
+    var iF_InvInNo = "";
+    var iF_InvInStatus = "";
+    var customerCodeCur = "";
+    var customerCodeSysCur = "";
+    var customerNameCur = "";
+    var customerAddressCur = "";
+    if (Model != null)
+    {
+        if (Model.Lst_InvF_InventoryIn != null && Model.Lst_InvF_InventoryIn.Count > 0)
+        {
+            objInvF_InventoryIn = Model.Lst_InvF_InventoryIn[0];
+            iF_InvInStatus = CUtils.StrValue(objInvF_InventoryIn.IF_InvInStatus);
+            iF_InvInNo = CUtils.StrValue(objInvF_InventoryIn.IF_InvInNo);
+            customerCodeSysCur = CUtils.StrValue(objInvF_InventoryIn.CustomerCode);
+        }
+
+        if (listMst_Customer == null || listMst_Customer.Count == 0)
+        {
+            listMst_Customer = new List<Mst_Customer>();
+        }
+        else
+        {
+            var listMst_CustomerCur = listMst_Customer.Where(it => !CUtils.IsNullOrEmpty(it.CustomerCodeSys) && !CUtils.IsNullOrEmpty(Model.Lst_InvF_InventoryIn[0].CustomerCode) && CUtils.StrValue(it.CustomerCodeSys).Equals(Model.Lst_InvF_InventoryIn[0].CustomerCode)).ToList();
+            if (listMst_CustomerCur != null && listMst_CustomerCur.Count > 0)
+            {
+                customerCodeCur = CUtils.StrValue(listMst_CustomerCur[0].CustomerCode);
+                customerNameCur = CUtils.StrValue(listMst_CustomerCur[0].CustomerName);
+                customerAddressCur = CUtils.StrValue(listMst_CustomerCur[0].CustomerAddress);
+            }
+        }
+    }
+
+}
+<script>
+    setAdminCurrentUrl('@Url.Action("Index", "InvF_InventoryIn")');
+</script>
+<script src="~/Content/assets/js/bootbox.js"></script>
+<script src="@Url.Content("~/Scripts/mine/InvF_InventoryIn.js")"></script>
+
+<style>
+    .margin-left-12 {
+        margin-left: 12% !important;
+    }
+
+    .padding-bottom-10 {
+        padding-bottom: 10px;
+    }
+</style>
+
+@section RenderButton{
+        <aside class="col-md-6 breadcrumb-menu">
+            <div class="form-group">
+                @if (viewType.Equals("create"))
+                {
+                    @RenderItemFormat("BTN_CREATE_INVF_INVENTORYIN", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnSave\" onclick=\"SaveData(0)\"><i class=\"fa fa-save\" aria-hidden=\"true\"></i> Lưu</a>", "", "")
+                    @RenderItemFormat("BTN_CREATE_AND_NEW_INVF_INVENTORYIN", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnSaveCreate\" onclick=\"SaveData(1)\"><i class=\"fa fa-save\" aria-hidden=\"true\"></i> Lưu và tạo mới</a>", "", "")
+                }
+                else if (viewType.Equals("update"))
+                {
+                    @RenderItemFormat("BTN_SAVE_INVF_INVENTORYIN", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnSave\" onclick=\"UpdateData(0)\"><i class=\"fa fa-save\" aria-hidden=\"true\"></i> Lưu</a>", "", "")
+                    @RenderItemFormat("BTN_SAVE_AND_NEW_INVF_INVENTORYIN", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnSave\" onclick=\"UpdateData(1)\"><i class=\"fa fa-save\" aria-hidden=\"true\"></i> Lưu và tạo mới</a>", "", "")
+                }
+                else if (viewType.Equals("detail"))
+                {
+                    var status = Convert.ToString(objInvF_InventoryIn.IF_InvInStatus);
+                    if (status == "PENDING")
+                    {
+                        @RenderItemFormat("BTN_EDIT_INVF_INVENTORYIN", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnEdit\" onclick=\"Edit('" + status + "','" + Url.Action("Update", "InvF_InventoryIn", new { if_invinno = objInvF_InventoryIn.IF_InvInNo }) + "')\"><i class=\"fa fa-edit\" aria-hidden=\"true\"></i> Sửa</a>", "", "")
+                        @RenderItemFormat("BTN_INVF_INVENTORYIN_APPROVE", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnApprove\" onclick=\"Approve()\"><i class=\"fa fa-check-circle\" aria-hidden=\"true\"></i> Duyệt</a>", "", "")
+                        @RenderItemFormat("BTN_INVF_INVENTORYIN_CANCEL", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnCancel\" onclick=\"Cancel()\"><i class=\"fa fa-ban\" aria-hidden=\"true\"></i> Hủy</a>", "", "")
+                    }
+                    @*if (status == "APPROVE")
+                        {
+                            @RenderItemFormat("BTN_SAVEAPPR_INVF_INVENTORYIN", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnSave\" onclick=\"SaveDataAppr(0)\"><i class=\"fa fa-save\" aria-hidden=\"true\"></i> Lưu</a>", "", "")
+                        }*@
+                }
+
+            </div>
+        </aside>
+}
+
+<div class="mt-3">
+    @using (Html.BeginForm("Create", "InvF_InventoryIn", FormMethod.Post, new { @id = "manageForm", @class = "form-horizontal" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+
+        @*Thông tin phiếu nhập kho*@
+        <div class="col-12 row">
+            @Html.Partial("Info_InvF_InventoryIn", Model, new ViewDataDictionary()
+            {
+                {"ListMst_InvInType", listMst_InvInType },
+                {"ListMst_Inventory", listMst_Inventory },
+                {"ListMst_Customer", listMst_Customer },
+                {"UserState", userState },
+                { "ViewType", viewType },
+            })
+        </div>
+
+
+        <ul class="nav nav-tabs position-relative">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#ProductInformation">@("Danh mục hàng hóa".HtmlItemString("invf_inventoryin"))</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#AuthenticationInformation" onclick="reloadSelectPrd()">@("Thông tin xác thực".HtmlItemString("invf_inventoryin"))</a>
+            </li>
+
+            <div class="nav-price">
+                <div class="form-group">
+                    <label class="control-label" for="TotalValIn">
+                        @("Tổng tiền hàng:".HtmlItemString("invf_inventoryin"))
+                    </label>
+                    <div class="control-input">
+                        @*<input type="text" class="disabled-fix text-right TotalValIn" name="TotalValIn" id="TotalValIn" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryIn.TotalValIn))" />*@
+                        <input type="text" class="text-right TotalValIn" name="TotalValIn" id="TotalValIn" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryIn.TotalValIn))" readonly />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="TotalValInDesc">
+                        @("Giảm giá:".HtmlItemString("invf_inventoryin"))
+                    </label>
+                    <div class="control-input">
+                        @*<input type="text" class="text-right disabled-fix TotalValInDesc" readonly="readonly" name="TotalValInDesc" id="TotalValInDesc" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryIn.TotalValInDesc))" />*@
+                        <input type="text" class="text-right TotalValInDesc" readonly name="TotalValInDesc" id="TotalValInDesc" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryIn.TotalValInDesc))" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="TotalValInAfterDesc">
+                        @("Tổng tiền trả NCC:".HtmlItemString("invf_inventoryin"))
+                    </label>
+                    <div class="control-input">
+                        @*<input type="text" class="text-right disabled-fix TotalValInAfterDesc" name="TotalValInAfterDesc" id="TotalValInAfterDesc" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryIn.TotalValInAfterDesc))" />*@
+                        <input type="text" class="text-right TotalValInAfterDesc totalAfterDesc" name="TotalValInAfterDesc" id="TotalValInAfterDesc" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryIn.TotalValInAfterDesc))" readonly />
+                    </div>
+                </div>
+            </div>
+        </ul>
+
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div id="ProductInformation" class="container-fluid padding-left-right-15 tab-pane active">
+                @Html.Partial("Load_Table_InvF_InventoryInDtl", Model, new ViewDataDictionary() {
+                    { "ViewType", viewType },
+                    { "UserState", userState },
+                })
+            </div>
+            <div id="AuthenticationInformation" class="container-fluid padding-left-right-15 tab-pane">
+                @Html.Partial("Load_Table_InvF_InventoryInQR", Model, new ViewDataDictionary() {
+                    { "ViewType", viewType },
+                    { "UserState", userState },
+                })
+            </div>
+        </div>
+    }
+</div>
+
+@*Import excel*@
+<div class="modal fade" id="ImportExcelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="exampleModalLabel">Nhập excel</h3>
+                <a href="javascript:;" onclick="CloseModalImportExcel()" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </a>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "manageFormImportExcel" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="key" name="key" value="" />
+                    <div class="form-group margin-bottom-9">
+                        <input type="file" name="file" id="file" />
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn mybtn-Button" onclick="Import()" id="btnSaveImport" style="padding-left: 10px!important; padding-right: 10px!important; font-size: 16px; font-weight: 500;">Nhập</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('select#InvInType').select2().on('select2:close', function () { commonUtils.showPopup(this); });
+        $('select#InvCodeIn').select2().on('select2:close', function () { commonUtils.showPopup(this); });
+        $('select#CustomerCode').select2().on('select2:close', function () { commonUtils.showPopup(this); });
+        $('select#InvCodeInActualPopup').select2();
+        $('select.InvCodeInActual_Lot').select2();
+        $('select#ProductCodeQR').select2();
+        $('#RefType').select2();
+    })
+</script>
+
+<script>
+
+    jQuery(function ($) {
+
+    format_Number();
+    });
+</script>
+
+<script>
+    function SaveData(flagRedirect) {
+        var ajaxSettings = {};
+        ajaxSettings.Type = 'post';
+        ajaxSettings.DataType = 'json';
+        ajaxSettings.Url = '@Url.Action("Create", "InvF_InventoryIn")';
+        var objInvF_InventoryIn = new InvF_InventoryIn();
+        objInvF_InventoryIn.ActionType = 'create';
+        objInvF_InventoryIn.ajaxSettings = ajaxSettings;
+        objInvF_InventoryIn.saveData(flagRedirect);
+    }
+</script>
+
+
+
+<script type="text/javascript">
+    function format_Number(){
+        var tableName = 'InvF_InventoryIn';
+           var totalValInFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValIn');
+            var totalValInDescFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValInDesc');
+            var totalValInAfterDescFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValInAfterDesc');
+       $('#TotalValIn').number(true, totalValInFormat);
+       $('#TotalValInDesc').number(true, totalValInDescFormat);
+
+       $('#TotalValInAfterDesc').number(true, totalValInAfterDescFormat);
+    }
+</script>

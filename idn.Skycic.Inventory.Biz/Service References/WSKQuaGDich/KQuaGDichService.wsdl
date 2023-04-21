@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://kquagdich.van.gdt.gov.vn/" xmlns:wssutil="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:conv="http://www.openuri.org/2002/04/wsdl/conversation/" xmlns="http://www.w3.org/2001/XMLSchema" name="KQuaGDichService" targetNamespace="http://kquagdich.van.gdt.gov.vn/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsp:UsingPolicy wssutil:Required="true" />
+  <ns0:Policy xmlns:ns0="http://schemas.xmlsoap.org/ws/2004/09/policy" wssutil:Id="usernametoken">
+    <ns1:SupportingTokens xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200512">
+      <ns0:Policy>
+        <ns1:UsernameToken ns1:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200512/IncludeToken/AlwaysToRecipient">
+          <ns0:Policy>
+            <ns1:WssUsernameToken10 />
+          </ns0:Policy>
+        </ns1:UsernameToken>
+      </ns0:Policy>
+    </ns1:SupportingTokens>
+  </ns0:Policy>
+  <wsdl:types>
+    <xsd:schema xmlns:soap11-enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wsi="http://ws-i.org/profiles/basic/1.1/xsd" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:ns1="http://kquagdich.services.van.ihtkk.seatechit/types" elementFormDefault="qualified" targetNamespace="http://kquagdich.van.gdt.gov.vn/">
+      <xsd:import schemaLocation="http://daotaonhantokhai.gdt.gov.vn:80/ihtkk_van/KQuaGDichServicePort?xsd=1" namespace="http://ws-i.org/profiles/basic/1.1/xsd" />
+      <xsd:import namespace="http://kquagdich.services.van.ihtkk.seatechit/types" />
+      <xsd:element name="traKQuaGDich" type="tns:traKQuaGDich" />
+      <xsd:complexType name="traKQuaGDich">
+        <xsd:sequence>
+          <xsd:element name="maGDich" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="traKQuaGDichResponse" type="tns:traKQuaGDichResponse" />
+      <xsd:complexType name="traKQuaGDichResponse">
+        <xsd:sequence>
+          <xsd:element name="return" type="wsi:swaRef" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="traKQuaPhienGDich" type="tns:traKQuaPhienGDich" />
+      <xsd:complexType name="traKQuaPhienGDich">
+        <xsd:sequence>
+          <xsd:element name="ngayGDich" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="traKQuaPhienGDichResponse" type="tns:traKQuaPhienGDichResponse" />
+      <xsd:complexType name="traKQuaPhienGDichResponse">
+        <xsd:sequence>
+          <xsd:element name="return" type="wsi:swaRef" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="traTTinMaSoThue" type="tns:traTTinMaSoThue" />
+      <xsd:complexType name="traTTinMaSoThue">
+        <xsd:sequence>
+          <xsd:element name="maSoThue" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="traTTinMaSoThueResponse" type="tns:traTTinMaSoThueResponse" />
+      <xsd:complexType name="traTTinMaSoThueResponse">
+        <xsd:sequence>
+          <xsd:element name="return" type="ns1:viewTin" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="traTThaiMaSoThue" type="tns:traTThaiMaSoThue" />
+      <xsd:complexType name="traTThaiMaSoThue">
+        <xsd:sequence>
+          <xsd:element name="maSoThue" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="traTThaiMaSoThueResponse" type="tns:traTThaiMaSoThueResponse" />
+      <xsd:complexType name="traTThaiMaSoThueResponse">
+        <xsd:sequence>
+          <xsd:element name="return" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="traDanhMuc" type="tns:traDanhMuc" />
+      <xsd:complexType name="traDanhMuc">
+        <xsd:sequence>
+          <xsd:element name="maLoaiDMuc" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="traDanhMucResponse" type="tns:traDanhMucResponse" />
+      <xsd:complexType name="traDanhMucResponse">
+        <xsd:sequence>
+          <xsd:element name="return" type="wsi:swaRef" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="traDsachTKhaiLoi" type="tns:traDsachTKhaiLoi" />
+      <xsd:complexType name="traDsachTKhaiLoi">
+        <xsd:sequence>
+          <xsd:element name="ngayTraLoi" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="traDsachTKhaiLoiResponse" type="tns:traDsachTKhaiLoiResponse" />
+      <xsd:complexType name="traDsachTKhaiLoiResponse">
+        <xsd:sequence>
+          <xsd:element name="return" type="wsi:swaRef" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="traTTinLoiTKhai" type="tns:traTTinLoiTKhai" />
+      <xsd:complexType name="traTTinLoiTKhai">
+        <xsd:sequence>
+          <xsd:element name="maGDich" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="traTTinLoiTKhaiResponse" type="tns:traTTinLoiTKhaiResponse" />
+      <xsd:complexType name="traTTinLoiTKhaiResponse">
+        <xsd:sequence>
+          <xsd:element name="return" type="ns1:mesgTKError" />
+        </xsd:sequence>
+      </xsd:complexType>
+    </xsd:schema>
+    <xs:schema targetNamespace="http://kquagdich.services.van.ihtkk.seatechit/types" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:complexType name="viewTin">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="fullName" type="xs:string" />
+          <xs:element minOccurs="0" name="tin" type="xs:string" />
+          <xs:element minOccurs="0" name="payTaxOfficeId" type="xs:string" />
+          <xs:element minOccurs="0" name="payTaxOfficeName" type="xs:string" />
+          <xs:element minOccurs="0" name="payTaxOfficeAbbreviation" type="xs:string" />
+          <xs:element minOccurs="0" name="depaId" type="xs:string" />
+          <xs:element minOccurs="0" name="email" type="xs:string" />
+          <xs:element minOccurs="0" name="tel" type="xs:string" />
+          <xs:element minOccurs="0" name="fax" type="xs:string" />
+          <xs:element minOccurs="0" name="prov" type="xs:string" />
+          <xs:element minOccurs="0" name="dist" type="xs:string" />
+          <xs:element minOccurs="0" name="addr" type="xs:string" />
+          <xs:element minOccurs="0" name="certSerialNumber" type="xs:string" />
+          <xs:element minOccurs="0" name="finaStartDate" type="xs:string" />
+        </xs:sequence>
+      </xs:complexType>
+    </xs:schema>
+    <xs:schema xmlns:wsi="http://ws-i.org/profiles/basic/1.1/xsd" targetNamespace="http://kquagdich.services.van.ihtkk.seatechit/types" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:complexType name="mesgTKError">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="tthai" type="xs:string" />
+          <xs:element minOccurs="0" name="tbaoloi" type="wsi:swaRef" />
+        </xs:sequence>
+      </xs:complexType>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="KQuaGDichServicePortType_traKQuaGDich">
+    <wsdl:part name="parameters" element="tns:traKQuaGDich" />
+  </wsdl:message>
+  <wsdl:message name="KQuaGDichServicePortType_traKQuaGDichResponse">
+    <wsdl:part name="parameters" element="tns:traKQuaGDichResponse" />
+  </wsdl:message>
+  <wsdl:message name="KQuaGDichServicePortType_traKQuaPhienGDich">
+    <wsdl:part name="parameters" element="tns:traKQuaPhienGDich" />
+  </wsdl:message>
+  <wsdl:message name="KQuaGDichServicePortType_traKQuaPhienGDichResponse">
+    <wsdl:part name="parameters" element="tns:traKQuaPhienGDichResponse" />
+  </wsdl:message>
+  <wsdl:message name="KQuaGDichServicePortType_traTTinMaSoThue">
+    <wsdl:part name="parameters" element="tns:traTTinMaSoThue" />
+  </wsdl:message>
+  <wsdl:message name="KQuaGDichServicePortType_traTTinMaSoThueResponse">
+    <wsdl:part name="parameters" element="tns:traTTinMaSoThueResponse" />
+  </wsdl:message>
+  <wsdl:message name="KQuaGDichServicePortType_traTThaiMaSoThue">
+    <wsdl:part name="parameters" element="tns:traTThaiMaSoThue" />
+  </wsdl:message>
+  <wsdl:message name="KQuaGDichServicePortType_traTThaiMaSoThueResponse">
+    <wsdl:part name="parameters" element="tns:traTThaiMaSoThueResponse" />
+  </wsdl:message>
+  <wsdl:message name="KQuaGDichServicePortType_traDanhMuc">
+    <wsdl:part name="parameters" element="tns:traDanhMuc" />
+  </wsdl:message>
+  <wsdl:message name="KQuaGDichServicePortType_traDanhMucResponse">
+    <wsdl:part name="parameters" element="tns:traDanhMucResponse" />
+  </wsdl:message>
+  <wsdl:message name="KQuaGDichServicePortType_traDsachTKhaiLoi">
+    <wsdl:part name="parameters" element="tns:traDsachTKhaiLoi" />
+  </wsdl:message>
+  <wsdl:message name="KQuaGDichServicePortType_traDsachTKhaiLoiResponse">
+    <wsdl:part name="parameters" element="tns:traDsachTKhaiLoiResponse" />
+  </wsdl:message>
+  <wsdl:message name="KQuaGDichServicePortType_traTTinLoiTKhai">
+    <wsdl:part name="parameters" element="tns:traTTinLoiTKhai" />
+  </wsdl:message>
+  <wsdl:message name="KQuaGDichServicePortType_traTTinLoiTKhaiResponse">
+    <wsdl:part name="parameters" element="tns:traTTinLoiTKhaiResponse" />
+  </wsdl:message>
+  <wsdl:portType name="KQuaGDichService">
+    <wsdl:operation name="traKQuaGDich">
+      <wsdl:input message="tns:KQuaGDichServicePortType_traKQuaGDich" />
+      <wsdl:output message="tns:KQuaGDichServicePortType_traKQuaGDichResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="traKQuaPhienGDich">
+      <wsdl:input message="tns:KQuaGDichServicePortType_traKQuaPhienGDich" />
+      <wsdl:output message="tns:KQuaGDichServicePortType_traKQuaPhienGDichResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="traTTinMaSoThue">
+      <wsdl:input message="tns:KQuaGDichServicePortType_traTTinMaSoThue" />
+      <wsdl:output message="tns:KQuaGDichServicePortType_traTTinMaSoThueResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="traTThaiMaSoThue">
+      <wsdl:input message="tns:KQuaGDichServicePortType_traTThaiMaSoThue" />
+      <wsdl:output message="tns:KQuaGDichServicePortType_traTThaiMaSoThueResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="traDanhMuc">
+      <wsdl:input message="tns:KQuaGDichServicePortType_traDanhMuc" />
+      <wsdl:output message="tns:KQuaGDichServicePortType_traDanhMucResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="traDsachTKhaiLoi">
+      <wsdl:input message="tns:KQuaGDichServicePortType_traDsachTKhaiLoi" />
+      <wsdl:output message="tns:KQuaGDichServicePortType_traDsachTKhaiLoiResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="traTTinLoiTKhai">
+      <wsdl:input message="tns:KQuaGDichServicePortType_traTTinLoiTKhai" />
+      <wsdl:output message="tns:KQuaGDichServicePortType_traTTinLoiTKhaiResponse" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="KQuaGDichService" type="tns:KQuaGDichService">
+    <wsp:PolicyReference URI="#usernametoken" />
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="traKQuaGDich">
+      <soap:operation soapAction="" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="traKQuaPhienGDich">
+      <soap:operation soapAction="" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="traTTinMaSoThue">
+      <soap:operation soapAction="" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="traTThaiMaSoThue">
+      <soap:operation soapAction="" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="traDanhMuc">
+      <soap:operation soapAction="" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="traDsachTKhaiLoi">
+      <soap:operation soapAction="" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="traTTinLoiTKhai">
+      <soap:operation soapAction="" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="KQuaGDichService">
+    <wsdl:port name="KQuaGDichServicePort" binding="tns:KQuaGDichService">
+      <soap:address location="http://daotaonhantokhai.gdt.gov.vn:80/ihtkk_van/KQuaGDichServicePort" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

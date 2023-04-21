@@ -1,0 +1,242 @@
+﻿@using System.Globalization;
+@model List<RptSv_Sys_Object>
+@{
+    const string title = "Danh sách Menu";
+    ViewBag.Title = title;
+    var totalRow = 0;
+    var totalRowActive = 0;
+    var totalRowInactive = 0;
+    var listSysAccess = ViewBag.ListSysAccess as List<RptSv_Sys_Access>;
+    if (listSysAccess == null || listSysAccess.Count == 0)
+    {
+        listSysAccess = new List<RptSv_Sys_Access>();
+    }
+    var currentUser = ViewBag.CurrentUser as Sys_User;
+}
+<script type="text/javascript">
+    var parents = new Array();
+    parents.push("@Url.Action("Index", "RptSv_Sys_Access")");
+    var parentsText = new Array();
+    parentsText.push("@MvcHtmlString.Create("Danh sách Menu")");
+    setAdminCurrentTag(parents, parentsText);
+</script>
+
+<style>
+    .cell-80 {
+        min-width: 80px !important;
+        width: 80px !important;
+        max-width: 80px !important;
+    }
+
+    .cell-85 {
+        min-width: 85px !important;
+        width: 85px !important;
+        max-width: 85px !important;
+    }
+
+    .cell-60 {
+        min-width: 60px !important;
+        width: 60px !important;
+        max-width: 60px !important;
+    }
+</style>
+
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="panel-group" id="steps">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h1 class="panel-title">@MvcHtmlString.Create(title)</h1>
+                    </div>
+                    <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                        <aside class="col-xs-12">
+                            @using (Html.BeginForm(null, null, FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+                            {
+                                @Html.AntiForgeryToken()
+
+                                <div class="scrollable-horizontal padding-left-0 padding-right-0 div-scrollable" data-size="2200" style="padding-top: 0!important;">
+                                    <div style="width: 100%; float: left;">
+
+                                        <table id="dynamic-table" class="table table-striped table-bordered table-hover table-cus table-bottom-0">
+                                            <thead>
+                                                <tr>
+                                                    <th class="cell-30">&nbsp;</th>
+                                                    <th class="text-center cell-250">Object Code</th>
+                                                    <th class="text-center cell-250">Object Name</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tbodyID">
+                                                @if (Model != null && Model.Count > 0)
+                                                {
+                                                    var i = 0;
+                                                    totalRow = Model.Count;
+                                                    foreach (var item in Model)
+                                                    {
+                                                        if (item.FlagActive.Equals("1"))
+                                                        {
+                                                            totalRowActive += 1;
+                                                        }
+                                                        else
+                                                        {
+                                                            totalRowInactive += 1;
+                                                        }
+                                                        <tr idx="@i" class="trdata @(i == 0 ? "selected" : "")" ondblclick="ShowDetailData(this)" objectcode="@MvcHtmlString.Create(item.ObjectCode)">
+                                                            <td class="cell-30 padding-0 center padding-left-right-0">
+                                                                <div class="action-buttons padding-top-2">
+                                                                    <a onclick="GetFunction('@item.ObjectCode')" id="btnAddUserInGroup" class="icon-cardrenew" href="javascript:" title="Gán Func vào Menu">
+                                                                        <i class="fa fa-th bigger-130"></i>
+                                                                    </a>
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-left cell-250">
+                                                                @MvcHtmlString.Create(item.ObjectCode)
+                                                            </td>
+                                                            <td class="text-left cell-250">
+                                                                @MvcHtmlString.Create(item.ObjectName)
+                                                            </td>
+                                                        </tr>
+                                                        i++;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <tr>
+                                                        <td colspan="3">
+                                                            <p>Dữ liệu không tồn tại!</p>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="hr hr-18 hr-double dotted"></div>
+
+                            }
+                        </aside>
+                    </div>
+                </div>
+
+
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h1 class="panel-title">@MvcHtmlString.Create("Danh sách nhóm người dùng")</h1>
+                    </div>
+                    <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                        <aside class="col-xs-12">
+                            <div class="col-xs-12 padding-left-0 padding-right-0" id="divDtl">
+                                @Html.Partial("ShowDetailData", listSysAccess)
+
+                            </div>
+                        </aside>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE CONTENT ENDS -->
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+</div>
+
+
+<div class="modal fade" id="ShowPopup" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+@*Active Menu*@
+<script type="text/javascript">
+    setAdminCurrentUrl('@Url.Action("Index", "RptSv_Sys_Access")');
+</script>
+
+@*DataTable*@
+<script type="text/javascript">
+    $(document).ready(function () {
+        dataTable('', '@MvcHtmlString.Create(totalRow.ToString(CultureInfo.InvariantCulture))','@MvcHtmlString.Create(totalRowActive.ToString(CultureInfo.InvariantCulture))', '@MvcHtmlString.Create(totalRowInactive.ToString(CultureInfo.InvariantCulture))');
+    });
+</script>
+
+<script type="text/javascript">
+    function ShowDetailData(thiz) {
+        $('.selected').removeClass('selected');
+        $(thiz).addClass('selected');
+        var objectcode = $(thiz).attr('objectcode');
+        if (!IsNullOrEmpty(objectcode))
+        {
+            GetDetailData(objectcode);
+        }
+
+    }
+
+    function GetDetailData(objectcode)
+    {
+        if (!IsNullOrEmpty(objectcode)) {
+            var url = '@Url.Action("GetDetailData", "RptSv_Sys_Access")';
+            var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+            $.ajax({
+                url: url,
+                data: {
+                    __RequestVerificationToken: token
+                    , objectcode: objectcode
+                },
+                type: 'post',
+                dataType: 'json',
+                traditional: true,
+                success: function (data) {
+                    if (data.Success) {
+                        $("#divDtl").html(data.Html);
+                    } else {
+                        _showErrorMsg123("Lỗi!", data.Detail);
+                    }
+
+                }
+            });
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    function ClosePopup()
+    {
+        $('#ShowPopup').modal("hide");
+        $('#ShowPopup').html('');
+    }
+
+    function GetFunction(objectcode) {
+        if (!IsNullOrEmpty(objectcode)) {
+            var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+            var url = '@Url.Action("GetFunction", "RptSv_Sys_Access")';
+            $.ajax({
+                url: url,
+                data: {
+                    __RequestVerificationToken: token
+                    , objectcode: objectcode
+                },
+                type: 'post',
+                dataType: 'json',
+                traditional: true,
+                success: function (data) {
+                    if (data.Success) {
+                        $('#ShowPopup').modal({
+                            backdrop: false,
+                            keyboard: true,
+                        });
+                        $("#ShowPopup").html(data.Html);
+                    } else {
+                        _showErrorMsg123("Lỗi!", data.Detail);
+                    }
+
+                }
+            });
+        }
+    }
+</script>
+
+
+
+
+
+
+
+
+

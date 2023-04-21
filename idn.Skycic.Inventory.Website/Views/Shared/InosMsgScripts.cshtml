@@ -1,0 +1,120 @@
+﻿@{
+    /**/
+
+    /**/
+
+    Layout = null;
+    var accService = new inos.common.Service.AccountService(Session.Session);
+    string token = accService.AccessToken;
+}
+<style type="text/css">
+    /*****************core **********************/
+    .inos-hide { display: none; }
+    .inos-chat-mainctn { box-shadow: 0px 0px 5px #888; border: none; border-radius: 0; overflow: hidden; position: fixed; bottom: 0; right: 0px; width: 300px; top: 53px; }
+        .inos-chat-mainctn iframe { width: 100%; border: none; height: 100%; }
+
+    .inos-chat-box { background: #fff; box-shadow: 0px 0px 3px #333; border: none; border-radius: 5px 5px 0 0; overflow: hidden; position: fixed; bottom: 0; right: 221px; width: 270px; height: 350px; }
+
+        .inos-chat-box.active { }
+        .inos-chat-box iframe { width: 100%; border: none; height: 350px; }
+
+    .inos-chat-morebtn { cursor: pointer; background: #fff; color: #e00; padding: 0 5px 0 5px; bottom: 0; position: fixed; box-shadow: 0px 0px 3px #333; border: none; border-radius: 5px 5px 0 0; line-height: 30px; font-size: 14px; font-weight: 700; }
+        .inos-chat-morebtn.active { box-shadow: none; }
+    .inos-chat-morelst { bottom: 35px; position: fixed; box-shadow: 0px 0px 3px #333; border: none; }
+
+        .inos-chat-morelst ul { padding: 0; margin: 0; width: 150px; }
+            .inos-chat-morelst ul li { font-size: 12px; line-height: 25px; position: relative; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; background: #fff; color: #555; padding: 0 15px 0 5px; box-sizing: padding-box; margin: 0; list-style-type: none; float: left; width: 100%; }
+                .inos-chat-morelst ul li:hover { background: #efefef; cursor: pointer; }
+                .inos-chat-morelst ul li a.rm { position: absolute; right: 5px; color: #e00; font-size: 12px; line-height: 25px; display: inline-block; padding: 0 3px 0 3px; }
+                    .inos-chat-morelst ul li a.rm:hover { color: #ffd800; }
+
+
+    /**************customizable****************/
+
+    #inosCtn { position: fixed; right: 0; bottom: 0; top: 60px; background: none; padding:10px; border-left:solid 1px #eee;  width: 60px;  box-sizing:padding-box; }
+
+        #inosCtn .inos-btn { padding: 8px; box-sizing: padding-box; width: 36px; height: 36px; float: right; margin-bottom: 30px; display: inline-block; border-radius: 50%; overflow: hidden; }
+
+            #inosCtn .inos-btn:hover, #inosCtn .inos-btn.active { background: #D2E4F5; }
+            #inosCtn .inos-btn img { width: 20px; height: 20px; }
+
+        #inosCtn.max { right:301px;}
+</style>
+
+<div id="inosCtn" class="inos-hide">
+    <a href="javascript:;" class="inos-btn" id="btnInosChat">
+        <img src="@inos.common.Paths.AuthorizationServerBaseAddress/assets/images/icon_messenger.png" />
+    </a>
+
+    <a href="javascript:;" class="inos-btn" id="btnInosEvent">
+        <img src="@inos.common.Paths.AuthorizationServerBaseAddress/assets/images/icon_calendar.png" />
+    </a>
+
+    <a href="javascript:;" class="inos-btn" id="btnInosWidget">
+        <img src="@inos.common.Paths.AuthorizationServerBaseAddress/assets/images/icon_dashboard.png" />
+    </a>
+</div>
+
+<script type="text/javascript" src="@inos.common.Paths.AuthorizationServerBaseAddress/Scripts/inmscripts.js?4"></script>
+<script>
+    $(function () {
+
+        var inapi = inm_API.init({
+            domain: '@inos.common.Paths.AuthorizationServerBaseAddress',
+            token: '@token',
+            onCtnHide: function () {
+
+                $('#inosCtn').removeClass('max');
+                $('#main_container').removeClass('inos-max');
+                //$('body').removeClass('inos-max');
+
+                $('#inosCtn .inos-btn').removeClass('active');
+            },
+            success: function () {
+
+                $('#inosCtn').removeClass('inos-hide');
+
+                $('#btnInosChat').click(function () {
+                    if ($(this).hasClass('active')) {
+                        inapi.hideCtn();
+                    }
+                    else {
+                        $('#inosCtn .inos-btn').removeClass('active');
+                        $(this).addClass('active')
+                        showInosTab('chat');
+                    }
+
+                });
+                $('#btnInosEvent').click(function () {
+                    if ($(this).hasClass('active')) {
+                        inapi.hideCtn();
+                    }
+                    else {
+                        $('#inosCtn .inos-btn').removeClass('active');
+                        $(this).addClass('active')
+                        showInosTab('event');
+                    }
+                });
+
+                $('#btnInosWidget').click(function () {
+                    if ($(this).hasClass('active')) {
+                        inapi.hideCtn();
+                    }
+                    else {
+                        $('#inosCtn .inos-btn').removeClass('active');
+                        $(this).addClass('active')
+                        showInosTab('widget');
+                    }
+                });
+
+            }
+        });
+
+        var showInosTab = function (tab) {
+            $('#main_container').addClass('inos-max');
+            inapi.showCtn(tab);
+            $('#inosCtn').addClass('max');
+        };
+    });
+
+</script>

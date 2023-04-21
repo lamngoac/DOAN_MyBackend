@@ -1,0 +1,220 @@
+﻿@model List<Inv_InventoryBalance>
+@{
+    var ProductCodeTonKho = ViewBag.ProductCode == null ? "" : ViewBag.ProductCode;
+    var ProductCodeBase = ViewBag.ProductCodeBase == null ? "" : ViewBag.ProductCodeBase;
+
+    var ProductCodeUser = ViewBag.ProductCodeUser == null ? "" : ViewBag.ProductCodeUser;
+    var ProductName = ViewBag.ProductName == null ? "" : ViewBag.ProductName;
+
+    var viewOnly = "0";
+    if (ViewBag.viewonly != null)
+    {
+        viewOnly = ViewBag.viewonly;
+    }
+}
+<div class="modal-dialog" style="width: 500px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel"><b>Chi tiết vị trí</b></h2>
+            <a href="javascript:;" onclick="ClosePopupShowTonKho()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body" style="">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupVTNhap" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group margin-bottom-9">
+                    <div class="col-10 col-sm-8">
+                        <span class="block input-icon input-icon-right">
+                            <label style="font-weight: bold">Mã hàng hóa: @ProductCodeUser - @ProductName</label>
+                            <label type="text" hidden id="ProductCodeTonKho" name="ProductCodeTonKho" style="font-weight: bold" class="col-6" readonly="readonly">@ProductCodeTonKho</label>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-12 margin-bottom-9">
+                    <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+                        <div style="width: 100%; float: left;">
+                            <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                                <thead>
+                                    <tr class="trthead">
+                                        <th fieldId="QtyTotalOk" sorttype="T" fieldName="Số phiếu xuất" fieldActive="0" class="text-center cell-100">
+                                            Số lượng
+                                        </th>
+                                        <th fieldId="InvOut" fieldName="InvOut" fieldActive="0" class="text-center cell-100">
+                                            Vị trí
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                        <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                            <tbody id="table-tbodyIDTonKho">
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="modal-footer">
+
+            @{
+                if (viewOnly == "1")
+                {
+                    <a href="javascript:void(0);" class="btn btn-nc-button" style="margin-left: 10px" id="btnSaveViTri" onclick="ClosePopupShowTonKho()">Đóng</a>
+                }
+                else
+                {
+                    <a href="javascript:void(0);" class="btn btn-nc-button" style="margin-left: 10px" id="btnSaveViTri" onclick="SaveViTri('@ProductCodeTonKho');">Lưu</a>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<script type="text/template" id="tmplAddRowViTriTonKho">
+    <tr class="data-item trdata" rd="==rd==" idx="==idx==" invcode="==InvCode==">
+        <td class="text-left cell-100">
+            <input readonly="readonly" class="QtyOut col-md-12 text-right ==qtytotalokCss==" value="==QtyTotalOK==" />
+        </td>
+        <td class="text-center cell-100">
+            <input readonly="readonly" class="QtyOut col-md-12 ==invcodeCss==" value="==InvCode==" />
+        </td>
+    </tr>
+</script>
+<script>
+    function SaveViTri(productcode) {
+        if (productcode == "") {
+            alert("Không tồn tại hàng hóa trong lưới.");
+            return;
+        }
+        debugger;
+        var trDetailproduct = $("#table-tbodyID tr.trdata[productcode=" + productcode + "]");
+        var idxDtl = 0;
+        if (trDetailproduct.length == 0) {
+            alert("Không tìm thấy hàng hóa trong lưới.");
+            return;
+        }
+        idxDtl = trDetailproduct.attr('idx');
+        var rd = trDetailproduct.attr('rd');
+        var check = true;
+        var lstVitri = "";
+        var sumqtyout = 0;
+        $("#table-tbodyIDTonKho tr.trdata").each(function () {
+            var tr = $(this);
+            var idx = tr.attr('idx');
+            var strqtytotalok = tr.find('input.qtytotalok-'+rd).val();
+            var strqtyout = strqtytotalok; // Bằng sl tồn kho
+            var strinvcode = tr.find('input.invcode-'+rd).val();
+            if (strinvcode != "") {
+                if (lstVitri == "") {
+                    lstVitri += strinvcode;
+                }
+                else {
+                    lstVitri += ", " + strinvcode;
+                }
+            }
+
+            if ($.isNumeric(qtyout) == true) {
+                alert("Số lượng xuất phải phải là số.");
+                tr.find('input[name="DtlTonKho[' + idx + '].QtyOut"]').focus();
+                return;
+            }
+
+            var qtytotalok = parseFloat(strqtytotalok);
+            var qtyout = parseFloat(strqtyout);
+            if (qtyout > qtytotalok) {
+                alert("Số lượng xuất không được lớn hơn số lượng tồn kho.");
+                check = false;
+                return;
+            }
+            if (qtyout > 0) {
+                sumqtyout += qtyout;
+
+                var strUnitCode = trDetailproduct.find('select.unitcode-'+rd).val();
+                if (strUnitCode == undefined || strUnitCode == "") {
+                    strUnitCode = trDetailproduct.find('select.unitcode-'+rd).val();
+                }
+                // Gom chung vào bảng table-detailCombo
+                var strHtml = commonUtils.getHtmlFromTemplate($('#rowtemplateComboDetail'), {
+                    ProductCodeRoot: productcode,
+                    ProductCode: productcode,
+                    UnitCode: strUnitCode,
+                    Remark: "",
+                    InvCodeOutActual: strinvcode,
+                    Qty: qtyout,
+                    idx: 999999
+                });
+
+                // Các vị trí không giống nhau
+                //$('#table-detailCombo').append(strHtml);
+
+                var lenItem = $('#table-detailCombo tr.trdata').length;
+                if (lenItem == 0) {
+                    $('#table-detailCombo').append(strHtml);
+                }
+                else {
+                    var trLo_Old = $('#table-detailCombo').find('tr[productcode="' + productcode + '"][invcode="' + strinvcode + '"]').eq(0);
+                    if (trLo_Old.length != 0) {
+                        trLo_Old.replaceWith(strHtml);
+                    }
+                    else {
+                        $('#table-detailCombo').append(strHtml);
+                    }
+                }
+            }
+
+        });
+        updateTableTrIdx($('#table-detailCombo tr'), false);
+        if (check == false) return;
+
+        // Tìm hàng hóa và gán lại
+
+        trDetailproduct.find('input.qtytotalok-'+rd).val(sumqtyout);
+        trDetailproduct.find('input.invcodeactual-'+rd).val(lstVitri);
+
+        // Gán lại nếu không thuốc xuất kho
+        trDetailproduct.find('input.invcodeactual-' + rd).val(lstVitri);
+        //
+
+        TongSoLuongTon();
+        ClosePopupShowTonKho();
+    }
+
+</script>
+
+
+<script>
+    var Lst_Data = [];
+    @if(Model!=null && Model.Count > 0)
+    {
+        foreach (var item in Model)
+        {
+            var qtytotalok = CUtils.StrValue(item.QtyTotalOK);
+            var invcode = CUtils.StrValue(item.InvCode);
+            <text>
+                var objRow = {
+                    QtyTotalOK: '@qtytotalok',
+                    InvCode: '@invcode',
+                }
+                Lst_Data.push(objRow);
+            </text>
+        }
+    }
+</script>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        debugger;
+        @*Add danh sách serial vào Popup*@
+        if (Lst_Data !== undefined && Lst_Data !== null && Lst_Data.length > 0) {
+            for (var i = 0; i < Lst_Data.length; i++) {
+                renderRowViTriTonKhoNoKKPopup(Lst_Data[i]);
+            }
+        }
+    });
+</script>

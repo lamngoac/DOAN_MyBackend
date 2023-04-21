@@ -1,0 +1,311 @@
+﻿
+@{
+    var title = "Tạo mới người dùng";
+    var titleMng = "Người dùng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript">
+    var parents = new Array();
+    parents.push("@Url.Action("Login", "Account")");
+    parents.push("");
+    var parentsText = new Array();
+    parentsText.push("@MvcHtmlString.Create(titleMng)");
+    parentsText.push("@MvcHtmlString.Create(title)");
+    setAdminCurrentTag(parents, parentsText);
+</script>
+
+<div class="container">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="title">
+                    <p style="vertical-align: bottom">ĐĂNG KÝ</p>
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="col-xs-12">
+                        @using (Html.BeginForm("Create", "Mst_Tax", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="row no-margin">
+                                <div class="col-xs-6">
+                                    <div class="form-group margin-bottom-5">
+                                        <label for=" " class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên tổ chức")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id=" " name=" " class="col-xs-11  " onkeyup="locdau(this);" value="" autocomplete="off" required />
+                                            </span>
+                                            <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for=" " class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã số thuế")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id=" " name=" " class="col-xs-11  " value="" autocomplete="off" required />
+                                            </span>
+                                            <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Địa chỉ")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 " value="" autocomplete="off" required />
+                                            </span>
+                                            <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Số điện thoại di động")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 " value="" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Số điện thoại cố định")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 " value="" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Fax")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 " value="" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                    <div class="form-group margin-bottom-5">
+                                        <label for=" " class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Người đại diện")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id=" " name=" " class="col-xs-11  " onkeyup="locdau(this);" value="" autocomplete="off" required />
+                                            </span>
+                                            <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for=" " class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Chức vụ")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id=" " name=" " class="col-xs-11  " value="" autocomplete="off" required />
+                                            </span>
+                                            <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tỉnh/Thành phố")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 " value="" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Chi cục quản lý")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 " value="" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mật khẩu (tối thiếu 8 ký tự)")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 " value="" autocomplete="off" required />
+                                            </span>
+                                            <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Nhập lại mật khẩu")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 " value="" autocomplete="off" required />
+                                            </span>
+                                            <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="container" style="width: 50%">
+                                <div class="form-group margin-bottom-5">
+                                    <label for=" " class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Người liên hệ")</label>
+                                    <div class="col-xs-12 col-sm-7">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id=" " name=" " class="col-xs-11  " value="" autocomplete="off" required />
+                                        </span>
+                                        <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Điện thoại")</label>
+                                    <div class="col-xs-12 col-sm-7">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="" name="" class="col-xs-11 " value="" autocomplete="off" required />
+                                        </span>
+                                        <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Địa chỉ email")</label>
+                                    <div class="col-xs-12 col-sm-7">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="" name="" class="col-xs-11 " value="" autocomplete="off" required />
+                                        </span>
+                                        <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã xác nhận")</label>
+                                    <div class="col-xs-12 col-sm-7">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="" name="" class="col-xs-11 " value="" autocomplete="off" required />
+                                        </span>
+                                        <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                    </div>
+
+                                </div>
+                            </div>
+                        }
+                    </aside>
+                    <div class="col-xs-12 text-center">
+                        <div class="clearfix">
+                            <div class="row no-margin text-center">
+                                <a href="javascript:void();" class="btn font-color mybtn-Button" style="margin-left: 10px; padding-left: 15px!important; padding-right: 15px!important; " onclick="SaveData();">Đăng ký</a>
+
+                                <button class="btn font-color mybtn-Button" type="reset" style="margin-left: 10px">
+                                    Reset
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+<script type="text/javascript">
+    processAjaxForm($('#manageForm'), function (response) {
+        processAjaxFormResult(response);
+
+    });
+</script>
+
+@*Active Menu*@
+<script type="text/javascript">
+    setAdminCurrentUrl('@Url.Action("", "")');
+</script>
+@*Set focus*@
+<script type="text/javascript">
+    var _getForm = document.getElementById("manageForm");
+    _getForm.addEventListener('reset', function () {
+        document.getElementById("Tax").focus()
+    })
+</script>
+
+<script>
+    $(document).ready(function () {
+        //datepicker plugin
+        $('#EffDateStart, #EffDateEnd').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: 'yyyy-mm-dd'
+        })
+            //show datepicker when clicking on the icon
+            .next().on(ace.click_event, function () {
+                $(this).prev().focus();
+            });
+
+    });
+</script>
+
+<script>
+    function CheckForm() {
+        if (!CheckIsNullOrEmpty('# ', 'has-error-fix', '@MvcHtmlString.Create("Tên tổ chức không được trống!")'))
+        {
+            return false;
+        }
+        if (!CheckIsNullOrEmpty('# ', 'has-error-fix', '@MvcHtmlString.Create("Mã số thuế không được trống!")'))
+        {
+            return false;
+        }
+        if (!CheckIsNullOrEmpty('#', 'has-error-fix', '@MvcHtmlString.Create("Địa chỉ không được trống!")'))
+        {
+            return false;
+        }
+        if (!CheckIsNullOrEmpty('#', 'has-error-fix', '@MvcHtmlString.Create("Người đại diện không được trống!")'))
+        {
+            return false;
+        }
+        if (!CheckIsNullOrEmpty('# ', 'has-error-fix', '@MvcHtmlString.Create("Chức vụ không được trống!")'))
+        {
+            return false;
+        }
+        if (!CheckIsNullOrEmpty('# ', 'has-error-fix', '@MvcHtmlString.Create("Mật khẩu không được trống!")'))
+        {
+            return false;
+        }
+        if (!CheckIsNullOrEmpty('#', 'has-error-fix', '@MvcHtmlString.Create("Nhập lại mật khẩu không được trống!")'))
+        {
+            return false;
+        }
+        if (!CheckIsNullOrEmpty('#', 'has-error-fix', '@MvcHtmlString.Create("Nhập lại mật khẩu không trùng khớp!")'))
+        {
+            return false;
+        }
+        if (!CheckIsNullOrEmpty('# ', 'has-error-fix', '@MvcHtmlString.Create("Người liên hệ không được trống!")'))
+        {
+            return false;
+        }
+        if (!CheckIsNullOrEmpty('# ', 'has-error-fix', '@MvcHtmlString.Create("Điện thoại không được trống!")'))
+        {
+            return false;
+        }
+        if (!CheckIsNullOrEmpty('#', 'has-error-fix', '@MvcHtmlString.Create("Địa chỉ email không được trống!")'))
+        {
+            return false;
+        }
+        if (!CheckIsNullOrEmpty('#', 'has-error-fix', '@MvcHtmlString.Create("Mã xác nhận không chính xác!")'))
+        {
+            return false;
+        }
+        return true;
+    }
+</script>
+
+
+
+
+
+
+
+

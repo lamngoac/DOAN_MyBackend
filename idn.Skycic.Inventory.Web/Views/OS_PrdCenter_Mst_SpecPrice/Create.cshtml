@@ -1,0 +1,235 @@
+﻿@model Mst_SpecPrice
+@{
+    Layout = "~/Views/Shared/_LayoutQuantri.cshtml";
+    var title = "TẠO MỚI MAPPING SPEC-PRICE";
+    var titleMng = "Danh mục mapping spec-price";
+    ViewBag.Title = title;
+
+    var listOS_PrdCenter_Mst_Spec = ViewBag.ListOS_PrdCenter_Mst_Spec as List<Mst_Spec>;
+    if (listOS_PrdCenter_Mst_Spec == null || listOS_PrdCenter_Mst_Spec.Count == 0)
+    {
+        listOS_PrdCenter_Mst_Spec = new List<Mst_Spec>();
+    }
+
+    var listOS_PrdCenter_Mst_Unit = ViewBag.ListOS_PrdCenter_Mst_Unit as List<Mst_Unit>;
+    if (listOS_PrdCenter_Mst_Unit == null || listOS_PrdCenter_Mst_Unit.Count == 0)
+    {
+        listOS_PrdCenter_Mst_Unit = new List<Mst_Unit>();
+    }
+
+    var listOS_PrdCenter_Mst_CurrencyEx = ViewBag.ListOS_PrdCenter_Mst_CurrencyEx as List<Mst_CurrencyEx>;
+    if (listOS_PrdCenter_Mst_CurrencyEx == null || listOS_PrdCenter_Mst_CurrencyEx.Count == 0)
+    {
+        listOS_PrdCenter_Mst_CurrencyEx = new List<Mst_CurrencyEx>();
+    }
+
+    var listOS_PrdCenter_Mst_VATRate = ViewBag.ListOS_PrdCenter_Mst_VATRate as List<idn.Skycic.Inventory.Common.Models.ProductCentrer.Mst_VATRate>;
+    if (listOS_PrdCenter_Mst_VATRate == null || listOS_PrdCenter_Mst_VATRate.Count == 0)
+    {
+        listOS_PrdCenter_Mst_VATRate = new List<idn.Skycic.Inventory.Common.Models.ProductCentrer.Mst_VATRate>();
+    }
+}
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="row no-margin box-shadow-tk">
+                        @using (Html.BeginForm("Create", "OS_PrdCenter_Mst_SpecPrice", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã tổ chức <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="OrgID" name="OrgID" class="col-xs-12 disabled-fix" value="@ViewBag.OrgID" autocomplete="off" required />
+                                        </span>
+
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="SpecCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã Spec <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <select id="SpecCode" name="SpecCode" class="col-xs-12 SpecCode" required="">
+                                                <option value=""></option>
+                                                @if (listOS_PrdCenter_Mst_Spec != null && listOS_PrdCenter_Mst_Spec.Count > 0)
+                                                {
+                                                    foreach (var item in listOS_PrdCenter_Mst_Spec)
+                                                    {
+                                                        <option value="@MvcHtmlString.Create(item.SpecCode.ToString().Trim())" desc="@MvcHtmlString.Create(item.SpecName.ToString().Trim())">@MvcHtmlString.Create(item.SpecCode.ToString().Trim())</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </span>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="UnitCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã đơn vị <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <select id="UnitCode" name="UnitCode" class="col-xs-12 UnitCode" required="">
+                                                <option value=""></option>
+                                                @if (listOS_PrdCenter_Mst_Unit != null && listOS_PrdCenter_Mst_Unit.Count > 0)
+                                                {
+                                                    foreach (var item in listOS_PrdCenter_Mst_Unit)
+                                                    {
+                                                        <option value="@MvcHtmlString.Create(item.UnitCode.ToString().Trim())" desc="@MvcHtmlString.Create(item.UnitName.ToString().Trim())">@MvcHtmlString.Create(item.UnitCode.ToString().Trim())</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </span>
+
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="BuyPrice" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Giá mua <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="BuyPrice" name="BuyPrice" class="col-xs-12 BuyPrice" value="" autocomplete="off" required />
+                                        </span>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="SellPrice" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Giá bán <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="SellPrice" name="SellPrice" class="col-xs-12 SellPrice" value="" autocomplete="off" required />
+                                        </span>
+
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="CurrencyCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã loại tiền <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <select id="CurrencyCode" name="CurrencyCode" class="col-xs-12 CurrencyCode" required="">
+                                                <option value=""></option>
+                                                @if (listOS_PrdCenter_Mst_CurrencyEx != null && listOS_PrdCenter_Mst_CurrencyEx.Count > 0)
+                                                {
+                                                    foreach (var item in listOS_PrdCenter_Mst_CurrencyEx)
+                                                    {
+                                                        <option value="@MvcHtmlString.Create(item.CurrencyCode.ToString().Trim())" desc="@MvcHtmlString.Create(item.CurrencyName.ToString().Trim())">@MvcHtmlString.Create(item.CurrencyCode.ToString().Trim())</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </span>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="DiscountVND" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Chiết khấu")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="DiscountVND" name="DiscountVND" class="col-xs-12 text-right DiscountVND" value="" autocomplete="off" />
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="VATRateCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã thuế suất")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+
+                                            <input type="text" id="VATRateCode" name="VATRateCode" class="col-xs-12 text-right VATRateCode" value="" autocomplete="off" />
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                        }
+                    </aside>
+                    <div class="col-xs-12 no-padding">
+                        <div class="clearfix">
+                            <div class="row no-margin" style="float: right">
+                                @RenderItemFormat("BTN_TAO_OS_PrdCenter_Mst_SpecPrice_LUU", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px; \" onclick=\"SaveData();\">Lưu</a>", "", "")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+<script type="text/javascript">
+    processAjaxForm($('#manageForm'), function (response) {
+        processAjaxFormResult(response);
+
+    });
+</script>
+
+@*Active Menu*@
+<script type="text/javascript">
+    setAdminCurrentUrl('@Url.Action("Index", "OS_PrdCenter_Mst_SpecPrice")');
+</script>
+
+@*Set focus*@
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#CurrencyCode').focus();
+    });
+    jQuery(function ($) {
+        $('.BuyPrice, .SellPrice').number(true, 0);
+        $('.DiscountVND').number(true, 2);
+    });
+</script>
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/OS_PrdCenter_Mst_SpecPrice.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "OS_PrdCenter_Mst_SpecPrice")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+        });
+        @* Set focus *@
+        $(document).ready(function () {
+            $('#CurrencyCode').focus();
+        });
+        function SaveData() {
+            debugger;
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Create", "OS_PrdCenter_Mst_SpecPrice")';
+            var objOS_PrdCenter_Mst_SpecPrice = new OS_PrdCenter_Mst_SpecPrice();
+            objOS_PrdCenter_Mst_SpecPrice.ActionType = 'create';
+            objOS_PrdCenter_Mst_SpecPrice.ajaxSettings = ajaxSettings;
+            objOS_PrdCenter_Mst_SpecPrice.saveData();
+        }
+    </script>
+}
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,201 @@
+﻿@{ 
+    var layoutLogin = "";
+    if(CUtils.IsNullOrEmpty(ViewBag.LayoutLogin))
+    {
+        layoutLogin = "";
+    }
+}
+<script type="text/javascript">
+    var __app = {};
+    $(document).ajaxStart(function () {
+        if ($("#show-loading").length > 0) {
+            $("#show-loading").remove();
+        }
+
+        if ($("#show-loading").length === 0) {
+            var div = $("<div id='show-loading' style='position: fixed; z-index: 999999; top: 0; left: 0; height: 100%; width: 100%; background: rgba( 236, 236, 236, .5 ) url(@Url.Content("~/Content/assets/images/showloading/indicatorbig.gif")) 50% 50% no-repeat'/>");
+            div.appendTo('body');
+        }
+        $("#show-loading").fadeIn(50000);
+    });
+
+    $(document).ajaxStop(function () {
+        $("#show-loading").hide();
+    });
+
+    $(document).ajaxError(
+        function (e, x, settings, exception) {
+            //debugger;
+            $("#show-loading").hide();
+            var message;
+            var statusErrorMap = {
+                '999': "Server understood the request but request content was invalid.",
+                '401': "Unauthorised access.",
+                '403': "Forbidden resouce can't be accessed",
+                '500': "Internal Server Error.",
+                '503': "Service Unavailable"
+            };
+            if (x.status) {
+                message = statusErrorMap[x.status];
+                if (!message) {
+                    message = "Unknow Error \n.";
+                }
+            } else if (exception === 'parsererror') {
+                message = "Error.\nParsing JSON Request failed.";
+            } else if (exception === 'timeout') {
+                message = "Request Time out.";
+            } else if (exception === 'abort') {
+                message = "Request was aborted by the server";
+            } else {
+                message = "Unknow Error \n.";
+            }
+            if (x.status !== 0)
+                _showErrorMsg123("THÔNG BÁO", x.responseText);
+        });
+
+    window.onerror = function (errorMeaage, fileName, lineNumber) {
+        __globalerror = 1;
+        var c = 'Script error: ' + errorMeaage + '\nFileName: ' + fileName + '\nLine no: ' + lineNumber;
+        //alert(c);
+        //$("#show-loading").hide();
+    };
+
+
+    function _showErrorMsg123(msg, detail) {
+        if ($("#errorcontainer123").length === 0) {
+            $("<div id='errorcontainer123' divshow='0'/>").appendTo('body');
+        }
+        $("#errorcontainer123").dialog({
+            autoOpen: false,
+            width: 715,
+            height: 210,
+            modal: true,
+            title: msg,
+            buttons: {
+                'Chi tiết': function (e) {
+                    var divshow = $('#errorcontainer123').attr('divshow');
+                    if (divshow === '0') {
+                        $('#errorcontainer123').attr('divshow', '1');
+                        $(this).dialog({
+                            height: 510
+                        });
+                    } else {
+                        $('#errorcontainer123').attr('divshow', '0');
+                        $(this).dialog({
+                            height: 210
+                        });
+                    }
+                },
+                'Đóng': function () {
+                    $('#errorcontainer123').attr('divshow', '0');
+                    $(this).dialog("close");
+                    $('#exclamation-circle').remove();
+                    $('#exit').remove();
+                    $("#show-loading").hide();
+                },
+            },
+            close: function () {
+                $('#errorcontainer123').attr('divshow', '0');
+                $(this).dialog("close");
+                $('#exclamation-circle').remove();
+                $('#exit').remove();
+                $("#show-loading").hide();
+            }
+        });
+        @*$('.ui-dialog-title').before('');
+        $('.ui-dialog-title').before('<img id="exclamation-circle" style="width: 35px; float: left" src="@Url.Content("~/Images/exclamation-circle-solid.svg")">');
+        $('.ui-dialog-titlebar-close').append('');
+        $('.ui-dialog-titlebar-close').append('<img id="exit" style="width: 15px; float: left" src="@Url.Content("~/Images/exit.svg")">');*@
+
+        $('.ui-dialog-title').html('');
+        $('.ui-dialog-title').append('<img id="exclamation-circle" style="width: 35px; float: left" src="@Url.Content("~/Images/exclamation-circle-solid.svg")"><span id="ui-id-1" class="ui-dialog-title">THÔNG BÁO</span>');
+        $('.ui-dialog-title-close').html('');
+        $('.ui-dialog-titlebar-close').html('');
+        $('.ui-dialog-titlebar-close').append('<img id="exit" style="width: 15px; float: left" src="@Url.Content("~/Images/exit.svg")">');
+
+
+        $("#errorcontainer123").empty();
+        $("#errorcontainer123").append(detail);
+        $("#errorcontainer123").dialog("open");
+        if (!IsNullOrEmpty('@MvcHtmlString.Create(layoutLogin)'))
+        {
+            $("#errorcontainer123").parent().find("div.ui-dialog-titlebar").addClass("ui-dialog-titlebar-fix");
+        }
+        //$(".error_detail_panel").css("display", "none");
+    }
+</script>
+
+<style>
+    .ui-dialog-titlebar-fix {
+        height: 35px !important;
+        padding-top: 5px !important;
+        padding-left: 15px !important;
+        font-weight: 500;
+    }
+    .ui-dialog{
+        z-index: 999999999!important;
+    }
+</style>
+
+<script type="text/javascript">
+    var showModalPopup = new function() {
+        this.showPopupError = function(msg, detail) {
+        if ($("#errorcontainer123").length === 0) {
+            $("<div id='errorcontainer123' divshow='0'/>").appendTo('body');
+        }
+        $("#errorcontainer123").dialog({
+            autoOpen: false,
+            width: 715,
+            height: 210,
+            modal: true,
+            title: msg,
+            buttons: {
+                'Chi tiết': function(e) {
+                    var divshow = $('#errorcontainer123').attr('divshow');
+                    if (divshow === '0') {
+                        $('#errorcontainer123').attr('divshow', '1');
+                        $(".error_detail_panel").css("display", "block");
+                        $(this).dialog({
+                            height: 510
+                        });
+                    } else {
+                        $('#errorcontainer123').attr('divshow', '0');
+                        $(".error_detail_panel").css("display", "none");
+                        $(this).dialog({
+                            height: 210
+                        });
+                    }
+                },
+                'Đóng': function() {
+                    $('#errorcontainer123').attr('divshow', '0');
+                    $(".error_detail_panel").css("display", "none");
+                    $(this).dialog("close");
+                    $('#exclamation-circle').remove();
+                    $('#exit').remove();
+                },
+            },
+            close: function() {
+                $('#errorcontainer123').attr('divshow', '0');
+                $(".error_detail_panel").css("display", "none");
+                $(this).dialog("close");
+                $('#exclamation-circle').remove();
+                $('#exit').remove();
+            }
+        });
+        $('.ui-dialog-title').html('');
+        $('.ui-dialog-title').append('<img id="exclamation-circle" style="width: 35px; float: left" src="@Url.Content("~/Images/exclamation-circle-solid.svg")"><span id="ui-id-1" class="ui-dialog-title">THÔNG BÁO</span>');
+        $('.ui-dialog-title-close').html('');
+        $('.ui-dialog-titlebar-close').append('<img id="exit" style="width: 15px; float: left" src="@Url.Content("~/Images/exit.svg")">');
+
+        $("#errorcontainer123").empty();
+        $("#errorcontainer123").append(detail);
+        $("#errorcontainer123").dialog("open");
+        if (!IsNullOrEmpty('@MvcHtmlString.Create(layoutLogin)'))
+        {
+            $("#errorcontainer123").parent().find("div.ui-dialog-titlebar").addClass("ui-dialog-titlebar-fix");
+        }
+        $(".error_detail_panel").css("display", "none");
+    };
+};
+
+</script>

@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="idn.Skycic.Inventory.Biz.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="HTC_NM_Biz_WSAccCenter_WS" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://118.70.129.122:12608/idocNet.Test.idocNet.AccCenter.V10.Ws/WS.asmx</Value>
+    </Setting>
+    <Setting Name="idN_TVAN_Biz_WSHTC_WSHTC64" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://11.22.0.1:11208/Test.DMS.HTC.Sales.WH.WS/WSHTC.asmx</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

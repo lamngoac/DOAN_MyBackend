@@ -1,0 +1,70 @@
+﻿@{
+    Layout = null;
+    var listMstInvInType = ViewBag.List_Mst_InvInType as List<Mst_InvInType>;
+}
+
+<div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+    <div style="width: 100%; float: left;">
+        <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+            <thead>
+                <tr class="trthead">
+                    <th class="text-center cell-100">@("Mã loại nhập kho".HtmlItemString("invf_inventoryin"))</th>
+                    <th class="text-center cell-200">@("Tên loại nhập kho".HtmlItemString("invf_inventoryin"))</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+        <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+            <tbody id="tbodySearchInvInTypeNew">
+                @if (listMstInvInType != null && listMstInvInType.Count > 0)
+                {
+                    var i = 0;
+                    foreach (var item in listMstInvInType)
+                    {
+                        <tr idx="@i" class="data-item trdata" onclick="ClickInvInType(this)">
+                            <!-- Khách hàng -->
+                            <input type="hidden" name="InvInTypePopUp[@i].InvInType" value="@item.InvInType" />
+                            <input type="hidden" name="InvInTypePopUp[@i].InvInTypeName" value="@item.InvInTypeName" />
+
+                            <td class="text-center cell-100">@item.InvInType</td>
+                            <td class="text-center cell-200">@item.InvInTypeName</td>
+
+                        </tr>
+                        i++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function ClickInvInType(thiz) {
+        $('.selected').removeClass('selected');
+        $(thiz).addClass('selected');
+
+        var rows = $('tbody#tbodySearchInvInTypeNew tr').length;
+        if (rows > 0) {
+            var rowsSelected = $('tbody#tbodySearchInvInTypeNew tr.selected').length;
+            if(rowsSelected > 0) {
+                var tr = $('tbody#tbodySearchInvInTypeNew').find('tr.selected');                
+                if (tr != null) {
+                    var idx = $(tr).attr('idx');
+                    var invInType = $(tr).find('input[type="hidden"][name="InvInTypePopUp[' + idx + '].InvInType"]').val();
+                    
+                    $('select#InvInType').val(invInType);
+                    $('select#InvInType').trigger('change');
+                    ClosePopupInvInType();
+                }
+            }
+            else {
+                alert("@MvcHtmlString.Create("Chưa chọn loại nhập kho!")");
+                return false;
+            }
+        } else {
+            alert("Lưới danh sách loại nhập kho trống!");
+            return false;
+        }
+        return true;
+    }</script>

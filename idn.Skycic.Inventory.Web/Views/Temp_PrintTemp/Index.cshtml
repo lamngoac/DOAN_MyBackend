@@ -1,0 +1,509 @@
+﻿@model PageInfo<Temp_PrintTemp>
+@{
+    Layout = "~/Views/Shared/CoreLayoutIn_Tem.cshtml";
+    var title = "DANH MỤC TEM";
+    ViewBag.Title = title;
+    ViewBag.OverflowX = true;
+    var startCount = 0;
+    var strStartCount = CUtils.StrValue(ViewBag.StartCount);
+    if (CUtils.IsNullOrEmpty(strStartCount) || !CUtils.IsNumeric(strStartCount))
+    {
+        strStartCount = "0";
+    }
+    else
+    {
+        startCount = Convert.ToInt32(strStartCount);
+    }
+    //var datasize = 1200;
+    var offset = ViewBag.Offset;
+
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+
+    var showtext = "";
+    if (Model.ItemCount > 0)
+    {
+        var recordstart = (Model.PageIndex) * Model.PageSize + 1;
+        var recordend = (Model.PageIndex + 1) * Model.PageSize;
+        if (recordend > Model.ItemCount)
+        {
+            recordend = Model.ItemCount;
+        }
+        showtext = recordstart + "-" + recordend + " trong số " + Model.ItemCount;
+    }
+}
+
+<style>
+    .ace-scroll, .scroll-content {
+        overflow: hidden !important;
+    }
+</style>
+
+<div class="row no-margin">
+    <div class="row no-margin">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="panel-group" id="steps">
+                <div class="panel panel-info">
+                    @*<div class="title">
+                            <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                        </div>*@
+                    <div class="panel-body no-padding" id="panel-body" style="">
+                        <aside class="col-xs-12 no-padding layout-tk">
+                            @using (Html.BeginForm(null, null, FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+                            {
+                                <input type="hidden" value="search" name="init" id="init" />
+                                <div class="col-xs-12 layout-search" style="padding: 10px 0">
+                                    <div class="col-xs-11 no-padding">
+                                        <div class="col-xs-4">
+                                            <div class="form-group margin-bottom-9">
+                                                <label for="PrintTempCode" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500">Mã mẫu</label>
+                                                <div class="col-xs-12 col-sm-9">
+                                                    <input type="text" id="printtempcode" name="printtempcode" class="col-xs-12" value="@MvcHtmlString.Create(ViewBag.PrintTempCode)" autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="form-group margin-bottom-9">
+                                                <label for="PrintTempDes" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500">Mô tả mẫu</label>
+                                                <div class="col-xs-12 col-sm-9">
+                                                    <input type="text" id="printtempdes" name="printtempdes" class="col-xs-12" value="@MvcHtmlString.Create(ViewBag.PrintTempDes)" autocomplete="off">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-4">
+                                            <div class="form-group margin-bottom-9">
+                                                <label for="fromdate" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500">Ngày tạo từ</label>
+                                                <div class="col-xs-12 col-sm-9">
+                                                    <div class="input-group date col-sm-12">
+                                                        <input type="text" id="fromdate" name="fromdate" class="col-xs-12 cl-date fromdate" data-date-format="yyyy-mm-dd" value="@MvcHtmlString.Create(ViewBag.FromDate)" autocomplete="off" />
+                                                        <span class="input-group-addon">
+                                                            <i class="far fa-calendar-alt"></i>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group margin-bottom-9">
+                                                <label for="" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500">Trạng thái</label>
+                                                <div class="col-xs-12 col-sm-9">
+                                                    <span class="block input-icon input-icon-right">
+                                                        @{
+                                                            var printtempstatus = "";
+                                                            if (!CUtils.IsNullOrEmpty(ViewBag.PrintTempStatus))
+                                                            {
+                                                                printtempstatus = CUtils.StrValueOrNull(ViewBag.PrintTempStatus);
+                                                            }
+                                                        }
+                                                        <select id="printtempstatus" name="printtempstatus" class="col-xs-12">
+                                                            <option value="">Tất cả</option>
+                                                            <option value="@MvcHtmlString.Create("PENDING")" @(printtempstatus.Equals("PENDING") ? "selected" : "")>@MvcHtmlString.Create("Pending")</option>
+                                                            <option value="@MvcHtmlString.Create("APPROVE")" @(printtempstatus.Equals("APPROVE") ? "selected" : "")>@MvcHtmlString.Create("Approve")</option>
+                                                            <option value="@MvcHtmlString.Create("CANCEL")" @(printtempstatus.Equals("CANCEL") ? "selected" : "")>@MvcHtmlString.Create("Cancel")</option>
+                                                        </select>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-4">
+                                            <div class="form-group margin-bottom-9">
+                                                <label class="control-label text-center col-sm-3" for="todate"> Ngày tạo đến</label>
+                                                <div class="col-xs-12 col-sm-9">
+                                                    <div class="input-group date col-sm-12">
+                                                        <input type="text" id="todate" name="todate" class="col-xs-12 cl-date todate" data-date-format="yyyy-mm-dd" value="@MvcHtmlString.Create(ViewBag.ToDate)" autocomplete="off" />
+                                                        <span class="input-group-addon">
+                                                            <i class="far fa-calendar-alt"></i>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-1">
+                                        <div class="form-group margin-bottom-9">
+                                            <div class="col-xs-12 col-sm-8">
+                                                <span class="block input-icon input-icon-right">
+                                                    @RenderItemFormat("BTN_QL_MAU_TEM_TK", "<a class=\"btn font-color button-search\" onclick=\"Search()\" href=\"javascript: void(0);\"><img class=\"img-search\" src=" + @Url.Content("~/Images/search.svg") + "></a>", "", "")
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12" style="margin: 10px 0">
+                                    @RenderItemFormat("BTN_QL_MAU_TEM_TAO", "<a class=\"btn font-color btn-nc-button\" href=\"" + Url.Action("Create", "Temp_PrintTemp") + "\"><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i> Tạo</a>", "", "")
+                                    <input type="hidden" id="checkmapping" value="true" />
+                                    <a class="btn btn-nc-button" data-toggle="dropdown" aria-expanded="false"><i class="fas fa-ellipsis-h"></i></a>
+                                    <ul class="dropdown-menu" role="menu" style="">
+                                        <li>
+                                            @RenderItemFormat("BTN_QL_MAU_TEM_XOA_MULTI", "<a class=\"mybtn-Button-1\" onclick=\"DeleteMultipleData()\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/Xoa.svg") + "'>Xóa</a>", "", "")
+                                        </li>
+                                        <li>
+                                            @RenderItemFormat("BTN_QL_MAU_TEM_DUYET_MULTI", "<a class=\"mybtn-Button-1\" onclick=\"ApprovedMultipleData()\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/duyet.svg") + "'>Duyệt</a>", "", "")
+                                        </li>
+                                        <li>
+                                            @RenderItemFormat("BTN_QL_MAU_TEM_NHAP_EXCEL", "<a class=\"mybtn-Button-1\" onclick=\"ShowPopupImportExcel(true)\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/import.svg") + "'>Nhập Excel</a>", "", "")
+                                        </li>
+                                        <li>
+                                            @RenderItemFormat("BTN_QL_MAU_TEM_XUAT_EXCEL", "<a class=\"mybtn-Button-1\" onclick=\"Export()\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/export.svg") + "'>Xuất Excel</a>", "", "")
+                                        </li>
+                                        <li>
+                                            @RenderItemFormat("BTN_QL_MAU_TEM_XUAT_EXCEL_TEM", "<a class=\"mybtn-Button-1\" onclick=\"ExportTemplate(true)\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/export.svg") + "'>Xuất Excel template</a>", "", "")
+                                        </li>
+                                    </ul>
+                                    <span class="search-bar">
+                                        <input type="text" class="quicksearch txtSearchObj" name="search" id="dynamic-table-search">
+                                        <input type="text" class="quicksearch1 txtSearchObj1" name="search" style="z-index: -1000; height: 0; padding: 0; margin: 0; border: 0">
+                                    </span>
+                                    @Html.Partial("Pagination", null, new ViewDataDictionary() { { "PageCur", MvcHtmlString.Create("1") }, { "RecordCount", MvcHtmlString.Create(Model.PageSize.ToString()) }, { "ShowText", showtext }, { "printtempcode", Request["printtempcode"] }, { "printtempdes", Request["printtempdes"] }, { "fromdate", Request["fromdate"] }, { "todate", Request["todate"] }, { "printtempstatus", Request["printtempstatus"] } })
+                                </div>
+                                <input type="hidden" value="@MvcHtmlString.Create(pageCur)" name="page" id="page" />
+                            }
+                            <input type="hidden" value="@MvcHtmlString.Create(Model.PageCount.ToString())" name="totalpage" id="totalpage" />
+                        </aside>
+                    </div>
+                </div>
+                <div class="panel panel-info no-margin">
+                    <div class="panel-body no-padding" id="panel-body">
+                        @Html.AntiForgeryToken()
+                        <aside class="col-xs-12 no-padding">
+                            <div class="padding-left-0 padding-right-0 div-scrollable" style="padding-top: 0!important;">
+                                <div style="width: 100%; float: left;">
+                                    <table id="dynamic-table" class="table table-striped table-bordered table-hover table-cus table-bottom-0 no-margin">
+                                        <thead>
+                                            <tr class="trthead">
+                                                <th class="cell-30 text-center">
+                                                    <label class="pos-rel">
+                                                        <input type="checkbox" class="cl-check no-margin" onclick="CheckAll(this);" />
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </th>
+                                                <th class="text-center cell-75">
+                                                </th>
+                                                <th class="text-center cell-50">@MvcHtmlString.Create("STT")</th>
+                                                <th fieldId="PRINTTEMPCODE" sorttype="T" class="text-center cell-120">
+                                                    @MvcHtmlString.Create("Mã mẫu")
+                                                </th>
+                                                <th fieldId="PRINTTEMPDESC" sorttype="T" class="text-center cell-120">
+                                                    @MvcHtmlString.Create("Mô tả")
+                                                </th>
+                                                <th fieldId="CREATETIMEUTC" sorttype="D" class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Ngày tạo")
+                                                </th>
+                                                <th fieldId="APPRDTIMEUTC" sorttype="D" class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Ngày duyệt")
+                                                </th>
+                                                <th class="text-center cell-75">
+                                                    @MvcHtmlString.Create("Trạng thái")
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                                <div>
+                                    <table id="dynamic-table-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody no-margin">
+                                        <tbody id="table-tbodyID" class="table-tbody">
+                                            @if (Model.DataList != null && Model.DataList.Count > 0)
+                                            {
+                                                var idx = 0;
+                                                foreach (var item in Model.DataList)
+                                                {
+                                                    var iindex = startCount + (idx + 1);
+                                                    var orgID = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.OrgID))
+                                                    {
+                                                        orgID = CUtils.StrValueOrNull(item.OrgID);
+                                                    }
+                                                    var status = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.PrintTempStatus))
+                                                    {
+                                                        status = CUtils.StrValueOrNull(item.PrintTempStatus);
+                                                    }
+                                                    var createDTimeUTC = CUtils.ReturnDateTimeUtcToLocalTime(CUtils.StrValue(item.CreateDTimeUTC), Nonsense.DATE_TIME_FORMAT, offset);
+                                                    var apprDTimeUTC = CUtils.ReturnDateTimeUtcToLocalTime(CUtils.StrValue(item.ApprDTimeUTC), Nonsense.DATE_TIME_FORMAT, offset);
+                                                    var printTempDesc = CUtils.StrValue(item.PrintTempDesc);
+                                                    var printTempDescSub = printTempDesc;
+                                                    if (!CUtils.IsNullOrEmpty(printTempDesc) && printTempDesc.Length > 5)
+                                                    {
+                                                        printTempDescSub = CUtils.CatChuoi(printTempDesc, 50);
+                                                    }
+
+                                                    <tr idx="@idx" printtempcode="@item.PrintTempCode" class="data-item trdata">
+                                                        <td class="cell-30 text-center">
+                                                            <label class="pos-rel">
+                                                                <input type="checkbox" class="cl-check sl_ace no-margin" />
+                                                                <span class="checkmark"></span>
+                                                            </label>
+                                                        </td>
+                                                        <td class="text-center cell-75">
+                                                            <div class="col-xs-12 no-padding action-buttons">
+                                                                @{
+                                                                    var urlDetail = Url.Action("Detail", "Temp_PrintTemp", new { printtempcode = item.PrintTempCode });
+                                                                    var urlUpdate = Url.Action("Update", "Temp_PrintTemp", new { printtempcode = item.PrintTempCode });
+                                                                    var urlApprove = Url.Action("Approved", "Temp_PrintTemp", new { printtempcode = item.PrintTempCode });
+                                                                }
+                                                                @if (status.Equals("PENDING"))
+                                                                {
+                                                                    @RenderItemFormat("BTN_QL_MAU_TEM_SUA", "<a class=\"icon-detail\" href=\'" + urlUpdate + "\' onclick=\"\" title=\"Sửa\"><i class=\"fas fa-pencil-alt\"></i></a>", "", "")
+                                                                    @RenderItemFormat("BTN_QL_MAU_TEM_XOA", "<a class=\"icon-detail\" href=\"javascript:;\" onclick=\"Delete('" + item.PrintTempCode.ToString() + "')\" title=\"Xóa\"><i class=\"fas fa-trash-alt\"></i></a>", "", "")
+                                                                    @RenderItemFormat("BTN_QL_MAU_TEM_DUYET", "<a class=\"icon-detail\" href=\"javascript:;\" onclick=\"Approved('" + item.PrintTempCode.ToString() + "')\" title=\"Duyệt\"><i class=\"far fa-check-circle\"></i></a>", "", "")
+                                                                }
+                                                                @if (status.Equals("APPROVE"))
+                                                                {
+                                                                    @RenderItemFormat("BTN_QL_MAU_TEM_HUY", "<a class=\"icon-detail\" href=\"javascript:;\" onclick=\"Cancel('" + item.PrintTempCode.ToString() + "')\" title=\"Cancel\"><i class=\"fas fa-ban\"></i></a>", "", "")
+                                                                }
+
+                                                                @RenderItemFormat("BTN_QL_MAU_TEM_CHI_TIET", "<a class=\"icon-detail\" href=\'" + urlDetail + "\' title=\"Chi tiết\"><i class=\"far fa-eye\"></i></a>", "", "")
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center cell-50">
+                                                            @MvcHtmlString.Create(iindex.ToString())
+                                                        </td>
+                                                        <td fieldId="PRINTTEMPCODE" sorttype="T" class="text-left cell-120">@CUtils.StrValueOrNull(item.PrintTempCode)</td>
+                                                        <td fieldId="PRINTTEMPDESC" sorttype="T" class="text-left cell-120" title="@MvcHtmlString.Create(printTempDesc)">@CUtils.StrValueOrNull(printTempDescSub)</td>
+                                                        <td fieldId="CREATETIMEUTC" sorttype="D" sortfomart="yyyy-MM-dd" class="text-center cell-100">@CUtils.StrValueOrNull(createDTimeUTC)</td>
+                                                        <td fieldId="APPRDTIMEUTC" sorttype="D" class="text-center cell-100">@CUtils.StrValueOrNull(apprDTimeUTC)</td>
+                                                        <td class="text-center cell-75">
+                                                            @if (status.Equals("PENDING"))
+                                                            {
+                                                                <span class="label label-sm label-warning">Pending</span>
+                                                            }
+                                                            else if (status.Equals("APPROVE"))
+                                                            {
+                                                                <span class="label label-sm label-success">Approve</span>
+                                                            }
+                                                            else if (status.Equals("CANCEL"))
+                                                            {
+                                                                <span class="label label-sm label-danger">Cancel</span>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                    idx++;
+                                                }
+                                            }
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+@*Import Excel*@
+<div class="modal fade" id="ImportExcelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+
+@section Scripts{
+
+    <script src="@Url.Content("~/Scripts/mine/Temp_PrintTemp.js")"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#fromdate').datepicker({
+                autoclose: true,
+                todayHighlight: true,
+                dateFormat: 'yy-mm-dd'
+
+            });
+            $('#todate').datepicker({
+                autoclose: true,
+                todayHighlight: true,
+                dateFormat: 'yy-mm-dd'
+
+            });
+        });
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "Temp_PrintTemp")');
+        
+        @* Scroll *@
+        $(document).ready(function () {
+            $('.scrollable-horizontal').each(function () {
+                var $this = $(this);
+                $(this).ace_scroll(
+                    {
+                        horizontal: true,
+                        //styleClass: 'scroll-top',//show the scrollbars on top(default is bottom)
+                        size: $this.attr('data-size') || 700,
+                        mouseWheelLock: true
+                    }
+                ).css({ 'padding-top': 0 });
+            });
+            $('.scrollable').each(function () {
+                var $this = $(this);
+                $(this).ace_scroll({
+                    //size: 500,
+                    size: $this.attr('data-size') || 30,
+                    mouseWheelLock: true
+                    //styleClass: 'scroll-left scroll-margin scroll-thin scroll-dark scroll-light no-track scroll-visible'
+                });
+            });
+        });
+        @* keypress *@
+        $(document).on('keypress', function (e) {
+            if (e.which == 13) {
+                Search();
+            }
+        });
+        function Search()
+        {
+            $('#manageForm').attr('action', '@Url.Action("Index", "Temp_PrintTemp")').submit();
+        }
+
+        var objTemp_PrintTemp = new Temp_PrintTemp();
+        function Delete(printtempcode) {
+            var objTemp_PrintTemp_Delete = {
+                PrintTempCode: printtempcode,
+            };
+
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Delete", "Temp_PrintTemp")';
+
+            objTemp_PrintTemp.Image_Message = "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO";
+            objTemp_PrintTemp.Confirm_Message = "Đồng ý xóa mẫu tem '" + printtempcode + "' ?";
+            objTemp_PrintTemp.ajaxSettings = ajaxSettings;
+            objTemp_PrintTemp.deleteData(objTemp_PrintTemp_Delete);
+        }
+
+        function DeleteMultipleData() {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Delete", "Temp_PrintTemp")';
+
+            objTemp_PrintTemp.Image_Message = "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO";
+            objTemp_PrintTemp.Confirm_Message = "Đồng ý xóa danh sách mẫu tem?";
+            objTemp_PrintTemp.ajaxSettings = ajaxSettings;
+            objTemp_PrintTemp.deleteMultipleData();
+        }
+
+        function Approved(printtempcode) {
+            var objTemp_PrintTemp_Approved = {
+                PrintTempCode: printtempcode,
+            };
+
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Approved", "Temp_PrintTemp")';
+
+            objTemp_PrintTemp.Image_Message = "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO";
+            objTemp_PrintTemp.Confirm_Message = "Đồng ý duyệt mẫu tem '" + printtempcode + "' ?";
+            objTemp_PrintTemp.ajaxSettings = ajaxSettings;
+            objTemp_PrintTemp.approvedData(objTemp_PrintTemp_Approved);
+        }
+
+        function ApprovedMultipleData() {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Approved", "Temp_PrintTemp")';
+
+            objTemp_PrintTemp.Image_Message = "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO";
+            objTemp_PrintTemp.Confirm_Message = "Đồng ý duyệt danh sách mẫu tem?";
+            objTemp_PrintTemp.ajaxSettings = ajaxSettings;
+            debugger
+            objTemp_PrintTemp.approvedMultipleData();
+        }
+
+        function Cancel(printtempcode) {
+            var objTemp_PrintTemp_Cancel = {
+                PrintTempCode: printtempcode,
+            };
+
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Cancel", "Temp_PrintTemp")';
+
+            objTemp_PrintTemp.Image_Message = "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO";
+            objTemp_PrintTemp.Confirm_Message = "Đồng ý hủy mẫu tem '" + printtempcode + "' ?";
+            objTemp_PrintTemp.ajaxSettings = ajaxSettings;
+            objTemp_PrintTemp.cancelData(objTemp_PrintTemp_Cancel);
+        }
+
+        function CancelMultipleData() {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Approved", "Temp_PrintTemp")';
+
+            objTemp_PrintTemp.Image_Message = "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO";
+            objTemp_PrintTemp.Confirm_Message = "Đồng ý hủy danh sách mẫu tem?";
+            objTemp_PrintTemp.ajaxSettings = ajaxSettings;
+            objTemp_PrintTemp.cancelMultipleData();
+        }
+
+        var objCommonExcel = new CommonExcel();
+        var objVariablesInit = {
+            Id_FormMain: '',
+            Id_FormImportExcel: 'manageFormImportExcel',
+            Id_Modal: 'ImportExcelModal',
+            Id_FileInput: 'file',
+        };
+
+        var ajaxSettings_Excel = {};
+        ajaxSettings_Excel.Type = 'post';
+        ajaxSettings_Excel.DataType = 'json';
+
+        function ShowPopupImportExcel() {
+            ajaxSettings_Excel.Url = '@Url.Action("ShowPopupImportExcel", "Admin")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.variablesInit(objVariablesInit);
+            objCommonExcel.showPopupImportExcel();
+        }
+
+        function ImportFileExcel() {
+            ajaxSettings_Excel.Url = '@Url.Action("Import", "Temp_PrintTemp")';
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.variablesInit(objVariablesInit);
+            objCommonExcel.importFileExcel();
+        }
+
+        function ExportTemplate() {
+            ajaxSettings_Excel.Url = '@Url.Action("ExportTemplate", "Temp_PrintTemp")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.exportExcel();
+        }
+
+        function Export() {
+            ajaxSettings_Excel.Url = '@Url.Action("Export", "Temp_PrintTemp")';
+
+            var printtempcode = commonUtils.returnValueTextOrNull('#printtempcode');
+            var printtempdes = commonUtils.returnValueTextOrNull('#printtempdes');
+            var fromdate = commonUtils.returnValueTextOrNull('#fromdate');
+            var todate = commonUtils.returnValueTextOrNull('#todate');
+            var status = commonUtils.returnValueTextOrNull('#status');
+
+            var ListSearchInput = [
+                { Key: 'printtempcode', Value: printtempcode },
+                { Key: 'printtempdes', Value: printtempdes },
+                { Key: 'fromdate', Value: fromdate },
+                { Key: 'todate', Value: todate },
+                { Key: 'status', Value: status },
+            ];
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.exportExcel(ListSearchInput);
+        }
+    </script>
+    <script type="text/javascript">
+        var listColumns = {
+            'PRINTTEMPCODE': [],
+            'PRINTTEMPDESC': [],
+            'CREATETIMEUTC': [],
+            'APPRDTIMEUTC': []
+        };
+        var options = {};
+        options.Columns = listColumns;
+        $('#dynamic-table').table_Sortable(options);
+    </script>
+
+}
+

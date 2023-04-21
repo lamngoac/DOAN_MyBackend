@@ -1,0 +1,22 @@
+﻿@model List<Mst_GovIDType>
+@{
+    //Layout = null;
+    var govIDType = CUtils.StrValue(ViewBag.GovIDType);
+}
+
+<optgroup label="">
+    <option value="">&nbsp;</option>
+    @if (Model != null && Model.Count > 0)
+    {
+        foreach (var item in Model)
+        {
+            var govIDTypeCur = CUtils.StrValue(item.GovIDType);
+            var govIDTypeNameCur = CUtils.StrValue(item.GovIDTypeName);
+            <option value="@MvcHtmlString.Create(govIDTypeCur)" desc="@MvcHtmlString.Create(govIDTypeNameCur)" @(govIDTypeCur.Equals(govIDType) ? "selected" : "")>@MvcHtmlString.Create(govIDTypeNameCur)</option>
+        }
+    }
+</optgroup>
+<option value="ADDDATA">@("".HtmlItemString("product"))</option>
+
+
+

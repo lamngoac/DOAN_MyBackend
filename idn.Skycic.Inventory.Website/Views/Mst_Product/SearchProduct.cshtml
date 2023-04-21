@@ -1,0 +1,203 @@
+﻿
+@model RT_Mst_Product
+@{
+    var init = CUtils.StrValue(ViewBag.init);
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+    var pageCount = CUtils.StrValue(ViewBag.PageCount);
+    var totalPage = "0";
+    //if (Model != null)
+    //{
+    //    totalPage = CUtils.StrValue(Model.PageCount);
+    //}
+
+
+    //var showtext = "";
+    //if (Model.ItemCount > 0)
+    //{
+    //    var recordstart = (Model.PageIndex) * Model.PageSize + 1;
+    //    var recordend = (Model.PageIndex + 1) * Model.PageSize;
+    //    if (recordend > Model.ItemCount)
+    //    {
+    //        recordend = Model.ItemCount;
+    //    }
+    //    showtext = recordstart + "-" + recordend + " trong số " + Model.ItemCount;
+    //}
+}
+
+@*<input type="hidden" id="page" value="@ViewBag.PageCur" />
+<input type="hidden" id="totalpage" value="@Model.PageCount" />*@
+
+<div class="col-xs-12 layout-bot-top-16" style="">
+    <div class="row">
+        <div class="col-6">
+            <a class="btn btn-nc-button" href="javascript:void(0);" style="" onclick="checkchoosePrd();"><i class="fa fa-check-circle" aria-hidden="true"></i> Chọn</a>
+            <span class="search-bar">
+                <input type="text" id="dynamic-table-thead-search" class="quicksearch txtSearchObj" name="search">
+                <input type="text" class="quicksearch1 txtSearchObj1" name="search" style="z-index: -1000; height: 0; padding: 0; margin: 0; border: 0">
+            </span>
+        </div>
+        @*<div class="col-6">
+            @Html.Partial("Pagination", null, new ViewDataDictionary() { { "PageCur", MvcHtmlString.Create(pageCur) }, { "PageCount", MvcHtmlString.Create(pageCount) }, { "ShowText", showtext } })
+        </div>*@
+    </div>
+</div>
+
+<div class="panel-body no-padding" id="panel-body" style="padding-left: 0px; padding-right: 0px;overflow:auto;max-height:500px;">
+    <aside class="col-xs-12 layout-table no-padding">
+        @Html.AntiForgeryToken()
+        <div class="scrollable-horizontal padding-left-0 padding-right-0" style="padding-top: 0!important;">
+            <div style="width: 100%; float: left;">
+                <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                    <thead>
+                        <tr class="trthead">
+                            <th fieldId="CONTROL" fieldName="CONTROL" fieldActive="0" class="text-center cell-50">
+                                <input type="checkbox" class="cl-check" onclick="CheckAll(this);" name="check-box-all" />
+                            </th>
+                            <th fieldId="STT" fieldName="STT" fieldActive="0" class="text-left cell-50">@MvcHtmlString.Create("STT")</th>
+                            <th fieldId="PRODUCTCODEUSER" fieldName="Mã hàng" fieldActive="0" sorttype="T" class="text-left cell-200">
+                                @("Mã hàng".HtmlItemString("product"))
+                            </th>
+                            <th fieldId="PRODUCTNAME" fieldName="Tên hàng" fieldActive="0" sorttype="T" class="text-left cell-250">
+                                @("Tên hàng".HtmlItemString("product"))
+                            </th>
+                            <th fieldId="PRODUCTTYPE" fieldName="Loại hàng" fieldActive="1" sorttype="T" class="text-left cell-200">
+                                @("Loại hàng".HtmlItemString("product"))
+                            </th>
+                            <th fieldId="PRODUCTGRPCODE" fieldName="Nhóm hàng" fieldActive="0" sorttype="T" class="text-left cell-200">
+                                @("Nhóm hàng".HtmlItemString("product"))
+                            </th>
+                            <th fieldId="BRANDCODE" fieldName="Nhãn hiệu" fieldActive="0" sorttype="T" class="text-left cell-200">
+                                @("Nhãn hiệu".HtmlItemString("product"))
+                            </th>
+                            <th fieldId="UNITCODE" fieldName="Đơn vị" fieldActive="0" sorttype="T" class="text-left cell-200">
+                                @("Đơn vị".HtmlItemString("product"))
+                            </th>
+                            <th fieldId="FLAGBUY" fieldName="Được mua" fieldActive="0" class="text-left cell-100">
+                                @("Được mua".HtmlItemString("product"))
+                            </th>
+                            <th fieldId="FLAGSELL" fieldName="Được bán" fieldActive="0" class="text-left cell-100">
+                                @("Được bán".HtmlItemString("product"))
+                            </th>
+                            <th fieldId="UPBUY" fieldName="Giá mua" fieldActive="0" sorttype="N" class="text-left cell-100">
+                                @("Giá mua".HtmlItemString("product"))
+                            </th>
+                            <th fieldId="UPSELL" fieldName="Giá bán" fieldActive="0" sorttype="N" class="text-left cell-100">
+                                @("Giá bán".HtmlItemString("product"))
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                    <tbody id="table-tbodyID" class="GetBom">
+                        @if (Model != null && Model.Lst_Mst_Product != null && Model.Lst_Mst_Product.Count > 0)
+                        {
+                            var i = 1;
+                            foreach (var item in Model.Lst_Mst_Product)
+                            {
+                                <tr idx="@(i)" class="data-item trdata GetBom" @*onclick="PrdOnClick(this);"*@ productcode="@item.ProductCode">
+                                    <input type="hidden" name="ListProduct[@i].ProductCode" value="@item.ProductCode" />
+                                    <input type="hidden" name="ListProduct[@i].ProductName" value="@item.ProductName" />
+                                    <input type="hidden" name="ListProduct[@i].ProductCodeUser" value="@item.ProductCodeUser" />
+                                    <input type="hidden" name="ListProduct[@i].ProductType" value="@item.ProductType" />
+                                    <input type="hidden" name="ListProduct[@i].ProductGrpCode" value="@item.ProductGrpCode" />
+                                    <input type="hidden" name="ListProduct[@i].BrandCode" value="@item.BrandCode" />
+                                    <input type="hidden" name="ListProduct[@i].ProductLevelSys" value="@item.ProductLevelSys" />
+                                    <input type="hidden" name="ListProduct[@i].ProductCodeBase" value="@item.ProductCodeBase" />
+                                    <input type="hidden" name="ListProduct[@i].ProductCodeRoot" value="@item.ProductCodeRoot" />
+                                    <input type="hidden" name="ListProduct[@i].OrgID" value="@item.OrgID" />
+                                    <input type="hidden" name="ListProduct[@i].NetworkID" value="@item.NetworkID" />
+                                    <input type="hidden" name="ListProduct[@i].UPBuy" value="@item.UPBuy" />
+                                    <input type="hidden" name="ListProduct[@i].UPSell" value="@item.UPSell" />
+                                    <input type="hidden" name="ListProduct[@i].QtyEffSt" value="@item.QtyEffSt" />
+
+                                    <td fieldId="CONTROL" class="text-center cell-50">
+                                        <input type="checkbox" class="cl-check" onclick="CheckBoxRoot(this);" name="ckb" />
+                                    </td>
+                                    <td fieldId="STT" class="text-center cell-50" style="">
+                                        @(i++)
+                                    </td>
+                                    <td fieldId="PRODUCTCODEUSER" class="text-left cell-200">
+                                        @item.ProductCodeUser
+                                    </td>
+                                    <td fieldId="PRODUCTNAME" class="text-left cell-250">
+                                        @item.ProductName
+                                    </td>
+                                    <td fieldId="PRODUCTTYPE" class="text-left cell-200">
+                                        @item.ProductType
+                                    </td>
+                                    <td fieldId="PRODUCTGRPCODE" class="text-left cell-200">
+                                        @item.ProductGrpCode
+                                    </td>
+                                    <td fieldId="BRANDCODE" class="text-left cell-200">
+                                        @item.BrandCode
+                                    </td>
+                                    <td fieldId="UNITCODE" class="text-left cell-200">
+                                        @item.UnitCode
+                                    </td>
+                                    <td fieldId="FLAGBUY" class="text-center cell-100">
+                                        @if (!CUtils.IsNullOrEmpty(item.FlagBuy))
+                                        {
+                                            if (item.FlagBuy.Equals("1"))
+                                            {
+                                                <span class="label label-sm label-success">Có</span>
+                                            }
+                                            else
+                                            {
+
+                                                <span class="label label-sm label-success">Không</span>
+                                            }
+                                        }
+                                    </td>
+                                    <td fieldId="FLAGSELL" class="text-center cell-100">
+                                        @if (item.FlagSell.Equals("1"))
+                                        {
+                                            <span class="label label-sm label-success">Có</span>
+                                        }
+                                        else
+                                        {
+
+                                            <span class="label label-sm label-success">Không</span>
+                                        }
+                                    </td>
+                                    <td fieldId="UPBUY" class="text-right cell-100 numberic">
+                                        @item.UPBuy
+                                    </td>
+                                    <td fieldId="UPSELL" class="text-right cell-100 numberic">
+                                        @item.UPSell
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </aside>
+</div>
+
+@*<script>
+        $('.scrollable-horizontal').hScroll();
+    </script>*@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

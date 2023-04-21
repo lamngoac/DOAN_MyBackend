@@ -1,0 +1,419 @@
+﻿
+@model RT_InvF_InventoryOut
+@{
+    /**/
+
+    var Lst_Mst_Inventory = ViewBag.Lst_Mst_Inventory as List<Mst_Inventory>;
+    var Lst_Mst_InventoryType = ViewBag.Lst_Mst_InventoryType as List<Mst_InventoryType>;
+    var Lst_Mst_InventoryLevelType = ViewBag.Lst_Mst_InventoryLevelType as List<Mst_InventoryLevelType>;
+    var IFInvOutNo = ViewBag.IFInvOutNo == null ? "" : ViewBag.IFInvOutNo.ToString();
+
+    var lst_Mst_InvOutType = new List<Mst_InvOutType>();
+    if (ViewBag.Lst_Mst_InvOutType != null)
+    {
+        lst_Mst_InvOutType = ViewBag.Lst_Mst_InvOutType as List<Mst_InvOutType>;
+    }
+
+    var lstCustomer = new List<Mst_Customer>();
+    if (ViewBag.Lst_MstCustomer != null)
+    {
+        lstCustomer = ViewBag.Lst_MstCustomer as List<Mst_Customer>;
+    }
+
+    var lst_Mst_ProductUI = new List<Mst_ProductUI>();
+    if (ViewBag.Lst_Mst_ProductUI != null)
+    {
+        lst_Mst_ProductUI = ViewBag.Lst_Mst_ProductUI;
+    }
+
+    string viewType = "create";
+    var userState = ViewBag.UserState as UserState;
+
+    var flagActive = "0";
+    var flagdisplaynone = "";
+
+    if (userState.RT_Mst_Sys_Config != null && userState.RT_Mst_Sys_Config.Lst_Mst_Sys_Config != null && userState.RT_Mst_Sys_Config.Lst_Mst_Sys_Config.Count > 0)
+    {
+        foreach (var item in userState.RT_Mst_Sys_Config.Lst_Mst_Sys_Config)
+        {
+            if (item.SysConfigID.Equals("IF_InvOut"))
+            {
+                flagActive = CUtils.StrValue(item.FlagActive);
+            }
+        }
+    }
+
+
+    if (flagActive.Equals("0"))
+    {
+        flagdisplaynone = "display-none";
+    }
+
+    var totalValOut = "";
+    var totalValOutDesc = "";
+    var totalValOutAfterDesc = "";
+
+
+
+}
+@{
+    ViewBag.Title = "Tạo phiếu xuất kho";
+}
+<style>
+    input:read-only {
+        background-color: #eee !important;
+    }
+</style>
+<script>
+    setAdminCurrentUrl('@Url.Action("Index", "InvF_InventoryOut")');
+</script>
+
+<script src="~/Content/assets/js/myjs/inventoryout.js"></script>
+<script src="~/Scripts/mine/InvF_InventoryOut.js"></script>
+
+@section RenderButton{
+    <div class="col-12 breadcrumb-menu">
+        @RenderItemFormat("BTN_INVENTORYOUT_SAVE", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnSave\" onclick=\"SaveData();\"><i class=\"fas fa-save\" aria-hidden=\"true\"></i> Lưu</a>", "", "")
+    </div>
+}
+@*<div class="mt-3">
+        <div class="col-12">
+            @RenderItemFormat("BTN_INVENTORYOUT_SAVE", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnSave\" onclick=\"SaveData();\"><i class=\"fas fa-save\" aria-hidden=\"true\"></i> Lưu</a>", "", "")
+        </div>
+    </div>*@
+
+<div class="mt-3">
+    <div class="col-12">
+        @using (Html.BeginForm("Create", "InvF_InventoryOut", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+
+            <div class="col-12 row">
+                <div class="col-12 row">
+                    <aside class="col-md-4">
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="IF_InvOutNo">
+                                @("Số phiếu xuất".HtmlItemString("invf_inventoryout"))
+                            </label>
+                            <div class="col-md-8">
+                                <input type="text" class="col-md-12 text-bold" name="IF_InvOutNo" id="IF_InvOutNo" value="@IFInvOutNo" />
+                            </div>
+                        </div>
+
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="InvInType">
+                                @("Loại xuất kho".HtmlItemString("invf_inventoryout"))
+                                <span style="color: red "> *</span>
+                            </label>
+                            <div class="col-md-8">
+                                <span class="block input-icon input-icon-right">
+                                    <select id="InvOutType" name="InvOutType" showpopup-control-searchdata="#ShowPopupInvInType" class="col-md-12" onchange="ChangeInvOutType(this);">
+                                        <optgroup label="">
+                                            <option value="">--Chọn Loại xuất kho--</option>
+                                            @if (lst_Mst_InvOutType != null && lst_Mst_InvOutType.Count > 0)
+                                            {
+                                                foreach (var item in lst_Mst_InvOutType)
+                                                {
+                                                    var invOutType = CUtils.StrValue(item.InvOutType);
+                                                    var invOutTypeName = CUtils.StrValue(item.InvOutTypeName);
+                                                    <option value="@MvcHtmlString.Create(invOutType)">@MvcHtmlString.Create(invOutTypeName)</option>
+                                                }
+                                            }
+                                        </optgroup>
+                                        <option value="Search" style="color: green !important">Tìm kiếm</option>
+                                        @*<option value="SEARCHDATA">@("Tìm kiếm".HtmlItemString("invf_inventoryout"))</option>*@
+                                    </select>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="InvCodeOut">
+                                @("Kho xuất".HtmlItemString("invf_inventoryout"))
+                                <span style="color: red "> *</span>
+                            </label>
+                            <div class="col-md-8">
+                                <span class="block input-icon input-icon-right">
+                                    <select id="InvCodeOut" name="InvCodeOut" showpopup-control-searchdata="#ShowPopupInvCodeOut" class="col-md-12 mstinventory" onchange="ChangeInvCodeOut(this);">
+                                        <optgroup label="">
+                                            <option value="">--Chọn kho xuất--</option>
+                                            @if (Lst_Mst_Inventory != null && Lst_Mst_Inventory.Count > 0)
+                                            {
+                                                foreach (var item in Lst_Mst_Inventory)
+                                                {
+                                                    var invCode = CUtils.StrValue(item.InvCode);
+                                                    var invName = CUtils.StrValue(item.InvName);
+                                                    <option invBUPattern="@(item.InvBUPattern == null ? "" : item.InvBUPattern)" value="@MvcHtmlString.Create(invCode)">@MvcHtmlString.Create(invCode) - @MvcHtmlString.Create(invName)</option>
+                                                }
+                                            }
+                                            <option value="Search">Tìm kiếm</option>
+                                        </optgroup>
+
+                                    </select>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="input1">
+                                @("Khách hàng".HtmlItemString("customer_inventoryout"))
+                                <span style="color: red "> *</span>
+                            </label>
+                            <div class="col-md-8">
+                                <select class="col-md-12" id="CustomerCode" name="CustomerCode" onchange="ChangeCustomer(this);">
+                                    <option value="">Tất cả</option>
+                                    <option value="Search">Tìm kiếm</option>
+                                    @if (lstCustomer != null && lstCustomer.Count > 0)
+                                    {
+                                        foreach (var item in lstCustomer)
+                                        {
+                                            <option value="@item.CustomerCodeSys">@item.CustomerCode - @item.CustomerName</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+
+                    </aside>
+                    <aside class="col-md-4">
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="input1">
+
+                            </label>
+                            <div class="col-md-8">
+                                <input type="checkbox" id="FlagXuatTuDH" onchange="ChangeXuatTuDonHang(this);" />
+                                <label>
+                                    @("Xuất theo yêu cầu nghiệp vụ".HtmlItemString("fromorder_inventoryout"))
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="input1">
+                                @("RefType".HtmlItemString("customer_inventoryout"))
+                            </label>
+                            <div class="col-md-8">
+                                <select class="col-md-12" id="refType" name="refType" disabled>
+                                    <optgroup label="">
+                                        <option value=""></option>
+                                        @*<option value="ORDERDL">Đơn hàng đại lý</option>*@
+                                        <option value="ORDERSO">Đơn hàng bán lẻ</option>
+                                        @*<option value="ORDERSR">Đơn hàng bán lẻ</option>*@
+                                        @*<option value="ADJUST">Điều chuyển</option>*@
+                                        <option value="RO">Vật tư sửa chữa</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="InvoiceNo">
+                                @("Số RefNo".HtmlItemString("refno_inventoryout"))
+                            </label>
+                            <div class="col-md-8">
+                                <input type="text" onchange="FillCustomerOrder1(this,'@Url.Action("GetRefNoDetail", "InvF_InventoryOut")');" class="col-md-12" name="RefNo" id="RefNo" readonly />
+                                <input type="text" id="RefType" name="RefType" hidden />
+                                <input type="hidden" id="RefNoSys" name="RefNoSys" value="" />
+                                <input type="text" id="QtyInvOutAvail" name="QtyInvOutAvail" hidden />
+
+                            </div>
+                        </div>
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="Remark">
+                                @("Nội dung xuất".HtmlItemString("remark_inventoryout"))
+                            </label>
+                            <div class="col-md-8">
+                                <textarea class="col-md-12" name="Remark" id="Remark" rows="2"></textarea>
+                            </div>
+                        </div>
+
+                        @*<div class="form-group margin-bottom-9">
+                                <label class="control-label col-md-4" for="Remark">
+                                    @("Đơn vị vận tải".HtmlItemString("remark_inventoryout"))
+                                </label>
+                                <div class="col-md-8">
+                                    <input type="text" class="col-md-12" name="ShippingCustomerCode" id="ShippingCustomerCode" />
+                                </div>
+                            </div>*@
+
+
+
+
+
+
+                    </aside>
+                    <aside class="col-md-4">
+
+                        @*<div class="form-group margin-bottom-9">
+                                <label class="control-label col-md-4" for="InvFCFOutCode01">
+                                    @("Mã vùng vận tải".HtmlItemString("invf_inventoryout"))
+                                </label>
+                                <div class="col-md-8">
+                                    <input type="text" class="col-md-12" name="ShippingAreaCode" id="ShippingAreaCode" />
+                                </div>
+                            </div>*@
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="InvFCFOutCode01">
+                                @("PT vận chuyển".HtmlItemString("invf_inventoryout"))
+                            </label>
+                            <div class="col-md-8">
+                                <input type="text" class="col-md-12" name="InvFCFOutCode01" id="InvFCFOutCode01" />
+                            </div>
+                        </div>
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="InvFCFOutCode03">
+                                @("Biển số xe".HtmlItemString("invf_inventoryout"))
+                            </label>
+                            <div class="col-md-8">
+                                <input type="text" class="col-md-12" name="InvFCFOutCode03" id="InvFCFOutCode03" />
+                            </div>
+                        </div>
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="InvFCFOutCode02">
+                                @("Số Container".HtmlItemString("invf_inventoryout"))
+                            </label>
+                            <div class="col-md-8">
+                                <input type="text" class="col-md-12" name="InvFCFOutCode02" id="InvFCFOutCode02" />
+                            </div>
+                        </div>
+                        @*<div class="form-group margin-bottom-9">
+                                <label class="control-label col-md-4" for="Remark">
+                                    @("Nội dung xuất".HtmlItemString("remark_inventoryout"))
+                                </label>
+                                <div class="col-md-8">
+                                    <textarea class="col-md-12" name="Remark" id="Remark" rows="2"></textarea>
+                                </div>
+                            </div>*@
+
+                    </aside>
+                </div>
+
+            </div>
+
+            <ul class="nav nav-tabs position-relative">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#ProductInformation">@("Danh mục hàng hóa".HtmlItemString("invf_inventoryin"))</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#AuthenticationInformation">@("Thông tin xác thực".HtmlItemString("invf_inventoryin"))</a>
+                </li>
+                <div class="nav-price">
+                    <div class="form-group">
+                        <label class="control-label" for="TotalValOut">
+                            @("Tổng tiền hàng:".HtmlItemString("labeltotalvalout_inventoryout"))
+                        </label>
+                        <div class="control-input">
+                            <input type="text" class="text-right TotalValOut" name="TotalValOut" id="TotalValOut" value="" readonly />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label" for="TotalValOutDesc">
+                            @("Giảm giá:".HtmlItemString("labeltotalvaloutdesc_inventoryout"))
+                        </label>
+                        <div class="control-input">
+                            <input type="text" class="text-right TotalValOutDesc" readonly name="TotalValOutDesc" id="TotalValOutDesc" value="" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label" for="TotalValOutAfterDesc">
+                            @("Tổng tiền thanh toán:".HtmlItemString("totalvaloutafterdesc_inventoryout"))
+                        </label>
+                        <div class="control-input">
+                            <input type="text" class="text-right TotalValOutAfterDesc totalAfterDesc" name="TotalValOutAfterDesc" id="TotalValOutAfterDesc" value="" readonly />
+                        </div>
+                    </div>
+                </div>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content" style="padding-bottom: 30px">
+                <div id="ProductInformation" class="container-fluid padding-left-right-15 tab-pane active">
+                    @*@Html.Partial("Lst_Product", new ViewDataDictionary() { { "lst_Mst_ProductUI", lst_Mst_ProductUI } })*@
+                    @Html.Partial("Load_Table_InvF_InventoryOutDtl", new ViewDataDictionary() { { "lst_Mst_ProductUI", lst_Mst_ProductUI }, { "UserState", userState } })
+                </div>
+                <div id="AuthenticationInformation" class="container-fluid padding-left-right-15 tab-pane">
+                    <br>
+                    @Html.Partial("TabXacThuc")
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@Html.Partial("_TemplateLotAndSerial")
+
+@Html.Partial("Modal")
+
+
+@Html.Partial("~/Views/ModalCommon/_ModalShow.cshtml")
+
+@section Scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            //$('.select2-selection').select2();
+            $('#FlagIn_Out').select2({
+                minimumResultsForSearch: -1
+            });
+
+            $("select#InvCodeOut").select2();
+            $("select#InvOutType").select2();
+            $("select#CustomerCode").select2();
+            $("select#ProductCode").select2();
+
+            jQuery(function ($) {
+                //if ($('.numberic').length) {
+                //$('.numberic').number(true, 2);
+                //}
+
+                format_Number();
+            });
+        });
+    </script>
+    <script type="text/javascript">
+        function SaveData(flagRedirect) {
+            debugger
+               var ajaxSettings = {};
+        ajaxSettings.Type = 'post';
+        ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Save", "InvF_InventoryOut")';
+
+            var objInvF_InventoryOut = new InvF_InventoryOut();
+            objInvF_InventoryOut.ActionType = 'create';
+            objInvF_InventoryOut.ajaxSettings = ajaxSettings;
+            objInvF_InventoryOut.saveData(flagRedirect);
+        }
+    </script>
+
+
+    <script type="text/javascript">
+        function format_Number() {
+            var tableName = 'InvF_InventoryOut';
+            var totalValOutFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValOut');
+            var totalValOutDescFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValOutDesc');
+            var totalValOutAfterDescFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValOutAfterDesc');
+
+
+
+            $('#TotalValOut').number(true, totalValOutFormat);
+            $('#TotalValOutDesc').number(true, totalValOutDescFormat);
+            $('#TotalValOutAfterDesc').number(true, totalValOutAfterDescFormat);
+        }
+    </script>
+
+
+
+}
+@Html.Partial("Template", Model, new ViewDataDictionary()
+{
+       { "ViewType", viewType },
+       { "UserState", userState }
+})
+
+@Html.Partial("Template_Scripts", Model, new ViewDataDictionary()
+{
+            { "ViewType", viewType },
+                {"UserState", userState }
+})
+
+

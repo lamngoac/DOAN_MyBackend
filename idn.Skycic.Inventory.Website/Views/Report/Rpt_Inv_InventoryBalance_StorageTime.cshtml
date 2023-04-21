@@ -1,0 +1,381 @@
+﻿@model List<Rpt_Inv_InventoryBalance_StorageTimeUI>
+@{
+    /**/
+
+    ViewBag.Title = "Báo cáo tuổi tồn kho";
+    var today = ViewBag.Today;
+    var List_Mst_ProductGroup = ViewBag.Lst_Mst_ProductGroup as List<Mst_ProductGroup>;
+
+}
+<script>
+    setAdminCurrentUrl('@Url.Action("Rpt_Inv_InventoryBalance_StorageTime", "Report")');
+</script>
+<div class="row no-margin">
+    <div class="col-sm-12">
+        <aside class="row no-margin">
+            @using (Html.BeginForm("Rpt_Inv_InventoryBalance_StorageTime", "Report", FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <input hidden id="init" name="init" value="search" />
+                <div class="layout-search layout-bot-top-16">
+                    <div class="row no-margin">
+                        <div class="col-4 row offset-1">
+                            <div class="row form-group margin-bottom-9 disabled-fix">
+                                <label for="ApprDTimeUTCFrom" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Đến ngày".HtmlItemString("inventory")) <span style="color: red;">*</span></label>
+                                <div class="col-sm-8 row date-input-group no-margin">
+                                    <div class="row col-12 no-margin no-padding">
+                                        <div class="col-12 no-padding">
+                                            <div class="input-group form-group" id="dtToDate">
+                                                <input type="text" id="ToDate" name="toDate" class="col-9 cl-date hasDatepicker" data-date-format="yyyy-mm-dd" value="@today" autocomplete="off" readonly>
+                                                <span class="input-group-addon col-3">
+                                                    <i class="far fa-calendar-alt"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row form-group margin-bottom-9">
+                                <label for="IF_MONo" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Hàng hoá".HtmlItemString("inventory"))</label>
+                                <div class="col-12 col-sm-8 form-group">
+                                    <span class="block input-icon input-icon-right col-12 no-padding">
+                                        @*<input type="text" id="ProductCode" name="productCode" class="col-12" value="" autocomplete="off" required />*@
+                                        <input class="col-12" id="myInput" type="text" name="myInput" onkeyup="Autocompletesearch()" placeholder="@("Nhập mã, tên để tìm kiếm".HtmlItemString("report"))" value="">
+                                        <input type="hidden" id="ProductCodeUser" name="ProductCodeUser" value="" autocomplete="off" required />
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3 row no-margin">
+                            <div class="form-group row no-margin">
+                                <div class="row form-group margin-bottom-9">
+                                    <label for="ProductGroupCode" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Nhóm hàng".HtmlItemString("inventory"))</label>
+                                    <div class="col-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right selection--multiple">
+                                            <select class="select2-selection col-12" name="productGroupCode" id="ProductGroupCode" multiple>
+                                                @{
+                                                    if (List_Mst_ProductGroup != null && List_Mst_ProductGroup.Count > 0)
+                                                    {
+                                                        foreach (var grp in List_Mst_ProductGroup)
+                                                        {
+                                                            <option value="@grp.ProductGrpCode">@grp.ProductGrpName</option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-1 row no-margin">
+                            <div class="form-group margin-bottom-9">
+                                <div class="row no-margin">
+                                    <span class="block input-icon input-icon-right">
+                                        @RenderItemFormat("BTN_BC_TUOI_TON_KHO_TIM_KIEM", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\"  onclick=\"SearchData();\"><img class=\"img-button-search\" src=" + Url.Content("~/Images/search.svg") + "></a>", "", "")
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </aside>
+        <div class="row no-margin">
+            <div class="col-sm-12 no-padding">
+                <div id="BindDataRpt_Inv_InventoryBalance_StorageTime" class="conten-table">
+                    @Html.Partial("BindDataRpt_Inv_InventoryBalance_StorageTime", Model)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('#ToDate').datepicker({
+        autoclose: true,
+        format: 'yyyy-mm-dd'
+    })
+</script>
+
+<!-- Search -->
+<script>
+        $(document).ready(function () {
+            $('#InvCode').select2();
+        })
+        function SearchData() {
+            var productCodeUser = commonUtils.returnValueText('input[name=ProductCodeUser]');
+            var productGrpCode = commonUtils.returnValueText('#ProductGroupCode');
+            
+            var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+            var url = '@Url.Action("DoSearch_Rpt_Inv_InventoryBalance_StorageTime", "Report")';
+            $.ajax({
+            type: "post",
+            data: {
+                __RequestVerificationToken: token,
+                productCodeUser: productCodeUser,
+                productGrpCode: productGrpCode
+            },
+            url: url,
+            dataType: 'json',
+                beforeSend: function () { }
+            }).done(function (result) {
+                if (result.Success) {
+                    $('#BindDataRpt_Inv_InventoryBalance_StorageTime').html('');
+                    $('#BindDataRpt_Inv_InventoryBalance_StorageTime').html(result.Html);
+                    format_Number();
+                } else {
+                    if (!commonUtils.isNullOrEmpty(result.Detail)) {
+                        showErrorDialog(result.Detail);
+                    }
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+
+            }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+                //alert("complete");
+            });
+        }
+</script>
+<!-- Excel -->
+<script>
+    function Export() {
+        var productCodeUser = commonUtils.returnValueText('input[name=ProductCodeUser]');
+        var productGrpCode = commonUtils.returnValueText('#ProductGroupCode');
+
+        var objCommonExcel = new CommonExcel();
+        var ajaxSettings_Excel = {};
+        ajaxSettings_Excel.Type = 'post';
+        ajaxSettings_Excel.DataType = 'json';
+        ajaxSettings_Excel.Url = '@Url.Action("Rpt_Inv_InventoryBalance_StorageTime_Export", "Report")';
+
+        var listParams = [
+            { "Key": 'productCodeUser', "Value": productCodeUser },
+            { "Key": 'productGrpCode', "Value": productGrpCode },
+        ];
+
+        objCommonExcel.ajaxSettingsInit();
+        objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+        objCommonExcel.exportExcel(listParams);
+        }
+</script>
+<!-- In -->
+<script src="@Url.Content("~/Scripts/print.min.js")"></script>
+<script>
+    function Print() {
+        var productCodeUser = commonUtils.returnValueText('input[name=ProductCodeUser]');
+        var productGrpCode = commonUtils.returnValueText('#ProductGroupCode');
+
+        let Url = '@Url.Action("PrintTemp_Rpt_Inv_InventoryBalance_StorageTime", "Report")';
+
+        $.ajax({
+            type: "post",
+            data:
+            {
+                productCodeUser: productCodeUser,
+                productGrpCode: productGrpCode
+            },
+            url: Url,
+            dataType: 'json',
+            beforeSend: function () { }
+        }).done(function (result) {
+            if (result.Success) {
+                if (result.LinkPDF !== undefined || result.LinkPDF !== '') {
+                    printPdf(result.LinkPDF);
+                }
+                else {
+                    alert('Không lấy được dữ liệu mẫu in');
+                }
+            }
+            else {
+                if (result.Messages !== undefined && result.Messages.length > 0) {
+                    alert(result.Messages[0]);
+                }
+                if (!commonUtils.isNullOrEmpty(result.Detail)) {
+                    showErrorDialog(result.Detail);
+                }
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+
+        }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+            //alert("complete");
+        });
+    }
+
+    function printPdf(linkPdf) {
+        printJS({
+            printable: linkPdf,
+            type: 'pdf',
+            showModal: true,
+            //onPrintDialogClose: () => console.log('The print dialog was closed'),
+            //onPdfOpen: () => console.log('Pdf was opened in a new tab due to an incompatible browser')
+        })
+    }
+</script>
+
+
+@*format number*@
+
+<script type="text/javascript">
+    function format_Number() {
+        var tableName = 'Rpt_Inv_InventoryBalance_StorageTime';
+        var qtyTotalOKFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'QtyTotalOK');
+        var mp_UpBuyFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'UPInv');
+        var totalInvValueFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValInv');
+
+        $('.qtyTotalOK').number(true, qtyTotalOKFormat);
+        $('.mp_UpBuy').number(true, mp_UpBuyFormat);
+        $('.totalInvValue').number(true, totalInvValueFormat);
+    }
+</script>
+
+<script type="text/javascript">
+        function Autocompletesearch() {
+            function autocomplete(inp, arrr) {
+                var currentFocus;
+                var a, b, i, c, val = inp.value;
+                    closeAllLists();
+                    if (!val) { return false; }
+                    currentFocus = -1;
+                    a = document.createElement("DIV");
+                    a.setAttribute("id", inp.id + "autocomplete-list");
+                    a.setAttribute("class", "autocomplete-items row col-10 no-padding");
+                    inp.parentNode.appendChild(a);
+                for (i = 0; i < arrr.length; i++) {
+                        /* kiểm tra xem mục có bắt đầu bằng các chữ cái giống như giá trị trường văn bản không: */
+                    let productCur = arrr[i];
+                    if (productCur.ProductName.toUpperCase().includes(val.toUpperCase())) {
+                            /* tạo thành phần DIV cho từng thành phần phù hợp: */
+                            b = document.createElement("DIV");
+                            b.setAttribute("class", "col-12 autocomplete-itemssmall");
+                            /* làm cho các chữ cái phù hợp in đậm: */
+                        b.innerHTML = "<span>" + productCur.ProductName + "</span>";
+                            //b.innerHTML += arrr[i].ProducName;
+                            /* chèn trường đầu vào sẽ giữ giá trị của mục mảng hiện tại: */
+                        b.innerHTML += "<input type='hidden' value='" + productCur.ProductCode + "'>";
+                            /* thực thi chức năng khi ai đó nhấp vào giá trị mục (phần tử DIV): */
+                            b.addEventListener("click", function (e) {
+                                /* chèn giá trị cho trường văn bản tự động hoàn thành: */
+                                inp.value = productCur.ProductName;
+                                GetProduct(productCur.ProductCode);
+                                closeAllLists();
+                            });
+                            a.appendChild(b);
+                        }
+
+                    }
+                    /* thực thi một chức năng nhấn một phím trên bàn phím: */
+                inp.addEventListener("keydown", function (e) {
+                    var x = document.getElementById(inp.id + "autocomplete-list");
+                    if (x) x = x.getElementsByTagName("div");
+                    if (e.keyCode == 40) {
+                        /* Nếu nhấn phím mũi tên DOWN, hãy tăng biến Focus hiện tại: */
+                        currentFocus++;
+                        /* và làm cho mục hiện tại rõ hơn: */
+                        addActive(x);
+                    } else if (e.keyCode == 38) {
+                        currentFocus--;
+                        addActive(x);
+                    } else if (e.keyCode == 13) {
+                        e.preventDefault();
+                        if (currentFocus > -1) {
+                            if (x) x[currentFocus].click();
+                        }
+                    }
+                });
+                document.addEventListener("click", function (e) {
+                    closeAllLists(e.target);
+                });
+                function addActive(x) {
+                    if (!x) return false;
+                    removeActive(x);
+                    if (currentFocus >= x.length) currentFocus = 0;
+                    if (currentFocus < 0) currentFocus = (x.length - 1);
+                    x[currentFocus].classList.add("autocomplete-active");
+                }
+                function removeActive(x) {
+                    for (var i = 0; i < x.length; i++) {
+                        x[i].classList.remove("autocomplete-active");
+                    }
+                }
+                function closeAllLists(elmnt) {
+                    var x = document.getElementsByClassName("autocomplete-items");
+                    for (var i = 0; i < x.length; i++) {
+                        if (elmnt != x[i] && elmnt != inp) {
+                            x[i].parentNode.removeChild(x[i]);
+                        }
+                    }
+                }
+            }
+            function GetProduct(prdid) {
+            let url = '@Url.Action("GetProductExactly", "Report")';
+                $.ajax({
+                    url: url,
+                    type: 'post',
+                    data: {
+                        prdid: prdid
+                        //__RequestVerificationToken: token
+                    },
+                    cache: false,
+                    dataType: 'json',
+                    traditional: true,
+                    //contentType: "application/json; charset=utf-8",
+                    //success: function (data) {
+                    //    $(".GetBom").html(data);
+
+                    //}
+                    success: function (data) {
+                        if (data.Data !== undefined) {
+                            var dataPrd = data.Data;
+
+                            //$("#ProductName").val(dataPrd.ProductCodeUser + ' - ' + dataPrd.ProductName + ' - ' + dataPrd.UnitCode);
+                            $("#ProductCodeUser").val(dataPrd.ProductCodeUser);
+                            //$("#UnitCode").val(dataPrd.UnitCode);
+                            //$("#myInput").val(dataPrd.ProductCodeUser);
+                            $("#myInput").val(dataPrd.ProductCodeUser + ' - ' + dataPrd.ProductName + ' - ' + dataPrd.UnitCode);
+                        }
+                        else {
+                            //$('.GetPrd').append('');
+                        }
+                    }
+
+                });
+            }
+            var x = document.getElementById("myInput");
+            Getkeyup(x.value);
+            function Getkeyup(prdid) {
+
+                if (prdid.length < 2) {
+                    $("#ProductCodeUser").val('');
+                    return;
+                }
+
+                var url = '@Url.Action("SearchProduct", "Report")';
+                $.ajax({
+                    url: url,
+                    type: 'post',
+                    data: {
+                        prdid: prdid,
+                    },
+                    cache: false,
+                    dataType: 'json',
+                    traditional: true,
+                    success: function (data) {
+                        var arr = [];
+                        if (data.length >0) {
+                            for (var i = 0; i < data.length; i++) {
+                                let prd = {};
+                                prd.ProductCode = data[i].ProductCode;
+                                prd.ProductName = data[i].ProductCodeUser + ' - ' + data[i].ProductName;
+
+                                arr.push(prd);
+                            }
+                        }
+                        autocomplete(document.getElementById("myInput"), arr);
+                    }
+                });
+
+            }
+        }
+</script>
+

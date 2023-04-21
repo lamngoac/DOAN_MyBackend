@@ -1,0 +1,537 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns="http://ws-i.org/profiles/basic/1.1/xsd" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://nhanhsothue.van.gdt.gov.vn/" xmlns:wssutil="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:conv="http://www.openuri.org/2002/04/wsdl/conversation/" xmlns="http://www.w3.org/2001/XMLSchema" name="NhanHSoThueService" targetNamespace="http://nhanhsothue.van.gdt.gov.vn/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsp:UsingPolicy wssutil:Required="true" />
+  <ns0:Policy xmlns:ns0="http://schemas.xmlsoap.org/ws/2004/09/policy" wssutil:Id="usernametoken">
+    <ns1:SupportingTokens xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200512">
+      <ns0:Policy>
+        <ns1:UsernameToken ns1:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200512/IncludeToken/AlwaysToRecipient">
+          <ns0:Policy>
+            <ns1:WssUsernameToken10 />
+          </ns0:Policy>
+        </ns1:UsernameToken>
+      </ns0:Policy>
+    </ns1:SupportingTokens>
+  </ns0:Policy>
+  <wsdl:types>
+    <xsi:schema xmlns:wsi="http://ws-i.org/profiles/basic/1.1/xsd" xmlns:soap11-enc="http://schemas.xmlsoap.org/soap/encoding/" elementFormDefault="qualified" targetNamespace="http://nhanhsothue.van.gdt.gov.vn/" xmlns:xsi="http://www.w3.org/2001/XMLSchema">
+      <xsi:import schemaLocation="http://daotaonhantokhai.gdt.gov.vn:80/ihtkk_van/NhanHSoThueServicePort?xsd=1" namespace="http://ws-i.org/profiles/basic/1.1/xsd" />
+      <xsi:element name="getDsachTbao" type="tns:getDsachTbao" />
+      <xsi:complexType name="getDsachTbao">
+        <xsi:sequence />
+      </xsi:complexType>
+      <xsi:element name="getDsachTbaoResponse" type="tns:getDsachTbaoResponse" />
+      <xsi:complexType name="getDsachTbaoResponse">
+        <xsi:sequence>
+          <xsi:element name="return" nillable="true" type="xsi:string" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="getTbao" type="tns:getTbao" />
+      <xsi:complexType name="getTbao">
+        <xsi:sequence>
+          <xsi:element name="idTbao" type="xsi:string" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="getTbaoResponse" type="tns:getTbaoResponse" />
+      <xsi:complexType name="getTbaoResponse">
+        <xsi:sequence>
+          <xsi:element name="return" type="wsi:swaRef" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="getxmlTBaoLan2" type="tns:getxmlTBaoLan2" />
+      <xsi:complexType name="getxmlTBaoLan2">
+        <xsi:sequence>
+          <xsi:element name="maTbao" nillable="true" type="xsi:string" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="getxmlTBaoLan2Response" type="tns:getxmlTBaoLan2Response" />
+      <xsi:complexType name="getxmlTBaoLan2Response">
+        <xsi:sequence>
+          <xsi:element name="return" type="wsi:swaRef" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="getTBaoLan2" type="tns:getTBaoLan2" />
+      <xsi:complexType name="getTBaoLan2">
+        <xsi:sequence />
+      </xsi:complexType>
+      <xsi:element name="getTBaoLan2Response" type="tns:getTBaoLan2Response" />
+      <xsi:complexType name="getTBaoLan2Response">
+        <xsi:sequence>
+          <xsi:element name="return" nillable="true" type="xsi:string" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="nhanHSoThue" type="tns:nhanHSoThue" />
+      <xsi:complexType name="nhanHSoThue">
+        <xsi:sequence>
+          <xsi:element name="maLoaiGDich" nillable="true" type="xsi:string" />
+          <xsi:element name="dlieuHSo" type="wsi:swaRef" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="nhanHSoThueResponse" type="tns:nhanHSoThueResponse" />
+      <xsi:complexType name="nhanHSoThueResponse">
+        <xsi:sequence>
+          <xsi:element name="return" nillable="true" type="xsi:string" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="nhanToKhaiThue" type="tns:nhanToKhaiThue" />
+      <xsi:complexType name="nhanToKhaiThue">
+        <xsi:sequence>
+          <xsi:element name="lanNop" nillable="true" type="xsi:string" />
+          <xsi:element name="dlieuHSo" type="wsi:swaRef" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="nhanToKhaiThueResponse" type="tns:nhanToKhaiThueResponse" />
+      <xsi:complexType name="nhanToKhaiThueResponse">
+        <xsi:sequence>
+          <xsi:element name="return" nillable="true" type="xsi:string" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="nhanPLucHSoThue" type="tns:nhanPLucHSoThue" />
+      <xsi:complexType name="nhanPLucHSoThue">
+        <xsi:sequence>
+          <xsi:element name="tIN" nillable="true" type="xsi:string" />
+          <xsi:element name="maTKhai" nillable="true" type="xsi:string" />
+          <xsi:element name="loaiTKhai" nillable="true" type="xsi:string" />
+          <xsi:element name="kyKKhai" nillable="true" type="xsi:string" />
+          <xsi:element name="maCQTNoiNop" nillable="true" type="xsi:string" />
+          <xsi:element name="maPLuc" nillable="true" type="xsi:string" />
+          <xsi:element name="dlieuHSo" type="wsi:swaRef" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="nhanPLucHSoThueResponse" type="tns:nhanPLucHSoThueResponse" />
+      <xsi:complexType name="nhanPLucHSoThueResponse">
+        <xsi:sequence>
+          <xsi:element name="return" nillable="true" type="xsi:string" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="nhanPLucHSoHoanThue" type="tns:nhanPLucHSoHoanThue" />
+      <xsi:complexType name="nhanPLucHSoHoanThue">
+        <xsi:sequence>
+          <xsi:element name="idHso" nillable="true" type="xsi:string" />
+          <xsi:element name="maGTBS" nillable="true" type="xsi:string" />
+          <xsi:element name="hthanhGTBS" nillable="true" type="xsi:string" />
+          <xsi:element name="ndungFile" type="wsi:swaRef" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="nhanPLucHSoHoanThueResponse" type="tns:nhanPLucHSoHoanThueResponse" />
+      <xsi:complexType name="nhanPLucHSoHoanThueResponse">
+        <xsi:sequence>
+          <xsi:element name="return" nillable="true" type="xsi:string" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="nhanHSoQTThueTNCN" type="tns:nhanHSoQTThueTNCN" />
+      <xsi:complexType name="nhanHSoQTThueTNCN">
+        <xsi:sequence>
+          <xsi:element name="tIN" nillable="true" type="xsi:string" />
+          <xsi:element name="maTKhai" nillable="true" type="xsi:string" />
+          <xsi:element name="loaiTKhai" nillable="true" type="xsi:string" />
+          <xsi:element name="kyKKhai" nillable="true" type="xsi:string" />
+          <xsi:element name="maCQTNoiNop" nillable="true" type="xsi:string" />
+          <xsi:element name="dlieuHSo" type="wsi:swaRef" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="nhanHSoQTThueTNCNResponse" type="tns:nhanHSoQTThueTNCNResponse" />
+      <xsi:complexType name="nhanHSoQTThueTNCNResponse">
+        <xsi:sequence>
+          <xsi:element name="return" nillable="true" type="xsi:string" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="nhanHSoQTThueTNCNCoId" type="tns:nhanHSoQTThueTNCNCoId" />
+      <xsi:complexType name="nhanHSoQTThueTNCNCoId">
+        <xsi:sequence>
+          <xsi:element name="tIN" nillable="true" type="xsi:string" />
+          <xsi:element name="maTKhai" nillable="true" type="xsi:string" />
+          <xsi:element name="loaiTKhai" nillable="true" type="xsi:string" />
+          <xsi:element name="kyKKhai" nillable="true" type="xsi:string" />
+          <xsi:element name="maCQTNoiNop" nillable="true" type="xsi:string" />
+          <xsi:element name="IdHso" nillable="true" type="xsi:string" />
+          <xsi:element name="dlieuHSo" type="wsi:swaRef" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="nhanHSoQTThueTNCNCoIdResponse" type="tns:nhanHSoQTThueTNCNCoIdResponse" />
+      <xsi:complexType name="nhanHSoQTThueTNCNCoIdResponse">
+        <xsi:sequence>
+          <xsi:element name="return" nillable="true" type="xsi:string" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="nhanBCAnChi" type="tns:nhanBCAnChi" />
+      <xsi:complexType name="nhanBCAnChi">
+        <xsi:sequence>
+          <xsi:element name="tIN" nillable="true" type="xsi:string" />
+          <xsi:element name="maTKhai" nillable="true" type="xsi:string" />
+          <xsi:element name="kyKKhai" nillable="true" type="xsi:string" />
+          <xsi:element name="dlieuHSo" type="wsi:swaRef" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="nhanBCAnChiResponse" type="tns:nhanBCAnChiResponse" />
+      <xsi:complexType name="nhanBCAnChiResponse">
+        <xsi:sequence>
+          <xsi:element name="return" nillable="true" type="xsi:string" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="nhanBCAnChiTuDLT" type="tns:nhanBCAnChiTuDLT" />
+      <xsi:complexType name="nhanBCAnChiTuDLT">
+        <xsi:sequence>
+          <xsi:element name="tIN" nillable="true" type="xsi:string" />
+          <xsi:element name="maTKhai" nillable="true" type="xsi:string" />
+          <xsi:element name="kyKKhai" nillable="true" type="xsi:string" />
+          <xsi:element name="dlieuHSo" type="wsi:swaRef" />
+          <xsi:element name="mstDLyThue" nillable="true" type="xsi:string" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="nhanBCAnChiTuDLTResponse" type="tns:nhanBCAnChiTuDLTResponse" />
+      <xsi:complexType name="nhanBCAnChiTuDLTResponse">
+        <xsi:sequence>
+          <xsi:element name="return" nillable="true" type="xsi:string" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="nhanPLucHSoThueTuDLT" type="tns:nhanPLucHSoThueTuDLT" />
+      <xsi:complexType name="nhanPLucHSoThueTuDLT">
+        <xsi:sequence>
+          <xsi:element name="tIN" nillable="true" type="xsi:string" />
+          <xsi:element name="maTKhai" nillable="true" type="xsi:string" />
+          <xsi:element name="loaiTKhai" nillable="true" type="xsi:string" />
+          <xsi:element name="kyKKhai" nillable="true" type="xsi:string" />
+          <xsi:element name="maCQTNoiNop" nillable="true" type="xsi:string" />
+          <xsi:element name="maPLuc" nillable="true" type="xsi:string" />
+          <xsi:element name="dlieuHSo" type="wsi:swaRef" />
+          <xsi:element name="mstDLyThue" nillable="true" type="xsi:string" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="nhanPLucHSoThueTuDLTResponse" type="tns:nhanPLucHSoThueTuDLTResponse" />
+      <xsi:complexType name="nhanPLucHSoThueTuDLTResponse">
+        <xsi:sequence>
+          <xsi:element name="return" nillable="true" type="xsi:string" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="nhanHSoXML" type="tns:nhanHSoXML" />
+      <xsi:complexType name="nhanHSoXML">
+        <xsi:sequence>
+          <xsi:element name="tIN" nillable="true" type="xsi:string" />
+          <xsi:element name="maTKhai" nillable="true" type="xsi:string" />
+          <xsi:element name="loaiTKhai" nillable="true" type="xsi:string" />
+          <xsi:element name="kyKKhai" nillable="true" type="xsi:string" />
+          <xsi:element name="dlieuHSo" type="wsi:swaRef" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="nhanHSoXMLResponse" type="tns:nhanHSoXMLResponse" />
+      <xsi:complexType name="nhanHSoXMLResponse">
+        <xsi:sequence>
+          <xsi:element name="return" nillable="true" type="xsi:string" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="nhanHSoXMLCoId" type="tns:nhanHSoXMLCoId" />
+      <xsi:complexType name="nhanHSoXMLCoId">
+        <xsi:sequence>
+          <xsi:element name="tIN" nillable="true" type="xsi:string" />
+          <xsi:element name="maTKhai" nillable="true" type="xsi:string" />
+          <xsi:element name="loaiTKhai" nillable="true" type="xsi:string" />
+          <xsi:element name="kyKKhai" nillable="true" type="xsi:string" />
+          <xsi:element name="IdHso" nillable="true" type="xsi:string" />
+          <xsi:element name="dlieuHSo" type="wsi:swaRef" />
+        </xsi:sequence>
+      </xsi:complexType>
+      <xsi:element name="nhanHSoXMLCoIdResponse" type="tns:nhanHSoXMLCoIdResponse" />
+      <xsi:complexType name="nhanHSoXMLCoIdResponse">
+        <xsi:sequence>
+          <xsi:element name="return" nillable="true" type="xsi:string" />
+        </xsi:sequence>
+      </xsi:complexType>
+    </xsi:schema>
+  </wsdl:types>
+  <wsdl:message name="NhanHSoThueServicePortType_getDsachTbao">
+    <wsdl:part name="parameters" element="tns:getDsachTbao" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_getDsachTbaoResponse">
+    <wsdl:part name="parameters" element="tns:getDsachTbaoResponse" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_getTbao">
+    <wsdl:part name="parameters" element="tns:getTbao" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_getTbaoResponse">
+    <wsdl:part name="parameters" element="tns:getTbaoResponse" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_getxmlTBaoLan2">
+    <wsdl:part name="parameters" element="tns:getxmlTBaoLan2" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_getxmlTBaoLan2Response">
+    <wsdl:part name="parameters" element="tns:getxmlTBaoLan2Response" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_getTBaoLan2">
+    <wsdl:part name="parameters" element="tns:getTBaoLan2" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_getTBaoLan2Response">
+    <wsdl:part name="parameters" element="tns:getTBaoLan2Response" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_nhanHSoThue">
+    <wsdl:part name="parameters" element="tns:nhanHSoThue" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_nhanHSoThueResponse">
+    <wsdl:part name="parameters" element="tns:nhanHSoThueResponse" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_nhanToKhaiThue">
+    <wsdl:part name="parameters" element="tns:nhanToKhaiThue" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_nhanToKhaiThueResponse">
+    <wsdl:part name="parameters" element="tns:nhanToKhaiThueResponse" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_nhanPLucHSoThue">
+    <wsdl:part name="parameters" element="tns:nhanPLucHSoThue" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_nhanPLucHSoThueResponse">
+    <wsdl:part name="parameters" element="tns:nhanPLucHSoThueResponse" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_nhanPLucHSoHoanThue">
+    <wsdl:part name="parameters" element="tns:nhanPLucHSoHoanThue" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_nhanPLucHSoHoanThueResponse">
+    <wsdl:part name="parameters" element="tns:nhanPLucHSoHoanThueResponse" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_nhanHSoQTThueTNCN">
+    <wsdl:part name="parameters" element="tns:nhanHSoQTThueTNCN" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_nhanHSoQTThueTNCNResponse">
+    <wsdl:part name="parameters" element="tns:nhanHSoQTThueTNCNResponse" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_nhanHSoQTThueTNCNCoId">
+    <wsdl:part name="parameters" element="tns:nhanHSoQTThueTNCNCoId" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_nhanHSoQTThueTNCNCoIdResponse">
+    <wsdl:part name="parameters" element="tns:nhanHSoQTThueTNCNCoIdResponse" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_nhanBCAnChi">
+    <wsdl:part name="parameters" element="tns:nhanBCAnChi" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_nhanBCAnChiResponse">
+    <wsdl:part name="parameters" element="tns:nhanBCAnChiResponse" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_nhanBCAnChiTuDLT">
+    <wsdl:part name="parameters" element="tns:nhanBCAnChiTuDLT" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_nhanBCAnChiTuDLTResponse">
+    <wsdl:part name="parameters" element="tns:nhanBCAnChiTuDLTResponse" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_nhanPLucHSoThueTuDLT">
+    <wsdl:part name="parameters" element="tns:nhanPLucHSoThueTuDLT" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_nhanPLucHSoThueTuDLTResponse">
+    <wsdl:part name="parameters" element="tns:nhanPLucHSoThueTuDLTResponse" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_nhanHSoXML">
+    <wsdl:part name="parameter" element="tns:nhanHSoXML" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_nhanHSoXMLResponse">
+    <wsdl:part name="parameter" element="tns:nhanHSoXMLResponse" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_nhanHSoXMLCoId">
+    <wsdl:part name="parameter" element="tns:nhanHSoXMLCoId" />
+  </wsdl:message>
+  <wsdl:message name="NhanHSoThueServicePortType_nhanHSoXMLCoIdResponse">
+    <wsdl:part name="parameter" element="tns:nhanHSoXMLCoIdResponse" />
+  </wsdl:message>
+  <wsdl:portType name="NhanHSoThueService">
+    <wsdl:operation name="getDsachTbao">
+      <wsdl:input message="tns:NhanHSoThueServicePortType_getDsachTbao" />
+      <wsdl:output message="tns:NhanHSoThueServicePortType_getDsachTbaoResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="getTbao">
+      <wsdl:input message="tns:NhanHSoThueServicePortType_getTbao" />
+      <wsdl:output message="tns:NhanHSoThueServicePortType_getTbaoResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="getxmlTBaoLan2">
+      <wsdl:input message="tns:NhanHSoThueServicePortType_getxmlTBaoLan2" />
+      <wsdl:output message="tns:NhanHSoThueServicePortType_getxmlTBaoLan2Response" />
+    </wsdl:operation>
+    <wsdl:operation name="getTBaoLan2">
+      <wsdl:input message="tns:NhanHSoThueServicePortType_getTBaoLan2" />
+      <wsdl:output message="tns:NhanHSoThueServicePortType_getTBaoLan2Response" />
+    </wsdl:operation>
+    <wsdl:operation name="nhanHSoThue">
+      <wsdl:input message="tns:NhanHSoThueServicePortType_nhanHSoThue" />
+      <wsdl:output message="tns:NhanHSoThueServicePortType_nhanHSoThueResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="nhanToKhaiThue">
+      <wsdl:input message="tns:NhanHSoThueServicePortType_nhanToKhaiThue" />
+      <wsdl:output message="tns:NhanHSoThueServicePortType_nhanToKhaiThueResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="nhanPLucHSoThue">
+      <wsdl:input message="tns:NhanHSoThueServicePortType_nhanPLucHSoThue" />
+      <wsdl:output message="tns:NhanHSoThueServicePortType_nhanPLucHSoThueResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="nhanPLucHSoHoanThue">
+      <wsdl:input message="tns:NhanHSoThueServicePortType_nhanPLucHSoHoanThue" />
+      <wsdl:output message="tns:NhanHSoThueServicePortType_nhanPLucHSoHoanThueResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="nhanHSoQTThueTNCN">
+      <wsdl:input message="tns:NhanHSoThueServicePortType_nhanHSoQTThueTNCN" />
+      <wsdl:output message="tns:NhanHSoThueServicePortType_nhanHSoQTThueTNCNResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="nhanHSoQTThueTNCNCoId">
+      <wsdl:input message="tns:NhanHSoThueServicePortType_nhanHSoQTThueTNCNCoId" />
+      <wsdl:output message="tns:NhanHSoThueServicePortType_nhanHSoQTThueTNCNCoIdResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="nhanBCAnChi">
+      <wsdl:input message="tns:NhanHSoThueServicePortType_nhanBCAnChi" />
+      <wsdl:output message="tns:NhanHSoThueServicePortType_nhanBCAnChiResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="nhanBCAnChiTuDLT">
+      <wsdl:input message="tns:NhanHSoThueServicePortType_nhanBCAnChiTuDLT" />
+      <wsdl:output message="tns:NhanHSoThueServicePortType_nhanBCAnChiTuDLTResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="nhanPLucHSoThueTuDLT">
+      <wsdl:input message="tns:NhanHSoThueServicePortType_nhanPLucHSoThueTuDLT" />
+      <wsdl:output message="tns:NhanHSoThueServicePortType_nhanPLucHSoThueTuDLTResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="nhanHSoXML">
+      <wsdl:input message="tns:NhanHSoThueServicePortType_nhanHSoXML" />
+      <wsdl:output message="tns:NhanHSoThueServicePortType_nhanHSoXMLResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="nhanHSoXMLCoId">
+      <wsdl:input message="tns:NhanHSoThueServicePortType_nhanHSoXMLCoId" />
+      <wsdl:output message="tns:NhanHSoThueServicePortType_nhanHSoXMLCoIdResponse" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="NhanHSoThueService" type="tns:NhanHSoThueService">
+    <wsp:PolicyReference URI="#usernametoken" />
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="getDsachTbao">
+      <soap:operation soapAction="" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getTbao">
+      <soap:operation soapAction="" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getxmlTBaoLan2">
+      <soap:operation soapAction="" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getTBaoLan2">
+      <soap:operation soapAction="" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="nhanHSoThue">
+      <soap:operation soapAction="" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="nhanToKhaiThue">
+      <soap:operation soapAction="" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="nhanPLucHSoThue">
+      <soap:operation soapAction="" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="nhanPLucHSoHoanThue">
+      <soap:operation soapAction="" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="nhanHSoQTThueTNCN">
+      <soap:operation soapAction="" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="nhanHSoQTThueTNCNCoId">
+      <soap:operation soapAction="" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="nhanBCAnChi">
+      <soap:operation soapAction="" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="nhanBCAnChiTuDLT">
+      <soap:operation soapAction="" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="nhanPLucHSoThueTuDLT">
+      <soap:operation soapAction="" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="nhanHSoXML">
+      <soap:operation soapAction="" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="nhanHSoXMLCoId">
+      <soap:operation soapAction="" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="NhanHSoThueService">
+    <wsdl:port name="NhanHSoThueServicePort" binding="tns:NhanHSoThueService">
+      <soap:address location="http://daotaonhantokhai.gdt.gov.vn:80/ihtkk_van/NhanHSoThueServicePort" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,224 @@
+﻿@model Mst_Inventory
+@{
+    Layout = "~/Views/Shared/CoreLayoutKho.cshtml";
+    const string title = "xEM kho";
+    ViewBag.Title = title;
+    var listInventory = ViewBag.ListInventory as List<Mst_Inventory>;
+    if (listInventory == null || listInventory.Count == 0)
+    {
+        listInventory = new List<Mst_Inventory>();
+    }
+    var chked = "checked=\"checked\"";
+}
+<script type="text/javascript">
+    var parents = new Array();
+    parents.push("@Url.Action("Index", "Mst_Inventory")");
+    parents.push("");
+    var parentsText = new Array();
+    parentsText.push("@MvcHtmlString.Create("Quản lý kho")");
+    parentsText.push("@MvcHtmlString.Create(title)");
+    setAdminCurrentTag(parents, parentsText);
+</script>
+<style type="text/css">
+    .form-horizontal .form-group {
+        margin-left: -12px;
+        margin-right: -12px;
+        margin-bottom: 15px;
+    }
+</style>
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="row no-margin box-shadow-tk">
+                        @using (Html.BeginForm("Create", "Mst_Inventory", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="col-sm-12">
+                                <div class="col-xs-3 no-padding">
+                                    <div class="form-group margin-bottom-9">
+                                        <label for="InvCode" class="col-xs-6 control-label no-padding-right font-weight-500 ">Mã kho<span style="color: red">*</span></label>
+                                        <div class="col-xs-6 col-sm-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="InvCode"  name="InvCode" class="col-xs-11 InvCode" onkeyup="locdau(this);" value="@if (Model != null && Model.InvCode != null){@Model.InvCode} else { @("")}" autocomplete="off" readonly required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-9">
+                                        <label for="InvName" class="col-xs-6 control-label no-padding-right font-weight-500 ">Tên kho<span style="color: red">*</span></label>
+                                        <div class="col-xs-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="InvName" name="InvName" class="col-xs-11 InvName" value="@if (Model != null && Model.InvName != null){@Model.InvName} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-9">
+                                        <label for="InvCodeParent" class="col-xs-6 control-label no-padding-right font-weight-500 ">Mã kho cha</label>
+                                        <div class="col-xs-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="InvCodeParent" name="InvCodeParent" disabled="disabled"  class="col-xs-11 " value="@if (Model != null && Model.InvCodeParent != null){@Model.InvCodeParent} else { @("")}" autocomplete="off" />
+
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 no-padding">
+
+                                    <div class="form-group margin-bottom-9">
+                                        <label for="InvLevelType" class="col-xs-6 control-label no-padding-right font-weight-500 ">Cấp kho<span style="color: red">*</span></label>
+                                        <div class="col-xs-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="InvLevelType"  name="InvLevelType" class="col-xs-11 "disabled="disabled" required="required" value="@if (Model != null && Model.InvLevelType != null){@Model.InvLevelType} else { @("")}" autocomplete="off" />
+
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-9">
+                                        <label for="InvType" class="col-xs-6 control-label no-padding-right font-weight-500 ">Loại kho<span style="color: red">*</span></label>
+                                        <div class="col-xs-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="InvType" name="InvType" class="col-xs-11 " disabled="disabled" required="required" value="@if (Model != null && Model.InvType != null){@Model.InvLevelType} else { @("")}" autocomplete="off" />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-9">
+                                        <label for="InvAddress" class="col-xs-6 control-label no-padding-right font-weight-500 ">Địa chỉ</label>
+                                        <div class="col-xs-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="InvAddress" name="InvAddress"  class="col-xs-11 InvAddress" value="@if (Model != null && Model.InvAddress != null){@Model.InvAddress} else { @("")}" autocomplete="off" />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 no-padding">
+                                    <div class="form-group margin-bottom-9">
+                                        <label for="InvContactName" class="col-xs-6 control-label no-padding-right font-weight-500 ">Người quản lý</label>
+                                        <div class="col-xs-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="InvContactName" name="InvContactName"  class="col-xs-11 InvContactName" value="@if (Model != null && Model.InvContactName != null){@Model.InvContactName} else { @("")}" autocomplete="off" />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-9">
+
+                                        <label for="InvContactEmail" class="col-xs-6 control-label no-padding-right font-weight-500 ">Email</label>
+                                        <div class="col-xs-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="InvContactEmail" name="InvContactEmail" class="col-xs-11 InvContactEmail" value="@if (Model != null && Model.InvContactEmail != null){@Model.InvContactEmail} else { @("")}" autocomplete="off" />
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group margin-bottom-9">
+                                        <label for="InvContactPhone" class="col-xs-6 control-label no-padding-right font-weight-500 ">Điện thoại</label>
+                                        <div class="col-xs-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="InvContactPhone" name="InvContactPhone" class="col-xs-11 InvContactPhone" value="@if (Model != null && Model.InvContactPhone != null){@Model.InvContactPhone} else { @("")}" autocomplete="off" />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 no-padding">
+                                    <div class="form-group margin-bottom-9">
+                                        <label for="Remark" class="col-xs-6 control-label no-padding-right font-weight-500 ">Ghi chú</label>
+                                        <div class="col-xs-6">
+                                            <span class="block input-icon input-icon-right">
+                                                <textarea id="Remark" name="Remark" class="col-xs-11 Remark" rows="3">@Model.Remark</textarea>
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    @{
+                                        var checkActive = "";
+                                        if (Model != null && Model.FlagActive.Equals("1"))
+                                        {
+                                            checkActive = "checked";
+                                        }
+                                        else
+                                        {
+                                            checkActive = "";
+                                        }
+                                    }
+                                    <div class="form-group margin-bottom-9">
+                                        <label for="FlagActive" class="col-xs-6 control-label no-padding-right font-weight-500 ">Kích hoạt</label>
+                                        <div class="col-xs-6">
+                                            <span class="block input-icon input-icon-right padding-top-5">
+                                                <label>
+                                                    <input name="FlagActive" id="FlagActive"  class="ace ace-switch ace-switch-4 " type="checkbox" value="" @checkActive />
+                                                    <span class="lbl"></span>
+                                                    <input name="FlagActive" type="hidden"  value="0" />
+                                                </label>
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                        }
+                    </aside>
+                    <div class="col-xs-12 no-padding">
+                        <div class="clearfix">
+                            <div class="row no-margin" style="float: right">
+                                @RenderItemFormat("BTN_SUA_KHO_LUU", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\"  style=\"margin-left: 10px;margin-top: 20px; padding-left: 15px!important; padding-right: 15px!important; \" onclick=\"SaveData();\"><i class=\"ace-icon fa fa-floppy-o bigger-110\"></i>Lưu</a>", "", "")
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- PAGE CONTENT ENDS -->
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+</div>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Mst_Inventory.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "Mst_Inventory")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+        });
+        @* Set focus *@
+        $(document).ready(function () {
+            $('#InvCode').focus();
+        });
+        function SaveData() {
+
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Edit", "Mst_Inventory")';
+            var objMst_Inventory = new Mst_Inventory();
+            objMst_Inventory.ActionType = 'edit';
+            objMst_Inventory.ajaxSettings = ajaxSettings;
+            objMst_Inventory.saveData();
+        }
+    </script>
+}
+
+
+
+
+
+
+
+
+
+

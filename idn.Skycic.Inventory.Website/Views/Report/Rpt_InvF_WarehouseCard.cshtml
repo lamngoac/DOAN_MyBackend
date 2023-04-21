@@ -1,0 +1,388 @@
+﻿@model List<Rpt_InvF_WarehouseCard>
+
+@{
+    ViewBag.Title = "Thẻ kho";
+    var List_Mst_InventoryInOut = ViewBag.List_Mst_InventoryInOut as List<Mst_Inventory>;
+}
+<script>
+    setAdminCurrentUrl('@Url.Action("Rpt_InvF_WarehouseCard", "Report")');
+</script>
+<style>
+
+    .selection--multiple:before {
+        display: inline-block;
+        font-style: normal;
+        font-variant: normal;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        content: "\f0d7";
+        position: absolute;
+        top: 15%;
+        left: 92%;
+        color: #787878;
+        font-size: 16px;
+        z-index: 9;
+    }
+
+</style>
+
+<div class="row no-margin">
+    <div class="col-sm-12">
+        <aside class="row no-margin">
+            @using (Html.BeginForm("Index", "InvF_MoveOrd", FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <input hidden id="init" name="init" value="search" />
+                <div class="layout-search layout-bot-top-16">
+                    <div class="row no-margin">
+                        <div class="col-5 row no-margin">
+                            <div class="row form-group margin-bottom-9">
+                                <label for="IF_MONo" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Hàng hoá".HtmlItemString("inventory")) <span style="color: red;"> *</span></label>
+                                <div class="col-12 col-sm-9 form-group">
+                                    <span class="block input-icon input-icon-right col-10">
+                                        <input type="text" id="ProductCodeUser" name="ProductCodeUser" class="col-12 ProductCodeUser" value="" autocomplete="off" required />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="row form-group margin-bottom-9">
+                                <label for="InvCode" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Kho".HtmlItemString("inventory"))</label>
+                                <div class="col-12 col-sm-9 form-group">
+                                    <span class="block input-icon input-icon-right selection--multiple col-10">
+                                        <select class="select2-selection--multiple col-10" name="InvCode" id="InvCode" multiple="multiple">
+                                            @{
+                                                if (List_Mst_InventoryInOut != null && List_Mst_InventoryInOut.Count > 0)
+                                                {
+                                                    foreach (var inv in List_Mst_InventoryInOut)
+                                                    {
+                                                        <option value="@inv.InvCode">@inv.InvName</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-5 row no-margin">
+                            <label for="ApprDTimeUTCFrom" class="col-12 col-sm-2 control-label no-padding-right font-weight-500 ">@("Ngày từ".HtmlItemString("inventory")) <span style="color: red;"> *</span></label>
+                            <div class="col-sm-9 row date-input-group no-margin">
+                                <div class="row col-5 no-margin">
+                                    <div class="col-12 no-padding">
+                                        <div class="input-group form-group" id="dtdatefrom">
+                                            <input type="text" id="ApprDTimeUTCFrom" name="ApprDTimeUTCFrom" class="col-9 cl-date ApprDTimeUTCFrom hasDatepicker" data-date-format="yyyy-mm-dd" value="" autocomplete="off">
+                                            <span class="input-group-addon col-3">
+                                                <i class="far fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <label for="ApprDTimeUTCTo" class="col-2 control-label no-padding-right font-weight-500 text-center">@("đến".HtmlItemString("inventory")) <span style="color: red;"> *</span></label>
+                                <div class="row col-5 no-margin">
+                                    <div class="col-12 no-padding">
+                                        <div class="input-group form-group" id="dtdateto">
+                                            <input type="text" id="ApprDTimeUTCTo" name="ApprDTimeUTCTo" class="col-9 cl-date ApprDTimeUTCTo hasDatepicker" data-date-format="yyyy-mm-dd" value="" autocomplete="off">
+                                            <span class="input-group-addon col-3">
+                                                <i class="far fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-2 row no-margin">
+                            <div class="form-group margin-bottom-9">
+                                <div class="row no-margin">
+                                    <span class="block input-icon input-icon-right">
+                                        @*<a class="btn btn-nc-button" onclick="SearchData()" href="javascript:void(0);" style=""><img class="img-button-search" src="@Url.Content("~/Images/search.svg")"></a>*@
+
+                                        @{ var imgSearch = Url.Content("~/Images/search.svg");}
+                                        @RenderItemFormat("BTN_BC_THE_KHO_TIM_KIEM", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\"  onclick=\"SearchData();\"><img class=\"img-button-search\" src=" + imgSearch + "></a>", "", "")
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </aside>
+        <div class="row no-margin">
+            <div class="col-sm-12 no-padding">
+                <div id="BindDataRpt_InvF_WarehouseCard" class="conten-table">
+                    @Html.Partial("BindDataRpt_InvF_WarehouseCard", Model)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Lo -->
+<div class="modal fade" id="ShowPopupLo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+</div>
+
+<!-- Modal Serial -->
+<div class="modal fade" id="ShowPopupSerial" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+</div>
+
+<script>
+    $(function () {
+        $('#ApprDTimeUTCFrom , #ApprDTimeUTCTo').datepicker({
+            autoclose: true,
+            format: 'yyyy-mm-dd'
+        })
+            ////show datepicker when clicking on the icon
+            .next().on('click', function () {
+                $(this).prev().focus();
+            });
+    });   
+</script>
+<!-- Search -->
+<script>
+        @*@*Active Menu*@
+        //setAdminCurrentUrl('@Url.Action("Rpt_InvF_WarehouseCard", "Report")');
+        $(document).ready(function () {
+            $('.select2-selection--multiple').select2({
+                minimumResultsForSearch: -1
+            });
+            $('.dropdown-menu').on('click', function (event) {
+                // The event won't be propagated up to the document NODE and
+                // therefore delegated events won't be fired
+                event.stopPropagation();
+            });
+        })
+        function SearchData() {
+            var productCodeUser = commonUtils.returnValueText('#ProductCodeUser');
+            var apprDTimeUTCFrom = commonUtils.returnValueText('#ApprDTimeUTCFrom');
+            var apprDTimeUTCTo = commonUtils.returnValueText('#ApprDTimeUTCTo');
+            var invCode = $('#InvCode').val();
+            if (productCodeUser == undefined || productCodeUser.length == 0) {
+                alert('Chưa chọn mã sản phẩm');
+                $('#ProductCodeUser').focus();
+                return false;
+            }
+            if (apprDTimeUTCFrom == undefined || apprDTimeUTCFrom.length == 0) {
+                $('#ApprDTimeUTCFrom').focus();
+                alert('Chưa chọn ngày từ');
+                return false;
+            }
+            if (apprDTimeUTCTo == undefined || apprDTimeUTCTo.length == 0) {
+                $('#ApprDTimeUTCTo').focus();
+                alert('Chưa chọn ngày đến');
+                return false;
+            }
+            var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+            var url = '@Url.Action("DoSearch_Rpt_InvF_WarehouseCard", "Report")';
+            $.ajax({
+            type: "post",
+            data: {
+                __RequestVerificationToken: token,
+                productcodeuser: productCodeUser,
+                apprDTimeUTCFrom: apprDTimeUTCFrom,
+                apprDTimeUTCTo: apprDTimeUTCTo,
+                invcode: invCode
+            },
+            url: url,
+            dataType: 'json',
+                beforeSend: function () { }
+            }).done(function (result) {
+                if (result.Success) {
+                    $('#BindDataRpt_InvF_WarehouseCard').html('');
+                    $('#BindDataRpt_InvF_WarehouseCard').html(result.Html);
+                    //$('.numberic').number(true, 2);
+                    //$('.numberic').each(function () {
+                        //$(this).number($(this).text(), 2)
+                    //})
+
+
+                    format_Number();
+                } else {
+                    if (!commonUtils.isNullOrEmpty(result.Detail)) {
+                        showErrorDialog(result.Detail);
+                    }
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+
+            }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+                //alert("complete");
+            });
+        }
+</script>
+<!-- Excel -->
+<script>
+    function Export() {
+        var productCodeUser = commonUtils.returnValueText('#ProductCodeUser');
+        var apprDTimeUTCFrom = commonUtils.returnValueText('#ApprDTimeUTCFrom');
+        var apprDTimeUTCTo = commonUtils.returnValueText('#ApprDTimeUTCTo');
+        var invCode = $('#InvCode').val();
+        if (productCodeUser == undefined || productCodeUser.length == 0) {
+            alert('Chưa chọn mã sản phẩm');
+            $('#ProductCodeUser').focus();
+            return false;
+        }
+        if (apprDTimeUTCFrom == undefined || apprDTimeUTCFrom.length == 0) {
+            $('#ApprDTimeUTCFrom').focus();
+            alert('Chưa chọn ngày từ');
+            return false;
+        }
+        if (apprDTimeUTCTo == undefined || apprDTimeUTCTo.length == 0) {
+            $('#ApprDTimeUTCTo').focus();
+            alert('Chưa chọn ngày đến');
+            return false;
+        }
+
+        var objCommonExcel = new CommonExcel();
+        var ajaxSettings_Excel = {};
+        ajaxSettings_Excel.Type = 'post';
+        ajaxSettings_Excel.DataType = 'json';
+        ajaxSettings_Excel.Url = '@Url.Action("Rpt_InvF_WarehouseCard_Export", "Report")';
+
+        var listParams = [
+            { "Key": 'productcodeuser', "Value": productCodeUser },
+            { "Key": 'apprDTimeUTCFrom', "Value": apprDTimeUTCFrom },
+            { "Key": 'apprDTimeUTCTo', "Value": apprDTimeUTCTo },
+            { "Key": 'invcode', "Value": invCode }
+        ];
+
+        objCommonExcel.ajaxSettingsInit();
+        objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+        objCommonExcel.exportExcel(listParams);
+        }
+</script>
+<!-- In -->
+<script src="@Url.Content("~/Scripts/print.min.js")"></script>
+<script>
+    function Print() {
+        debugger
+        var productCodeUser = commonUtils.returnValueText('#ProductCodeUser');
+        var apprDTimeUTCFrom = commonUtils.returnValueText('#ApprDTimeUTCFrom');
+        var apprDTimeUTCTo = commonUtils.returnValueText('#ApprDTimeUTCTo');
+        if (productCodeUser == undefined || productCodeUser.length == 0) {
+            alert('Chưa chọn mã sản phẩm');
+            $('#ProductCodeUser').focus();
+            return false;
+        }
+        if (apprDTimeUTCFrom == undefined || apprDTimeUTCFrom.length == 0) {
+            $('#ApprDTimeUTCFrom').focus();
+            alert('Chưa chọn ngày từ');
+            return false;
+        }
+        if (apprDTimeUTCTo == undefined || apprDTimeUTCTo.length == 0) {
+            $('#ApprDTimeUTCTo').focus();
+            alert('Chưa chọn ngày đến');
+            return false;
+        }
+
+        let Url = '@Url.Action("PrintTemp_Rpt_InvF_WarehouseCard", "Report")';
+
+        $.ajax({
+            type: "post",
+            data:
+            {
+                productcodeuser: productCodeUser,
+                apprDTimeUTCFrom: apprDTimeUTCFrom,
+                apprDTimeUTCTo: apprDTimeUTCTo,
+            },
+            url: Url,
+            dataType: 'json',
+            beforeSend: function () { }
+        }).done(function (result) {
+            if (result.Success) {
+                if (result.LinkPDF !== undefined || result.LinkPDF !== '') {
+                    printPdf(result.LinkPDF);
+                }
+                else {
+                    alert('Không lấy được dữ liệu mẫu in');
+                }
+            }
+            else {
+                if (result.Messages !== undefined && result.Messages.length > 0) {
+                    alert(result.Messages[0]);
+                }
+                if (!commonUtils.isNullOrEmpty(result.Detail)) {
+                    showErrorDialog(result.Detail);
+                }
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+
+        }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+            //alert("complete");
+        });
+    }
+
+    function printPdf(linkPdf) {
+        printJS({
+            printable: linkPdf,
+            type: 'pdf',
+            showModal: true,
+            //onPrintDialogClose: () => console.log('The print dialog was closed'),
+            //onPdfOpen: () => console.log('Pdf was opened in a new tab due to an incompatible browser')
+        })
+    }
+</script>
+
+<!-- Use cookies -->
+@*<script>
+    // $(document).readdy();
+    document.addEventListener('DOMContentLoaded', function () {
+        readCookies("Rpt_InvF_WarehouseCard_Export");
+        var checkboxs = document.querySelectorAll('#togglecolumn.ulshowdata input[type="checkbox"]');
+        for (let checkbox of checkboxs) {
+            checkbox.addEventListener('change', setCookie)
+        }
+    });
+
+    function saveSelectedToCookie() {
+        setCookie("Rpt_InvF_WarehouseCard_Export", {
+            path: '/',
+            expires: 10
+        });
+    }
+
+    function setCookie(name, options = {}) {
+        var checkboxs = document.querySelectorAll('#togglecolumn.ulshowdata input[type="checkbox"]');
+        var value = new Object();
+        for (const ckb of checkboxs) {
+            value[ckb.name] = ckb.checked === true ? "0" : "1";
+        }
+        let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(JSON.stringify(value));
+
+        if (options.expires instanceof Date) {
+            options.expires = options.expires.toUTCString();
+        }
+
+        for (let optionKey in options) {
+            updatedCookie += "; " + optionKey;
+            let optionValue = options[optionKey];
+            if (optionValue !== true) {
+                updatedCookie += "=" + optionValue;
+            }
+        }
+        document.cookie = updatedCookie;
+    }
+
+    function readCookies(name) {
+        var result = document.cookie.match(new RegExp(name + '=([^;]+)'));
+        result && (result = JSON.parse(decodeURIComponent(result[1])));
+        if (result != null && result != undefined) {
+            for (const key in result) {
+                $('#dynamic-table-thead').find('th[fieldid="' + key + '"]').attr('fieldactive', result[key]);
+            }
+        }
+    }
+</script>*@
+
+@*format number*@
+
+
+<script type="text/javascript">
+    function format_Number(){
+        var tableName = 'Rpt_InvF_WarehouseCard';
+        var qtyTransFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'QtyTrans');
+        var totalQtyInvFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalQtyInv');
+        
+
+      $('.valQtyTrans').number(true, qtyTransFormat);
+        $('.valTotalQtyInv').number(true, totalQtyInvFormat);
+    }
+</script>

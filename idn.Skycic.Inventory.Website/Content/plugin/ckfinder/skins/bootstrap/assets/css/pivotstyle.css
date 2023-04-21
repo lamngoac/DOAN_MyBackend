@@ -1,0 +1,47 @@
+﻿
+			/* styles for responsive pivot UI + bootstrap-like styles */			
+			
+			.pivotHolder table.pvtUi {
+				table-layout:fixed;
+			}
+				.pivotHolder select {
+					visibility:hidden;
+				}
+					.pivotHolder select.form-control {
+						visibility:visible;
+					}
+
+			.pivotHolder > table.pvtUi, .pivotHolder table.pvtTable {
+				width:100%;
+				margin-bottom:0px;
+			}
+				.pivotHolder > table.pvtUi>tbody>tr>td, .pivotHolder > table.pvtUi>tbody>tr>th {
+					border: 1px solid #ddd;
+				}
+				.pivotHolder .pvtAxisContainer li span.pvtAttr {
+					height:auto;
+					white-space:nowrap;
+				}
+				.pivotHolder .pvtAxisContainer.pvtUnused, .pivotHolder .pvtAxisContainer.pvtCols {
+					vertical-align:middle;
+				}
+
+			.pivotHolder > table.pvtUi>tbody>tr:first-child > td:first-child {
+				width:250px;
+			}
+
+			.pivotHolder td.pvtRendererArea {
+				padding-bottom:0px;
+				padding-right:0px;
+				border-bottom-width:0px !important;
+				border-right-width:0px !important;
+			}
+			.pivotHolder td.pvtVals br { display:none; }			
+			
+			.pvtRendererArea>div {
+				overflow:auto;
+			}
+			
+			.pvtTableRendererHolder {
+				max-height:600px;  /* limit table height if needed */
+			}	

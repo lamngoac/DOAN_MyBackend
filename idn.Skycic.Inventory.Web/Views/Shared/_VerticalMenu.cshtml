@@ -1,0 +1,134 @@
+﻿
+<div id="sidebar" class="sidebar responsive ace-save-state">
+    <script type="text/javascript">
+        try {
+            ace.settings.loadState('sidebar');
+        } catch (e) { }
+    </script>
+
+    <ul class="nav nav-list" style="background:#fff;">
+        @{
+            /**/
+
+            // Menu:
+        }
+        @if (CheckAccess("MENU_ROOT"))
+        {
+            
+            if (CheckAccess("MENU_HANG_HOA"))
+            {
+                <li class="">
+                    <a href="javascrip:void();" class="dropdown-toggle">
+                        <img class="img-responsive img-inactive none-click" src="~/Images/qlhanghoa.svg" />
+                        <img class="img-responsive img-inactive click" src="~/Images/qlhanghoa.click.svg" />
+                        <span class="menu-text none-click">
+                            Quản lý hàng hóa
+                        </span>
+                        <span class="menu-text click">
+                            Quản lý hàng hóa
+                        </span>
+
+                        <b class="arrow fa fa-angle-down"></b>
+                    </a>
+                    <b class="arrow"></b>
+                    <ul class="submenu">
+
+                        <!--Chưa xác định-->
+                        @*@RenderSubMenuItem("MENU_QL_MA_HOP", "Quản lý mã hộp ", "Index", "Inv_InventoryBox")
+                        @RenderSubMenuItem("MENU_QL_MA_THUNG", "Quản lý mã thùng ", "Index", "Inv_InventoryCarton")*@
+                        @RenderSubMenuItem("MENU_QL_SAN_PHAM", "Quản lý sản phẩm ", "Index", "Mst_Part")
+                        @RenderSubMenuItem("MENU_QL_LOAI_SAN_PHAM", "Quản lý loại SP ", "Index", "Mst_PartType")
+                        @RenderSubMenuItem("MENU_QL_NHOM_SAN_PHAM", "Quản lý nhóm SP ", "Index", "Mst_PartMaterialType")
+                        @RenderSubMenuItem("MENU_QL_DON_VI_SAN_PHAM", "Quản lý đơn vị sản phẩm ", "Index", "Mst_PartUnit")
+                        @*@RenderSubMenuItem("MENU_QL_MAP_INVENTORY", "Quản lý kho", "Index", "Mst_Inventory")
+                        @RenderSubMenuItem("MENU_QL_PHIEU_NHAP", "Quản lý phiếu nhập", "Index", "InvF_InventoryInFG")
+                        @RenderSubMenuItem("MENU_QL_PHIEU_XUAT", "Quản lý phiếu xuất", "Index", "InvF_InventoryOutFG")
+                        
+                        @RenderSubMenuItem("MENU_QL_MAU_TEM", "Quản lý mẫu tem", "Index", "Temp_PrintTemp")
+                        @RenderSubMenuItem("MENU_QL_CAP_SO_IN_TEM", "Quản lý cấp số in tem", "Index", "Inv_InventorySecret")
+                        @RenderSubMenuItem("MENU_PHAN_QUYEN_HIEN_THI", "Phân quyền hiển thị", "Index", "View_ColumnInGroup")*@
+
+                    </ul>
+                </li>
+            }
+            @*if (CheckAccess("MENU_KHO_XAC_THUC"))
+            {
+                <li class="">
+                    <a href="javascrip:void();" class="dropdown-toggle">
+                        <img class="img-responsive img-inactive none-click" src="~/Images/khothongtinxacthuc.svg" />
+                        <img class="img-responsive img-inactive click" src="~/Images/khothongtinxacthuc.click.svg" />
+                        <span class="menu-text none-click">
+                            Quản lý kho thông tin xác thực
+                        </span>
+                        <span class="menu-text click">
+                            Quản lý kho thông tin xác thực
+                        </span>
+
+                        <b class="arrow fa fa-angle-down"></b>
+                    </a>
+                    <b class="arrow"></b>
+                    <ul class="submenu">
+                        @RenderSubMenuItem("MENU_QL_XAC_THUC_TT_SAN_PHAM", "Xác thực thông tin sản phẩm", "Index", "Inv_InventoryBalanceSerial")
+                    </ul>
+                </li>
+            }*@
+            if (CheckAccess("MENU_TO_CHUC"))
+            {
+                <li class="">
+                    <a href="javascrip:void();" class="dropdown-toggle">
+                        <img class="img-responsive img-inactive none-click" style="max-width:20px" src="~/Images/quanlytochuc.svg" />
+                        <img class="img-responsive img-inactive click" style="max-width:20px"  src="~/Images/quanlytochuc.click.svg" />
+                        <span class="menu-text none-click">
+                            Quản lý tổ chức
+                        </span>
+                        <span class="menu-text click">
+                            Quản lý tổ chức
+                        </span>
+                        <b class="arrow fa fa-angle-down"></b>
+                    </a>
+                    <b class="arrow"></b>
+                    <ul class="submenu">
+                        @RenderSubMenuItem("MENU_QL_DON_VI_THANH_VIEN", "Quản lý đơn vị thành viên", "Index", "Mst_NNT")
+                        @*@RenderSubMenuItem("MENU_TAO_DON_VI_THANH_VIEN", "Tạo đơn vị thành viên (Org con)", "Create", "Mst_NNT")*@
+                        @RenderSubMenuItem("MENU_QL_BPPB", "Quản lý Bộ phận/Phòng ban", "Index", "Mst_Department")
+                        @RenderSubMenuItem("MENU_QL_TINH_TP", "Danh mục Tỉnh/Thành phố", "Index", "Mst_Province")
+                        @*@RenderSubMenuItem("MENU_QL_CQT", "Danh mục cơ quan thuế", "Index", "Mst_GovTaxID")*@
+                        @RenderSubMenuItem("MENU_QL_QUAN_HUYEN", "Danh mục Quận/Huyện", "Index", "Mst_District")
+                        @*@RenderSubMenuItem("MENU_QL_DAI_LY", "Quản lý đại lý", "Index", "Mst_Agent")*@
+                        @*@RenderSubMenuItem("MENU_QL_DON_VI", "Quản lý đơn vị", "Index", "Mst_Dealer")*@
+
+                    </ul>
+                </li>
+            }
+            if (CheckAccess("MENU_TAI_KHOAN"))
+            {
+                <li class="">
+                    <a href="javascrip:void();" class="dropdown-toggle">
+                        <img class="img-responsive img-inactive none-click" src="~/Images/taikhoan.svg" />
+                        <img class="img-responsive img-inactive click" src="~/Images/taikhoan.click.svg" />
+                        
+                        <span class="menu-text none-click">
+                            Tài khoản
+                        </span>
+                        <span class="menu-text click">
+                            Tài khoản
+                        </span>
+                        <b class="arrow fa fa-angle-down"></b>
+                    </a>
+                    <b class="arrow"></b>
+                    <ul class="submenu">
+                        @RenderSubMenuItem("MENU_QL_NG_DUNG", "Quản lý người dùng", "Index", "Sys_User")
+                        @RenderSubMenuItem("MENU_QL_NHOM_NG_DUNG", "Quản lý nhóm người dùng", "Index", "Sys_Group")
+                    </ul>
+                </li>
+            }
+            
+        }
+
+
+    </ul><!-- /.nav-list -->
+
+    <div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse">
+        <i id="sidebar-toggle-icon" class="ace-icon fa fa-angle-double-left ace-save-state" data-icon1="ace-icon fa fa-angle-double-left" data-icon2="ace-icon fa fa-angle-double-right"></i>
+    </div>
+</div>

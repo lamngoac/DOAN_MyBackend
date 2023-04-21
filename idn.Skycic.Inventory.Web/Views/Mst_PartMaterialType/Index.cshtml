@@ -1,0 +1,317 @@
+﻿@model PageInfo<Mst_PartMaterialType>
+@{
+    Layout = "~/Views/Shared/CoreLayoutQuanTri.cshtml";
+    var title = "DANH MỤC NHÓM SẢN PHẨM";
+    ViewBag.Title = title;
+    var startCount = 0;
+    var strStartCount = ViewBag.StartCount as string;
+    if (!CUtils.IsNullOrEmpty(strStartCount))
+    {
+        startCount = Convert.ToInt32(strStartCount);
+    }
+    var offset = ViewBag.Offset;
+
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+
+    var showtext = "";
+    if (Model.ItemCount > 0)
+    {
+        var recordstart = (Model.PageIndex) * Model.PageSize + 1;
+        var recordend = (Model.PageIndex + 1) * Model.PageSize;
+        if (recordend > Model.ItemCount)
+        {
+            recordend = Model.ItemCount;
+        }
+        showtext = recordstart + "-" + recordend + " trong số " + Model.ItemCount;
+    }
+}
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                @*<div class="title">
+                        <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                    </div>*@
+                <div class="panel-body no-padding">
+                    <div class="col-xs-12 no-padding">
+                        @using (Html.BeginForm("Index", "Mst_PartMaterialType", FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <aside class="col-xs-12 layout-tk layout-bot-top-16">
+                                @RenderItemFormat("BTN_QL_NHOM_SP_TAO", "<a class=\"btn font-color mybtn-Button\" href=\"" + Url.Action("Create", "Mst_PartMaterialType") + "\" style=\"font-size: 13px;margin-right: 10px; \"><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i> Tạo</a>", "", "")
+
+                                <a class="btn font-color mybtn-Button" data-toggle="dropdown" aria-expanded="false" style="font-size: 13px; margin-right: 5px;position: relative;"><i class="fas fa-ellipsis-h"></i></a>
+                                <ul class="dropdown-menu" role="menu" style="">
+                                    <li>
+                                        @RenderItemFormat("BTN_QL_NHOM_SP_NHAP_EXCEL", "<a class=\"mybtn-Button-1\" onclick=\"ShowPopupImportExcel()\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/import.svg") + "'>Nhập Excel</a>", "", "")
+                                    </li>
+                                    <li>
+                                        @RenderItemFormat("BTN_QL_NHOM_SP_XUAT_EXCEL", "<a class=\"mybtn-Button-1\" onclick=\"Export()\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/export.svg") + "'>Xuất Excel</a>", "", "")
+                                    </li>
+                                    <li>
+                                        @RenderItemFormat("BTN_QL_NHOM_SP_XUAT_EXCEL_TEM", "<a class=\"mybtn-Button-1\" onclick=\"ExportTemplate()\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/export.svg") + "'>Xuất Excel template</a>", "", "")
+                                    </li>
+                                </ul>
+                                <span class="search-bar">
+                                    <input type="text" id="dynamic-table-thead-search" class="quicksearch txtSearchObj" name="search">
+                                    <input type="text" class="quicksearch1 txtSearchObj1" name="search" style="z-index: -1000; height: 0; padding: 0; margin: 0; border: 0">
+                                </span>
+                                @Html.Partial("Pagination", null, new ViewDataDictionary() { { "PageCur", MvcHtmlString.Create("1") }, { "recordcount", MvcHtmlString.Create(Model.PageSize.ToString()) }, { "ShowText", showtext } })
+                                <input type="hidden" value="@MvcHtmlString.Create(pageCur)" name="page" id="page" />
+                            </aside>
+                        }
+                        <input type="hidden" value="@MvcHtmlString.Create(Model.PageCount.ToString())" name="totalpage" id="totalpage" />
+                    </div>
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <div class="scrollable-horizontal padding-left-0 padding-right-0 div-scrollable" data-size="625" style="padding-top: 0!important;">
+                        <div style="width:100%; float: left;">
+                            <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                                <thead>
+                                    <tr class="trthead">
+                                        <th class="cell-75">&nbsp;</th>
+                                        <th class="cell-50">@MvcHtmlString.Create("TT")</th>
+                                        <th fieldid="PMTYPE" sorttype="T" class="cell-200">
+                                            @MvcHtmlString.Create("Mã nhóm sản phẩm")
+                                        </th>
+                                        <th fieldid="PMTYPENAME" sorttype="T" class="cell-200">
+                                            @MvcHtmlString.Create("Tên nhóm sản phẩm")
+                                        </th>
+                                        <th class="cell-100">
+                                            @MvcHtmlString.Create("Trạng thái")
+                                        </th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div id="scrollable_1" class="scrollable" style="width: 100%; float: left;">
+                            <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody">
+                                <tbody id="table-tbodyID">
+
+                                    @if (Model != null && Model.DataList != null && Model.DataList.Count > 0)
+                                    {
+                                        var idx = 0;
+                                        foreach (var item in Model.DataList)
+                                        {
+                                            var iindex = startCount + (idx + 1);
+                                            var pmtype = "";
+                                            if (!CUtils.IsNullOrEmpty(item.PMType))
+                                            {
+                                                pmtype = CUtils.StrValueOrNull(item.PMType);
+                                            }
+                                            var pmtypename = "";
+                                            if (!CUtils.IsNullOrEmpty(item.PMTypeName))
+                                            {
+                                                pmtypename = CUtils.StrValueOrNull(item.PMTypeName);
+                                            }
+                                            var flagactive = "";
+                                            if (!CUtils.IsNullOrEmpty(item.FlagActive))
+                                            {
+                                                flagactive = CUtils.StrValueOrNull(item.FlagActive);
+                                            }
+
+                                            <tr idx="@idx" class="data-item trdata">
+                                                <td class="text-center cell-75">
+                                                    <div class="action-buttons padding-top-2">
+                                                        @{
+                                                            var urlDetail = Url.Action("Detail", "Mst_PartMaterialType", new { pmtype = item.PMType });
+                                                            var urlUpdate = Url.Action("Update", "Mst_PartMaterialType", new { pmtype = item.PMType });
+
+                                                        }
+                                                        @RenderItemFormat("BTN_QL_NHOM_SP_CHI_TIET", "<a class=\"icon-detail\" href=\'" + urlDetail + "\' title=\"Chi tiết\"><i class=\"far fa-eye\"></i></a>", "", "")
+                                                        @RenderItemFormat("BTN_QL_NHOM_SP_SUA", "<a class=\"icon-edit\" href=\'" + urlUpdate + "\' title=\"Sửa\"><i class=\"fas fa-pencil-alt\"></i></a>", "", "")
+                                                        @RenderItemFormat("BTN_QL_NHOM_SP_XOA", "<a href=\"javascript:;\" class=\"icon-delete\" title=\"Xóa\" onclick=\"Delete('" + item.PMType.ToString() + "')\"><i class=\"fas fa-trash-alt\"></i></a>", "", "")
+                                                    </div>
+                                                </td>
+                                                <td class="text-center cell-50">
+                                                    @MvcHtmlString.Create(iindex.ToString())
+                                                </td>
+                                                <td fieldid="PMTYPE" sorttype="T" class="cell-200">
+                                                    @MvcHtmlString.Create(pmtype)
+                                                </td>
+                                                <td fieldid="PMTYPENAME" sorttype="T" class="cell-200">
+                                                    @MvcHtmlString.Create(pmtypename)
+                                                </td>
+                                                <td class="cell-100">
+                                                    @if (flagactive.Equals("1"))
+                                                    {
+                                                        <span class="label label-sm label-success">Active</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="label label-sm label-danger">Inactive</span>
+                                                    } <!--Trạng thái-->
+                                                </td>
+                                            </tr>
+                                            idx++;
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div><!-- /.row -->
+@*Active Menu*@
+<script type="text/javascript">
+    setAdminCurrentUrl('@Url.Action("Index", "Mst_PartMaterialType")');
+</script>
+
+@*Import Excel*@
+<div class="modal fade" id="ImportExcelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Mst_PartMaterialType.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "Mst_PartMaterialType")');
+        //processAjaxForm($('#manageForm'), function (response) {
+        //    processAjaxFormResult(response);
+        //});
+
+        @* Scroll *@
+        //$(document).ready(function () {
+        //    $('.scrollable-horizontal').each(function () {
+        //        var $this = $(this);
+        //        $(this).ace_scroll(
+        //            {
+        //                horizontal: true,
+        //                //styleClass: 'scroll-top',//show the scrollbars on top(default is bottom)
+        //                size: $this.attr('data-size') || 6500,
+        //                mouseWheelLock: true
+        //            }
+        //        ).css({ 'padding-top': 0 });
+        //    });
+        //});
+        //$('.scrollable').each(function () {
+        //    var $this = $(this);
+        //    $(this).ace_scroll({
+        //        //size: 500,
+        //        size: $this.attr('data-size') || 1000,
+        //        mouseWheelLock: true
+        //        //styleClass: 'scroll-left scroll-margin scroll-thin scroll-dark scroll-light no-track scroll-visible'
+        //    });
+        //});
+
+        @* keypress *@
+        $(document).on('keypress', function (e) {
+            if (e.which == 13) {
+                Search();
+            }
+        });
+        function Search()
+        {
+            $('#manageForm').attr('action', '@Url.Action("Index", "Mst_PartMaterialType")').submit();
+        }
+        var objMst_PartMaterialType = new Mst_PartMaterialType();
+        function Delete(pmtype) {
+            var objMst_PartMaterialType_Delete = {
+                PMType: pmtype,
+            };
+
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Delete", "Mst_PartMaterialType")';
+
+            objMst_PartMaterialType.Image_Message = "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO";
+            objMst_PartMaterialType.Confirm_Message = "Đồng ý xóa nhóm sản phẩm '" + pmtype + "' ?";
+            objMst_PartMaterialType.ajaxSettings = ajaxSettings;
+            objMst_PartMaterialType.deleteData(objMst_PartMaterialType_Delete);
+        }
+
+        var objCommonExcel = new CommonExcel();
+        var objVariablesInit = {
+            Id_FormMain: '',
+            Id_FormImportExcel: 'manageFormImportExcel',
+            Id_Modal: 'ImportExcelModal',
+            Id_FileInput: 'file',
+        };
+
+        var ajaxSettings_Excel = {};
+        ajaxSettings_Excel.Type = 'post';
+        ajaxSettings_Excel.DataType = 'json';
+
+        function ShowPopupImportExcel(check) {
+            ajaxSettings_Excel.Url = '@Url.Action("ShowPopupImportExcel", "Admin")';
+            ajaxSettings_Excel.Check = check;
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.variablesInit(objVariablesInit);
+            objCommonExcel.showPopupImportExcel();
+        }
+
+        function ImportFileExcel() {
+            ajaxSettings_Excel.Url = '@Url.Action("Import", "Mst_PartMaterialType")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.variablesInit(objVariablesInit);
+            objCommonExcel.importFileExcel();
+        }
+
+        function ExportTemplate(check) {
+            ajaxSettings_Excel.Url = '@Url.Action("ExportTemplate", "Mst_PartMaterialType")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.exportExcel();
+        }
+
+        function Export() {
+            ajaxSettings_Excel.Url = '@Url.Action("Export", "Mst_PartMaterialType")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.exportExcel();
+        }
+
+        //Tìm kiếm nhanh
+        $(document).ready(function () {
+            (function ($) {
+                var body = $('body');
+                body.on('keyup', '#txtSearchObj', function () {
+                    var datafilter = $(this).val();
+                    if (datafilter !== undefined && datafilter !== null && datafilter.toString().trim()) {
+                        datafilter = datafilter.toUpperCase().trim();
+                    }
+                    var rex = new RegExp($(this).val(), 'i');
+                    $('#table-tbodyID tr').hide();
+                    $('#table-tbodyID tr').filter(function () {
+                        //debugger
+                        var dataOfRow = $(this).text();
+                        if (dataOfRow !== undefined && dataOfRow !== null && dataOfRow.toString().trim().length > 0) {
+                            dataOfRow = dataOfRow.toUpperCase().trim();
+                        }
+                        if (dataOfRow.toUpperCase().indexOf(datafilter) > -1) {
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }
+                    }).show();
+                });
+
+            }(jQuery));
+
+        });
+    </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/js/table-sortable-v3.js")"></script>
+    <script type="text/javascript">
+        var listColumns = {
+            //'STT': [],//['abc', 'def'],
+            'PMTYPE': [],//['ghi', 'klm'],
+            'PMTYPENAME': []
+        };
+        var options = {};
+        options.Columns = listColumns;
+        $('#dynamic-table-thead').table_Sortable(options);
+    </script>
+}

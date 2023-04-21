@@ -1,0 +1,225 @@
+﻿
+
+@model Mst_SpecUnit
+@{
+    Layout = "~/Views/Shared/_LayoutQuantri.cshtml";
+    var title = "TẠO MỚI MAPPING SPEC-UNIT";
+    var titleMng = "Danh mục mapping spec-unit";
+    ViewBag.Title = title;
+
+    var listOS_PrdCenter_Mst_Spec = ViewBag.ListOS_PrdCenter_Mst_Spec as List<Mst_Spec>;
+    if (listOS_PrdCenter_Mst_Spec == null || listOS_PrdCenter_Mst_Spec.Count == 0)
+    {
+        listOS_PrdCenter_Mst_Spec = new List<Mst_Spec>();
+    }
+
+    var listOS_PrdCenter_Mst_Unit = ViewBag.ListOS_PrdCenter_Mst_Unit as List<Mst_Unit>;
+    if (listOS_PrdCenter_Mst_Unit == null || listOS_PrdCenter_Mst_Unit.Count == 0)
+    {
+        listOS_PrdCenter_Mst_Unit = new List<Mst_Unit>();
+    }
+}
+<script type="text/javascript">
+    var parents = new Array();
+    parents.push("@Url.Action("Index", "OS_PrdCenter_Mst_SpecUnit")");
+    parents.push("");
+    var parentsText = new Array();
+    parentsText.push("@MvcHtmlString.Create("titleMng")");
+    parentsText.push("@MvcHtmlString.Create("title")");
+    setAdminCurrentTag(parents, parentsText);
+</script>
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="row no-margin box-shadow-tk">
+                        @using (Html.BeginForm("Create", "OS_PrdCenter_Mst_SpecUnit", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="OrgID" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã tổ chức <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="OrgID" name="OrgID" class="col-xs-12 OrgID disabled-fix" value="@ViewBag.OrgID" autocomplete="off" required />
+                                        </span>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group margin-bottom-5">
+                                    <label for="SpecCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã Spec <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <select id="SpecCode" name="SpecCode" class="col-xs-12 SpecCode" required="">
+                                                <option value=""></option>
+                                                @if (listOS_PrdCenter_Mst_Spec != null && listOS_PrdCenter_Mst_Spec.Count > 0)
+                                                {
+                                                    foreach (var item in listOS_PrdCenter_Mst_Spec)
+                                                    {
+                                                        <option value="@MvcHtmlString.Create(item.SpecCode.ToString().Trim())" desc="@MvcHtmlString.Create(item.SpecName.ToString().Trim())">@MvcHtmlString.Create(item.SpecCode.ToString().Trim())</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </span>
+
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="UnitCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã đơn vị <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <select id="UnitCode" name="UnitCode" class="col-xs-12 UnitCode" required="">
+                                                <option value=""></option>
+                                                @if (listOS_PrdCenter_Mst_Unit != null && listOS_PrdCenter_Mst_Unit.Count > 0)
+                                                {
+                                                    foreach (var item in listOS_PrdCenter_Mst_Unit)
+                                                    {
+                                                        <option value="@MvcHtmlString.Create(item.UnitCode.ToString().Trim())" desc="@MvcHtmlString.Create(item.UnitName.ToString().Trim())">@MvcHtmlString.Create(item.UnitCode.ToString().Trim())</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </span>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="StandardUnitCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã đơn vị chuẩn <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="StandardUnitCode" name="StandardUnitCode" class="col-xs-12 StandardUnitCode" value="" autocomplete="off" required />
+                                        </span>
+
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="SpecUnitDesc" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mô tả")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="SpecUnitDesc" name="SpecUnitDesc" class="col-xs-12 SpecUnitDesc" value="" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="Qty" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Số lượng <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="Qty" name="Qty" class="col-xs-12 text-right Qty" value="" autocomplete="off" required />
+                                        </span>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="Length" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Dài")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="Length" name="Length" class="col-xs-12 text-right Length" value="" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="Width" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Rộng")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="Width" name="Width" class="col-xs-12 text-right Width" value="" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="Height" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Cao")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="Height" name="Height" class="col-xs-12 text-right Height" value="" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="Volume" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Thể tích")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="Volume" name="Volume" class="col-xs-12 text-right Volume" value="" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="Weight" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Khối lượng")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="Weight" name="Weight" class="col-xs-12 text-right Weight" value="" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        }
+                    </aside>
+                    <div class="col-xs-12 no-padding">
+                        <div class="clearfix">
+                            <div class="row no-margin" style="float: right">
+                                @RenderItemFormat("BTN_TAO_BTN_SUA_OS_PRDCENTER_MST_SPECUNIT_LUU", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px; \" onclick=\"SaveData();\">Lưu</a>", "", "")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/OS_PrdCenter_Mst_SpecUnit.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "OS_PrdCenter_Mst_SpecUnit")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+        });
+        @* Set focus *@
+        var _getForm = document.getElementById("manageForm");
+        _getForm.addEventListener('reset',
+            function () {
+                document.getElementById("").focus();
+            });
+        jQuery(function ($) {
+            $('.Qty').number(true, 0);
+            $('.Length, .Width, .Height, .Volume, .Weight').number(true, 2);
+        });
+
+        function SaveData() {
+            //debugger;
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Create", "OS_PrdCenter_Mst_SpecUnit")';
+            var objOS_PrdCenter_Mst_SpecUnit = new OS_PrdCenter_Mst_SpecUnit();
+            objOS_PrdCenter_Mst_SpecUnit.ActionType = 'create';
+            objOS_PrdCenter_Mst_SpecUnit.ajaxSettings = ajaxSettings;
+            objOS_PrdCenter_Mst_SpecUnit.saveData();
+        }
+    </script>
+}

@@ -1,0 +1,20 @@
+﻿@model List<InvF_InventoryInInstLot>
+
+@if (Model != null && Model.Count > 0)
+{
+    var idx = 0;
+    foreach (var item in Model)
+    {
+        <tr class="data-item trdata" idx="@idx" productcode="@item.ProductCode">
+            <input type="hidden" name="Lst_InvF_InventoryInInstLot[@idx].ProductCode" value="@item.ProductCode" />
+            <input type="hidden" name="Lst_InvF_InventoryInInstLot[@idx].ProductCodeRoot" value="@item.ProductCode" />
+            <input type="hidden" name="Lst_InvF_InventoryInInstLot[@idx].ProductLotNo" value="@item.ProductLotNo" />
+            <input type="hidden" name="Lst_InvF_InventoryInInstLot[@idx].ProductionDate" value="@item.ProductionDate" />
+            <input type="hidden" name="Lst_InvF_InventoryInInstLot[@idx].ExpiredDate" value="@item.ExpiredDate" />
+            <input type="hidden" name="Lst_InvF_InventoryInInstLot[@idx].InvCodeInActual" value="@item.InvCodeInActual" />
+            <input type="hidden" name="Lst_InvF_InventoryInInstLot[@idx].Qty" value="@item.Qty">
+        </tr>
+        idx++;
+    }
+}
+

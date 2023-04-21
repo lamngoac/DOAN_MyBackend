@@ -1,0 +1,159 @@
+﻿@model RT_Mst_Sys_Config
+@{
+    ViewBag.Title = "Cấu hình hệ thống";
+    var listMst_Sys_Config = new List<Mst_Sys_Config>();
+
+    if (Model != null)
+    {
+        if (Model.Lst_Mst_Sys_Config != null && Model.Lst_Mst_Sys_Config.Count > 0)
+        {
+            listMst_Sys_Config.AddRange(Model.Lst_Mst_Sys_Config);
+        }
+    }
+}
+
+<style>
+    .config-title {
+        font-size: 15px;
+        padding: 0;
+        margin-bottom: 3px;
+        font-weight: 700;
+    }
+
+    .info-config {
+        /*color: #999;*/
+        position: relative;
+        padding-right: 30px;
+    }
+</style>
+
+
+<div class="col-12">
+    <div class="clearfix">
+        <div class="row no-margin" style="padding-top: 10px;">
+            <div class="">
+                @RenderItemFormat("BTN_SUA_CAU_HINH", "<a href=\"javascript: void(0); \" class=\"btn btn-nc-button\" style=\"\" onclick=\"SaveData();\"><i class=\"fas fa-save\" aria-hidden=\"true\"></i> Cập nhật</a>", "", "")
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="col-12" style="padding-top:30px">
+    <h3 class="config-title" style="padding-bottom:30px">Hiển thị thông tin giá hàng hoá</h3>
+    <div class="row" style="padding-left:30px">
+        @if (listMst_Sys_Config != null && listMst_Sys_Config.Count > 0)
+        {
+            @Html.AntiForgeryToken()
+            var i = 0;
+            foreach (var item in listMst_Sys_Config)
+            {
+                <div class="row col-6">
+
+                    <div class="col-1 config-right">
+                        @{
+                            var flagActive = "";
+                            if (item.FlagActive.Equals("1"))
+                            {
+                                flagActive = "checked";
+                            }
+                        }
+                        <span class="block input-icon input-icon-right padding-top-5">
+                            <label class="lbl-flag">
+
+
+
+                                <label class="lbl-flag">
+                                    <input name="flagshow-@i" id="flagshow-@i" class="cl-check" type="checkbox" value="@item.FlagActive" @flagActive />
+                                </label>
+                            </label>
+                        </span>
+
+                    </div>
+                    <div class="col-9 config-left">
+                        <h3 class="config-title">
+                            @MvcHtmlString.Create(CUtils.StrValue(item.SysConfigName))
+                        </h3>
+                        <input type="hidden" name="SysConfigID-@i" id="SysConfigID-@i" value="@CUtils.StrValue(item.SysConfigID)" />
+                        <input type="hidden" name="Lst_Mst_Sys_Config[@i].FlagActive" value="@(item.FlagActive == null ? "" : item.FlagActive)" />
+                        <input type="hidden" name="Lst_Mst_Sys_Config[@i].SysConfigID" value="@(item.SysConfigID == null ? "" : item.SysConfigID)" />
+                    </div>
+                </div>
+                i++;
+            }
+        }
+    </div>
+</div>
+<div class="col-12" style="padding-top:30px">
+    <h3 class="config-title" style="padding-bottom:30px">Phương pháp tính giá tồn kho</h3>
+    <div class="row" style="padding-left:30px">
+        <div class="row col-6">
+            <div class="col-1 config-right">
+                <span class="block input-icon input-icon-right padding-top-5">
+                    <label class="lbl-flag disabled-fix">
+                        <input name="flagshow-0" id="flagshow-0" class="cl-check" type="checkbox" value="1" checked />
+                    </label>
+                </span>
+            </div>
+            <div class="col-9 config-left">
+                <h3 class="config-title">
+                    @MvcHtmlString.Create("Phương pháp bình quân gia quyền")
+                </h3>
+
+            </div>
+        </div>
+        <div class="row col-6">&nbsp;</div>
+        <div class="row col-6">
+            <div class="col-1 config-right">
+                <span class="block input-icon input-icon-right padding-top-5">
+                    <label class="lbl-flag disabled-fix">
+                        <input name="flagshow-1" id="flagshow-1" class="cl-check disabled-fix" type="checkbox" value="0" />
+                    </label>
+                </span>
+            </div>
+            <div class="col-9 config-left">
+                <h3 class="config-title">
+                    @MvcHtmlString.Create("Phương pháp nhập trước, xuất trước (FIFO)")
+                </h3>
+
+            </div>
+        </div>
+        <div class="row col-6">&nbsp;</div>
+        <div class="row col-6">
+            <div class="col-1 config-right">
+                <span class="block input-icon input-icon-right padding-top-5">
+                    <label class="lbl-flag disabled-fix">
+                        <input name="flagshow-2" id="flagshow-2" class="cl-check" type="checkbox" value="0" />
+                    </label>
+                </span>
+            </div>
+            <div class="col-9 config-left">
+                <h3 class="config-title">
+                    @MvcHtmlString.Create("Phương pháp giá đích danh")
+                </h3>
+
+            </div>
+        </div>
+        <div class="row col-6">&nbsp;</div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Mst_Sys_Config.js")"></script>
+
+    <script type="text/javascript">
+        function SaveData() {
+            debugger
+             var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Update", "Mst_Sys_Config")';
+
+            var objMst_Sys_Config = new Mst_Sys_Config();
+            objMst_Sys_Config.ActionType = 'edit';
+            objMst_Sys_Config.ajaxSettings = ajaxSettings;
+            objMst_Sys_Config.saveData();
+        }
+    </script>
+
+}

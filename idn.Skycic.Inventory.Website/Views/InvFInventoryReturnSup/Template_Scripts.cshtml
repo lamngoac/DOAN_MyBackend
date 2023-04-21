@@ -1,0 +1,3216 @@
+﻿@model RT_InvF_InventoryReturnSup
+@{
+    string viewType = CUtils.StrValue(ViewBag.ViewType);
+    var userState = ViewBag.UserState as UserState;
+
+
+
+
+}
+
+@*Danh mục hàng hóa*@
+@*Autocomplete*@
+
+
+<script type="text/javascript">
+    function checkProductExists(objProduct) {
+        var rows = $('tbody#table-tbodyID tr.trdata').length;
+        if (rows > 0) {
+            var productCode = objProduct.ProductCode;
+            var productExists = false;
+            $('tbody#table-tbodyID tr.trdata').each(function () {
+                if (!productExists) {
+                    var $trCur = $(this);
+                    var productCodeCur = $trCur.attr('productcode');
+                    if (productCodeCur === productCode) {
+                        productExists = true;
+                    }
+                }
+
+            });
+            if (productExists) {
+                var listToastr = [];
+                var message = 'Hàng hóa "' + objProduct.ProductName + '" đã tồn tại trên lưới'
+                objToastr = { ToastrType: 'error', ToastrMessage: message };
+                listToastr.push(objToastr);
+                commonUtils.showToastr(listToastr);
+                return false;
+            } else {
+                return true;
+            }
+        }
+        else {
+            return true;
+        }
+    }
+</script>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        debugger
+        $('#myInput').autocomplete({
+            source: function (request, response) {
+                var keyword = request.term;
+                if (!commonUtils.isNullOrEmpty(keyword)) {
+                    //var invCodeOut = $('#InvCodeOut').val();
+                    var invCodeOut = commonUtils.returnValueText('#InvCodeOut');
+
+                    if (commonUtils.isNullOrEmpty(invCodeOut)) {
+                        var listToastr = [];
+                        objToastr = { ToastrType: 'error', ToastrMessage: '@MvcHtmlString.Create("Chưa chọn kho xuất".HtmlItemString("ordorderdl"))' };
+                        listToastr.push(objToastr);
+                        commonUtils.showToastr(listToastr);
+
+                        $('#myInput').val('');
+                        commonUtils.setFocus('InvCodeOut');
+                    }
+
+                    if (keyword.toString().trim().length > 1) {
+                        var url = '@Url.Action("SearchProduct", "InvFInventoryReturnSup")';
+                        var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+                        $.ajax({
+                            url: url,
+                            type: 'post',
+                            data: {
+                                prdid: keyword,
+                                autosearch: "true",
+                                __RequestVerificationToken: token
+                            },
+                            cache: false,
+                            dataType: 'json',
+                            success: function (objResult) {
+                                debugger
+                                var _data = objResult.data;
+                                var listItems = $.map(objResult.data, function (data, id) {
+                                    return {
+                                        value: data.ProductCode,
+                                        label: data.ProductCodeUser + ' - ' + data.ProductName,
+                                        //
+                                        data: data
+                                    };
+                                })
+                                //listItems.push({ label: "Search", value: "", isShowAll: true })
+                                response(listItems);
+
+                                var options = "";
+                                options += `<li >
+                                                    <a href="javascript:;" onclick="ShowPopupProductSearch();">Tìm kiếm thêm</a>
+                                                </li>`;
+                                $('ul#ui-id-1').append(options);
+                            },
+                            error: function (xmlHttpRequest, textStatus, errorThrown) {
+                                console.log('some error occured', textStatus, errorThrown);
+                            }
+                        });
+                    }
+                }
+
+            },
+            minLength: 1,
+            select: function (event, ui) {
+                debugger
+                var objData = ui.item.data;
+                var productExists = checkProductExists(objData);
+                if (!productExists) {
+                    return false;
+                }
+                else {
+                    var productCode = objData.ProductCode;
+                    var invBUPattern = "";
+                    var selectKho = $('select.mstinventory').eq(0);
+                    var optionSelect = $(selectKho).find('option:selected');
+                    invBUPattern = optionSelect.attr("invBUPattern");
+                    var productCodeBase = objData.ProductCodeBase;
+                    var valconvert = objData.ValConvert;
+                    var productCodeRoot = objData.ProductCodeRoot;
+                    var flagLot = objData.FlagLot;
+                    var flagSerial = objData.FlagSerial;
+
+                    var dataInput = {
+                        productCode: productCode,
+                        InvBUPattern: invBUPattern,
+                        productCodeBase: productCodeBase,
+                        valconvert: valconvert,
+                        productCodeRoot: productCodeRoot,
+                        FlagLot: flagLot,
+                        FlagSerial: flagSerial
+
+                    };
+
+                    $.ajax({
+                        type: 'post',
+                        data: dataInput,
+                        url: '@Url.Action("GetProductExactly1", "InvFInventoryReturnSup")',
+                        dataType: 'json',
+                        beforeSend: function () {
+                        }
+                    }).done(function (objResult) {
+                        debugger;
+                        if (objResult.Success) {
+                            debugger
+
+                            var objInvF_InventoryReturnSupDtlRender = {
+                                objInventoryReturnSupDtl: objResult.objMST_ProductUI,
+                                ListProductBase: objResult.Data,
+                                List_PhanBoHH: objResult.List_PhanBoHH,
+                                List_PhanBoLot: objResult.List_PhanBoLot,
+                                List_PhanBoSerial: objResult.List_PhanBoSerial
+                            };
+                            debugger
+                            renderInvF_InventoryReturnSupDtl(objInvF_InventoryReturnSupDtlRender);
+                            tongTienHang();
+                            $('#myInput').val('');
+                            commonUtils.setFocus('InvCodeOut');
+                            $('#InvCodeOut').prop('disabled', true);
+                            return false;
+                        }
+                        else {
+                            if (!commonUtils.isNullOrEmpty(objResult.Detail)) {
+                                _showErrorMsg123('Lỗi!', objResult.Detail);
+                            }
+                        }
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                    }).always(function () {
+                    });
+                }
+            }
+
+        }).autocomplete("instance")._renderItem = function (ul, item) {
+
+            var li = $("<li>")
+                .attr("data-value", item.value)
+                .append(item.label)
+                .appendTo(ul);
+
+            if (item.isShowAll === true) {
+                li.on("click", function () {
+                    var orderNo = $('#OrderNo').val();
+                    var url = "";
+                    @*if (orderNo != null && orderNo != "") {
+                        url = '@Url.Action("GetProductSearchOrder", "InvF_InventoryOut")';
+                    }
+                    else {*@
+                        url = '@Url.Action("SearchProduct", "InvFInventoryReturnSup")';
+                    //}
+                    $.ajax({
+                        url: url,
+                        data: {
+                            productkey: "",
+                            showview: "1",
+                            orderNo: orderNo
+                        },
+                        type: 'post',
+                        dataType: 'json',
+                        traditional: true,
+                        success: function (data) {
+                            debugger
+                            if (data.Success) {
+                                debugger
+                                $('#ShowPopupProduct').modal({
+                                    backdrop: false,
+                                    keyboard: true,
+                                });
+                                $("#ShowPopupProduct").html(data.Html);
+                                var display = $("#ShowPopupProduct").css('display');
+                                if (display == "none") {
+                                    $("#ShowPopupProduct").show();
+                                }
+                            } else {
+                                showErrorDialog(data.Detail);
+                            }
+                        }
+                    });
+                    return false;
+                });
+                li.attr('class', 'showall');
+            }
+            return li;
+        };
+
+
+        $("#IF_InvInNo").focusout(function () {
+            var checked = $('#FlagTraTuPN').prop('checked');
+            if (checked === true) {
+                let iF_InvInNo = $("#IF_InvInNo").val();
+                if (iF_InvInNo === null || iF_InvInNo === undefined || iF_InvInNo.length === 0) {
+                    let listError = [];
+                    listError = commonUtils.checkElementIsNullOrEmpty_AddListError(listError, '#IF_InvInNo', 'has-error-fix', 'Chưa nhập số phiếu nhập!');
+                    commonUtils.showToastr(listError);
+                    $("#IF_InvInNo").focus();
+                }
+                else {
+                    let invcodeout = $('#InvCodeOut').val();
+                    if (invcodeout === undefined || invcodeout === '') {
+                        alert("Kho xuất chưa được chọn");
+                        $('#InvCodeOut').focus();
+                        return;
+                    }
+
+                    $('#ShowPopupProductInInvInSearch #sIF_InvInNo').val(iF_InvInNo);
+
+                    var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+                    var url = '@Url.Action("SearchProductInInvInExactly", "InvFInventoryReturnSup")';
+                    $.ajax({
+                        type: "post",
+                        data: {
+                            __RequestVerificationToken: token,
+                            if_invinno: iF_InvInNo
+                        },
+                        url: url,
+                        dataType: 'json',
+                        beforeSend: function () { }
+                    }).done(function (result) {
+                        if (result.Success) {
+                            debugger;
+                            $('#invinProductCode').html('');
+                            $('#invinProductCode').html(result.Html);
+                            if (result.Html.length === 0 || result.Html ==="\r\n") {
+                                alert('Số phiếu nhập không tồn tại trong hệ thống');
+                            }
+
+                            //Gán KH
+                            let optSelect = $('#invinProductCode').find('option:selected');
+
+                            let customerCodeSys = $(optSelect).attr("CustomerCodeSys");
+                            $('#CustomerCode').val(customerCodeSys);
+                            $('#CustomerCode').trigger('change');
+
+                        } else {
+                            if (!commonUtils.isNullOrEmpty(result.Detail)) {
+                                showErrorDialog(result.Detail);
+                            }
+                        }
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+
+                    }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+                        //alert("complete");
+                    });
+                }
+            }
+        });
+
+
+    });
+</script>
+
+
+<script type="text/javascript">
+    function ShowPopupProductSearch() {
+        $('#ShowPopupProductSearch').modal('show');
+    }
+    function ClosePopupProductSearch() {
+        $('#ShowPopupProductSearch').modal('hide');
+        $('#ShowPopupProductSearch').on('hidden.bs.modal', function () {
+            $('#ShowPopupProductSearch form')[0].reset();
+        });
+    }
+</script>
+
+<script type="text/javascript">
+    function AddProductToList(thiz) {
+        debugger
+
+        let productCode = $(thiz).val();
+        //if (productCode === 'SEARCHDATA' || productCode === '') {
+        //    return;
+        //}
+        let optSelect = $(thiz).find('option:selected');
+        let productCodeUser = $(optSelect).attr("ProductCodeUser");
+        let productCodeBase = $(optSelect).attr("ProductCodeBase");
+        let productName = $(optSelect).attr("ProductName");
+        let unitCode = $(optSelect).attr("UnitCode");
+        let uPIn = $(optSelect).attr("UPIn");
+        let flagLot = $(optSelect).attr("FlagLot");
+        let flagSerial = $(optSelect).attr("FlagSerial");
+        let qty = $(optSelect).attr("Qty");
+        let valConvert = $(optSelect).attr("ValConvert");
+        let productCodeRoot = "";
+        var invBUPattern = "";
+        var selectKho = $('select.mstinventory').eq(0);
+        var optionSelect = $(selectKho).find('option:selected');
+        var if_InvInNo = $('#IF_InvInNo').val();
+        invBUPattern = optionSelect.attr("invBUPattern");
+
+          var dataInput = {
+                    productCode: productCode,
+                    InvBUPattern: invBUPattern,
+                    productCodeBase: productCodeBase,
+                valconvert: valConvert,
+                    productCodeRoot: productCodeRoot,
+              IF_InvInNo: if_InvInNo
+                };
+                 $.ajax({
+                        type: 'post',
+                        data: dataInput,
+                        url: '@Url.Action("GetProductExactly1", "InvFInventoryReturnSup")',
+                        dataType: 'json',
+                        beforeSend: function () {
+                        }
+                    }).done(function (objResult) {
+                        debugger;
+                        if (objResult.Success) {
+                            debugger
+
+                            var objInvF_InventoryReturnSupDtlRender = {
+                                objInventoryReturnSupDtl: objResult.objMST_ProductUI,
+                                ListProductBase : objResult.Data,
+                            };
+                            debugger
+                            renderInvF_InventoryReturnSupDtl(objInvF_InventoryReturnSupDtlRender);
+                            tongTienHang();
+                            $('#myInput').val('');
+                            commonUtils.setFocus('InvCodeOut');
+                            return false;
+                        }
+                        else {
+                            if (!commonUtils.isNullOrEmpty(objResult.Detail)) {
+                                _showErrorMsg123('Lỗi!', objResult.Detail);
+                            }
+                        }
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                    }).always(function () {
+                    });
+    }
+</script>
+
+<script type="text/javascript">
+    function ChangeTraTuPN(thiz) {
+        var checked = $(thiz).prop('checked');
+        if (checked === true) {
+            $('#IF_InvInNo').removeAttr("readonly");
+            $('#IF_InvInNo').focus();
+            $('#divPrdInvIn').show();
+            $('#myInput').hide();
+            $('#quetmavach').hide();
+            FlagScan = '0';
+        }
+        else {
+            $('#IF_InvInNo').val('');
+            $('#IF_InvInNo').attr("readonly", "readonly");
+            $('#divPrdInvIn').hide();
+            $('#myInput').show();
+            $('#quetmavach').hide();
+            FlagScan = '0';
+        }
+    }
+</script>
+
+
+@*Thêm hàng hóa vào lưới - Trường hợp thêm nhiều hàng hóa xử lý hới khác*@
+<script type="text/javascript">
+    function renderInvF_InventoryReturnSupDtl(data) {
+        debugger
+        var date = new Date();
+        var randomCur = date.getTime();
+        var randHex = commonUtils.randHex(12);
+        randomCur = randomCur + randHex;
+        var objInvF_InventoryReturnSupDtl = data.objInventoryReturnSupDtl;
+        var list_ProductBase = data.ListProductBase;
+
+
+        if (objInvF_InventoryReturnSupDtl !== null && objInvF_InventoryReturnSupDtl !== undefined) {
+            var productCode = commonUtils.returnValue(objInvF_InventoryReturnSupDtl.ProductCode);
+
+            if (!commonUtils.isNullOrEmpty(productCode)) {
+
+                var productcoderootCss = 'productcoderoot-' + randomCur;
+                var productcodebaseCss = 'productcodebase-' + randomCur;
+                var productcodeCss = 'productcode-' + randomCur;
+                var productcodeuserCss = 'productcodeuser-' + randomCur;
+                var producttypeCss = 'producttype-' + randomCur;
+                var productnameCss = 'productname-' + randomCur;
+                var select2Css = 'select2-' + randomCur;
+                var QtyTotalOKCss = 'QtyTotalOK-' + randomCur;
+                var qtyCss = 'qty-' + randomCur;
+                var invcodeinactualCss = 'invcodeinactual-' + randomCur;
+                var invcodeinactualtypeCss = 'invcodeinactualtype-' + randomCur;
+                var upinCss = 'upin-' + randomCur;
+                var upreturnsupCss = 'upreturnsup-' + randomCur;
+                var valreturnsupCss = 'valreturnsup-' + randomCur;
+                var flaglotCss = 'flaglot-' + randomCur;
+                var flagserialCss = 'flagserial-' + randomCur;
+                var remarkCss = 'remark-' + randomCur;
+                var SerialNoCss = 'SerialNo-' + randomCur;
+                var valconvertCss = 'valconvert-' + randomCur;
+                var upinvCss = 'upinv-' + randomCur;
+            }
+
+
+            var extData = {
+                productcoderootCss: productcoderootCss,
+                productcodebaseCss: productcodebaseCss,
+                productcodeCss: productcodeCss,
+                productcodeuserCss: productcodeuserCss,
+                producttypeCss: producttypeCss,
+                productnameCss: productnameCss,
+                select2Css: select2Css,
+                QtyTotalOKCss: QtyTotalOKCss,
+                qtyCss: qtyCss,
+                invcodeinactualCss: invcodeinactualCss,
+                invcodeinactualtypeCss: invcodeinactualtypeCss,
+                upinCss: upinCss,
+                upreturnsupCss: upreturnsupCss,
+                valreturnsupCss: valreturnsupCss,
+                flaglotCss: flaglotCss,
+                flagserialCss: flagserialCss,
+                remarkCss: remarkCss,
+                SerialNoCss: SerialNoCss,
+                valconvertCss: valconvertCss,
+                upinvCss: upinvCss,
+                rd: randomCur,
+                idx: 9999,
+            };
+
+
+            var $item = $(commonUtils.getHtmlFromTemplate($('#tmpl_InvF_InventoryReturnSup'), objInvF_InventoryReturnSupDtl, extData));
+
+            var $tableProduct_InFvCodeReturnSupActual_Cache = $('#table-detailInvCodeReturnSupActual'); @* Cache hàng hóa - vị trí *@
+
+            var flagLot = commonUtils.returnValue(objInvF_InventoryReturnSupDtl.FlagLot);
+            var flagSerial = commonUtils.returnValue(objInvF_InventoryReturnSupDtl.FlagSerial);
+
+            if (flagLot === '0' && flagSerial === '0') {
+                var $spanInvCodeReturnSupActualType = $item.find('span.' + invcodeinactualtypeCss);
+                if ($spanInvCodeReturnSupActualType !== undefined && $spanInvCodeReturnSupActualType !== null && $spanInvCodeReturnSupActualType.length > 0) {
+                    @* Nếu hàng hóa không quản lý LOT và Serail(Hàng hóa thường ???) thì add tùy chọn show popup vị trí nhập *@
+                    var extData_InvCodeReturnSupActualType = {
+                        idx: 9999,
+                    };
+                    var $invCodeInActualType = $(commonUtils.getHtmlFromTemplate($('#tmpl_ShowPopup_Product_InvCodeOutActual'), objInvF_InventoryReturnSupDtl, extData_InvCodeReturnSupActualType));
+                    $invCodeInActualType.appendTo($spanInvCodeReturnSupActualType);
+                }
+
+
+                @* Add cache hàng hóa - vị trí **@
+
+                debugger
+                var extData_Product_InvCodeReturnSupActual_Cache = {
+                    idx: 9999,
+                };
+
+
+                var $trProduct_InvCodeReturnActual_Cache = $(commonUtils.getHtmlFromTemplate($('#tmpl_Product_InvCodeReturnSupActual'), objInvF_InventoryReturnSupDtl, extData_Product_InvCodeReturnSupActual_Cache));
+                $trProduct_InvCodeReturnActual_Cache.appendTo($tableProduct_InFvCodeReturnSupActual_Cache);
+            }
+
+
+            else {
+                var $inputQty = $item.find('input.' + qtyCss);
+                if ($inputQty !== undefined && $inputQty !== null && $inputQty.length > 0) {
+                    if (!$inputQty.hasClass('disabled-fix')) {
+                        $inputQty.addClass('disabled-fix');
+                    }
+                }
+
+
+                var $spanProductType = $item.find('span.' + producttypeCss);
+
+                if ($spanProductType !== null && $spanProductType !== undefined && $spanProductType.length > 0) {
+                    @* Nếu hàng hóa quản lý LOT hoặc Serail thì add tùy chọn show popup LOT hoặc Serail tương ứng *@
+                    var extData_ProductType = {};
+                    if (flagLot === '1') {
+                        var $productTypeLOT = $(commonUtils.getHtmlFromTemplate($('#tmpl_ShowPopup_Product_FlagLot'), objInvF_InventoryReturnSupDtl, extData_ProductType));
+                        $productTypeLOT.appendTo($spanProductType);
+                    }
+                    else if (flagSerial === '1') {
+                        var $productTypeSerial = $(commonUtils.getHtmlFromTemplate($('#tmpl_ShowPopup_Product_FlagSerial'), objInvF_InventoryReturnSupDtl, extData_ProductType));
+                        $productTypeSerial.appendTo($spanProductType);
+                    }
+                }
+            }
+
+            debugger
+            @* Add đơn vị hàng hoá *@
+            if (list_ProductBase !== null && list_ProductBase !== undefined && list_ProductBase.length > 0) {
+                for (var i = 0; i < list_ProductBase.length; i++) {
+                    var productCodeCur = commonUtils.returnValue(list_ProductBase[i].ProductCode);
+                    var flagLotCur = commonUtils.returnValue(list_ProductBase[i].FlagLot);
+                    var flagSerialCur = commonUtils.returnValue(list_ProductBase[i].FlagSerial);
+                    @* Add danh sách hàng hóa cache *@
+                    var $divProducts = $item.find('div.products-list');
+                    if ($divProducts !== null && $divProducts !== undefined && $divProducts.length > 0) {
+                        var $product = $(commonUtils.getHtmlFromTemplate($('#tmpl_products_list'), list_ProductBase[i]));
+                        $product.appendTo($divProducts);
+                    }
+                    if (flagLotCur === '0' && flagSerialCur === '0') {
+                        var $trProductInvCodeReturnSupActualCache = $tableProduct_InFvCodeReturnSupActual_Cache.find('tr[productcode="' + productCode + '"]');
+                        if ($trProductInvCodeReturnSupActualCache !== null && $trProductInvCodeReturnSupActualCache !== undefined && $trProductInvCodeReturnSupActualCache.length > 0) {
+                            var $divList_Product_InvCodeReturnSupActual_Cache = $trProductInvCodeReturnSupActualCache.find('div.products-list-cache');
+
+                            if ($divList_Product_InvCodeReturnSupActual_Cache !== null && $divList_Product_InvCodeReturnSupActual_Cache !== undefined && $divList_Product_InvCodeReturnSupActual_Cache.length > 0) {
+                                var extData_Product_InvCodeReturnSupActual = {
+                                    idx: 9999,
+                                };
+
+
+                                var $divProduct_InvCodeReturnSupActual = $(commonUtils.getHtmlFromTemplate($('#tmpl_product_invcodeinactual_list_cache'), list_ProductBase[i], extData_Product_InvCodeReturnSupActual));
+                                $divProduct_InvCodeReturnSupActual.appendTo($divList_Product_InvCodeReturnSupActual_Cache);
+                            }
+                        }
+                    }
+
+
+                    var $select = $item.find('select.select2');
+                    if ($select !== null && $select !== undefined) {
+                        var $optgroup = $select.find('optgroup');
+                        if ($optgroup !== null && $optgroup !== undefined) {
+                            var selected = '';
+                            if (productCode === productCodeCur) {
+                                selected = 'selected="selected"';
+                            }
+
+
+                            var extData_Options = {
+                                selected: selected,
+                            };
+                            var $option = $(commonUtils.getHtmlFromTemplate($('#tmpl_options'), list_ProductBase[i], extData_Options));
+                            $option.appendTo($optgroup);
+                        }
+
+                        var $tdSelect2 = $select.parent();
+                        if ($tdSelect2 !== undefined && $tdSelect2 !== null && $tdSelect2.length > 0) {
+                            if (!$tdSelect2.hasClass('disabled-fix')) {
+                                $tdSelect2.addClass('disabled-fix');
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            $item.appendTo($('#table-tbodyID'));
+               //format number
+            var tableName = 'InvF_InventoryReturnSup';
+            var qtyTotalOKFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'Qty');
+            var qtyformat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'Qty');
+            var upinformat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'UPIn');
+            var upreturnsupformat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'UPReturnSup');
+            var valreturnsupformat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'ValReturnSup');
+            var upinvFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'UPinv');
+
+            var totalValReturnSupFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValReturnSup');
+            var totalValReturnSupDescFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValReturnSupDesc');
+            var totalValReturnSupAfterDescFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValReturnSupAfterDesc');
+            
+
+
+            $('#TotalValReturnSup').number(true, totalValReturnSupFormat);
+            $('#TotalValReturnSupDesc').number(true, totalValReturnSupDescFormat);
+            $('#TotalValReturnSupAfterDesc').number(true, totalValReturnSupAfterDescFormat);
+
+            $('.' + qtyCss).number(true, qtyformat);
+            $('.' + QtyTotalOKCss).number(true, qtyTotalOKFormat);
+            $('.' + upinCss).number(true, upinformat);
+            $('.' + upreturnsupCss).number(true, upreturnsupformat);
+            $('.' + valreturnsupCss).number(true, valreturnsupformat);
+            $('.' + upinvCss).number(true, upinvFormat);
+
+            $('.' + select2Css).select2({
+                minimumResultsForSearch: -1
+            });
+
+
+            commonUtils.updateTableTrNotShowIdx($('#table-tbodyID tr.trdata'), true);
+
+            commonUtils.updateTableTrNotShowIdx($('#table-detailInvCodeReturnSupActual tr.trdata'), true);
+
+
+
+        }
+
+    }
+</script>
+
+<script type="text/javascript">
+    function tongTienHang() {
+        debugger
+        var sumtienhang = 0.0;
+        var sumgiamgia = 0.0;
+        var sumthanhtoan = 0.0;
+        var tongsl = 0.0;
+
+
+        var rows = $('tbody#table-tbodyID tr').length;
+        if (rows > 0) {
+            $('tbody#table-tbodyID tr').each(function () {
+                debugger
+
+                var $tr = $(this);
+                var rd = $tr.attr('rd');
+                var strUPReturnSup = commonUtils.parseFloat(commonUtils.returnValue($tr.find('input.upreturnsup-' + rd).val()));
+                var strQty = commonUtils.parseFloat(commonUtils.returnValue($tr.find('input.qty-' + rd).val()));
+
+                var giatrahang = parseFloat(strUPReturnSup);
+                var qty = parseFloat(strQty);
+                var valamout = giatrahang * qty;
+                $tr.find('input.valreturnsup-' + rd).val(valamout);
+
+
+                var tienhang = giatrahang * qty;
+                sumtienhang += tienhang;
+
+                sumthanhtoan += valamout;
+                tongsl += strQty;
+            });
+
+
+
+            sumgiamgia = sumtienhang - sumthanhtoan;
+            $('#TotalValReturnSup').val(sumtienhang);
+            $('#TotalValReturnSupDesc').val(sumgiamgia);
+            $('#TotalValReturnSupAfterDesc').val(sumthanhtoan);
+
+            //FormatNumber('#TotalValReturnSup', 2);
+            //FormatNumber('#TotalValReturnSupDesc', 2);
+            //FormatNumber('#TotalValReturnSupAfterDesc', 2);
+            if ($('#TotalValReturnSup').length) {
+                //$('#TotalValReturnSup').number(true, 2);
+            }
+            if ($('#TotalValReturnSupDesc').length) {
+                //$('#TotalValReturnSupDesc').number(true, 2);
+            }
+            if ($('#TotalValReturnSupAfterDesc').length) {
+                //$('#TotalValReturnSupAfterDesc').number(true, 2);
+            }
+
+            document.getElementById('spanTotalPrd').textContent = tongsl;
+
+        }
+        else {
+            document.getElementById('spanTotalPrd').textContent = tongsl;
+            $('#TotalValReturnSup').val(sumtienhang);
+            $('#TotalValReturnSupDesc').val(sumgiamgia);
+            $('#TotalValReturnSupAfterDesc').val(sumthanhtoan);
+            if ($('#TotalValReturnSup').length) {
+                //$('#TotalValReturnSup').number(true, 2);
+            }
+            if ($('#TotalValReturnSupDesc').length) {
+                //$('#TotalValReturnSupDesc').number(true, 2);
+            }
+            if ($('#TotalValReturnSupAfterDesc').length) {
+                //$('#TotalValReturnSupAfterDesc').number(true, 2);
+            }
+        }
+        var tableName = 'InvF_InventoryReturnSup';
+        var totalValReturnSupFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValReturnSup');
+        var totalValReturnSupDescFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValReturnSupDesc');
+        var totalValReturnSupAfterDescFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValReturnSupAfterDesc');
+        $('#TotalValReturnSup').number(true, totalValReturnSupFormat);
+        $('#TotalValReturnSupDesc').number(true, totalValReturnSupDescFormat);
+        $('#TotalValReturnSupAfterDesc').number(true, totalValReturnSupAfterDescFormat);
+    }
+</script>
+
+
+
+<script type="text/javascript">
+    function renderInvF_InventoryOutDtl_Multi(data) {
+        debugger
+        var date = new Date();
+        var randomCur = date.getTime();
+        var randHex = commonUtils.randHex(12);
+        randomCur = randomCur + randHex;
+
+        var objInvF_InventoryReturnSupDtl = data.InvF_InventoryOutDtl;
+        var list_ProductBase = data.Lst_InvF_InventoryOutBase;
+
+        if (objInvF_InventoryReturnSupDtl !== null && objInvF_InventoryReturnSupDtl !== undefined) {
+            var productCode = commonUtils.returnValue(objInvF_InventoryReturnSupDtl.ProductCode);
+            var productCodeBase = commonUtils.returnValue(objInvF_InventoryReturnSupDtl.ProductCodeBase);
+            if (!commonUtils.isNullOrEmpty(productCode)) {
+
+                var productcoderootCss = 'productcoderoot-' + randomCur;
+                var productcodebaseCss = 'productcodebase-' + randomCur;
+                var productcodeCss = 'productcode-' + randomCur;
+                var productcodeuserCss = 'productcodeuser-' + randomCur;
+                var producttypeCss = 'producttype-' + randomCur;
+                var productnameCss = 'productname-' + randomCur;
+                var select2Css = 'select2-' + randomCur;
+                var QtyTotalOKCss = 'QtyTotalOK-' + randomCur;
+                var qtyCss = 'qty-' + randomCur;
+                var invcodeinactualCss = 'invcodeinactual-' + randomCur;
+                var invcodeinactualtypeCss = 'invcodeinactualtype-' + randomCur;
+                var upinCss = 'upin-' + randomCur;
+                var upreturnsupCss = 'upreturnsup-' + randomCur;
+                var valreturnsupCss = 'valreturnsup-' + randomCur;
+                var flaglotCss = 'flaglot-' + randomCur;
+                var flagserialCss = 'flagserial-' + randomCur;
+                var remarkCss = 'remark-' + randomCur;
+                var SerialNoCss = 'SerialNo-' + randomCur;
+                var valconvertCss = 'valconvert-' + randomCur;
+                var upinvCss = 'upinv-' + randomCur;
+            }
+
+            var extData = {
+                productcoderootCss: productcoderootCss,
+                productcodebaseCss: productcodebaseCss,
+                productcodeCss: productcodeCss,
+                productcodeuserCss: productcodeuserCss,
+                producttypeCss: producttypeCss,
+                productnameCss: productnameCss,
+                select2Css: select2Css,
+                QtyTotalOKCss: QtyTotalOKCss,
+                qtyCss: qtyCss,
+                invcodeinactualCss: invcodeinactualCss,
+                invcodeinactualtypeCss: invcodeinactualtypeCss,
+                upinCss: upinCss,
+                upreturnsupCss: upreturnsupCss,
+                valreturnsupCss: valreturnsupCss,
+                flaglotCss: flaglotCss,
+                flagserialCss: flagserialCss,
+                remarkCss: remarkCss,
+                SerialNoCss: SerialNoCss,
+                valconvertCss: valconvertCss,
+                upinvCss: upinvCss,
+                rd: randomCur,
+                idx: 9999,
+            };
+
+            debugger
+            var $item = $(commonUtils.getHtmlFromTemplate($('#tmpl_InvF_InventoryReturnSup'), objInvF_InventoryReturnSupDtl, extData));
+
+            var $tableProduct_InFvCodeReturnSupActual_Cache = $('#table-detailInvCodeReturnSupActual'); @* Cache hàng hóa - vị trí *@
+
+            var flagLot = commonUtils.returnValue(objInvF_InventoryReturnSupDtl.FlagLot);
+            var flagSerial = commonUtils.returnValue(objInvF_InventoryReturnSupDtl.FlagSerial);
+            if (flagLot === '0' && flagSerial === '0') {
+                var $spanInvCodeReturnSupActualType = $item.find('span.' + invcodeinactualtypeCss);
+                if ($spanInvCodeReturnSupActualType !== undefined && $spanInvCodeReturnSupActualType !== null && $spanInvCodeReturnSupActualType.length > 0) {
+                    @* Nếu hàng hóa không quản lý LOT và Serail(Hàng hóa thường ???) thì add tùy chọn show popup vị trí nhập *@
+                    var extData_InvCodeReturnSupActualType = {
+                        idx: 9999,
+                    };
+                    var $invCodeInActualType = $(commonUtils.getHtmlFromTemplate($('#tmpl_ShowPopup_Product_InvCodeOutActual'), objInvF_InventoryReturnSupDtl, extData_InvCodeReturnSupActualType));
+                    $invCodeInActualType.appendTo($spanInvCodeReturnSupActualType);
+                }
+
+
+                @* Add cache hàng hóa - vị trí **@
+
+                debugger
+                var extData_Product_InvCodeReturnSupActual_Cache = {
+                    idx: 9999,
+                };
+
+
+                var $trProduct_InvCodeReturnActual_Cache = $(commonUtils.getHtmlFromTemplate($('#tmpl_Product_InvCodeReturnSupActual'), objInvF_InventoryReturnSupDtl, extData_Product_InvCodeReturnSupActual_Cache));
+                $trProduct_InvCodeReturnActual_Cache.appendTo($tableProduct_InFvCodeReturnSupActual_Cache);
+            }
+            else {
+                var $inputQty = $item.find('input.' + qtyCss);
+                if ($inputQty !== undefined && $inputQty !== null && $inputQty.length > 0) {
+                    if (!$inputQty.hasClass('disabled-fix')) {
+                        $inputQty.addClass('disabled-fix');
+                    }
+                }
+
+
+                var $spanProductType = $item.find('span.' + producttypeCss);
+
+                if ($spanProductType !== null && $spanProductType !== undefined && $spanProductType.length > 0) {
+                    @* Nếu hàng hóa quản lý LOT hoặc Serail thì add tùy chọn show popup LOT hoặc Serail tương ứng *@
+                    var extData_ProductType = {};
+                    if (flagLot === '1') {
+                        var $productTypeLOT = $(commonUtils.getHtmlFromTemplate($('#tmpl_ShowPopup_Product_FlagLot'), objInvF_InventoryReturnSupDtl, extData_ProductType));
+                        $productTypeLOT.appendTo($spanProductType);
+                    }
+                    else if (flagSerial === '1') {
+                        var $productTypeSerial = $(commonUtils.getHtmlFromTemplate($('#tmpl_ShowPopup_Product_FlagSerial'), objInvF_InventoryReturnSupDtl, extData_ProductType));
+                        $productTypeSerial.appendTo($spanProductType);
+                    }
+                }
+            }
+
+            debugger
+            @* Add đơn vị hàng hoá *@
+            if (list_ProductBase !== null && list_ProductBase !== undefined && list_ProductBase.length > 0) {
+                for (var i = 0; i < list_ProductBase.length; i++) {
+                    var productCodeCur = commonUtils.returnValue(list_ProductBase[i].LstProductAutoSearchBase.ProductCode);
+
+                    var productCodeBaseCur = commonUtils.returnValue(list_ProductBase[i].LstProductAutoSearchBase.ProductCodeBase);
+                    var flagLotCur = commonUtils.returnValue(list_ProductBase[i].LstProductAutoSearchBase.FlagLot);
+                    var flagSerialCur = commonUtils.returnValue(list_ProductBase[i].LstProductAutoSearchBase.FlagSerial);
+
+                    if (productCodeBaseCur === productCodeBase) {
+                    @* Add danh sách hàng hóa cache *@
+                        var $divProducts = $item.find('div.products-list');
+                        if ($divProducts !== null && $divProducts !== undefined && $divProducts.length > 0) {
+                            var $product = $(commonUtils.getHtmlFromTemplate($('#tmpl_products_list'), list_ProductBase[i].LstProductAutoSearchBase));
+                            $product.appendTo($divProducts);
+                        }
+                        if (flagLotCur === '0' && flagSerialCur === '0') {
+                            var $trProductInvCodeReturnSupActualCache = $tableProduct_InFvCodeReturnSupActual_Cache.find('tr[productcode="' + productCode + '"]');
+                            if ($trProductInvCodeReturnSupActualCache !== null && $trProductInvCodeReturnSupActualCache !== undefined && $trProductInvCodeReturnSupActualCache.length > 0) {
+                                var $divList_Product_InvCodeReturnSupActual_Cache = $trProductInvCodeReturnSupActualCache.find('div.products-list-cache');
+
+                                if ($divList_Product_InvCodeReturnSupActual_Cache !== null && $divList_Product_InvCodeReturnSupActual_Cache !== undefined && $divList_Product_InvCodeReturnSupActual_Cache.length > 0) {
+                                    var extData_Product_InvCodeReturnSupActual = {
+                                        idx: 9999,
+                                    };
+
+
+                                    var $divProduct_InvCodeReturnSupActual = $(commonUtils.getHtmlFromTemplate($('#tmpl_product_invcodeinactual_list_cache'), list_ProductBase[i].LstProductAutoSearchBase, extData_Product_InvCodeReturnSupActual));
+                                    $divProduct_InvCodeReturnSupActual.appendTo($divList_Product_InvCodeReturnSupActual_Cache);
+                                }
+                            }
+                        }
+
+
+                        var $select = $item.find('select.select2');
+                        if ($select !== null && $select !== undefined) {
+                            var $optgroup = $select.find('optgroup');
+                            if ($optgroup !== null && $optgroup !== undefined) {
+                                var selected = '';
+                                if (productCode === productCodeCur) {
+                                    selected = 'selected="selected"';
+                                }
+
+
+                                var extData_Options = {
+                                    selected: selected,
+                                };
+                                var $option = $(commonUtils.getHtmlFromTemplate($('#tmpl_options'), list_ProductBase[i].LstProductAutoSearchBase, extData_Options));
+                                $option.appendTo($optgroup);
+                            }
+
+                            var $tdSelect2 = $select.parent();
+                            if ($tdSelect2 !== undefined && $tdSelect2 !== null && $tdSelect2.length > 0) {
+                                if (!$tdSelect2.hasClass('disabled-fix')) {
+                                    $tdSelect2.addClass('disabled-fix');
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            $item.appendTo($('#table-tbodyID'));
+
+            var tableName = 'InvF_InventoryReturnSup';
+            var qtyTotalOKFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'Qty');
+            var qtyformat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'Qty');
+            var upinformat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'UPIn');
+            var upreturnsupformat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'UPReturnSup');
+            var valreturnsupformat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'ValReturnSup');
+            var upinvFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'UPinv');
+
+            var totalValReturnSupFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValReturnSup');
+            var totalValReturnSupDescFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValReturnSupDesc');
+            var totalValReturnSupAfterDescFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValReturnSupAfterDesc');
+            $('#TotalValReturnSup').number(true, totalValReturnSupFormat);
+            $('#TotalValReturnSupDesc').number(true, totalValReturnSupDescFormat);
+            $('#TotalValReturnSupAfterDesc').number(true, totalValReturnSupAfterDescFormat);
+
+            $('.' + qtyCss).number(true, qtyformat);
+            $('.' + QtyTotalOKCss).number(true, qtyTotalOKFormat);
+            $('.' + upinCss).number(true, upinformat);
+            $('.' + upreturnsupCss).number(true, upreturnsupformat);
+            $('.' + valreturnsupCss).number(true, valreturnsupformat);
+            $('.' + upinvCss).number(true, upinvFormat);
+
+            $('.' + select2Css).select2({
+                minimumResultsForSearch: -1
+            });
+
+            commonUtils.updateTableTrNotShowIdx($('#table-tbodyID tr.trdata'), true);
+            commonUtils.updateTableTrNotShowIdx($('#table-detailInvCodeReturnSupActual tr.trdata'), true);
+
+
+        }
+    }
+</script>
+
+<script>
+    function renderProductInvFInventoryOutInstLot(data) {
+        debugger
+
+        var objProduct_InvF_InventoryOutInstLot = data.Product_InvF_InventoryOutInstLot;
+        var listMst_Inventory = data.Lst_Mst_Inventory;
+        if (objProduct_InvF_InventoryOutInstLot !== null && objProduct_InvF_InventoryOutInstLot !== undefined) {
+            //add vao cache lot
+            var extData = {
+                idx: 9999,
+            };
+            var $item = $(commonUtils.getHtmlFromTemplate($('#tmpl_Product_LOT'), objProduct_InvF_InventoryOutInstLot, extData));
+            $item.appendTo($('#table-detailLot'));
+        }
+        commonUtils.updateTableTrNotShowIdx($('#table-detailLot tr.trdata'), true);
+    }
+</script>
+
+<script>
+    function renderProductInvFInventoryOutInstSerial(data) {
+        debugger
+        objProduct_InvF_InventoryOutInstSerial = data.Product_InvF_InventoryInInstSerial;
+        if (objProduct_InvF_InventoryOutInstSerial != null && objProduct_InvF_InventoryOutInstSerial != undefined) {
+            var extData = {
+                idx: 9999,
+            };
+            var $item = $(commonUtils.getHtmlFromTemplate($('#tmpl_Product_Serial'), objProduct_InvF_InventoryOutInstSerial, extData));
+            $item.appendTo($('#table-detailSerial'));
+        }
+    }
+</script>
+<script type="text/javascript">
+    function changeProduct(thiz) {
+        debugger
+        var message = '';
+        var listToastr = [];
+
+        var $select = $(thiz);
+
+        if ($select != null && $select != undefined) {
+            var ischange = $select.attr('ischange');
+            if (ischange === '1') {
+                $select.attr('ischange', '0');
+                return false;
+            }
+            var $tr = $(thiz).parent().parent();
+            var rd = $tr.attr('rd');
+            var unitCode = $select.val();
+            var productCodeInit = $select.attr('initdata');
+            if (!commonUtils.isNullOrEmpty(unitCode)) {
+                var $option = $select.find(":selected");
+                var productCodeSelected = '';
+
+                if ($option != undefined && $option !== null && $option.length > 0) {
+                    productCodeSelected = commonUtils.returnValue($option.attr('productcode'));
+                }
+
+                var productCode = $tr.attr('productcode');
+                var $divProducts = $tr.find('div.products-list');
+                @* Danh sách hàng hóa(lưới hàng hóa chính) *@
+                var Lst_InvF_InventoryReturnSupDtl = List_InvF_InventoryReturnSupDtl();
+                @* Kiểm tra hàng hóa theo đơn vị vừa chọn đã tồn tại trên lưới hàng hóa chính chưa *@
+                if (!commonUtils.isNullOrEmpty(productCodeSelected)) {
+                    if (Lst_InvF_InventoryReturnSupDtl !== undefined && Lst_InvF_InventoryReturnSupDtl !== null && Lst_InvF_InventoryReturnSupDtl.length > 0) {
+                        for (var i = 0; i < Lst_InvF_InventoryReturnSupDtl.length; i++) {
+                            if (productCodeSelected === Lst_InvF_InventoryReturnSupDtl[i].ProductCode) {
+                                var productCodeUserSelectedCur = '';
+                                var productNameSelectedCur = '';
+                                var unitCodeSelectedCur = '';
+                                var $divProductSelected = $divProducts.find('div[productcode="' + productCodeSelected + '"]');
+                                if ($divProductSelected !== null && $divProductSelected !== undefined) {
+                                    productCodeUserSelectedCur = $divProductSelected.find('input.ProductCodeUser').val();
+                                    productNameSelectedCur = $divProductSelected.find('input.ProductName').val();
+                                    unitCodeSelectedCur = $divProductSelected.find('input.UnitCode').val();
+                                }
+
+                                message = 'Hàng hóa "' + productNameSelectedCur + '" - "' + unitCodeSelectedCur + '" đã tồn tại trên lưới';
+
+                                var objToastr = { ToastrType: 'error', ToastrMessage: message };
+                                listToastr.push(objToastr);
+                                break;
+                            }
+                        }
+                    }
+
+                }
+                if (listToastr !== undefined && listToastr !== null && listToastr.length > 0) {
+                    commonUtils.showToastr(listToastr);
+                    var $divProductOld = $divProducts.find('div[productcode="' + productCode + '"]');
+                    if ($divProductOld !== undefined && $divProductOld !== null) {
+                        var unitCodeOld = $divProductOld.find('input.UnitCode').val();
+                        if (!commonUtils.isNullOrEmpty(unitCodeOld)) {
+                            $select.val(unitCodeOld);
+                            $select.attr('ischange', '1');
+                            $select.select2().trigger('change');
+                        }
+                    }
+
+                    return false;
+                }
+                else {
+                    debugger
+                    var flagLOT = commonUtils.returnValue($tr.find('input.flaglot-' + rd).val());
+                    var flagSerial = commonUtils.returnValue($tr.find('input.flagserial-' + rd).val());
+                    if (flagLOT === '0' && flagSerial === '0') {
+                        changeProduct_No_LOT_No_Serial(thiz);
+                    }
+                    else if (flagLOT === '1') {
+                        debugger
+                        changeProduct_LOT(thiz);
+                    }
+                    else if (flagSerial === '1') {
+                        debugger
+                        changeProduct_Serial(thiz);
+                    }
+                }
+            }
+        }
+    }
+</script>
+
+
+<script type="text/javascript">
+    function renderProductInventoryReturnSupDtlChild(data) {
+        debugger
+        var obj_ProductInventoryReturnSupDtlChild = data.Product_InvF_InventoryReturnSupDtlChild;
+        var productCode = obj_ProductInventoryReturnSupDtlChild.ProductCode;
+        var $tableProduct_InvCodeInActual_Cache = $('#table-detailInvCodeReturnSupActual'); @* Cache hàng hóa - vị trí *@
+        //var rowOlds = $tableProduct_InvCodeInActual_Cache.find('tr[productcode="' + productCode + '"]').length;
+        //if (rowOlds > 0) {
+        //    $tableProduct_InvCodeInActual_Cache.find('tr[productcode="' + productCode + '"]').each(function () {
+        //        var $tr = $(this);
+        //        var $divList_Product_InvCodeInActual = $tr.find('div.products-list-cache');
+        //        if ($divList_Product_InvCodeInActual !== undefined && $divList_Product_InvCodeInActual !== null) {
+
+        //            $divList_Product_InvCodeInActual.find('div.result[productcode="' + productCode + '"]').each(function () {
+        //                var $div = $(this);
+        //                $div.remove();
+
+        //            });
+        //        }
+
+        //    });
+        //}
+
+        var $trInvCodeInActual = $tableProduct_InvCodeInActual_Cache.find('tr[productcode="' + productCode + '"]');
+        var $divList_Product_InvCodeInActual_Cache = $trInvCodeInActual.find('div.products-list-cache');
+
+        var InvCode = obj_ProductInventoryReturnSupDtlChild.InvCodeInActual;
+        var QtyTotalOK = obj_ProductInventoryReturnSupDtlChild.QtyTotalOK;
+        var QtyAvailOK = obj_ProductInventoryReturnSupDtlChild.Qty;
+
+
+        if ($divList_Product_InvCodeInActual_Cache != null && $divList_Product_InvCodeInActual_Cache != undefined && $divList_Product_InvCodeInActual_Cache.length > 0) {
+            var objProduct = {
+                ProductCode: productCode,
+                InvCodeInActual: InvCode,
+                Qty: QtyAvailOK,
+                QtyTotalOK: QtyTotalOK,
+            };
+
+            var extData = {
+                idx: 9999,
+            };
+
+            var $divProduct_InvCodeInActual = $(commonUtils.getHtmlFromTemplate($('#tmpl_product_invcodeinactual_list_cache'), objProduct, extData));
+            $divProduct_InvCodeInActual.appendTo($divList_Product_InvCodeInActual_Cache);
+        }
+
+
+    }
+</script>
+
+<script type="text/javascript">
+        function changeProduct_No_LOT_No_Serial(thiz) {
+            debugger
+            var $tr = $(thiz).parent().parent();
+            var rd = $tr.attr('rd');
+            var $select = $(thiz);
+            if ($select !== undefined && $select !== null && $select.length > 0) {
+                debugger
+                var $option = $select.find(":selected");
+                var productCodeSelected = '';
+
+
+                if ($option !== undefined && $option !== null && $option.length > 0) {
+                    productCodeSelected = commonUtils.returnValue($option.attr('productcode'));
+                }
+
+                var productCodeOld = $tr.attr('productcode');
+                var $divProducts = $tr.find('div.products-list');
+                if ($divProducts !== null && $divProducts !== undefined) {
+                    debugger
+                    @* Update thông tin của hàng hóa hiện tại vào list cache danh sách hàng hóa *@
+                    var $divProductOld = $divProducts.find('div[productcode="' + productCodeOld + '"]');
+                    if ($divProductOld !== null && $divProductOld !== undefined && $divProductOld.length > 0) {
+                        var qtyOld = $tr.find('input.qty-' + rd).val();
+                        var qtyToTalOkOld = $tr.find('input.QtyTotalOK-' + rd).val();
+                        var invCodeInActualOld = $tr.find('input.invcodeinactual-' + rd).val();
+                        var uPInOld = $tr.find('input.upin-' + rd).val();
+                        var upReturnSupOld = $tr.find('input.upreturnsup-' + rd).val();
+                        var valOUTAfterDescOld = $tr.find('input.ValOUTAfterDesc-' + rd).val();
+                        var remarkOld = $tr.find('input.remark-' + rd).val();
+
+
+                        $divProductOld.find('input.Qty').val(qtyOld);
+                        $divProductOld.find('input.QtyTotalOK').val(qtyToTalOkOld);
+                        $divProductOld.find('input.InvCodeInActual').val(invCodeInActualOld);
+                        $divProductOld.find('input.UPIn').val(uPInOld);
+                        $divProductOld.find('input.UPReturnSup').val(upReturnSupOld);
+                        $divProductOld.find('input.ValReturnSup').val(valOUTAfterDescOld);
+                        $divProductOld.find('input.Remark').val(remarkOld);
+
+                    }
+
+                    var $divProductSelected = $divProducts.find('div[productcode="' + productCodeSelected + '"]');
+                    if ($divProductSelected !== null && $divProductSelected !== undefined && $divProductSelected.length > 0) {
+                        debugger
+                        var productCodeRoot = $divProductSelected.find('input.ProductCodeRoot').val();
+                        var productCodeBase = $divProductSelected.find('input.ProductCodeBase').val();
+                        var productCode = $divProductSelected.find('input.ProductCode').val();
+                        var productCodeUser = $divProductSelected.find('input.ProductCodeUser').val();
+                        var productName = $divProductSelected.find('input.ProductName').val();
+                        var flagLot = $divProductSelected.find('input.FlagLot').val();
+                        var flagSerial = $divProductSelected.find('input.FlagSerial').val();
+                        var unitCode = $divProductSelected.find('input.UnitCode').val();
+                        var invCodeInActual = $divProductSelected.find('input.InvCodeInActual').val();
+                        var qty = $divProductSelected.find('input.Qty').val();
+                        var qtyToTalOk = $divProductSelected.find('input.QtyTotalOK').val();
+                        var uPIn = $divProductSelected.find('input.UPIn').val();
+                        var uPReturnSup = $divProductSelected.find('input.UPReturnSup').val();
+                        var valReturnSup = $divProductSelected.find('input.ValReturnSup').val();
+                        var remark = $divProductSelected.find('input.Remark').val();
+
+                        var valConvert = $divProductSelected.find('input.ValConvert').val();
+
+
+                        @* Gán giá trị *@
+                        $tr.attr('productcode', productCode);
+
+                        var $spanProductCodeUser = $tr.find('span.productcodeuser-' + rd);
+                        if ($spanProductCodeUser !== undefined && $spanProductCodeUser !== null && $spanProductCodeUser.length > 0) {
+                            $spanProductCodeUser.text(productCodeUser);
+                        }
+
+                        var $spanProductName = $tr.find('span.productname-' + rd);
+                        if ($spanProductName !== undefined && $spanProductName !== null && $spanProductName.length > 0) {
+                            $spanProductName.text(productName);
+                        }
+                        $tr.find('input.productcode-' + rd).val(productCode);
+                        $tr.find('input.productcodeuser-' + rd).val(productCodeUser);
+                        $tr.find('input.productcodebase-' + rd).val(productCodeBase);
+                        $tr.find('input.productcoderoot-' + rd).val(productCodeRoot);
+                        $tr.find('input.productname-' + rd).val(productName);
+                        $tr.find('input.flaglot-' + rd).val(flagLot);
+                        $tr.find('input.flagserial-' + rd).val(flagSerial);
+
+                        $select.attr('ischange', '0');
+                        $select.attr('initdata', productCode);
+
+                        $tr.find('input.qty-' + rd).val(qty);
+                        $tr.find('input.QtyTotalOK-' + rd).val(qtyToTalOk);
+                        $tr.find('input.invcodeinactual-' + rd).val(invCodeInActual);
+
+                        var $spanInvCodeInActualType = $tr.find('span.invcodeinactualtype-' + rd);
+
+                        if ($spanInvCodeInActualType !== null && $spanInvCodeInActualType !== undefined && $spanInvCodeInActualType.length > 0) {
+                            var objInvF_InventoryReturnSupDtl = {
+                                ProductCode: productCode,
+                                ProductCodeUser: productCodeUser,
+                                ProductName: productName,
+                                ProductCodeBase: productCodeBase,
+                                ValConvert: valConvert
+                            };
+
+                            var extData_InvCodeInActualType = {};
+                            var $invCodeInActualType = $(commonUtils.getHtmlFromTemplate($('#tmpl_ShowPopup_Product_InvCodeOutActual'), objInvF_InventoryReturnSupDtl, extData_InvCodeInActualType));
+                            $spanInvCodeInActualType.empty();
+                            $invCodeInActualType.appendTo($spanInvCodeInActualType);
+                        }
+
+                        $tr.find('input.upin-' + rd).val(uPIn);
+                        $tr.find('input.upreturnsup-' + rd).val(uPReturnSup);
+                        $tr.find('input.valreturnsup-' + rd).val(valReturnSup);
+                        $tr.find('textarea.remark-' + rd).val(remark);
+
+
+                        tongTienHang();
+
+                    }
+                }
+
+            }
+        }
+</script>
+
+<script type="text/javascript">
+        function changeProduct_LOT(thiz) {
+            debugger
+            var $tr = $(thiz).parent().parent();
+            var rd = $tr.attr('rd');
+            var $select = $(thiz);
+            if ($select !== null && $select !== undefined && $select.length > 0) {
+                var $option = $select.find(":selected");
+                var productCodeSelected = '';
+
+                if ($option != undefined && $option !== null && $option.length > 0) {
+                    productCodeSelected = commonUtils.returnValue($option.attr('productcode'));
+                }
+                var productCodeOld = $tr.attr('productcode');
+                var $divProducts = $tr.find('div.products-list');
+                if ($divProducts !== null && $divProducts !== undefined) {
+                    @* Update ghi chú của hàng hóa hiện tại vào list cache danh sách hàng hóa *@
+                    var $divProductOld = $divProducts.find('div[productcode="' + productCodeOld + '"]');
+                    if ($divProductOld !== null && $divProductOld !== undefined && $divProductOld.length > 0) {
+                        var remarkOld = $tr.find('textarea.remark-' + rd).val();
+                        $divProductOld.find('input.Remark').val(remarkOld);
+                    }
+
+                    var $divProductSelected = $divProducts.find('div[productcode="' + productCodeSelected + '"]');
+
+                    if ($divProductSelected !== null && $divProductSelected !== undefined && $divProductSelected.length > 0) {
+                        var productCodeRoot = $divProductSelected.find('input.ProductCodeRoot').val();
+                        var productCodeBase = $divProductSelected.find('input.ProductCodeBase').val();
+                        var productCode = $divProductSelected.find('input.ProductCode').val();
+                        var productCodeUser = $divProductSelected.find('input.ProductCodeUser').val();
+                        var productName = $divProductSelected.find('input.ProductName').val();
+                        var flagLot = $divProductSelected.find('input.FlagLot').val();
+                        var flagSerial = $divProductSelected.find('input.FlagSerial').val();
+
+                        var invCodeInActual = $divProductSelected.find('input.InvCodeInActual').val();
+                        var qty = $divProductSelected.find('input.Qty').val();
+                        var qtyToTalOk = $divProductSelected.find('input.QtyTotalOK').val();
+                        var uPIn = $divProductSelected.find('input.UPIn').val();
+                        var uPReturnSup = $divProductSelected.find('input.UPReturnSup').val();
+                        var valReturnSup = $divProductSelected.find('input.ValReturnSup').val();
+                        var remark = $divProductSelected.find('input.Remark').val();
+                        var valConvert = $divProductSelected.find('input.ValConvert').val();
+                        @* Gán giá trị *@
+
+                        $tr.attr('productcode', productCode);
+                        var $spanProductCodeUser = $tr.find('span.productcodeuser-' + rd);
+                        if ($spanProductCodeUser !== null && $spanProductCodeUser !== undefined && $spanProductCodeUser.length > 0) {
+                            $spanProductCodeUser.text(productCodeUser);
+                        }
+
+                        var $spanProductType = $tr.find('span.producttype-' + rd);
+                        if ($spanProductType !== null && $spanProductType !== undefined && $spanProductType.length > 0) {
+                            var objInvF_InventoryReturnSupDtl = {
+                                ProductCode: productCode,
+                                ProductCodeUser: productCodeUser,
+                                ProductName: productName,
+                                ProductCodeBase: productCodeBase,
+                                ValConvert: valConvert
+                            };
+
+                            var extData_ProductType = {};
+                            var $productTypeSerial = $(commonUtils.getHtmlFromTemplate($('#tmpl_ShowPopup_Product_FlagSerial'), objInvF_InventoryReturnSupDtl, extData_ProductType));
+                            $spanProductType.empty();
+                            $productTypeSerial.appendTo($spanProductType);
+                        }
+
+
+                        var $spanProductName = $tr.find('span.productname-' + rd);
+                        if ($spanProductName != null && $spanProductName !== undefined && $spanProductName.length > 0) {
+                            $spanProductName.text(productName);
+                        }
+
+                        $tr.find('input.productcode-' + rd).val(productCode);
+                        $tr.find('input.productcodeuser-' + rd).val(productCodeUser);
+                        $tr.find('input.productcodebase-' + rd).val(productCodeBase);
+                        $tr.find('input.productcoderoot-' + rd).val(productCodeRoot);
+                        $tr.find('input.productname-' + rd).val(productName);
+                        $tr.find('input.flaglot-' + rd).val(flagLot);
+                        $tr.find('input.flagserial-' + rd).val(flagSerial);
+
+                        $select.attr('ischange', '0');
+                        $select.attr('initdata', productCode);
+
+                        $tr.find('input.qty-' + rd).val(qty);
+                        $tr.find('input.QtyTotalOK-' + rd).val(qtyToTalOk);
+                        $tr.find('input.invcodeinactual-' + rd).val(invCodeInActual);
+
+                        $tr.find('input.upin-' + rd).val(uPIn);
+                        $tr.find('input.upreturnsup-' + rd).val(uPReturnSup);
+                        $tr.find('input.valreturnsup-' + rd).val(valReturnSup);
+                        $tr.find('textarea.remark-' + rd).val(remark);
+
+
+                        tongTienHang();
+
+                    }
+                }
+
+            }
+        }
+</script>
+
+<script>
+        function changeProduct_Serial(thiz) {
+            debugger
+            var $tr = $(thiz).parent().parent();
+            var rd = $tr.attr('rd');
+            var $select = $(thiz);
+
+            if ($select !== null && $select !== undefined && $select.length > 0) {
+                var $option = $select.find(":selected");
+                var productCodeSelected = '';
+
+                if ($option !== undefined && $option !== null && $option.length > 0) {
+                    productCodeSelected = commonUtils.returnValue($option.attr('productcode'));
+                }
+                var productCodeOld = $tr.attr('productcode');
+                var $divProducts = $tr.find('div.products-list');
+                if ($divProducts !== null && $divProducts !== undefined && $divProducts.length > 0) {
+                    @* Update ghi chú của hàng hóa hiện tại vào list cache danh sách hàng hóa *@
+                    var $divProductOld = $divProducts.find('div[productcode="' + productCodeOld + '"]');
+                    if ($divProductOld !== undefined && $divProductOld !== null && $divProductOld.length > 0) {
+                        var remarkOld = $tr.find('textarea.remark-' + rd).val();
+                        $divProductOld.find('input.Remark').val(remarkOld);
+                    }
+                    var $divProductSelected = $divProducts.find('div[productcode="' + productCodeSelected + '"]');
+                    if ($divProductSelected !== null && $divProductSelected !== undefined && $divProductSelected.length > 0) {
+                        var productCodeRoot = $divProductSelected.find('input.ProductCodeRoot').val();
+                        var productCodeBase = $divProductSelected.find('input.ProductCodeBase').val();
+                        var productCode = $divProductSelected.find('input.ProductCode').val();
+                        var productCodeUser = $divProductSelected.find('input.ProductCodeUser').val();
+                        var productName = $divProductSelected.find('input.ProductName').val();
+                        var flagLot = $divProductSelected.find('input.FlagLot').val();
+                        var flagSerial = $divProductSelected.find('input.FlagSerial').val();
+
+                        var invCodeInActual = $divProductSelected.find('input.InvCodeInActual').val();
+                        var qty = $divProductSelected.find('input.Qty').val();
+                        var qtyToTalOk = $divProductSelected.find('input.QtyTotalOK').val();
+                        var uPIn = $divProductSelected.find('input.UPIn').val();
+                        var uPReturnSup = $divProductSelected.find('input.UPReturnSup').val();
+                        var valReturnSup = $divProductSelected.find('input.ValReturnSup').val();
+                        var remark = $divProductSelected.find('input.Remark').val();
+                        var valConvert = $divProductSelected.find('input.ValConvert').val();
+
+                        @* Gán giá trị *@
+                        $tr.attr('productcode', productCode);
+                        var $spanProductCodeUser = $tr.find('span.productcodeuser-' + rd);
+                        if ($spanProductCodeUser !== null && $spanProductCodeUser !== undefined && $spanProductCodeUser.length > 0) {
+                            $spanProductCodeUser.text(productCodeUser);
+                        }
+
+                        var $spanProductType = $tr.find('span.producttype-' + rd);
+
+                        if ($spanProductType !== null && $spanProductType !== undefined && $spanProductType.length > 0) {
+                            var objInvF_InventoryOutDtl = {
+                                ProductCode: productCode,
+                                ProductCodeUser: productCodeUser,
+                                ProductName: productName,
+                                ProductCodeBase: productCodeBase,
+                                ValConvert: valConvert
+                            };
+
+                            var extData_ProductType = {};
+                            var $productTypeSerial = $(commonUtils.getHtmlFromTemplate($('#tmpl_ShowPopup_Product_FlagSerial'), objInvF_InventoryOutDtl, extData_ProductType));
+                            $spanProductType.empty();
+                            $productTypeSerial.appendTo($spanProductType);
+                        }
+
+
+                        var $spanProductName = $tr.find('span.productname-' + rd);
+                        if ($spanProductName !== undefined && $spanProductName !== null && $spanProductName.length > 0) {
+                            $spanProductName.text(productName);
+                        }
+
+                        $tr.find('input.productcode-' + rd).val(productCode);
+                        $tr.find('input.productcodeuser-' + rd).val(productCodeUser);
+                        $tr.find('input.productcodebase-' + rd).val(productCodeBase);
+                        $tr.find('input.productcoderoot-' + rd).val(productCodeRoot);
+                        $tr.find('input.productname-' + rd).val(productName);
+                        $tr.find('input.flaglot-' + rd).val(flagLot);
+                        $tr.find('input.flagserial-' + rd).val(flagSerial);
+
+                        $select.attr('ischange', '0');
+                        $select.attr('initdata', productCode);
+
+                        $tr.find('input.qty-' + rd).val(qty);
+                        $tr.find('input.QtyTotalOK-' + rd).val(qtyToTalOk);
+                        $tr.find('input.invcodeinactual-' + rd).val(invCodeInActual);
+
+                        $tr.find('input.upin-' + rd).val(uPIn);
+                        $tr.find('input.upreturnsup-' + rd).val(uPReturnSup);
+                        $tr.find('input.valreturnsup-' + rd).val(valReturnSup);
+                        $tr.find('textarea.remark-' + rd).val(remark);
+
+
+                        tongTienHang();
+                    }
+                }
+
+            }
+        }
+</script>
+
+<script type="text/javascript">
+    function List_InvF_InventoryReturnSupDtl() {
+        debugger;
+        @* Danh sách hàng hóa(lưới hàng hóa chính) *@
+        var Lst_InvF_InventoryOutDtl = [];
+        var rowsProductData = $('tbody#table-tbodyID tr.trdata').length;
+        if (rowsProductData > 0) {
+            $('tbody#table-tbodyID tr.trdata').each(function () {
+                debugger;
+                var $tr = $(this);
+                var objInvF_InventoryOutDtl = {};
+                var productcode = commonUtils.returnValue($tr.attr('productcode'));
+                objInvF_InventoryOutDtl.ProductCode = productcode;
+                Lst_InvF_InventoryOutDtl.push(objInvF_InventoryOutDtl);
+            });
+        }
+
+        return Lst_InvF_InventoryOutDtl;
+    }
+</script>
+
+
+
+<script type="text/javascript">
+        function inputQty(thiz) {
+            debugger
+            var $tr = $(thiz).parent().parent();
+            var rd = $tr.attr('rd');
+            var listError = [];
+
+            var fQty = 0.0;
+            var qty = commonUtils.returnValue($(thiz).val());
+
+            var productCode = $tr.find('input.productcode-' + rd).val();
+            var productCodeBase = $tr.find('input.productcodebase-' + rd).val();
+            var invBUPattern = "";
+            var selectKho = $('select.mstinventory').eq(0);
+            var optionSelect = $(selectKho).find('option:selected');
+            invBUPattern = optionSelect.attr("invBUPattern");
+            var valconvert = $tr.find('input.valconvert-' + rd).val();
+            var productCodeUser = $tr.find('input.productcodeuser-' + rd).val();
+            var productName = $tr.find('input.productname-' + rd).val();
+            var fQtyTotalOK = 0.0;
+            var qtyTotalOK = commonUtils.returnValue($tr.find('input.QtyTotalOK-' + rd).val());
+            if (!commonUtils.isNullOrEmpty(qtyTotalOK)) {
+                fQtyTotalOK = commonUtils.parseFloat(qtyTotalOK);
+            }
+            if (commonUtils.isNullOrEmpty(qty)) {
+                var objToastr = {
+                    ToastrType: 'error',
+                    ToastrMessage: 'Vui lòng nhập số lượng',
+                };
+                listError.push(objToastr);
+            }
+            else {
+                fQty = commonUtils.parseFloat(qty);
+                if (fQty <= 0) {
+                    var objToastr = {
+                        ToastrType: 'error',
+                        ToastrMessage: 'Số lượng phải > 0',
+                    };
+                    listError.push(objToastr);
+                }
+                if (fQty > fQtyTotalOK) {
+                    var objToastr1 = {
+                        ToastrType: 'error',
+                        ToastrMessage: 'Số lượng phải < số lượng tồn',
+                    };
+                    listError.push(objToastr1);
+                }
+            }
+
+
+            if (listError !== undefined && listError !== null && listError.length > 0) {
+                commonUtils.showToastr(listError);
+                return false;
+            }
+
+            else {
+
+                var url = '@Url.Action("Get_TonKho_PhanBo", "InvFInventoryReturnSup")';
+                var dataInput = {
+                    productCode: productCode,
+                    productCodeBase: productCodeBase,
+                    InvBUPattern: invBUPattern,
+                    ValConvert: valconvert,
+                    ProductCodeUser: productCodeUser,
+                    ProductName: productName,
+                    qty: fQty,
+                };
+
+
+                $.ajax({
+                    type: 'post',
+                    data: dataInput,
+                    url: url,
+                    dataType: 'json',
+                    async: false,
+                    beforeSend: function () {
+                    }
+                }).done(function (objResult) {
+                    debugger
+                    if (objResult.Success) {
+                        debugger
+
+                        var listInventoryBalance = [];
+                        if (objResult.ListInventoryBalance !== undefined && objResult.ListInventoryBalance !== null && objResult.ListInventoryBalance.length > 0) {
+
+                            //xoá cache hàng hoá đã lưu
+
+
+                            var productCode = $tr.attr('productcode');
+                            var $tableProduct_InvCodeInActual_Cache = $('#table-detailInvCodeReturnSupActual'); @* Cache hàng hóa - vị trí *@
+                            var rowOlds = $tableProduct_InvCodeInActual_Cache.find('tr[productcodebase="' + productCodeBase + '"]').length;
+                            if (rowOlds > 0) {
+                                $tableProduct_InvCodeInActual_Cache.find('tr[productcodebase="' + productCodeBase + '"]').each(function () {
+                                    debugger
+                                    var $tr = $(this);
+                                    var $divList_Product_InvCodeInActual = $tr.find('div.products-list-cache');
+                                    if ($divList_Product_InvCodeInActual !== undefined && $divList_Product_InvCodeInActual !== null) {
+
+                                        $divList_Product_InvCodeInActual.find('div.result[productcode="' + productCode + '"]').each(function () {
+                                            var $div = $(this);
+                                            $div.remove();
+
+                                        });
+                                    }
+
+                                });
+                            }
+
+
+                            //end xoá cache hàng hoá đã lưu
+
+
+
+                            listInventoryBalance = objResult.ListInventoryBalance;
+
+                            var lstVitri = '';
+                            var checkQtyTotalOK = true;
+                            var fTotalQtyPhanBo = 0.0;
+                            debugger
+
+                            var $trInvCodeInActual = $tableProduct_InvCodeInActual_Cache.find('tr[productcodebase="' + productCodeBase + '"]');
+
+                            var $divList_Product_InvCodeInActual_Cache = $trInvCodeInActual.find('div.products-list-cache');
+                            for (var j = 0; j < listInventoryBalance.length; j++) {
+                                debugger
+                                var objInventoryBalance = listInventoryBalance[j];
+                                if (objInventoryBalance !== undefined && objInventoryBalance !== null) {
+                                    if (checkQtyTotalOK) {
+                                        var invCodeOutActual = commonUtils.returnValue(objInventoryBalance.InvCode);
+                                        if (!commonUtils.isNullOrEmpty(invCodeOutActual)) {
+                                            if (lstVitri == "") {
+                                                lstVitri += invCodeOutActual;
+                                            }
+                                            else {
+                                                lstVitri += ", " + invCodeOutActual;
+                                            }
+                                        }
+
+                                        var fQtyPhanBo = 0.0;
+                                        var fQtyTotalOKCur = commonUtils.parseFloat(objInventoryBalance.QtyTotalOK);
+                                        if (fTotalQtyPhanBo < fQtyTotalOK) {
+                                            if (fQty > fQtyTotalOKCur) {
+                                                fQtyPhanBo = fQtyTotalOKCur;
+                                                fQty -= fQtyPhanBo;
+                                            }
+                                            else {
+                                                fQtyPhanBo = fQty;
+                                                fQty = 0;
+                                                checkQtyTotalOK = false;
+                                            }
+
+                                            fTotalQtyPhanBo += fQtyPhanBo;
+                                        }
+
+                                        //add list mới vào cache hàng hoá
+                                        var objProduct = {
+                                            ProductCode: productCode,
+                                            InvCodeInActual: invCodeOutActual,
+                                            Qty: fQtyPhanBo,
+                                            QtyTotalOK: objInventoryBalance.QtyTotalOK,
+                                        };
+
+                                        var extData = {
+                                            idx: 9999,
+                                        };
+
+                                        var $divProduct_InvCodeInActual = $(commonUtils.getHtmlFromTemplate($('#tmpl_product_invcodeinactual_list_cache'), objProduct, extData));
+                                        $divProduct_InvCodeInActual.appendTo($divList_Product_InvCodeInActual_Cache);
+                                    }
+                                }
+
+                                debugger
+                              
+                            }
+
+
+                            commonUtils.updateTableTrNotShowIdx($('#table-detailInvCodeReturnSupActual tr.trdata'), true);
+
+                            
+
+
+
+
+                            var fUPIn = commonUtils.parseFloat(commonUtils.returnValue($tr.find('input.upin-' + rd).val()));
+                            var fUPReturnsup = commonUtils.parseFloat(commonUtils.returnValue($tr.find('input.upreturnsup-' + rd).val()));
+                            //var fValReturnSup = commonUtils.parseFloat(commonUtils.returnValue($tr.find('input.valreturnsup-' + rd).val()));
+
+                            var fValReturnSup = fUPReturnsup * fQtyPhanBo;
+                            $tr.find('input.valreturnsup-' + rd).val(fValReturnSup);
+                            $tr.find('input.invcodeinactual-' + rd).val(lstVitri);
+                            tongTienHang();
+                            //Cập nhật SL hàng hóa tại các vị trí (Mặc định gán số lượng cho vị trí đầu tiên, các vị trí còn lại gán = 0)
+                            debugger
+                            //var productCode = $tr.attr('productcode');
+
+                            //if (!commonUtils.isNullOrEmpty(productCode)) {
+                            //    debugger
+                            //    $('#table-detailInvCodeReturnSupActual').find('tr[productcodebase="' + productCodeBase + '"]').each(function () {
+                            //        debugger
+                            //        var $trInvCodeInActual = $(this);
+                            //        if ($trInvCodeInActual !== undefined && $trInvCodeInActual !== null && $trInvCodeInActual.length > 0) {
+                            //            var $divList_Product_InvCodeInActual_Cache = $trInvCodeInActual.find('div.products-list-cache');
+                            //            $divList_Product_InvCodeInActual_Cache.find('div.result[productcode="' + productCode + '"]').each(function () {
+                            //                debugger
+                            //                var $div = $(this);
+                            //                $div.find('input.Qty').val(fQtyPhanBo);
+                            //                fQtyPhanBo = 0.0;
+                            //            });
+
+                            //        }
+
+                            //    });
+
+                            //}
+                        }
+                    }
+                    else {
+                        if (!commonUtils.isNullOrEmpty(objResult.Detail)) {
+                            _showErrorMsg123('Lỗi!', objResult.Detail);
+                        }
+                    }
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+
+                }).always(function () {
+                });
+
+            }
+        }
+</script>
+
+
+<script type="text/javascript">
+    function inputUPInDesc(thiz) {
+        debugger
+
+        var $tr = $(thiz).parent().parent();
+        var rd = $tr.attr('rd');
+
+
+        var listError = [];
+        var fUPIn = 0.0;
+        var fUPReturnSup = 0.0;
+
+        var uPReturnSup = commonUtils.returnValue($(thiz).val());
+        if (commonUtils.isNullOrEmpty(uPReturnSup)) {
+            var objToastr = {
+                ToastrType: 'error',
+                ToastrMessage: 'Vui lòng nhập giá trả hàng',
+            };
+            listError.push(objToastr);
+        }
+        else {
+            fUPReturnSup = commonUtils.parseFloat(uPReturnSup);
+            if (fUPReturnSup < 0) {
+                var objToastr = {
+                    ToastrType: 'error',
+                    ToastrMessage: 'Giá trả hàng >= 0',
+                };
+                listError.push(objToastr);
+            }
+            else {
+                fUPIn = commonUtils.parseFloat(commonUtils.returnValue($tr.find('input.upin-' + rd).val()));
+                if (fUPIn < fUPReturnSup) {
+                    var objToastr = {
+                        ToastrType: 'error',
+                        ToastrMessage: 'Giá trả hàng <= giá nhập',
+                    };
+                    listError.push(objToastr);
+                    //
+                    //$(thiz).val(uPInDescInit);
+                }
+            }
+        }
+
+        if (listError !== undefined && listError !== null && listError.length > 0) {
+            commonUtils.showToastr(listError);
+            return false;
+        }
+        else {
+            debugger
+            var fQty = commonUtils.parseFloat(commonUtils.returnValue($tr.find('input.qty-' + rd).val()));
+            var fValOUTAfterDesc = fUPReturnSup * fQty;
+            $tr.find('input.valreturnsup-' + rd).val(fValOUTAfterDesc);
+
+            tongTienHang();
+        }
+
+    }
+</script>
+
+
+<script type="text/javascript">
+    function inputUPIn(thiz) {
+        var $tr = $(thiz).parent().parent();
+        var rd = $tr.attr('rd');
+
+
+        var listError = [];
+        var fUPIn = 0.0;
+        var fUPReturnSup = 0.0;
+
+        var uPIn = commonUtils.returnValue($(thiz).val());
+        if (commonUtils.isNullOrEmpty(uPIn)) {
+            var objToastr = {
+                ToastrType: 'error',
+                ToastrMessage: 'Vui lòng nhập giá nhập',
+            };
+            listError.push(objToastr);
+        }
+
+        else {
+            fUPIn = commonUtils.parseFloat(uPIn);
+            if (fUPIn < 0) {
+                var objToastr = {
+                    ToastrType: 'error',
+                    ToastrMessage: 'Giá nhập >= 0',
+                };
+                listError.push(objToastr);
+            }
+            else {
+                fUPReturnSup = commonUtils.parseFloat(commonUtils.returnValue($tr.find('input.upreturnsup-' + rd).val()));
+                //if (fUPOut < fUPOutDesc) {
+                //    var objToastr = {
+                //        ToastrType: 'error',
+                //        ToastrMessage: 'Giá giảm <= giá bán',
+                //    };
+                //    listError.push(objToastr);
+                //    //
+                //    //$(thiz).val(uPInDescInit);
+                //}
+            }
+        }
+
+        if (listError !== undefined && listError !== null && listError.length > 0) {
+            commonUtils.showToastr(listError);
+            return false;
+        }
+        else {
+            debugger
+            var fQty = commonUtils.parseFloat(commonUtils.returnValue($tr.find('input.qty-' + rd).val()));
+            var fValOUTAfterDesc = fUPReturnSup * fQty;
+            $tr.find('input.valreturnsup-' + rd).val(fValOUTAfterDesc);
+
+            tongTienHang();
+        }
+    }
+</script>
+
+
+<script type="text/javascript">
+        function showPopupInvCodeInActual(thiz, ProductCode, ProductCodeUser, ProductName, ProductCodeBase, ValConvert) {
+            debugger
+            var $tr = $('tbody#table-tbodyID tr[productcode = "' + ProductCode + '"]');
+            var rd = $tr.attr('rd');
+
+            var viewtype = '@CUtils.StrValue(viewType)';
+            //tim kho xuat
+            var valmstInventory = "";
+            if ($('select.mstinventory').length > 0) {
+                var selectKho = $('select.mstinventory').eq(0);
+                var optionSelect = $(selectKho).find('option:selected');
+
+                valmstInventory = optionSelect.attr("invBUPattern");
+
+            }
+            var listDtl = [];
+            debugger
+            $('#table-detailInvCodeReturnSupActual').find('tr[productcodebase="' + ProductCodeBase + '"]').each(function () {
+                debugger
+                var $trInvCodeInActual = $(this);
+                if ($trInvCodeInActual !== undefined && $trInvCodeInActual !== null && $trInvCodeInActual.length > 0) {
+                    var $divList_Product_InvCodeInActual_Cache = $trInvCodeInActual.find('div.products-list-cache');
+                    $divList_Product_InvCodeInActual_Cache.find('div.result[productcode="' + ProductCode + '"]').each(function () {
+                        debugger
+                        var $div = $(this);
+                        var productCodeCur = $div.find('input.ProductCode').val();
+                        var qTycur = $div.find('input.Qty').val();
+                        var invCodeCur = $div.find('input.InvCodeInActual').val();
+
+                        var obj = {
+                            ProductCode: productCodeCur,
+                            Qty: qTycur,
+                            InvCodeOutActual: invCodeCur
+                        };
+                        listDtl.push(obj);
+                    });
+
+                }
+
+            });
+
+            var objListDtl = commonUtils.returnJSONValue(listDtl);
+
+            var url = '@Url.Action("GetTonKho", "InvFInventoryReturnSup")';
+            $.ajax({
+                url: url,
+                data: {
+                    productCode: ProductCode,
+                    invBUPattern: valmstInventory,
+                    productCodeBase: ProductCodeBase,
+                    ValConvert: ValConvert,
+                    ProductCodeUser: ProductCodeUser,
+                    ProductName: ProductName,
+                    listdetail: objListDtl,
+                    ViewType: viewtype
+                },
+                type: 'post',
+                dataType: 'json',
+                traditional: true,
+                success: function (data) {
+                    debugger
+                    if (data.Success) {
+                        debugger
+                        $('#ShowPopupTonKho').modal({
+                            backdrop: false,
+                            keyboard: true,
+                        });
+                        $("#ShowPopupTonKho").html(data.Html); // truyen html vao #form
+                        $("#ShowPopupTonKho")
+                        var display = $("#ShowPopupTonKho").css('display');
+                        if (display == "none") {
+                            $("#ShowPopupTonKho").show();
+                        }
+                    } else {
+                        showErrorDialog(data.Detail);
+                    }
+                }
+            });
+        }
+</script>
+
+
+<script type="text/javascript">
+    function deleteRow(thiz) {
+        var rows = $('tbody#table-tbodyID tr.trdata').length;
+        if (rows > 0) {
+            debugger;
+            var $tr = $(thiz).parent().parent();
+            if ($tr !== null && $tr !== undefined && $tr.length > 0) {
+                var rd = $tr.attr('rd');
+                var productCode = $tr.attr('productcode');
+                @* Xóa cache *@
+                var flagLOT = commonUtils.returnValue($tr.find('input.flaglot-' + rd).val());
+                var flagSerial = commonUtils.returnValue($tr.find('input.flagserial-' + rd).val());
+                var rowOlds = 0;
+                if (flagLOT === '0' && flagSerial === '0') {
+                    rowOlds = $('#table-detailInvCodeReturnSupActual').find('tr[productcode="' + productCode + '"]').length;
+                    if (rowOlds > 0) {
+                        $('#table-detailInvCodeReturnSupActual').find('tr[productcode="' + productCode + '"]').each(function () {
+                            $(this).remove();
+                        });
+                        commonUtils.updateTableTrNotShowIdx($('#table-detailInvCodeReturnSupActual tr.trdata'), true);
+                    }
+                }
+                else if (flagLOT === '1') {
+                    rowOlds = $('#table-detailLot').find('tr[productcode="' + productCode + '"]').length;
+                    if (rowOlds > 0) {
+                        $('#table-detailLot').find('tr[productcode="' + productCode + '"]').each(function () {
+                            $(this).remove();
+                        });
+                        commonUtils.updateTableTrNotShowIdx($('#table-detailLot tr.trdata'), true);
+                    }
+                }
+                else if (flagSerial === '1') {
+                    rowOlds = $('#table-detailSerial').find('tr[productcode="' + productCode + '"]').length;
+                    if (rowOlds > 0) {
+                        $('#table-detailSerial').find('tr[productcode="' + productCode + '"]').each(function () {
+                            $(this).remove();
+                        });
+                        commonUtils.updateTableTrNotShowIdx($('#table-detailSerial tr.trdata'), true);
+                    }
+                }
+
+                $tr.remove();
+            }
+            if (rows > 1) {
+                commonUtils.updateTableTrNotShowIdx($('tbody#table-tbodyID tr.trdata'), true);
+
+            } else {
+                // Css lại table head
+                $('#InvCodeOut').prop('disabled', false);
+            }
+        }
+        tongTienHang();
+    }
+</script>
+
+
+@*<script>
+        function showPopupLot(thiz, ProductCode, ProductCodeUser, ProductName, ProductCodeBase) {
+            debugger
+            var $tr = $('tbody#table-tbodyID tr[productcode = "' + ProductCode + '"]');
+            var rd = $tr.attr('rd');
+            //tim kho suat
+            var valmstInventory = "";
+            if ($('select.mstinventory').length > 0) {
+                var selectKho = $('select.mstinventory').eq(0);
+                var optionSelect = $(selectKho).find('option:selected');
+
+                valmstInventory = optionSelect.attr("invBUPattern");
+
+            }
+            var strvalconvert = "";
+            var Qty = $tr.find('input.qty-' + rd).val();
+            var productCodeBaseCur = $tr.find('input.productcodebase-' + rd).val();
+            var productCodeUserCur = $tr.find('input.productcodeuser-' + rd).val();
+            var productNameCur = $tr.find('input.productname-' + rd).val();
+            var url = '@Url.Action("GetPhanBoLot", "ModalCommon")';
+            var objLst_PhanBo = {};
+            var list_locPhanBo = [];
+            var $tr = $('#table-detailLot').find('tr[productcode="' + ProductCode + '"]');
+            //if ($tr.length > 0) {
+            //    $tr.each(function () {
+            //        var tr = $(this);
+            //        var idx = $(tr).attr('idx');
+            //        var trdata = $('tbody#table-detailLot').find('tr.trdata[idx = "' + idx + '"]');
+
+            //        var ProductionDate = trdata.find('input.ProductionDate').val();
+            //        var InvCode = trdata.find('input.InvCodeInActual').val();
+            //        var ProductLotNo = trdata.find('input.ProductLotNo').val();
+            //        var ExpiredDate = trdata.find('input.ExpiredDate').val();
+            //        var QtyTotalOK = trdata.find('input.QtyTotalOK').val();
+            //        var Qtycur = trdata.find('input.Qty').val();
+
+
+            //        objLst_PhanBo = {
+            //            ProductCode: productCode,
+            //            ProductLotNo: ProductLotNo,
+            //            InvCode: InvCode,
+            //            ProductionDate: ProductionDate,
+            //            ExpiredDate: ExpiredDate,
+            //            QtyTotalOK: QtyTotalOK,
+            //            Qty: Qtycur,
+            //        };
+            //        list_locPhanBo.push(objLst_PhanBo);
+
+
+            //    });
+            //    RenderPopupViTriLot(list_locPhanBo, ProductCode, productCodeBaseCur, valmstInventory, productCodeUserCur, productNameCur, strvalconvert, Qty);
+            //}
+            //else {
+
+
+
+                $.ajax({
+                    url: url,
+                    data: {
+                        productCode: ProductCode,
+                        productCodeBase: productCodeBaseCur,
+                        InvBUPattern: valmstInventory,
+                        Qty: Qty,
+                    },
+                    type: 'post',
+                    dataType: 'json',
+                    traditional: true,
+                    success: function (objResult) {
+                        debugger
+                        if (objResult.Success) {
+                            debugger
+                            List_PhanBoLot = objResult.List_PhanBoLot;
+                            var objLst_PhanBo = [];
+                            var list_locPhanBo = {};
+                            //for (var i = 0; i < )
+
+
+
+                            var rowOlds = $('#table-detailLot').find('tr[productcode="' + ProductCode + '"]').length;
+                            if (rowOlds == 0) {
+                                //$('#table-detailLot').find('tr[productcode="' + ProductCode + '"]').each(function () {
+                                //    $(this).remove();
+                                //});
+                                for (var i = 0; i < List_PhanBoLot.length; i++) {
+                                    var objProduct = {
+                                        ProductCode: List_PhanBoLot[i].ProductCode,
+                                        ProductLotNo: List_PhanBoLot[i].ProductLotNo,
+                                        ProductionDate: List_PhanBoLot[i].ProductionDate,
+                                        ExpiredDate: List_PhanBoLot[i].ExpiredDate,
+                                        Qty: List_PhanBoLot[i].Qty,
+                                        InvCodeInActual: List_PhanBoLot[i].InvCode,
+                                        QtyTotalOK: List_PhanBoLot[i].QtyTotalOK,
+                                    };
+
+                                    var extData = {
+                                        idx: 9999,
+                                    };
+                                    var $item = $(commonUtils.getHtmlFromTemplate($('#tmpl_Product_LOT'), objProduct, extData));
+                                    $item.appendTo($('#table-detailLot'));
+                                }
+                                commonUtils.updateTableTrNotShowIdx($('#table-detailLot tr.trdata'), true);
+                            }
+
+
+
+
+
+                            RenderPopupViTriLot(List_PhanBoLot, ProductCode, productCodeBaseCur, valmstInventory, productCodeUserCur, productNameCur, strvalconvert, Qty);
+                        }
+                        else {
+                            if (!commonUtils.isNullOrEmpty(objResult.Detail)) {
+                                _showErrorMsg123('Lỗi!', objResult.Detail);
+                            }
+                        }
+                    }
+                });
+            //}
+        }
+    </script>*@
+
+
+<script type="text/javascript">
+    function RenderPopupViTriLot(list_PhanBoLot, productCode, productCodeBase, invBUPattern, productCodeUser, productName, valconvert, qty) {
+        debugger
+            var url = '@Url.Action("Lo", "InvFInventoryReturnSup")';
+        var objListLot = commonUtils.returnJSONValue(list_PhanBoLot);
+        $.ajax({
+            url: url,
+            data: {
+                productCode: productCode,
+                productCodeBase: productCodeBase,
+                invBUPattern: invBUPattern,
+                productCodeUser: productCodeUser,
+                productName: productName,
+                valconvert: valconvert,
+                qty: qty,
+                listLot: objListLot
+            },
+            type: 'post',
+            dataType: 'json',
+            traditional: true,
+            success: function (data) {
+                debugger
+                if (data.Success) {
+                    debugger
+                    $('#ShowPopupLo').modal({
+                        backdrop: false,
+                        keyboard: true,
+                    });
+                    $("#ShowPopupLo").html(data.Html); // truyen html vao #form
+                    var display = $("#ShowPopupLo").css('display');
+                    if (display == "none") {
+                        $("#ShowPopupLo").show();
+                    }
+                    debugger
+                    ShowCacheLot(productCode);
+                } else {
+                    showErrorDialog(data.Detail);
+                }
+            }
+        });
+    }
+</script>
+
+
+<script>
+    function ShowCacheLot(productCode) {
+        debugger
+        var $tr = $('#table-detailLot').find('tr[productcode="' + productCode + '"]');
+        if ($tr.length > 0) {
+            var strHtml = "";
+            var st = 0;
+            $tr.each(function () {
+                debugger
+                var tr = $(this);
+                var idx = $(tr).attr('idx');
+                var trdata = $('tbody#table-detailLot').find('tr.trdata[idx = "' + idx + '"]');
+
+                var ProductionDate = trdata.find('input.ProductionDate').val();
+                var InvCode = trdata.find('input.InvCodeInActual').val();
+                var ProductLotNo = trdata.find('input.ProductLotNo').val();
+                var ExpiredDate = trdata.find('input.ExpiredDate').val();
+                var QtyTotalOK = trdata.find('input.QtyTotalOK').val();
+                var Qty = trdata.find('input.Qty').val();
+
+                strHtml = getHtmlFromTemplate($('#rowtemplateLo'), {
+                    ProductLotNo: ProductLotNo,
+                    InvCode: InvCode,
+                    ProductionDate: ProductionDate,
+                    ExpiredDate: ExpiredDate,
+                    QtyTotalOK: QtyTotalOK,
+                    Qty: Qty,
+                    idx: 999999
+                });
+
+                if (st == 0) {
+                    $('#table-tbodyIDLo').html(strHtml);
+                }
+                else {
+                    $('#table-tbodyIDLo').append(strHtml);
+                }
+                st++;
+                updateTableTrIdx($('#table-tbodyIDLo tr'), false);
+            });
+        }
+    }
+
+</script>
+
+
+<script>
+    function showPopupLot(thiz, ProductCode, ProductCodeUser, ProductName, ProductCodeBase, ValConvert) {
+        //lay list lot
+        debugger
+        var $tr = $('#table-detailLot').find('tr[productcode="' + ProductCode + '"]');
+
+        var obj = {};
+        var listLot = [];
+
+        var valmstInventory = "";
+        if ($('select.mstinventory').length > 0) {
+            var selectKho = $('select.mstinventory').eq(0);
+            var optionSelect = $(selectKho).find('option:selected');
+
+            valmstInventory = optionSelect.attr("invBUPattern");
+
+        }
+
+        var viewtype = '@CUtils.StrValue(viewType)';
+
+        if ($tr.length > 0) {
+            var strHtml = "";
+            var st = 0;
+            $tr.each(function () {
+                debugger
+                var tr = $(this);
+                var idx = $(tr).attr('idx');
+                var trdata = $('tbody#table-detailLot').find('tr.trdata[idx = "' + idx + '"]');
+
+                var ProductionDate = trdata.find('input.ProductionDate').val();
+                var InvCode = trdata.find('input.InvCodeInActual').val();
+                var ProductLotNo = trdata.find('input.ProductLotNo').val();
+                var ExpiredDate = trdata.find('input.ExpiredDate').val();
+                var QtyTotalOK = trdata.find('input.QtyTotalOK').val();
+                var Qty = trdata.find('input.Qty').val();
+
+
+
+
+                obj = {
+                    ProductLotNo: ProductLotNo,
+                    ProductCode: ProductCode,
+                    Qty: Qty,
+                    InvCodeOutActual: InvCode
+                };
+                listLot.push(obj);
+
+
+
+            });
+        }
+        debugger
+        var objListLot = commonUtils.returnJSONValue(listLot);
+        var url = '@Url.Action("Lo", "InvFInventoryReturnSup")';
+        debugger
+        $.ajax({
+            url: url,
+            data: {
+                productCode: ProductCode,
+                productCodeBase: ProductCodeBase,
+                invBUPattern: valmstInventory,
+                productCodeUser: ProductCodeUser,
+                productName: ProductName,
+                valConvert: ValConvert,
+                listLot: objListLot,
+                ViewType: viewtype
+            },
+            type: 'post',
+            dataType: 'json',
+            traditional: true,
+            success: function (data) {
+                if (data.Success) {
+
+                    $('#ShowPopupLo').modal({
+                        backdrop: false,
+                        keyboard: true,
+                    });
+                    $("#ShowPopupLo").html(data.Html); // truyen html vao #form
+                    var display = $("#ShowPopupLo").css('display');
+                    if (display == "none") {
+                        $("#ShowPopupLo").show();
+                    }
+                } else {
+                    showErrorDialog(data.Detail);
+                }
+            }
+        });
+
+    }
+</script>
+
+<script type="text/javascript">
+    function product_InvF_InventoryOutInstLot_Save() {
+        debugger
+
+        var rows = $('tbody#table-tbodyIDLo tr.trdata').length;
+        if (rows > 0) {
+            var productCode = commonUtils.returnValueText('#manageFormShowPopupLo input#mdLo_ProductCode');
+            if (!commonUtils.isNullOrEmpty(productCode)) {
+                @* Xóa LOT - hàng hóa đã lưu cache *@
+                var rowOlds = $('#table-detailLot').find('tr[productcode="' + productCode + '"]').length;
+                if (rowOlds > 0) {
+                    $('#table-detailLot').find('tr[productcode="' + productCode + '"]').each(function () {
+                        $(this).remove();
+                    });
+                }
+                @* Thêm LOT - hàng hóa vào cache *@
+                var fTotalQty = 0.0;
+                var arrayInvCode = [];
+                var lstVitri = "";
+                $("#table-tbodyIDLo tr.trdata").each(function () {
+                    debugger
+                    var $tr = $(this);
+                    var rd = $tr.attr('idx');
+
+                    var ProductLotNo = $tr.find('input[name="Lst_InvF_InventoryOutLotDtl[' + rd + '].ProductLotNo"]').val();
+                    var ProductionDate = $tr.find('input[name="Lst_InvF_InventoryOutLotDtl[' + rd + '].ProductionDate"]').val();
+                    var ExpiredDate = $tr.find('input[name="Lst_InvF_InventoryOutLotDtl[' + rd + '].ExpiredDate"]').val();
+                    var fQty = commonUtils.parseFloat(commonUtils.returnValue($tr.find('input[name="Lst_InvF_InventoryOutLotDtl[' + rd + '].Qty"]').val()));
+                    var QtyTotalOK = $tr.find('input[name="Lst_InvF_InventoryOutLotDtl[' + rd + '].QtyTotalOK"]').val();
+                    var InvCode = $tr.find('input[name="Lst_InvF_InventoryOutLotDtl[' + rd + '].InvCode"]').val();
+                    if (InvCode != null) {
+                        if (arrayInvCode.includes(InvCode) == false && fQty !== '0' && fQty > 0) {
+                            arrayInvCode.push(InvCode);
+                            if (lstVitri == "") {
+                                lstVitri += InvCode;
+                            }
+                            else {
+                                lstVitri += ", " + InvCode;
+                            }
+                        }
+
+                    }
+                    fTotalQty += fQty;
+                    //if (fQty > 0) {
+                    var objProduct = {
+                        ProductCode: productCode,
+                        ProductLotNo: ProductLotNo,
+                        ProductionDate: ProductionDate,
+                        ExpiredDate: ExpiredDate,
+                        Qty: fQty,
+                        InvCodeInActual: InvCode,
+                        QtyTotalOK: QtyTotalOK,
+                    };
+
+                    var extData = {
+                        idx: 9999,
+                    };
+                    var $item = $(commonUtils.getHtmlFromTemplate($('#tmpl_Product_LOT'), objProduct, extData));
+                    $item.appendTo($('#table-detailLot'));
+                    //}
+
+                });
+                commonUtils.updateTableTrNotShowIdx($('#table-detailLot tr.trdata'), true);
+
+                debugger
+                @* Update lại vị trí, số lượng *@
+                    var $trInvF_InventoryInDtl = $('#table-tbodyID').find('tr[productcode="' + productCode + '"]');
+                if ($trInvF_InventoryInDtl !== undefined && $trInvF_InventoryInDtl !== null && $trInvF_InventoryInDtl.length > 0) {
+                    var rdInvF_InventoryInDtl = $trInvF_InventoryInDtl.attr('rd');
+                    var $inputQty = $trInvF_InventoryInDtl.find('input.qty-' + rdInvF_InventoryInDtl);
+                    if ($inputQty !== undefined && $inputQty !== null && $inputQty.length > 0) {
+                        $inputQty.val(fTotalQty);
+                    }
+
+                    var $inputInvCodeInActual = $trInvF_InventoryInDtl.find('input.invcodeinactual-' + rdInvF_InventoryInDtl);
+                    if ($inputInvCodeInActual !== undefined && $inputInvCodeInActual !== null && $inputInvCodeInActual.length > 0) {
+                        $inputInvCodeInActual.val(lstVitri);
+                    }
+
+                    tongTienHang();
+
+                }
+                ClosePopupLo();
+            }
+        }
+    }
+</script>
+
+
+@*<script type="text/javascript">
+        function showPopupSerial( ProductCode, ProductCodeUser, ProductName, ProductCodeBase) {
+            debugger
+
+
+            //tim kho suat
+            var valmstInventory = "";
+            if ($('select.mstinventory').length > 0) {
+                var selectKho = $('select.mstinventory').eq(0);
+                var optionSelect = $(selectKho).find('option:selected');
+
+                valmstInventory = optionSelect.attr("invBUPattern");
+
+            }
+                    var type = "";
+            var url = '@Url.Action("Serial", "InvFInventoryReturnSup")';
+
+            $.ajax({
+                url: url,
+                data: {
+                    productCode: ProductCode,
+                    invBUPattern: valmstInventory,
+                    productCodeBase: ProductCodeBase,
+                    type: type,
+                    productCodeUser: ProductCodeUser,
+                    productName: ProductName
+                },
+                type: 'post',
+                dataType: 'json',
+                traditional: true,
+                success: function (data) {
+                    if (data.Success) {
+                        debugger
+                        $('#ShowPopupSerial').modal({
+                            backdrop: false,
+                            keyboard: true,
+                        });
+                        $("#ShowPopupSerial").html(data.Html); // truyen html vao #form
+                        var display = $("#ShowPopupSerial").css('display');
+                        if (display == "none") {
+                            $("#ShowPopupSerial").show();
+                        }
+                        debugger
+                        ShowSerialCache1(ProductCode, ProductCodeUser, ProductName, ProductCodeBase);
+                    } else {
+                        showErrorDialog(data.Detail);
+                    }
+                }
+            });
+        }
+    </script>*@
+
+<script>
+    function ShowSerialCache1(productCode, productCodeUser, productName, productCodeBase) {
+        debugger
+        var $tr = $('tbody#table-tbodyID tr[productcode = "' + productCode + '"]');
+        var rd = $tr.attr('rd');
+        //tim kho suat
+        var valmstInventory = "";
+        if ($('select.mstinventory').length > 0) {
+            var selectKho = $('select.mstinventory').eq(0);
+            var optionSelect = $(selectKho).find('option:selected');
+
+            valmstInventory = optionSelect.attr("invBUPattern");
+
+        }
+                var Qty = $tr.find('input.qty-' + rd).val();
+        var url = '@Url.Action("GetPhanBoSerial", "ModalCommon")';
+
+        $.ajax({
+            url: url,
+            data: {
+                productCode: productCode,
+                productCodeBase: productCodeBase,
+                InvBUPattern: valmstInventory,
+                Qty: Qty,
+            },
+            type: 'post',
+            dataType: 'json',
+            traditional: true,
+            success: function (objResult) {
+                debugger
+                if (objResult.Success) {
+                    debugger
+                    List_PhanBoLot = objResult.List_PhanBoLot;
+                    var objLst_PhanBo = [];
+                    var list_locPhanBo = {};
+                    var strHtml = "";
+                    var st = 0;
+                    @* Xóa serial - hàng hóa đã lưu cache *@
+                            var rowOlds = $('#table-detailSerial').find('tr[productcode="' + productCode + '"]').length;
+                    if (rowOlds > 0) {
+                        $('#table-detailSerial').find('tr[productcode="' + productCode + '"]').each(function () {
+                            $(this).remove();
+                        });
+                    }
+                    for (var i = 0; i < List_PhanBoLot.length; i++) {
+                        debugger
+                        strHtml = getHtmlFromTemplate($('#rowtemplateSerial'), {
+                            ProductCode: List_PhanBoLot[i].ProductCode,
+                            SerialNo: List_PhanBoLot[i].SerialNo,
+                            InvCode: List_PhanBoLot[i].InvCode,
+                            idx: 999999
+                        });
+
+                        if (st == 0) {
+                            $('#table-tbodyIDSerial').html(strHtml);
+                        }
+                        else {
+                            $('#table-tbodyIDSerial').append(strHtml);
+                        }
+                        st++;
+                        updateTableTrIdx($('#table-tbodyIDSerial tr'), false);
+
+                        var objProduct = {
+                            ProductCode: List_PhanBoLot[i].ProductCode,
+                            InvCodeInActual: List_PhanBoLot[i].InvCode,
+                            SerialNo: List_PhanBoLot[i].SerialNo,
+                        };
+                        var extData = {
+                            idx: 9999,
+                        };
+
+                        var $item = $(commonUtils.getHtmlFromTemplate($('#tmpl_Product_Serial'), objProduct, extData));
+                        $item.appendTo($('#table-detailSerial'));
+
+
+                    }
+                    commonUtils.updateTableTrNotShowIdx($('#table-detailSerial tr.trdata'), true);
+
+                }
+                else {
+                    if (!commonUtils.isNullOrEmpty(objResult.Detail)) {
+                        _showErrorMsg123('Lỗi!', objResult.Detail);
+                    }
+                }
+            }
+        });
+    }
+</script>
+
+
+<script type="text/javascript">
+    function showPopupSerial(ProductCode, ProductCodeUser, ProductName, ProductCodeBase) {
+        debugger
+        var $tr = $('#table-detailSerial').find('tr[productcode="' + ProductCode + '"]');
+
+        var obj = {};
+        var listSerial = [];
+
+        var valmstInventory = "";
+        if ($('select.mstinventory').length > 0) {
+            var selectKho = $('select.mstinventory').eq(0);
+            var optionSelect = $(selectKho).find('option:selected');
+
+            valmstInventory = optionSelect.attr("invBUPattern");
+
+        }
+
+
+        if ($tr.length > 0) {
+            $tr.each(function () {
+                debugger
+                var tr = $(this);
+                var idx = $(tr).attr('idx');
+                var trdata = $('tbody#table-detailSerial').find('tr.trdata[idx = "' + idx + '"]');
+
+                //var ProductionDate = trdata.find('input.ProductionDate').val();
+                //var InvCode = trdata.find('input.InvCodeInActual').val();
+                //var ProductLotNo = trdata.find('input.ProductLotNo').val();
+                //var ExpiredDate = trdata.find('input.ExpiredDate').val();
+                //var QtyTotalOK = trdata.find('input.QtyTotalOK').val();
+                //var Qty = trdata.find('input.Qty').val();
+                var productCode = trdata.find('input.ProductCode').val();
+                var serialNo = trdata.find('input.SerialNo').val();
+                var invCode = trdata.find('input.InvCodeInActual').val();
+
+
+
+                obj = {
+                    ProductCode: productCode,
+                    SerialNo: serialNo,
+                    InvCodeOutActual: invCode
+
+                };
+                listSerial.push(obj);
+
+
+
+            });
+
+        }
+        var objListSerial = commonUtils.returnJSONValue(listSerial);
+        var url = '@Url.Action("Serial", "InvFInventoryReturnSup")';
+        var type = "";
+        var viewtype = '@CUtils.StrValue(viewType)';
+        $.ajax({
+            url: url,
+            data: {
+                productCode: ProductCode,
+                invBUPattern: valmstInventory,
+                productCodeBase: ProductCodeBase,
+                type: type,
+                productCodeUser: ProductCodeUser,
+                productName: ProductName,
+                listSerial: objListSerial,
+                ViewType: viewtype
+            },
+            type: 'post',
+            dataType: 'json',
+            traditional: true,
+            success: function (data) {
+                if (data.Success) {
+
+                    $('#ShowPopupSerial').modal({
+                        backdrop: false,
+                        keyboard: true,
+                    });
+                    $("#ShowPopupSerial").html(data.Html); // truyen html vao #form
+                    var display = $("#ShowPopupSerial").css('display');
+                    if (display == "none") {
+                        $("#ShowPopupSerial").show();
+                    }
+                } else {
+                    showErrorDialog(data.Detail);
+                }
+            }
+        });
+    }
+</script>
+
+
+@*Xử lý import file*@
+<script>
+        var objCommonExcel = new CommonExcel();
+        var objVariablesInit = {
+            Id_FormMain: '',
+            Id_FormImportExcel: 'manageFormImportExcel',
+            Id_Modal: 'ImportExcelModal',
+            Id_FileInput: 'file',
+        };
+
+
+        var ajaxSettings_Excel = {};
+        ajaxSettings_Excel.Type = 'post';
+        ajaxSettings_Excel.DataType = 'json';
+
+    function ImportProducts() {
+        debugger
+        //alert("import");
+        $('#key').val("PRODUCT");
+        $('#file').val('');
+        ShowPopupImportExcel();
+    }
+
+    function ImportLot() {
+        $('#key').val("LOT");
+        $('#file').val('');
+        ShowPopupImportExcel();
+    }
+
+    function ImportSerial() {
+        $('#key').val("SERIAL");
+        $('#file').val('');
+        ShowPopupImportExcel();
+    }
+
+
+    function ShowPopupImportExcel() {
+        debugger
+        $('#ImportExcelModal').modal('show')
+    }
+
+
+    function CloseModalImportExcel() {
+        $('#ImportExcelModal').modal('hide')
+        $('#ImportExcelModal').on('hidden.bs.modal', function () {
+            $(this).find('#manageFormImportExcel').trigger('reset');
+        });
+    }
+
+    function Import() {
+        var file = $("#file").val();
+        if (file.length === 0) {
+            alert("Nhập file cần Import");
+            $("#file").val('');
+            return false;
+        } else {
+            var checkFile = false;
+            var _index = file.lastIndexOf('.');
+            if (_index !== undefined && _index !== null && _index > 0) {
+                var fileType = file.substring(_index + 1, file.length).toLowerCase();
+                if (fileType === 'xls' || fileType.toLowerCase() === 'xlsx') {
+                    checkFile = true;
+                }
+            }
+            if (checkFile) {
+                var key = $("#key").val();
+                if (key.toString().toUpperCase().trim() == "PRODUCT") {
+                    ImportFileExcelProduct();
+                }
+                else if (key.toString().toUpperCase().trim() == "LOT") {
+                    ImportFileExcelLot();
+                }
+                else if (key.toString().toUpperCase().trim() == "SERIAL") {
+                    ImportFileExcelSerial();
+                }
+                else if (key.toString().toUpperCase().trim() == "QR") {
+                    ImportFileExcelQR();
+                }
+            }
+            else {
+                alert("File Excel Import không hợp lệ!");
+            }
+        }
+    }
+
+        function ImportFileExcelProduct() {
+            debugger
+            var formData = new window.FormData($('#manageFormImportExcel')[0]);
+            var incodeOut = commonUtils.returnValue('#InvCodeOut');
+            if (commonUtils.isNullOrEmpty(incodeOut)) {
+                var listToastr = [];
+                objToastr = { ToastrType: 'error', ToastrMessage: '@MvcHtmlString.Create("Chưa chọn kho xuất".HtmlItemString("ordorderdl"))' };
+                listToastr.push(objToastr);
+                commonUtils.showToastr(listToastr);
+
+                commonUtils.setFocus('InvCodeOut');
+                return false;
+            }
+            else {
+                var invBUPattern = '';
+                var $option = $('#InvCodeOut').find(":selected");
+                if ($option !== undefined && $option !== null && $option.length > 0) {
+                    invBUPattern = $option.attr('InvBUPattern');
+                }
+
+
+
+
+                formData.append('tax_file', $('input[type=file]')[0].files[0]);
+                formData.append('invBUPattern', invBUPattern);
+
+                $('#ImportExcelModal').modal("hide");
+
+                //Loading();
+                var url = '@(Url.Action("ImportProduct", "InvFInventoryReturnSup"))';
+
+                $.ajax({
+                    url: url,
+                    data: formData,
+                    type: 'post',
+                    beforeSend: function () { },
+                    success: function (objResult) {
+                        debugger
+                        if (objResult.Success) {
+                            debugger
+
+                            var listData = objResult.listDtlImport;
+                            var listProductBase = objResult.list_MstProductUI;
+
+                            if (listProductBase !== undefined && listProductBase !== null && listProductBase.length > 0) {
+
+
+                                var listInventoryDtlAutoSearch = [];
+
+
+                                var List_PrdBase = [];
+                                for (var i = 0; i < listProductBase.length; i++) {
+                                    debugger
+                                    objProductAutoSearch = {};
+                                    listProductAutoSearch = [];
+                                    objProductAutoSearch.ProductCodeRoot = listProductBase[i].ProductCodeRoot;
+                                    objProductAutoSearch.ProductCodeBase = listProductBase[i].ProductCodeBase;
+                                    objProductAutoSearch.ProductCode = listProductBase[i].ProductCode;
+                                    objProductAutoSearch.ProductCodeUser = listProductBase[i].ProductCodeUser;
+                                    objProductAutoSearch.ProductName = listProductBase[i].ProductName;
+                                    objProductAutoSearch.FlagSerial = listProductBase[i].FlagSerial;
+                                    objProductAutoSearch.FlagLot = listProductBase[i].FlagLot;
+                                    objProductAutoSearch.UnitCode = listProductBase[i].UnitCode;
+                                    objProductAutoSearch.InvCodeInActual = listProductBase[i].InvCodeInActual;
+                                    objProductAutoSearch.Qty = listProductBase[i].Qty;
+                                    objProductAutoSearch.QtyTotalOK = listProductBase[i].QtyTotalOK;
+                                    objProductAutoSearch.UPIn = listProductBase[i].UPIn;
+                                    objProductAutoSearch.UPReturnSup = listProductBase[i].UPReturnSup;
+                                    objProductAutoSearch.ValReturnSup = listProductBase[i].ValReturnSup;
+                                    objProductAutoSearch.Remark = listProductBase[i].Remark;
+                                    objProductAutoSearch.ValConvert = listProductBase[i].ValConvert;
+                                    objProductAutoSearch.UPinv = listProductBase[i].UPinv;
+                                    listProductAutoSearch.push(objProductAutoSearch);
+
+
+                                    debugger
+                                    var productCodeBaseCur = listProductBase[i].ProductCodeBase;
+                                    var listProductBaseUI = listProductBase[i].lstUnitCodeUIByProduct.filter(function (m) {
+                                        return m.ProductCodeBase === productCodeBaseCur;
+
+                                    });
+
+                                    for (var j = 0; j < listProductBaseUI.length; j++) {
+                                        var listProductAutoSearchBase = [];
+                                        var objProductAutoSearchBase = {};
+                                        objProductAutoSearchBase.ProductCodeRoot = listProductBaseUI[j].ProductCodeRoot;
+                                        objProductAutoSearchBase.ProductCodeBase = listProductBaseUI[j].ProductCodeBase;
+                                        objProductAutoSearchBase.ProductCode = listProductBaseUI[j].ProductCode;
+                                        objProductAutoSearchBase.ProductCodeUser = listProductBaseUI[j].ProductCodeUser;
+                                        objProductAutoSearchBase.ProductName = listProductBaseUI[j].ProductName;
+                                        objProductAutoSearchBase.FlagSerial = listProductBaseUI[j].FlagLot;
+                                        objProductAutoSearchBase.FlagLot = listProductBaseUI[j].FlagSerial;
+                                        objProductAutoSearchBase.UnitCode = listProductBaseUI[j].UnitCode;
+                                        objProductAutoSearchBase.InvCodeInActual = listProductBaseUI[j].InvCodeInActual;
+                                        objProductAutoSearchBase.Qty = listProductBaseUI[j].Qty;
+                                        objProductAutoSearchBase.QtyTotalOK = listProductBaseUI[j].QtyTotalOK;
+                                        objProductAutoSearchBase.UPIn = listProductBaseUI[j].UPIn;
+                                        objProductAutoSearchBase.UPReturnSup = listProductBaseUI[j].UPReturnSup;
+                                        objProductAutoSearchBase.ValReturnSup = listProductBaseUI[j].Qty * listProductBaseUI[j].UPReturnSup;
+                                        objProductAutoSearchBase.Remark = listProductBaseUI[j].Remark;
+                                        objProductAutoSearchBase.ValConvert = listProductBaseUI[j].ValConvert; 
+                                        objProductAutoSearchBase.UPinv = listProductBaseUI[j].UPinv;
+                                        listProductAutoSearchBase.push(objProductAutoSearchBase);
+                                        var objProductBase = {
+                                            LstProductAutoSearchBase: objProductAutoSearchBase
+                                        };
+                                        List_PrdBase.push(objProductBase);
+                                    }
+                                    var objProduct = {
+                                        InvF_InventoryOutDtl: objProductAutoSearch,
+                                        Lst_InvF_InventoryOutDtl: listProductAutoSearch,
+                                        Lst_InvF_InventoryOutBase: List_PrdBase
+                                    };
+                                    listInventoryDtlAutoSearch.push(objProduct);
+                                }
+
+                                debugger
+                                if (listInventoryDtlAutoSearch != null && listInventoryDtlAutoSearch != undefined && listInventoryDtlAutoSearch.length > 0) {
+                                    for (var i = 0; i < listInventoryDtlAutoSearch.length; i++) {
+                                        renderInvF_InventoryOutDtl_Multi(listInventoryDtlAutoSearch[i]);
+                                    }
+                                    //commonUtils.updateTableTrNotShowIdx($('#table-tbodyID tr.trdata'), true);
+                                    //commonUtils.updateTableTrNotShowIdx($('#table-detailInvCodeReturnSupActual tr.trdata'), true);
+
+                                    var tongsl = 0.0;
+
+                                    tongTienHang();
+                                }
+                            }
+
+
+                            debugger
+                            var listChild = [];
+                            if (listData !== undefined && listData !== null && listData.length > 0) {
+                                for (var i = 0; i < listData.length; i++) {
+                                    var objProductDtlChild = {};
+                                    var listProductDtlChild = [];
+
+                                    objProductDtlChild.ProductCode = listData[i].ProductCode;
+                                    objProductDtlChild.InvCodeInActual = listData[i].InvCodeOutActual;
+                                    objProductDtlChild.Qty = listData[i].Qty;
+                                        objProductDtlChild.QtyTotalOK = '';
+                                    listProductDtlChild.push(objProductDtlChild);
+                                    var objSerial = {
+                                        Product_InvF_InventoryReturnSupDtlChild: objProductDtlChild,
+                                        Lst_Mst_Inventory: listSerialAutoSearch
+                                    };
+                                    listChild.push(objSerial);
+                                }
+
+                                debugger
+                                if (listChild !== null && listChild !== undefined && listChild.length > 0) {
+                                    for (var j = 0; j < listChild.length; j++) {
+                                        var $tableProduct_InvCodeInActual_Cache = $('#table-detailInvCodeReturnSupActual');
+                                        var productCode = listChild[j].Product_InvF_InventoryReturnSupDtlChild.ProductCode;
+                                        var rowOlds = $tableProduct_InvCodeInActual_Cache.find('tr[productcode="' + productCode + '"]').length;
+                                        if (rowOlds > 0) {
+                                            $tableProduct_InvCodeInActual_Cache.find('tr[productcode="' + productCode + '"]').each(function () {
+                                                var $tr = $(this);
+                                                var $divList_Product_InvCodeInActual = $tr.find('div.products-list-cache');
+                                                if ($divList_Product_InvCodeInActual !== undefined && $divList_Product_InvCodeInActual !== null) {
+
+                                                    $divList_Product_InvCodeInActual.find('div.result[productcode="' + productCode + '"]').each(function () {
+                                                        var $div = $(this);
+                                                        $div.remove();
+
+                                                    });
+                                                }
+
+                                            });
+                                        }
+                                    }
+
+                                    for (var i = 0; i < listChild.length; i++) {
+                                        renderProductInventoryReturnSupDtlChild(listChild[i]);
+                                    }
+                                    commonUtils.updateTableTrNotShowIdx($('#table-detailInvCodeReturnSupActual tr.trdata'), true);
+                                }
+                            }
+                        }
+                        else {
+                            var listError = [];
+                            var message = commonUtils.returnValue(objResult.Messages[0]);
+                            if (!commonUtils.isNullOrEmpty(message)) {
+                                var objToastr = { ToastrType: 'error', ToastrMessage: message };
+                                listError.push(objToastr);
+                            }
+                            if (listError !== undefined && listError !== null && listError.length > 0) {
+                                commonUtils.showToastr(listError);
+                            }
+                            var detail = commonUtils.returnValue(objResult.Detail);
+                            if (!commonUtils.isNullOrEmpty(detail)) {
+                                _showErrorMsg123('Lỗi!', detail);
+                            }
+                        }
+
+                    },
+                    error: function () {
+                        //Endloading();
+                    },
+                    cache: false,
+                    contentType: false,
+                    //dataType: "json",
+                    processData: false
+
+                });
+
+            }
+    }
+
+
+    function ImportFileExcelLot() {
+        debugger
+        var formData = new window.FormData($('#manageFormImportExcel')[0]);
+         var incodeOut = commonUtils.returnValue('#InvCodeOut');
+        if (commonUtils.isNullOrEmpty(incodeOut)) {
+            var listToastr = [];
+            objToastr = { ToastrType: 'error', ToastrMessage: '@MvcHtmlString.Create("Chưa chọn kho xuất".HtmlItemString("ordorderdl"))' };
+            listToastr.push(objToastr);
+            commonUtils.showToastr(listToastr);
+
+            commonUtils.setFocus('InvCodeOut');
+            return false;
+        }
+        else {
+            var invBUPattern = '';
+            var $option = $('#InvCodeOut').find(":selected");
+            if ($option !== undefined && $option !== null && $option.length > 0) {
+                invBUPattern = $option.attr('InvBUPattern');
+            }
+            formData.append('tax_file', $('input[type=file]')[0].files[0]);
+            formData.append('invBUPattern', invBUPattern);
+            $('#ImportExcelModal').modal("hide");
+            var url = '@(Url.Action("ImportLot", "InvFInventoryReturnSup"))';
+            $.ajax({
+
+                url: url,
+                data: formData,
+                type: 'post',
+                beforeSend: function () { },
+                success: function (objResult) {
+                    debugger
+                    if (objResult.Success) {
+                        debugger
+
+                        var listData = objResult.listDtlImport;
+                        var listProductBase = objResult.list_MstProductUI;
+
+                        if (listProductBase !== undefined && listProductBase !== null && listProductBase.length > 0) {
+
+                            var listInventoryDtlAutoSearch = [];
+
+
+                            var List_PrdBase = [];
+
+                            for (var i = 0; i < listProductBase.length; i++) {
+                                objProductAutoSearch = {};
+                                listProductAutoSearch = [];
+
+                                objProductAutoSearch.ProductCodeRoot = listProductBase[i].ProductCodeRoot;
+                                objProductAutoSearch.ProductCodeBase = listProductBase[i].ProductCodeBase;
+                                objProductAutoSearch.ProductCode = listProductBase[i].ProductCode;
+                                objProductAutoSearch.ProductCodeUser = listProductBase[i].ProductCodeUser;
+                                objProductAutoSearch.ProductName = listProductBase[i].ProductName;
+                                objProductAutoSearch.FlagSerial = listProductBase[i].FlagSerial;
+                                objProductAutoSearch.FlagLot = listProductBase[i].FlagLot;
+                                objProductAutoSearch.UnitCode = listProductBase[i].UnitCode;
+                                objProductAutoSearch.InvCodeInActual = listProductBase[i].InvCodeInActual;
+                                objProductAutoSearch.Qty = listProductBase[i].Qty;
+                                objProductAutoSearch.QtyTotalOK = listProductBase[i].QtyTotalOK;
+                                objProductAutoSearch.UPIn = listProductBase[i].UPIn;
+                                objProductAutoSearch.UPReturnSup = listProductBase[i].UPReturnSup;
+                                objProductAutoSearch.ValReturnSup = listProductBase[i].ValReturnSup;
+                                objProductAutoSearch.Remark = listProductBase[i].Remark;
+                                objProductAutoSearch.ValConvert = listProductBase[i].ValConvert;
+                                objProductAutoSearch.UPinv = listProductBase[i].UPinv;
+                                listProductAutoSearch.push(objProductAutoSearch);
+
+
+                                debugger
+                                var productCodeBaseCur = listProductBase[i].ProductCodeBase;
+                                var listProductBaseUI = listProductBase[i].lstUnitCodeUIByProduct.filter(function (m) {
+                                    return m.ProductCodeBase === productCodeBaseCur;
+
+                                });
+
+                                for (var j = 0; j < listProductBaseUI.length; j++) {
+                                    var listProductAutoSearchBase = [];
+                                    var objProductAutoSearchBase = {};
+                                    objProductAutoSearchBase.ProductCodeRoot = listProductBaseUI[j].ProductCodeRoot;
+                                    objProductAutoSearchBase.ProductCodeBase = listProductBaseUI[j].ProductCodeBase;
+                                    objProductAutoSearchBase.ProductCode = listProductBaseUI[j].ProductCode;
+                                    objProductAutoSearchBase.ProductCodeUser = listProductBaseUI[j].ProductCodeUser;
+                                    objProductAutoSearchBase.ProductName = listProductBaseUI[j].ProductName;
+                                    objProductAutoSearchBase.FlagSerial = listProductBaseUI[j].FlagLot;
+                                    objProductAutoSearchBase.FlagLot = listProductBaseUI[j].FlagSerial;
+                                    objProductAutoSearchBase.UnitCode = listProductBaseUI[j].UnitCode;
+                                    objProductAutoSearchBase.InvCodeInActual = listProductBaseUI[j].InvCodeInActual;
+                                    objProductAutoSearchBase.Qty = listProductBaseUI[j].Qty;
+                                    objProductAutoSearchBase.QtyTotalOK = listProductBaseUI[j].QtyTotalOK;
+                                    objProductAutoSearchBase.UPIn = listProductBaseUI[j].UPIn;
+                                    objProductAutoSearchBase.UPReturnSup = listProductBaseUI[j].UPReturnSup;
+                                    objProductAutoSearchBase.ValReturnSup = listProductBaseUI[j].Qty * listProductBaseUI[j].UPReturnSup;
+                                    objProductAutoSearchBase.Remark = listProductBaseUI[j].Remark;
+                                    objProductAutoSearchBase.ValConvert = listProductBaseUI[j].ValConvert;
+                                    objProductAutoSearchBase.UPinv = listProductBaseUI[j].UPinv;
+                                    listProductAutoSearchBase.push(objProductAutoSearchBase);
+                                    var objProductBase = {
+                                        LstProductAutoSearchBase: objProductAutoSearchBase
+                                    };
+                                    List_PrdBase.push(objProductBase);
+                                }
+                                var objProduct = {
+                                    InvF_InventoryOutDtl: objProductAutoSearch,
+                                    Lst_InvF_InventoryOutDtl: listProductAutoSearch,
+                                    Lst_InvF_InventoryOutBase: List_PrdBase
+                                };
+                                listInventoryDtlAutoSearch.push(objProduct);
+
+                            }
+                            debugger
+                            if (listInventoryDtlAutoSearch !== null && listInventoryDtlAutoSearch !== undefined && listInventoryDtlAutoSearch.length > 0) {
+                                for (var i = 0; i < listInventoryDtlAutoSearch.length; i++) {
+                                    renderInvF_InventoryOutDtl_Multi(listInventoryDtlAutoSearch[i]);
+                                }
+
+                                var tongsl = 0.0;
+
+                                tongTienHang();
+                            }
+
+                        }
+
+                        var listChild = [];
+                        if (listData !== undefined && listData !== null && listData.length > 0) {
+                            for (var i = 0; i < listData.length; i++) {
+                                var objLotAutoSearch = {};
+                                var listLotAutoSearch = [];
+
+                                objLotAutoSearch.InvCodeInActual = listData[i].InvCodeOutActual;
+                                objLotAutoSearch.ProductCode = listData[i].ProductCode;
+                                objLotAutoSearch.ProductLotNo = listData[i].ProductLotNo;
+                                objLotAutoSearch.ProductionDate = '';
+                                objLotAutoSearch.ExpiredDate = '';
+                                objLotAutoSearch.Qty = listData[i].Qty;
+                                objLotAutoSearch.QtyTotalOK = listData[i].QtyTotalOK;
+                                listLotAutoSearch.push(objLotAutoSearch);
+                                var objSerial = {
+                                    Product_InvF_InventoryOutInstLot: objLotAutoSearch,
+                                    Lst_Mst_Inventory: listLotAutoSearch
+                                };
+                                listChild.push(objSerial);
+                            }
+                            if (listChild !== null && listChild !== undefined && listChild.length > 0) {
+
+                                for (var i = 0; i < listChild.length; i++) {
+                                    renderProductInvFInventoryOutInstLot(listChild[i]);
+                                }
+                                commonUtils.updateTableTrNotShowIdx($('#table-detailLot tr.trdata'), true);
+                            }
+
+
+                        }
+
+                    }
+                    else {
+                        var listError = [];
+                        var message = commonUtils.returnValue(objResult.Messages[0]);
+                        if (!commonUtils.isNullOrEmpty(message)) {
+                            var objToastr = { ToastrType: 'error', ToastrMessage: message };
+                            listError.push(objToastr);
+                        }
+                        if (listError !== undefined && listError !== null && listError.length > 0) {
+                            commonUtils.showToastr(listError);
+                        }
+                        var detail = commonUtils.returnValue(objResult.Detail);
+                        if (!commonUtils.isNullOrEmpty(detail)) {
+                            _showErrorMsg123('Lỗi!', detail);
+                        }
+                    }
+                },
+                error: function () {
+                    //Endloading();
+
+                },
+                cache: false,
+                contentType: false,
+                //dataType: "json",
+                processData: false
+
+
+            });
+        }
+    }
+
+
+    function ImportFileExcelSerial() {
+        debugger
+        var formData = new window.FormData($('#manageFormImportExcel')[0]);
+         var incodeOut = commonUtils.returnValue('#InvCodeOut');
+        if (commonUtils.isNullOrEmpty(incodeOut)) {
+            var listToastr = [];
+            objToastr = { ToastrType: 'error', ToastrMessage: '@MvcHtmlString.Create("Chưa chọn kho xuất".HtmlItemString("ordorderdl"))' };
+            listToastr.push(objToastr);
+            commonUtils.showToastr(listToastr);
+
+            commonUtils.setFocus('InvCodeOut');
+            return false;
+        }
+        else {
+            var invBUPattern = '';
+            var $option = $('#InvCodeOut').find(":selected");
+            if ($option !== undefined && $option !== null && $option.length > 0) {
+                invBUPattern = $option.attr('InvBUPattern');
+            }
+              formData.append('tax_file', $('input[type=file]')[0].files[0]);
+            formData.append('invBUPattern', invBUPattern);
+            $('#ImportExcelModal').modal("hide");
+            //Loading();
+            var url = '@(Url.Action("ImportSerial", "InvFInventoryReturnSup"))';
+
+            $.ajax({
+                url: url,
+                data: formData,
+                type: 'post',
+                beforeSend: function () { },
+                success: function (objResult) {
+                    debugger
+                    if (objResult.Success) {
+                        debugger
+
+                        var listData = objResult.listDtlImport;
+                        var listProductBase = objResult.list_MstProductUI;
+                        if (listProductBase !== undefined && listProductBase !== null && listProductBase.length > 0) {
+                            var listInventoryDtlAutoSearch = [];
+                            var List_PrdBase = [];
+
+                            for (var i = 0; i < listProductBase.length; i++) {
+                              var objProductAutoSearch = {};
+                              var listProductAutoSearch = [];
+
+                                objProductAutoSearch.ProductCodeRoot = listProductBase[i].ProductCodeRoot;
+                                objProductAutoSearch.ProductCodeBase = listProductBase[i].ProductCodeBase;
+                                objProductAutoSearch.ProductCode = listProductBase[i].ProductCode;
+                                objProductAutoSearch.ProductCodeUser = listProductBase[i].ProductCodeUser;
+                                objProductAutoSearch.ProductName = listProductBase[i].ProductName;
+                                objProductAutoSearch.FlagSerial = listProductBase[i].FlagSerial;
+                                objProductAutoSearch.FlagLot = listProductBase[i].FlagLot;
+                                objProductAutoSearch.UnitCode = listProductBase[i].UnitCode;
+                                objProductAutoSearch.InvCodeInActual = listProductBase[i].InvCodeInActual;
+                                objProductAutoSearch.Qty = listProductBase[i].Qty;
+                                objProductAutoSearch.QtyTotalOK = listProductBase[i].QtyTotalOK;
+                                objProductAutoSearch.UPIn = listProductBase[i].UPIn;
+                                objProductAutoSearch.UPReturnSup = listProductBase[i].UPReturnSup;
+                                objProductAutoSearch.ValReturnSup = listProductBase[i].ValReturnSup;
+                                objProductAutoSearch.Remark = listProductBase[i].Remark;
+                                objProductAutoSearch.ValConvert = listProductBase[i].ValConvert;
+                                objProductAutoSearch.UPinv = listProductBase[i].ValConvert;
+                                listProductAutoSearch.push(objProductAutoSearch);
+
+
+                                var productCodeBaseCur = listProductBase[i].ProductCodeBase;
+                                var listProductBaseUI = listProductBase[i].lstUnitCodeUIByProduct.filter(function (m) {
+                                    return m.ProductCodeBase === productCodeBaseCur;
+
+                                });
+
+
+                                for (var j = 0; j < listProductBaseUI.length; j++) {
+                                    var listProductAutoSearchBase = [];
+                                    var objProductAutoSearchBase = {};
+                                    objProductAutoSearchBase.ProductCodeRoot = listProductBaseUI[j].ProductCodeRoot;
+                                    objProductAutoSearchBase.ProductCodeBase = listProductBaseUI[j].ProductCodeBase;
+                                    objProductAutoSearchBase.ProductCode = listProductBaseUI[j].ProductCode;
+                                    objProductAutoSearchBase.ProductCodeUser = listProductBaseUI[j].ProductCodeUser;
+                                    objProductAutoSearchBase.ProductName = listProductBaseUI[j].ProductName;
+                                    objProductAutoSearchBase.FlagSerial = listProductBaseUI[j].FlagLot;
+                                    objProductAutoSearchBase.FlagLot = listProductBaseUI[j].FlagSerial;
+                                    objProductAutoSearchBase.UnitCode = listProductBaseUI[j].UnitCode;
+                                    objProductAutoSearchBase.InvCodeInActual = listProductBaseUI[j].InvCodeInActual;
+                                    objProductAutoSearchBase.Qty = listProductBaseUI[j].Qty;
+                                    objProductAutoSearchBase.QtyTotalOK = listProductBaseUI[j].QtyTotalOK;
+                                    objProductAutoSearchBase.UPIn = listProductBaseUI[j].UPIn;
+                                    objProductAutoSearchBase.UPReturnSup = listProductBaseUI[j].UPReturnSup;
+                                    objProductAutoSearchBase.ValReturnSup = listProductBaseUI[j].Qty * listProductBaseUI[j].UPReturnSup;
+                                    objProductAutoSearchBase.Remark = listProductBaseUI[j].Remark;
+                                    objProductAutoSearchBase.ValConvert = listProductBaseUI[j].ValConvert;
+                                    objProductAutoSearchBase.UPinv = listProductBaseUI[j].UPinv;
+                                    listProductAutoSearchBase.push(objProductAutoSearchBase);
+                                    var objProductBase = {
+                                        LstProductAutoSearchBase: objProductAutoSearchBase
+                                    };
+                                    List_PrdBase.push(objProductBase);
+
+                                }
+                                var objProduct = {
+                                    InvF_InventoryOutDtl: objProductAutoSearch,
+                                    Lst_InvF_InventoryOutDtl: listProductAutoSearch,
+                                    Lst_InvF_InventoryOutBase: List_PrdBase
+                                };
+                                listInventoryDtlAutoSearch.push(objProduct);
+                            }
+                            debugger
+                            if (listInventoryDtlAutoSearch !== null && listInventoryDtlAutoSearch !== undefined && listInventoryDtlAutoSearch.length > 0) {
+                                for (var i = 0; i < listInventoryDtlAutoSearch.length; i++) {
+                                    renderInvF_InventoryOutDtl_Multi(listInventoryDtlAutoSearch[i]);
+                                }
+
+                                var tongsl = 0.0;
+
+                                tongTienHang();
+                            }
+                        }
+
+
+                        var listChild = [];
+                        if (listData !== undefined && listData !== null && listData.length > 0) {
+                            for (var i = 0; i < listData.length; i++) {
+                                var objSerialAutoSearch = {};
+                                var listSerialAutoSearch = [];
+
+                                objSerialAutoSearch.ProductCode = listData[i].ProductCode;
+                                objSerialAutoSearch.SerialNo = listData[i].SerialNo;
+                                objSerialAutoSearch.InvCodeInActual = listData[i].InvCodeOutActual;
+
+                                listSerialAutoSearch.push(objSerialAutoSearch);
+                                var objSerial = {
+                                    Product_InvF_InventoryInInstSerial: objSerialAutoSearch,
+                                    Lst_Mst_Inventory: listSerialAutoSearch
+                                };
+                                listChild.push(objSerial);
+                            }
+
+                            if (listChild !== null && listChild !== undefined && listChild.length > 0) {
+                                for (var i = 0; i < listChild.length; i++) {
+                                    renderProductInvFInventoryOutInstSerial(listChild[i]);
+                                }
+                                commonUtils.updateTableTrNotShowIdx($('#table-detailSerial tr.trdata'), true);
+                            }
+
+                        }
+
+                    }
+
+                    else {
+                        var listError = [];
+                        var message = commonUtils.returnValue(objResult.Messages[0]);
+                        if (!commonUtils.isNullOrEmpty(message)) {
+                            var objToastr = { ToastrType: 'error', ToastrMessage: message };
+                            listError.push(objToastr);
+                        }
+                        if (listError !== undefined && listError !== null && listError.length > 0) {
+                            commonUtils.showToastr(listError);
+                        }
+                        var detail = commonUtils.returnValue(objResult.Detail);
+                        if (!commonUtils.isNullOrEmpty(detail)) {
+                            _showErrorMsg123('Lỗi!', detail);
+                        }
+                    }
+
+                },
+                error: function () {
+                    //Endloading();
+                },
+                cache: false,
+                contentType: false,
+                //dataType: "json",
+                processData: false
+
+
+            });
+
+        }
+
+    }
+
+</script>

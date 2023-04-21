@@ -1,0 +1,209 @@
+﻿
+@model RT_InvF_InventoryReturnSup
+
+@{
+    /**/
+
+    ViewBag.Title = "Template";
+
+    var tmpl_selected = "==selected==";
+    var disabledCss = "";
+
+
+    string viewType = CUtils.StrValue(ViewBag.ViewType);
+    var disabled = "";
+
+
+    if (viewType.Equals("detail"))
+    {
+        disabled = "disabled-fix";
+    }
+
+
+    var status = ViewBag.Status;
+
+
+    var userState = ViewBag.UserState as UserState;
+    var flagActive = "0";
+    var flagdisplaynone = "";
+
+
+    if (userState.RT_Mst_Sys_Config != null && userState.RT_Mst_Sys_Config.Lst_Mst_Sys_Config != null && userState.RT_Mst_Sys_Config.Lst_Mst_Sys_Config.Count > 0)
+    {
+        foreach (var item in userState.RT_Mst_Sys_Config.Lst_Mst_Sys_Config)
+        {
+            if (item.SysConfigID.Equals("IF_InvReturnSup"))
+            {
+                flagActive = CUtils.StrValue(item.FlagActive);
+            }
+        }
+    }
+
+    if (flagActive.Equals("0"))
+    {
+        flagdisplaynone = "display-none";
+    }
+}
+
+@*Template lưới hàng hóa*@
+
+<script type="text/template" id="tmpl_ShowPopup_Product_FlagSerial">
+    <a href="javascript:;" title="Chi tiết Serial" onclick="showPopupSerial('==ProductCode==','==ProductCodeUser==','==ProductName==','==ProductCodeBase==')">(Serial)</a>
+</script>
+<script type="text/template" id="tmpl_ShowPopup_Product_FlagLot">
+    <a href="javascript:;" title="Chi tiết Lô" onclick="showPopupLot(this, '==ProductCode==','==ProductCodeUser==','==ProductName==','==ProductCodeBase==', '==ValConvert==')">(Lô)</a>
+</script>
+<script type="text/template" id="tmpl_ShowPopup_Product_InvCodeOutActual">
+    <a href="javascript:;" title="Chọn vị trí nhập" onclick="showPopupInvCodeInActual(this,'==ProductCode==','==ProductCodeUser==','==ProductName==','==ProductCodeBase==','==ValConvert==')"><i class="fa fa-caret-down"></i></a>
+</script>
+
+
+
+@*template thay đổi đơn vị*@
+<script type="text/template" id="tmpl_options">
+    <option value="==UnitCode==" @MvcHtmlString.Create(tmpl_selected) productcode="==ProductCode==" valconvert="==ValConvert==">==UnitCode==</option>
+</script>
+
+@*template cache hang hoa cung base*@
+
+<script type="text/template" id="tmpl_products_list">
+    <div class="result display-none" productcode="==ProductCode==">
+        <input type="hidden" class="ProductCodeRoot" value="==ProductCodeRoot==" />
+        <input type="hidden" class="ProductCodeBase" value="==ProductCodeBase==" />
+        <input type="hidden" class="ProductCode" value="==ProductCode==" />
+        <input type="hidden" class="ProductCodeUser" value="==ProductCodeUser==" />
+        <input type="hidden" class="ProductName" value="==ProductName==" />
+        @*<input type="hidden" class="ProductType" value="==ProductType==" />*@
+        <input type="hidden" class="FlagSerial" value="==FlagSerial==" />
+        <input type="hidden" class="FlagLot" value="==FlagLot==" />
+        <input type="hidden" class="UnitCode" value="==UnitCode==" />
+        <input type="hidden" class="InvCodeInActual" value="==InvCodeInActual==" />
+        <input type="hidden" class="Qty" value="==Qty==" />
+        <input type="hidden" class="QtyTotalOK" value="==QtyTotalOK==" />
+        <input type="hidden" class="UPIn" value="==UPIn==" />
+        <input type="hidden" class="UPReturnSup" value="==UPReturnSup==" />
+        <input type="hidden" class="ValReturnSup" value="==ValReturnSup==" />
+        <input type="hidden" class="Remark" value="==Remark==" />
+        <input type="hidden" class="ProductLotNo" value="==ProductLotNo==" />
+        <input type="hidden" class="SerialNo" value="==SerialNo==" />
+        <input type="hidden" class="ValConvert" value="==ValConvert==" />
+        <input type="hidden" class="UPInv" value="==UPInv==" />
+    </div>
+</script>
+
+
+@*template luoi hang hoa*@
+
+
+<script type="text/template" id="tmpl_InvF_InventoryReturnSup">
+    <tr class="trdata" qtyOrder="==qtyOrder==" productcode="==ProductCode==" idx="==idx==" rd="==rd==">
+        <td class="cell-50 td-event-delete @disabled">
+            <a href="javascript:;" title="Xóa" onclick="deleteRow(this)"><i class="fas fa-trash-alt"></i></a>
+            <div class="products-list">
+            </div>
+        </td>
+        <td class="text-left cell-100 productcodeuser">
+            <span class="==productcodeuserCss==">==ProductCodeUser==</span> &nbsp; <span class="==producttypeCss==">@*==ProductType==*@</span>
+        </td>
+        <td class="text-left cell-150">
+            <span class="==productnameCss==">==ProductName==</span>
+            <input type="hidden" class="==productcodeCss==" value="==ProductCode==" />
+            <input type="hidden" class="==productcodeuserCss==" value="==ProductCodeUser==" />
+            <input type="hidden" class="==productcodebaseCss==" value="==ProductCodeBase==" />
+            <input type="hidden" class="==productcoderootCss==" value="==ProductCodeRoot==" />
+            <input type="hidden" class="==productnameCss==" value="==ProductName==" />
+            <input type="hidden" class="==flaglotCss==" value="==FlagLot==" />
+            <input type="hidden" class="==flagserialCss==" value="==FlagSerial==" />
+            <input type="hidden" class="==valconvertCss==" value="==ValConvert==" />
+            <input type="hidden" class="==upinvCss==" value="==UPInv==" />
+
+        </td>
+        <td class="cell-100 td-select2 @disabled">
+            <select class="select2 col-12 no-border ==select2Css==" onchange="changeProduct(this)" initdata="==ProductCode==" ischange="0">
+                <optgroup></optgroup>
+                <option></option>
+            </select>
+        </td>
+        <td class="text-center cell-100 QtyTotalOK ">
+            <input type="text" class="col-12 no-border text-right ==QtyTotalOKCss==" initdata="==QtyTotalOK==" value="==QtyTotalOK==" readonly="readonly" />
+        </td>
+        <td class="text-center cell-100 Qty">
+            <input type="text" class="col-12 no-border text-right ==qtyCss== @disabled" initdata="==Qty==" value="==Qty==" onkeyup="inputQty(this)" />
+        </td>
+        <td class="text-left cell-200">
+            @*==InvCodeSuggest==*@
+            <input type="text" class="col-11 no-border text-left disabled-fix ==invcodeinactualCss==" value="==InvCodeInActual==" />
+            <span class="==invcodeinactualtypeCss==">@*==ShowPopupInvCodeInActual==*@</span>
+            @*<input readonly="readonly" class="col-md-11 InvCode" name="Lst_InvF_InventoryOutDtl[==idx==].InvCodeOutActual" value="==InvCode==" />
+                ==showTonKho==*@
+        </td>
+        <td class="text-left cell-100 @flagdisplaynone">
+            <input type="text" class="col-12 no-border text-right UPOUT ==upinCss== @disabled" initdata="==UPIn==" value="==UPIn==" onkeyup="inputUPIn(this)" />
+        </td>
+        <td class="text-left cell-100 @flagdisplaynone">
+            <input type="text" class="col-12 no-border text-right UPOUTDesc ==upreturnsupCss== @disabled" initdata="==UPReturnSup==" value="==UPReturnSup==" onkeyup="inputUPInDesc(this)" />
+        </td>
+        <td class="text-left cell-150 @flagdisplaynone">
+            <input type="text" class="col-12 no-border text-right disabled-fix ValOUTAfterDesc ==valreturnsupCss==" value="==ValReturnSup==" />
+
+        </td>
+        <td class="text-left cell-150 ">
+            <textarea rows="1" class="col-12 no-border @disabled remark ==remarkCss==">==Remark==</textarea>
+        </td>
+    </tr>
+</script>
+
+
+
+@*Cache hàng hóa - vị trí - table-detailInvCodeInActual*@
+<script type="text/template" id="tmpl_product_invcodeinactual_list_cache">
+    <div class="result display-none" productcode="==ProductCode==">
+        <input type="hidden" class="ProductCode" value="==ProductCode==" />
+        <input type="hidden" class="InvCodeInActual" value="==InvCodeInActual==" />
+        <input type="hidden" class="QtyTotalOK" value="==QtyTotalOK==" />
+        <input type="hidden" class="Qty" value="==Qty==" />
+        <input type="hidden" class="UPInv" value="==UPInv==" /> @*Tạm thời add vào*@
+    </div>
+</script>
+<script type="text/template" id="tmpl_Product_InvCodeReturnSupActual">
+    <tr class="data-item trdata" productcode="==ProductCode==" idx="==idx=="  productcodebase="==ProductCodeBase==">
+        <td>
+            <div class="products-list-cache">
+            </div>
+        </td>
+    </tr>
+</script>
+
+
+
+
+@*Cache hàng hóa - LOT - table-detailLot*@
+<script type="text/template" id="tmpl_Product_LOT">
+    <tr class="data-item trdata" productcode="==ProductCode==" idx="==idx==" invCodeInActual="==InvCodeInActual==">
+        <td>
+            @*<input type="hidden" class="ProductCodeRoot" value="==ProductCodeRoot==" />*@
+            <input type="hidden" class="ProductCode" value="==ProductCode==" />
+            <input type="hidden" class="ProductLotNo" value="==ProductLotNo==" />
+            <input type="hidden" class="ProductionDate" value="==ProductionDate==" />
+            <input type="hidden" class="ExpiredDate" value="==ExpiredDate==" />
+            <input type="hidden" class="InvCodeInActual" value="==InvCodeInActual==" />
+            <input type="hidden" class="Qty" value="==Qty==" />
+            <input type="hidden" class="QtyTotalOK" value="==QtyTotalOK==" />
+        </td>
+    </tr>
+</script>
+
+
+@*Cache hàng hóa - Serail - table-detailSerial*@
+<script type="text/template" id="tmpl_Product_Serial">
+    <tr class="data-item trdata" productcode="==ProductCode==" idx="==idx==" invCodeInActual="==InvCodeInActual==">
+        <td>
+            @*<input type="hidden" class="ProductCodeRoot" value="==ProductCodeRoot==" />*@
+            <input type="hidden" class="ProductCode" value="==ProductCode==" />
+            <input type="hidden" class="SerialNo" value="==SerialNo==" />
+            <input type="hidden" class="InvCodeInActual" value="==InvCodeInActual==" />
+        </td>
+    </tr>
+</script>
+
+

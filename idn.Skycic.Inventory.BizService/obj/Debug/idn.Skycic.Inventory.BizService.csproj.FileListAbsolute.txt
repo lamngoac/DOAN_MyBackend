@@ -1,0 +1,96 @@
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\idn.Skycic.Inventory.BizService.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\idn.Skycic.Inventory.BizService.pdb
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\idn.Skycic.Inventory.Common.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\idn.Skycic.Inventory.Constants.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\idn.Skycic.Inventory.Utils.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\System.Net.Http.Formatting.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\Newtonsoft.Json.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\EPPlus.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\RestSharp.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\TSession.Core.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\System.Web.Helpers.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\CommonUtils.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\EncryptionLib.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\System.Web.WebPages.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\EzSqlServer.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\Microsoft.Web.Infrastructure.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\System.Web.WebPages.Deployment.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\idn.Skycic.Inventory.Common.pdb
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\idn.Skycic.Inventory.Constants.pdb
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\idn.Skycic.Inventory.Utils.pdb
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\System.Net.Http.Formatting.xml
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\Newtonsoft.Json.xml
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\RestSharp.xml
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\System.Web.Helpers.xml
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\System.Web.WebPages.xml
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\Microsoft.Web.Infrastructure.xml
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\bin\Debug\System.Web.WebPages.Deployment.xml
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\obj\Debug\idn.Skycic.Inventory.BizService.csprojAssemblyReference.cache
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\obj\Debug\idn.Skycic.Inventory.BizService.csproj.CoreCompileInputs.cache
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\obj\Debug\idn.Skycic.Inventory.BizService.csproj.CopyComplete
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\obj\Debug\idn.Skycic.Inventory.BizService.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.BizService\obj\Debug\idn.Skycic.Inventory.BizService.pdb
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\idn.Skycic.Inventory.BizService.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\idn.Skycic.Inventory.BizService.pdb
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\idn.Skycic.Inventory.Common.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\idn.Skycic.Inventory.Constants.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\idn.Skycic.Inventory.Utils.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\System.Net.Http.Formatting.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\Newtonsoft.Json.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\EPPlus.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\RestSharp.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\TSession.Core.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\System.Web.Helpers.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\CommonUtils.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\EncryptionLib.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\System.Web.WebPages.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\EzSqlServer.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\Microsoft.Web.Infrastructure.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\System.Web.WebPages.Deployment.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\idn.Skycic.Inventory.Common.pdb
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\idn.Skycic.Inventory.Constants.pdb
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\idn.Skycic.Inventory.Utils.pdb
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\System.Net.Http.Formatting.xml
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\Newtonsoft.Json.xml
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\RestSharp.xml
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\System.Web.Helpers.xml
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\System.Web.WebPages.xml
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\Microsoft.Web.Infrastructure.xml
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\System.Web.WebPages.Deployment.xml
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\obj\Debug\idn.Skycic.Inventory.BizService.csprojAssemblyReference.cache
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\obj\Debug\idn.Skycic.Inventory.BizService.csproj.CoreCompileInputs.cache
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\obj\Debug\idn.Skycic.Inventory.BizService.csproj.CopyComplete
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\obj\Debug\idn.Skycic.Inventory.BizService.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\obj\Debug\idn.Skycic.Inventory.BizService.pdb
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\idn.Skycic.Inventory.BizService.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\idn.Skycic.Inventory.BizService.pdb
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\idn.Skycic.Inventory.Common.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\idn.Skycic.Inventory.Constants.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\idn.Skycic.Inventory.Utils.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\System.Net.Http.Formatting.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\Newtonsoft.Json.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\EPPlus.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\RestSharp.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\TSession.Core.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\System.Web.Helpers.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\CommonUtils.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\EncryptionLib.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\System.Web.WebPages.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\EzSqlServer.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\Microsoft.Web.Infrastructure.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\System.Web.WebPages.Deployment.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\idn.Skycic.Inventory.Common.pdb
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\idn.Skycic.Inventory.Constants.pdb
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\idn.Skycic.Inventory.Utils.pdb
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\System.Net.Http.Formatting.xml
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\Newtonsoft.Json.xml
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\RestSharp.xml
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\System.Web.Helpers.xml
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\System.Web.WebPages.xml
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\Microsoft.Web.Infrastructure.xml
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\bin\Debug\System.Web.WebPages.Deployment.xml
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\obj\Debug\idn.Skycic.Inventory.BizService.csprojAssemblyReference.cache
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\obj\Debug\idn.Skycic.Inventory.BizService.csproj.CoreCompileInputs.cache
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\obj\Debug\idn.Skycic.Inventory.BizService.csproj.CopyComplete
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\obj\Debug\idn.Skycic.Inventory.BizService.dll
+E:\MERN Project\BackEnd\V1.0\idn.Skycic.Inventory.BizService\obj\Debug\idn.Skycic.Inventory.BizService.pdb

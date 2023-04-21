@@ -1,0 +1,157 @@
+﻿@model Mst_District
+@{
+    Layout = "~/Views/Shared/CoreLayoutQuanTri.cshtml";
+    var title = "SỬA DANH MỤC QUẬN/HUYỆN";
+    var titleMng = "Danh mục quận huyện";
+    ViewBag.Title = title;
+    var listMst_Province = ViewBag.ListMst_Province as List<Mst_Province>;
+    if (listMst_Province == null || listMst_Province.Count == 0)
+    {
+        listMst_Province = new List<Mst_Province>();
+    }
+}
+<script type="text/javascript">
+    var parents = new Array();
+    parents.push("@Url.Action("Index", "Mst_District")");
+    parents.push("");
+    var parentsText = new Array();
+    parentsText.push("@MvcHtmlString.Create("titleMng")");
+    parentsText.push("@MvcHtmlString.Create("title")");
+    setAdminCurrentTag(parents, parentsText);
+
+
+
+</script>
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="row no-margin box-shadow-tk">
+                        @using (Html.BeginForm("Create", "Mst_PaymentType", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-9">
+                                    <label for="DistrictCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã quận/ huyện <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="DistrictCode" name="DistrictCode" class="col-xs-12 DistrictCode" onkeyup="locdau(this);" value="@if (Model != null && Model.DistrictCode != null){@MvcHtmlString.Create(Model.DistrictCode.ToString())} else { @("")}" disabled autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-9">
+                                    <label for="DistrictName" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên quận/ huyện <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="DistrictName" name="DistrictName" class="col-xs-12 Code DistrictName" value="@if (Model != null && Model.DistrictName != null){@MvcHtmlString.Create(Model.DistrictName.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-9">
+                                    <label for="ProvinceCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã tỉnh/ thành phố <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            @{
+                                                var provincecode = "";
+                                                if (Model != null)
+                                                {
+                                                    if (Model.ProvinceCode != null)
+                                                    {
+                                                        provincecode = Model.ProvinceCode.ToString();
+                                                    }
+                                                }
+                                            }
+                                            <select id="ProvinceCode" name="ProvinceCode" class="col-xs-12 ProvinceCode">
+                                                <option value=""></option>
+                                                @if (listMst_Province != null && listMst_Province.Count > 0)
+                                                {
+                                                    foreach (var item in listMst_Province)
+                                                    {
+                                                        <option value="@MvcHtmlString.Create(item.ProvinceCode.ToString().Trim())" desc="@MvcHtmlString.Create(item.ProvinceCode.ToString().Trim())" @(item.ProvinceCode.ToString().Trim().Equals(provincecode) ? "selected" : "")>@MvcHtmlString.Create(item.ProvinceCode.ToString().Trim())</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-9">
+                                    @{
+                                        var checkActive = "";
+                                        if (Model != null && Model.FlagActive.Equals("1"))
+                                        {
+                                            checkActive = "checked";
+                                        }
+                                        else
+                                        {
+                                            checkActive = "";
+                                        }
+                                    }
+                                    <label for="FlagActive" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">Trạng thái</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right padding-top-5">
+                                            <label>
+                                                <input name="FlagActive" id="FlagActive" class="ace ace-switch ace-switch-4 " type="checkbox" value="1" @checkActive />
+                                                <span class="lbl"></span>
+                                                <input name="" type="hidden" value="0" />
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        }
+                    </aside>
+                    <div class="col-xs-12 no-padding">
+                        <div class="clearfix">
+                            <div class="row no-margin" style="float: right">
+                                @RenderItemFormat("BTN_SUA_QUAN_HUYEN_CAP_NHAT", "<a href=\"javascript:void();\" class=\"btn btn-nc-button\" style=\"margin-top: 20px; \" onclick=\"SaveData();\">Lưu</a>", "", "")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Mst_District.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "Mst_District")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+        });
+        @* Set focus *@
+        var _getForm = document.getElementById("manageForm");
+        _getForm.addEventListener('reset', function () {
+            document.getElementById("").focus()
+        });
+        function SaveData() {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Edit", "Mst_District")';
+            var objMst_District = new Mst_District();
+            objMst_District.ActionType = 'edit';
+            objMst_District.ajaxSettings = ajaxSettings;
+            objMst_District.saveData();
+        }
+    </script>
+}

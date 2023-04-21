@@ -1,0 +1,139 @@
+﻿
+@model Mst_Area
+@{
+    ViewBag.Title = "Chi tiết vùng thị trường";
+
+    var listMst_AreaExt = ViewBag.ListMst_AreaExt as List<Mst_AreaExt>;
+    if (listMst_AreaExt == null || listMst_AreaExt.Count == 0)
+    {
+        listMst_AreaExt = new List<Mst_AreaExt>();
+    }
+
+    var htmlStr = "mstorg";
+
+    var areaCode = "";
+    var areaName = "";
+    var areaDes = "";
+    var flagActive = "";
+    var areaParentCode = "";
+    var checkActive = "";
+
+    if (Model != null)
+    {
+        if (!CUtils.IsNullOrEmpty(Model.AreaCode))
+        {
+            areaCode = CUtils.StrValue(Model.AreaCode);
+        }
+
+        if (!CUtils.IsNullOrEmpty(Model.AreaName))
+        {
+            areaName = CUtils.StrValue(Model.AreaName);
+        }
+
+        if (!CUtils.IsNullOrEmpty(Model.AreaDesc))
+        {
+            areaDes = CUtils.StrValue(Model.AreaDesc);
+        }
+        if (!CUtils.IsNullOrEmpty(Model.FlagActive))
+        {
+            flagActive = CUtils.StrValue(Model.FlagActive);
+        }
+        if (!CUtils.IsNullOrEmpty(Model.AreaCodeParent))
+        {
+            areaParentCode = CUtils.StrValue(Model.AreaCodeParent);
+        }
+    }
+
+    if (flagActive.Equals("1"))
+    {
+        checkActive = "checked";
+    }
+    else
+    {
+        checkActive = "";
+    }
+
+
+}
+
+<div>
+    <div class="row no-margin">
+        <aside class="col-12">
+            @using (Html.BeginForm("Detail", "Mst_Area", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <div class="layout-bot-top-16 col-12 row">
+                    <div class="col-4 no-padding">
+                        <div class="form-group margin-bottom-9">
+                            <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Tên khu vực".HtmlItemString(htmlStr)) <span style="color:red">*</span></label>
+                            <div class="col-12 col-sm-8">
+                                <span class="block input-icon input-icon-right">
+                                    <input type="text" id="areaname" name="areaname" class="col-12 areaname" value="@MvcHtmlString.Create(areaName)" autocomplete="off" required disabled />
+                                    <input type="hidden" id="areaCode" name="areaCode" class="col-12 areaCode" value="@MvcHtmlString.Create(areaCode)" />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group margin-bottom-9">
+                            <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Khu vực cha".HtmlItemString(htmlStr))</label>
+                            <div class="col-12 col-sm-8">
+                                <select id="AreaCodeParent" name="AreaCodeParent" class="col-12 AreaCodeParent" disabled>
+                                    <optgroup label="">
+                                        <option value="">&nbsp;</option>
+                                        @if (listMst_AreaExt != null && listMst_AreaExt.Count > 0)
+                                        {
+                                            foreach (var item in listMst_AreaExt)
+                                            {
+                                                var areaCodeCur = CUtils.StrValue(item.AreaCode);
+                                                var areaLevelCur = CUtils.StrValue(item.AreaLevel);
+                                                var hlevelTitleCur = CUtils.StrValue(item.HlevelTitle);
+                                                <option value="@MvcHtmlString.Create(areaCodeCur)" area-level="@MvcHtmlString.Create(areaLevelCur)" @(areaParentCode.Equals(areaCodeCur) ? "selected" : "")>@MvcHtmlString.Create(hlevelTitleCur)</option>
+                                            }
+                                        })
+                                    </optgroup>
+                                    <option value="ADDDATA">@("".HtmlItemString("product"))</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 no-padding">
+                        <div class="form-group margin-bottom-9">
+                            <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Mô tả".HtmlItemString(htmlStr))</label>
+                            <div class="col-12 col-sm-8">
+                                <span class="block input-icon input-icon-right">
+                                    <textarea type="text" id="areades" name="areades" class="col-12 areades" disabled autocomplete="off" required>@MvcHtmlString.Create(areaDes)</textarea>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group margin-bottom-9">
+                            <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Trạng thái".HtmlItemString(htmlStr))</label>
+                            <div class="col-12 col-sm-8">
+                                <span class="block input-icon input-icon-right ">
+                                    <label style="margin-top:-2px">
+                                        <input id="FlagActive" name="FlagActive" class="ace ace-switch ace-switch-4" type="checkbox" value="@MvcHtmlString.Create(flagActive)" disabled @checkActive>
+                                        <span class="lbl"></span>
+                                    </label>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </aside>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        setAdminCurrentUrl('@Url.Action("Index", "Mst_Area")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+
+        });
+        var _getForm = document.getElementById("manageForm");
+        _getForm.addEventListener('reset', function () {
+            document.getElementById("").focus();
+        });
+
+    </script>
+}

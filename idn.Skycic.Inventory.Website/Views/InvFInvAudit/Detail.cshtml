@@ -1,0 +1,359 @@
+﻿@model RT_InvF_InvAudit
+@{
+    var Lst_Mst_Inventory = ViewBag.Lst_Mst_Inventory as List<Mst_Inventory>;
+    var Lst_Mst_InventoryType = ViewBag.Lst_Mst_InventoryType as List<Mst_InventoryType>;
+    var Lst_Mst_InventoryLevelType = ViewBag.Lst_Mst_InventoryLevelType as List<Mst_InventoryLevelType>;
+    var IFInvAudNo = ViewBag.IFInvAudNo == null ? "" : ViewBag.IFInvAudNo.ToString();
+
+    var lst_Mst_InvOutType = new List<Mst_InvOutType>();
+    if (ViewBag.Lst_Mst_InvOutType != null)
+    {
+        lst_Mst_InvOutType = ViewBag.Lst_Mst_InvOutType as List<Mst_InvOutType>;
+    }
+
+    var lstCustomer = new List<Mst_Customer>();
+    if (ViewBag.Lst_MstCustomer != null)
+    {
+        lstCustomer = ViewBag.Lst_MstCustomer as List<Mst_Customer>;
+    }
+
+    var lst_Mst_ProductUI = new List<Mst_ProductUI>();
+    if (ViewBag.Lst_Mst_ProductUI != null)
+    {
+        lst_Mst_ProductUI = ViewBag.Lst_Mst_ProductUI;
+    }
+
+    var InvF_InvAudit = new InvF_InvAudit();
+    if (Model != null && Model.Lst_InvF_InvAudit != null && Model.Lst_InvF_InvAudit.Count != 0)
+    {
+        InvF_InvAudit = Model.Lst_InvF_InvAudit[0];
+    }
+    var iF_InvAuditStatus = CUtils.StrValue(InvF_InvAudit.IF_InvAuditStatus);
+    var lst_InvF_InvAuditDtl = new List<InvF_InvAuditDtl>();
+    var style = "";
+    if (Model.Lst_InvF_InvAuditDtl != null)
+    {
+        lst_InvF_InvAuditDtl = Model.Lst_InvF_InvAuditDtl;
+        if (Model.Lst_InvF_InvAuditDtl.Count > 0)
+        {
+            style = "disabled=\"disabled\"";
+        }
+    }
+
+
+}
+@{
+    ViewBag.Title = "Chi tiết phiếu kiểm kê";
+}
+<script src="@Url.Content("~/Scripts/print.min.js")"></script>
+
+<div class="mt-3">
+    <div class="col-12">
+        @using (Html.BeginForm("Update", "InvFInvAudit", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+            <div class="col-12 row no-margin">
+                <div class="margin-bottom-9">
+                    @if (iF_InvAuditStatus.Equals("PENDING"))
+                    {
+                        @RenderItemFormat("BTN_QL_KIEM_KE_DUYET", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnApprove\" onclick=\"Approve('" + Url.Action("Approve", "InvFInvAudit") + "', '" + CUtils.StrValue(InvF_InvAudit.IF_InvAudNo) + "');\"><i class=\"fa fa-check-circle\" aria-hidden=\"true\"></i> Duyệt</a>", "", "")
+                        @RenderItemFormat("BTN_QL_KIEM_KE_HUY", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnCancel\" onclick=\"Cancel('" + Url.Action("Cancel", "InvFInvAudit") + "', '" + CUtils.StrValue(InvF_InvAudit.IF_InvAudNo) + "');\"><i class=\"fas fa-ban\" aria-hidden=\"true\"></i> Hủy</a>", "", "")
+                    }
+                    else
+                    {
+                        if (iF_InvAuditStatus.Equals("APPROVE"))
+                        {
+                            @RenderItemFormat("BTN_QL_KIEM_KE_DUYET_SAU_KIEM", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnFinish\" onclick=\"Finish('" + Url.Action("Finish", "InvFInvAudit") + "', '" + CUtils.StrValue(InvF_InvAudit.IF_InvAudNo) + "');\"><i class=\"far fa-flag\" aria-hidden=\"true\"></i> Duyệt điều chỉnh</a>", "", "")
+                            @RenderItemFormat("BTN_QL_KIEM_KE_HUY", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnCancel\" onclick=\"Cancel('" + Url.Action("Cancel", "InvFInvAudit") + "', '" + CUtils.StrValue(InvF_InvAudit.IF_InvAudNo) + "');\"><i class=\"fas fa-ban\" aria-hidden=\"true\"></i> Hủy</a>", "", "")
+                        }
+                    }
+                    @RenderItemFormat("BTN_QL_KIEM_KE_IN", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnPrint\" onclick=\"Print()\"><i class=\"fas fa-download\" aria-hidden=\"true\"></i> Print</a>", "", "")
+                </div>
+            </div>
+            <div class="col-12 row">
+                <div class="col-12 row">
+                    <aside class="col-md-4">
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="IFInvAudNo">
+                                @("Số phiếu kiểm kê".HtmlItemString("ifinvaudno_invfinvaudit"))
+                            </label>
+                            <div class="col-md-8">
+                                <input type="text" class="col-md-12 text-bold" name="IFInvAudNo" id="IFInvAudNo" readonly="readonly" value="@(InvF_InvAudit.IF_InvAudNo == null ? "" : InvF_InvAudit.IF_InvAudNo)" />
+                            </div>
+                        </div>
+
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="IFInvAudNo">
+                                @("Ngày tạo".HtmlItemString("createdtime_invfinvaudit"))
+                            </label>
+                            <div class="col-md-8">
+                                <input type="text" class="col-md-12 text-bold" readonly="readonly" value="@(InvF_InvAudit.CreateDTimeUTC == null ? "" : Convert.ToDateTime(InvF_InvAudit.CreateDTimeUTC).ToString("yyyy-MM-dd"))" />
+                            </div>
+                        </div>
+                    </aside>
+                    <aside class="col-md-4">
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="InvCodeOut">
+                                @("Kho kiểm kê".HtmlItemString("invcode_invfinvaudit"))
+                                <span style="color: red "> *</span>
+                            </label>
+                            <div class="col-md-8">
+                                <span class="block input-icon input-icon-right">
+                                    <select @style showpopup-control-searchdata="#ShowPopupInvCodeAudit" class="col-md-12 mstinventory" onchange="ChangeInvCodeOut(this);" id="InvCodeAudit">
+                                        <optgroup label="">
+                                            <option value="">--Chọn kho kiểm kê--</option>
+                                            @if (Lst_Mst_Inventory != null && Lst_Mst_Inventory.Count > 0)
+                                            {
+                                                foreach (var item in Lst_Mst_Inventory)
+                                                {
+                                                    var invCode = CUtils.StrValue(item.InvCode);
+                                                    var invName = CUtils.StrValue(item.InvName);
+                                                    <option @(InvF_InvAudit.InvCodeAudit.Equals(item.InvCode) ? "selected" : "") invBUPattern="@(item.InvBUPattern == null ? "" : item.InvBUPattern)" value="@MvcHtmlString.Create(invCode)">@MvcHtmlString.Create(invName)</option>
+                                                }
+                                            }
+                                        </optgroup>
+                                    </select>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="IFInvAudNo">
+                                @("Trạng thái".HtmlItemString("ifinvaudno_invfinvaudit"))
+                            </label>
+                            <div class="col-md-8">
+                                <input type="text" class="col-md-12 text-bold" name="IF_InvAuditStatus" id="IF_InvAuditStatus" readonly="readonly" value="@InvF_InvAudit.IF_InvAuditStatus" />
+                            </div>
+                        </div>
+                    </aside>
+                    <aside class="col-md-4">
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-3" for="Remark">
+                                @("Ghi chú".HtmlItemString("remark_invfinvaudit"))
+                            </label>
+                            <div class="col-md-12">
+                                <textarea class="col-md-6" disabled name="Remark" id="Remark" rows="2">@(InvF_InvAudit.Remark == null ? "" : InvF_InvAudit.Remark.ToString())</textarea>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+
+            </div>
+        }
+    </div>
+</div>
+
+@Html.Partial("LstProduct", lst_InvF_InvAuditDtl, new ViewDataDictionary() {
+    { "viewonly", "1" },
+    { "IF_InvAuditStatus", InvF_InvAudit.IF_InvAuditStatus }
+})
+@Html.Partial("_TemplateHtml", new ViewDataDictionary() {
+    { "lstInvF_InvAuditInstLot", Model.Lst_InvF_InvAuditInstLot },
+    { "lstInvF_InvAuditInstSerial", Model.Lst_InvF_InvAuditInstSerial }
+})
+@Html.Partial("_CommonJs", new ViewDataDictionary() {
+    { "viewonly", "1" }
+})
+<script src="~/Scripts/mine/InvF_Audit.js"></script>
+@section Scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("select#InvCodeAudit").select2();
+            $("select#ProductCode").select2();
+        });
+    </script>
+
+    <!-- In phiếu -->
+    <script>
+        function Print() {
+            var IF_InvAudNo = commonUtils.returnValueText('#IFInvAudNo');
+            if (commonUtils.isNullOrEmpty(IF_InvAudNo)) {
+                alert("Số phiếu kiểm kê trống!");
+                return false;
+            }
+            let Url = '@Url.Action("PrintTemp", "InvFInvAudit")';
+
+            $.ajax({
+                type: "post",
+                data:
+                {
+                    IF_InvAudNo: IF_InvAudNo
+                },
+                url: Url,
+                dataType: 'json',
+                beforeSend: function () { }
+            }).done(function (result) {
+                if (result.Success) {
+                    if (result.LinkPDF !== undefined || result.LinkPDF !== '') {
+                        printPdf(result.LinkPDF);
+                    }
+                    else {
+                        alert('Không lấy được dữ liệu mẫu in');
+                    }
+                }
+                else {
+                    if (result.Messages !== undefined && result.Messages.length > 0) {
+                        alert(result.Messages[0]);
+                    }
+                    if (!commonUtils.isNullOrEmpty(result.Detail)) {
+                        showErrorDialog(result.Detail);
+                    }
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+
+            }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+                //alert("complete");
+            });
+        }
+
+        function printPdf(linkPdf) {
+            printJS({
+                printable: linkPdf,
+                type: 'pdf',
+                showModal: true,
+                //onPrintDialogClose: () => console.log('The print dialog was closed'),
+                //onPdfOpen: () => console.log('Pdf was opened in a new tab due to an incompatible browser')
+            })
+        }
+    </script>
+    <script>
+        function Approve(url, IF_InvAudNo) {
+            var listError = [];
+            if (IF_InvAudNo === "") {
+                var objToastr = {
+                    ToastrType: 'error',
+                    ToastrMessage: 'Số phiếu kiểm kê không tồn tại!'
+                };
+                listError.push(objToastr);
+            }
+            if (listError !== undefined && listError !== null && listError.length > 0) {
+                commonUtils.showToastr(listError);
+                return false;
+            }
+            var remark = commonUtils.returnValueText('#Remark');
+            var lstIF_InvAudNo = [];
+            var objIF_InvAudNo = {
+                IF_InvAudNo: IF_InvAudNo,
+                Remark: remark,
+            };
+            lstIF_InvAudNo.push(objIF_InvAudNo);
+
+            bootbox.confirm({
+                title: "Thông báo",
+                message: "Đồng ý duyệt phiếu kiểm kê " + IF_InvAudNo + " ?",
+                buttons: {
+                    'cancel': {
+                        label: 'Thoát',
+                        className: 'btn btn-cancel'
+                    },
+                    'confirm': {
+                        label: 'Đồng ý',
+                        className: 'btn btn-nc-button btn-yes'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        $.ajax({
+                            url: url,
+                            data: {
+                                lstIF_InvAudNo: commonUtils.returnJSONValue(lstIF_InvAudNo),
+                            },
+                            type: 'post',
+                            dataType: 'json',
+                            traditional: true,
+                            success: function (data) {
+                                if (data.Success) {
+                                    var listToastr = [];
+                                    objToastr = { ToastrType: 'success', ToastrMessage: data.Messages };
+                                    listToastr.push(objToastr);
+                                    commonUtils.showToastr(listToastr);
+
+                                    if (data.RedirectUrl !== null) {
+                                        window.location.href = data.RedirectUrl;
+                                    }
+                                } else {
+                                    showErrorDialog(data.Detail);
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    </script>
+    <script>
+        function Finish(url, IF_InvAudNo) {
+            var listError = [];
+            if (IF_InvAudNo === "") {
+                var objToastr = {
+                    ToastrType: 'error',
+                    ToastrMessage: 'Số phiếu kiểm kê không tồn tại!'
+                };
+                listError.push(objToastr);
+            }
+            if (listError !== undefined && listError !== null && listError.length > 0) {
+                commonUtils.showToastr(listError);
+                return false;
+            }
+            var remark = commonUtils.returnValueText('#Remark');
+            var lstIF_InvAudNo = [];
+            var objIF_InvAudNo = {
+                IF_InvAudNo: IF_InvAudNo,
+                Remark: remark,
+            };
+            lstIF_InvAudNo.push(objIF_InvAudNo);
+
+            bootbox.confirm({
+                title: "Thông báo",
+                message: "Đồng ý duyệt phiếu kiểm kê " + IF_InvAudNo + " ?",
+                buttons: {
+                    'cancel': {
+                        label: 'Thoát',
+                        className: 'btn btn-cancel'
+                    },
+                    'confirm': {
+                        label: 'Đồng ý',
+                        className: 'btn btn-nc-button btn-yes'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        $.ajax({
+                            url: url,
+                            data: {
+                                lstIF_InvAudNo: commonUtils.returnJSONValue(lstIF_InvAudNo),
+                            },
+                            type: 'post',
+                            dataType: 'json',
+                            traditional: true,
+                            success: function (data) {
+                                if (data.Success) {
+                                    var listToastr = [];
+                                    objToastr = { ToastrType: 'success', ToastrMessage: data.Messages };
+                                    listToastr.push(objToastr);
+                                    commonUtils.showToastr(listToastr);
+
+                                    if (data.RedirectUrl !== null) {
+                                        window.location.href = data.RedirectUrl;
+                                    }
+                                } else {
+                                    showErrorDialog(data.Detail);
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    </script>
+    <script type="text/javascript">
+    $(document).ready(function () {
+        $('th.cl-action').addClass('display-none');
+        $('td.cl-action').addClass('display-none');
+        var $tdColspan = $('#dynamic-table-thead-tbody').find('tfoot tr.tr-tfoot').find('td.cl-colspan');
+        if ($tdColspan !== undefined && $tdColspan !== null && $tdColspan.length > 0) {
+            $tdColspan.attr('colspan', 4);
+        }
+    });
+    </script>
+}

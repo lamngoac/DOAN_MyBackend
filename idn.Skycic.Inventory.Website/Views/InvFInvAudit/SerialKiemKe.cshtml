@@ -1,0 +1,940 @@
+﻿@model List<Inv_InventoryBalanceSerial>
+@{
+    var type = ""; // type = "kiemke"
+    if (ViewBag.type != null)
+    {
+        type = ViewBag.type;
+    }
+    var ProductCodeUser = ViewBag.ProductCodeUser == null ? "" : ViewBag.ProductCodeUser;
+    var ProductName = ViewBag.ProductName == null ? "" : ViewBag.ProductName;
+    var ProductCode = ViewBag.ProductCode == null ? "" : ViewBag.ProductCode;
+    var Lst_InvF_InvAuditInstSerial_Actual = new List<InvF_InvAuditInstSerial>();
+    if (ViewBag.Lst_InvF_InvAuditInstSerial_Actual != null)
+    {
+        Lst_InvF_InvAuditInstSerial_Actual = ViewBag.Lst_InvF_InvAuditInstSerial_Actual;
+    }
+    var FlagAudit = "0";
+    if (ViewBag.FlagAudit != null)
+    {
+        FlagAudit = ViewBag.FlagAudit;
+    }
+    var Lst_Mst_Inventory = ViewBag.Lst_Mst_Inventory as List<Mst_Inventory>;
+
+    // Lấy danh sách thực tế không có trong tồn kho
+    //var lstSerialThucTe = new List<InvF_InvAuditInstSerial>();
+
+    //foreach(var it in Lst_InvF_InvAuditInstSerial_Actual)
+    //{
+    //    var lstTonKho = Model.Where(x => x.SerialNo.Equals(it.SerialNo)).ToList();
+    //    if(lstTonKho.Count == 0) // Không tồn tại trong tồn kho
+    //    {
+    //        lstSerialThucTe.Add(it);
+    //    }
+    //}
+    var viewonly = "";
+    if (ViewBag.viewonly != null)
+    {
+        viewonly = ViewBag.viewonly;
+    }
+
+    var disabled = "";
+    var hiddenElement = "";
+    if (viewonly == "1")
+    {
+        disabled = "disabled";
+        hiddenElement = "idn-hidden";
+    }
+}
+
+<div class="modal-dialog" style="width: 850px; max-width: 850px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel"><b>POPUP danh sách Serial</b></h2>
+            <a href="javascript:;" onclick="ClosePopupSerial()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body" style="">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopuSerial" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="col-md-12 no-padding">
+                    <div class="form-group margin-bottom-9">
+                        <div class="col-10 col-sm-8 no-padding">
+                            <span class="block input-icon input-icon-right">
+                                <label>Mã hàng hóa: @ProductCodeUser - @ProductName</label>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group margin-bottom-5">
+                        <input hidden id="mdSerial_ProductCode" value="@(ViewBag.ProductCode == null ? "" : ViewBag.ProductCode)" />
+                        @*<label for="ParentCode" class="col-xs-3 col-sm-3 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tìm số Serial <span style=\"color: red\">*</span>")</label>
+                            <div class="col-xs-3 col-sm-4">
+                                <select id="Serial" style="width: 150px;" multiple>
+                                    @{
+                                        foreach (var it in Model)
+                                        {
+                                            <option ProductLotNo="@it.ProductLotNo" SerialNo="@(it.SerialNo == null ? "" : it.SerialNo)" InvCode="@it.InvCode" value="@it.SerialNo">@it.SerialNo</option>
+                                        }
+                                    }
+                                </select>
+                            </div>*@
+                        <div class="col-xs-3 col-sm-4 no-padding">
+                            @*<a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="SelectSerial()" style="font-size: 13px;">Chọn</a>*@
+                            <a class="btn btn-nc-button @hiddenElement" href="javascript:void(0);" onclick="ShowAddSerial()" style="font-size: 13px;">Thêm mới</a>
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+                <div style="width: 100%; float: left;">
+                    <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                        <thead>
+                            <tr class="trthead">
+                                <th class="text-center cell-50 @hiddenElement">
+                                </th>
+                                <th colspan="2" class="text-center">Tồn kho</th>
+                                <th colspan="2" class="text-center">Thực tế</th>
+                            </tr>
+                            <tr class="trthead">
+                                <th class="text-center cell-50 @hiddenElement">
+                                </th>
+                                <th fieldId="SerialNo" sorttype="T" fieldName="Số Serial" fieldActive="0" class="text-left cell-100">
+                                    @("Số Serial".HtmlItemString("inventory"))
+                                </th>
+                                <th fieldId="InvCode" sorttype="T" fieldName="Vị trí" fieldActive="0" class="text-left cell-100">
+                                    @("Vị trí".HtmlItemString("inventory"))
+                                </th>
+                                <th fieldId="SerialNoActual" sorttype="T" fieldName="Số Serial thực tế" fieldActive="0" class="text-left cell-150">
+                                    @("Số Serial".HtmlItemString("SerialNoActual"))
+                                </th>
+                                <th fieldId="InvCodeActual" sorttype="T" fieldName="Vị trí thực tế" fieldActive="0" class="text-left cell-150">
+                                    @("Vị trí".HtmlItemString("inventory"))
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                    <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                        <tbody id="table-tbodyIDSerial">                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a class="btn btn-nc-button" href="javascript:void(0);" onclick="ClosePopupSerial()" style="float: right;font-size: 13px;">Đóng</a>
+            <a class="btn btn-nc-button @hiddenElement" href="javascript:void(0);" onclick="SaveSerial()" style="float: right;font-size: 13px;"><i class="fa fa-save" aria-hidden="true"></i> Lưu</a>
+        </div>
+    </div>
+</div>
+
+<script type="text/template" id="rowtemplateSerial">
+    <tr class="data-item trdata" idx="==idx==" productcode="==ProductCode==">
+        <input type="hidden" name="Lst_InvF_InventoryOutSerialDtl[==idx==].SerialNo" value="==SerialNo==" />
+        <input type="hidden" name="Lst_InvF_InventoryOutSerialDtl[==idx==].InvCode" value="==InvCode==" />
+        <input type="hidden" name="Lst_InvF_InventoryOutSerialDtl[==idx==].FlagExist" value="0" />
+        <td fieldId="CONTROL" fieldActive="0" class="text-center cell-50 action-buttons @hiddenElement">
+            <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteSerial(this, '==SerialNo==');"><i class="fas fa-trash-alt"></i></a>
+        </td>
+        <td class="stt text-center cell-50"></td>
+        <td fieldId="SerialNo" fieldActive="0" class="text-left cell-200">
+            ==SerialNo==
+        </td>
+        <td fieldId="InvCode" fieldActive="0" class="text-left cell-200">
+            ==InvCode==
+        </td>
+        <td fieldId="SerialNoActual" fieldActive="0" class="text-left cell-200">
+            <input name="Lst_InvF_InventoryOutSerialDtl[==idx==].SerialNoActual" value="" class="col-md-12 SerialNoActual" @disabled />
+        </td>
+        <td fieldId="InvCode" fieldActive="0" class="text-left cell-200">
+            <input name="Lst_InvF_InventoryOutSerialDtl[==idx==].InvCodeActual" value="" class="col-md-12 InvCodeActual" @disabled />
+        </td>
+    </tr>
+</script>
+<script type="text/template" id="rowtemplateSerialCache">
+    <tr class="data-item trdata" rd="==rd==" idx="==idx==" productcode="==ProductCode==" serialno="==SerialNo==" invcode="==InvCode==">
+        <input type="hidden" class="==serialnoCss==" value="==SerialNo==">
+        <input type="hidden" class="==invcodeCss==" value="==InvCode==">
+        <td class="text-center cell-50 action-buttons @hiddenElement">
+            <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteSerial(this, ' ==SerialNo==');"><i class="fas fa-trash-alt"></i></a>
+        </td>
+        <td class="text-left cell-100">==SerialNo==</td>
+        <td class="text-left cell-100">==InvCode==</td>
+        <td class="text-left cell-150">
+            <input value="==SerialNoActual==" class="col-md-12 ==serialnoactualCss==" @disabled />
+        </td>
+        <td class="text-left cell-150">
+            <select class="col-md-12 ==selectinvcodeactualCss==" @disabled>
+                <optgroup></optgroup>
+            </select>
+        </td>
+    </tr>
+</script>
+
+<table hidden>
+    <tbody id="rowtemplateSerialKiemKe">
+        <tr class="data-item trdata" rd="==rd==" idx="==idx==" productcode="==ProductCode==" serialno="==SerialNo==" invcode="==InvCode==">
+            <input type="hidden" class="==serialnoCss==" value="">
+            <input type="hidden" class="==invcodeCss==" value="">
+            <input type="hidden" class="==flagexistCss==" value="0">
+            <td class="text-center cell-50 action-buttons @hiddenElement">
+                <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteSerial(this, '==SerialNo==');"><i class="fas fa-trash-alt"></i></a>
+            </td>
+            <td class="text-left cell-100"></td>
+            <td class="text-left cell-100"></td>
+            <td class="text-left cell-150">
+                <input class="col-md-12 ==serialnoactualCss==" style="color:cornflowerblue" value="==SerialNo==" @disabled/>
+            </td>
+            <td class="text-left cell-150">
+                <select class="col-md-12 ==selectinvcodeactualCss==" @disabled>
+                    <optgroup></optgroup>
+                </select>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="modal fade" id="ShowPopupAddSerial" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 400px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Thêm mới Serial</b></h2>
+                <a href="javascript:;" onclick="ClosePopupAddSerial()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <aside class="modal-body" style="">
+                <aside class="col-md-12">
+                    <div class="form-group margin-bottom-9">
+                        <label class="control-label col-md-4">
+                            Số Serial
+                        </label>
+                        <div class="col-md-8">
+                            <input type="text" id="SerialNoNew" class="col-md-12" value="">
+                        </div>
+                    </div>
+                    <div class="form-group margin-bottom-9">
+                        <label class="control-label col-md-4">
+                            Vị trí
+                        </label>
+                        <div class="col-md-8">
+                            <select id="InvCodeAudit_New" name="InvCodeAudit_New" showpopup-control-searchdata="#ShowPopupInvCodeAudit_New" class="col-md-12 mstinventory">
+                                <optgroup label="">
+                                    <option value="">--Chọn kho kiểm kê--</option>
+                                    @if (Lst_Mst_Inventory != null && Lst_Mst_Inventory.Count > 0)
+                                    {
+                                        foreach (var item in Lst_Mst_Inventory)
+                                        {
+                                            var invCode = CUtils.StrValue(item.InvCode);
+                                            var invName = CUtils.StrValue(item.InvName);
+                                            <option invBUPattern="@(item.InvBUPattern == null ? "" : item.InvBUPattern)" value="@MvcHtmlString.Create(invCode)">@MvcHtmlString.Create(invName)</option>
+                                        }
+                                    }
+                                </optgroup>
+                                <option value="Search">Tìm kiếm</option>
+                            </select>
+                        </div>
+                    </div>
+                </aside>
+            </aside>
+
+            <div class="modal-footer">
+                <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="SaveSerialNew()" style="float: right;font-size: 13px;">Lưu</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $("select#Serial").select2();
+    });
+    function ShowSerialCache(productcode) {
+        debugger;
+        var listInvCode = JSON.parse('@Html.Raw(Json.Encode(Lst_Mst_Inventory))');
+        if (productcode == null || productcode == undefined) return;
+        var lst_tr = $('#table-detailSerial tr.trdata[productcode="' + productcode + '"]');
+        if (lst_tr.length == 0) return;
+        var st = 0;
+        lst_tr.each(function () {
+            var tr = $(this);
+            var idx = tr.attr("idx");
+            var rds = tr.attr("rd");
+            var SerialNo = tr.find('input.serialno-'+rds).val();
+            var InvCode = tr.find('input.invcodeinit-'+rds).val();
+
+            var SerialNoActual = tr.find('input.serialnoactual-' + rds).val();
+            var InvCodeActual = tr.find('input.invcodeactual-' + rds).val();
+            var FlagExist = tr.find('input.flagexist-' + rds).val();
+            var InventoryAction = tr.find('input.inventoryaction-' + rds).val();
+
+            if (FlagExist == "0") {
+                InvCode = "";
+                SerialNo = "";
+            }
+            if (InventoryAction == "OUT") {
+                InvCodeActual = "";
+                SerialNoActual = "";
+            }
+
+            var date = new Date();
+            var randomCur = date.getTime();
+            var randHex = commonUtils.randHex(12);
+            randomCur = randomCur + randHex;
+
+            var serialnoactualCss = "serialnoactual-" + randomCur;
+            var invcodeCss = "invcode-" + randomCur;
+            var serialnoCss = "serialno-" + randomCur;
+            var flagexistCss = "flagexist-" + randomCur;
+            var selectinvcodeactualCss = "selectinvcodeactual-" + randomCur;
+
+            var extData = {
+                invcodeCss: invcodeCss,
+                serialnoactualCss: serialnoactualCss,
+                serialnoCss: serialnoCss,
+                flagexistCss: flagexistCss,
+                selectinvcodeactualCss: selectinvcodeactualCss,
+                rd: randomCur,
+                idx: 99999,
+            };
+
+            var $strHtml = $(commonUtils.getHtmlFromTemplate($('#rowtemplateSerialCache'), {
+                ProductCode: productcode,
+                SerialNo: SerialNo,
+                InvCode: InvCode,
+                SerialNoActual: SerialNoActual,
+                InvCodeActual: InvCodeActual,
+                idx: 999999
+            }, extData));
+
+            //Bỏ nút xóa với các serial tồn kho
+            if (FlagExist == "1") {
+                var td = $strHtml.find('td.action-buttons');
+                td.html('');
+            }
+            debugger;
+            //Danh sách vị trí tồn kho
+            if (listInvCode !== null && listInvCode.length > 0) {
+                for (var i = 0; i < listInvCode.length; i++) {
+                    var $optionInvCode = $("<option>");
+                    $optionInvCode.attr('value', listInvCode[i].InvCode);
+                    $optionInvCode.attr('invBUPattern', listInvCode[i].InvBUPattern);
+                    if (InvCode === listInvCode[i].InvCode) {
+                        $optionInvCode.attr('selected', 'selected');
+                    }
+                    $optionInvCode.text(listInvCode[i].InvName);
+                    $strHtml.find('.' + selectinvcodeactualCss + ' optgroup').append($optionInvCode);
+                }
+            }
+
+            if (st == 0) {
+                $('#table-tbodyIDSerial').html($strHtml);
+            }
+            else {
+                $('#table-tbodyIDSerial').append($strHtml);
+            }
+            debugger;
+            var tr_tbodyIDSerial = $('#table-tbodyIDSerial').find('tr.trdata[productcode="' + productcode + '"][SerialNo="' + SerialNo + '"][invcode="' + InvCode + '"]');
+            $(tr_tbodyIDSerial).find('select.InvCodeActual').val(InvCodeActual);
+
+            st++;
+            updateTableTrIdx($('#table-tbodyIDSerial tr'), false);
+
+            $('.' + selectinvcodeactualCss).select2({
+                minimumResultsForSearch: -1
+            });
+        });
+    }
+    function SelectSerial() {
+        var length = $('#Serial').find("option:selected").length;
+        if (length == 0) {
+            alert("Không có serial nào được chọn");
+            return;
+        }
+        var lstSerial = [];
+
+        for (var i = 0; i < length; i++) {
+            var Serial = new Object();
+            var optselect = $('#Serial').find("option:selected").eq(i);
+            Serial.SerialNo = optselect.attr("SerialNo");
+            Serial.InvCode = optselect.attr("InvCode");
+            lstSerial.push(Serial);
+        }
+        var qtySerial = lstSerial.length;
+        var strHtml = ""
+        for (var i = 0; i < qtySerial; i++) {
+            var item = lstSerial[i];
+
+            var date = new Date();
+            var randomCur = date.getTime();
+            var randHex = commonUtils.randHex(12);
+            randomCur = randomCur + randHex;
+
+            var serialnoactualCss = "serialnoactual-" + randomCur;
+            var invcodeCss = "invcode-" + randomCur;
+            var serialnoCss = "serialno-" + randomCur;
+            var flagexistCss = "flagexist-" + randomCur;
+            var selectinvcodeactualCss = "selectinvcodeactual-" + randomCur;
+
+            var extData = {
+                invcodeCss: invcodeCss,
+                serialnoactualCss: serialnoactualCss,
+                serialnoCss: serialnoCss,
+                flagexistCss: flagexistCss,
+                selectinvcodeactualCss: selectinvcodeactualCss,
+                rd: randomCur,
+                idx: 99999,
+            };
+
+            strHtml += commonUtils.getHtmlFromTemplate($('#rowtemplateSerialKiemKe'), {
+                SerialNo: item.SerialNo,
+                InvCode: item.InvCode,
+                ProductCode: '@ProductCode',
+                idx: 999999
+            }, extData);
+
+            var trOld = $('#table-tbodyIDSerial tr.trdata[serialno="' + item.SerialNo + '"][invcode="' + item.InvCode + '"]');
+            if (trOld.length > 0) {
+                trOld.replaceWith(strHtml);
+            }
+            else {
+                $('#table-tbodyIDSerial').append(strHtml);
+            }
+            updateTableTrIdx($('#table-tbodyIDSerial tr'), false);
+            $('.' + selectinvcodeactualCss).select2({
+                minimumResultsForSearch: -1
+            });
+        }
+
+        //$('#table-tbodyIDSerial').html(strHtml);
+    }
+
+    function DeleteSerial(thiz, maSerial) {
+        var tr = $(thiz).parents('tr');
+        if (tr != undefined) {
+            tr.remove();
+            updateTableTrIdx($('#table-tbodyIDSerial tr'), false);
+        }
+    }
+
+    function CheckItemExistArr(SerialNo, arrCheck) { // arrCheck có : SerialNo
+        var objResult = new Object();
+        var checkExist = false;
+
+        var countArr = arrCheck.length;
+        for (var i = 0; i < countArr; i++) {
+            var strSerialNo = arrCheck[i].SerialNo;
+
+            if (strSerialNo == SerialNo) {
+                checkExist = true;
+                objResult.Data = arrCheck[i];
+                break;
+            }
+        }
+        objResult.Result = checkExist
+        return objResult;
+    }
+
+    function CheckSerialExistArr(SerialNo, InvCodeInit, InvCodeActual, arrCheck) { // arrCheck có : SerialNo
+        var checkExist = false;
+
+        var countArr = arrCheck.length;
+        for (var i = 0; i < countArr; i++) {
+            var strSerialNo = arrCheck[i].SerialNo;
+            var strInvCodeInit = arrCheck[i].InvCodeInit;
+            var strInvCodeActual = arrCheck[i].InvCodeActual;
+            if (strSerialNo == SerialNo && strInvCodeInit == InvCodeInit && strInvCodeActual == InvCodeActual) {
+                checkExist = true;
+                break;
+            }
+        }
+        return checkExist;
+    }
+
+    function SaveSerial() {
+        debugger;
+        var length = $('#table-tbodyIDSerial tr.trdata').length;
+        var productcode = $('#mdSerial_ProductCode').val();
+        if (productcode != null && productcode != "") {
+            $('#table-detailSerial tr.trdata[productcode="' + productcode + '"]').remove();
+        }
+        //var check = true;
+        //var arrCheckInvCode = [];
+
+        var arrayInvCode = [];
+        var arrInit = [];
+        var arrActual = [];
+        var arrResult = [];
+        var arrCheck_SerialNo_InvCode = [];
+        var lstVitri = "";
+
+        $("#table-tbodyIDSerial tr.trdata").each(function () {
+            var tr = $(this);
+            var idx = $(tr).attr('idx');
+            var rd = $(tr).attr('rd');
+            //var strHtml;
+            var SerialNo = tr.find('input.serialno-'+rd).val();
+            var InvCode = tr.find('input.invcode-'+rd).val();
+
+            var SerialNoActual = tr.find('input.serialnoactual-'+rd).val();
+            var InvCodeActual = tr.find('select.selectinvcodeactual-'+rd).val();
+
+            // Lấy danh sách Serial
+
+            if (InvCode != "" && SerialNo != "") {
+                var serialNo_InvCodeInit = SerialNo + "%_%" + InvCode;
+                if (!arrCheck_SerialNo_InvCode.includes(serialNo_InvCodeInit)) {
+                    arrCheck_SerialNo_InvCode.push(serialNo_InvCodeInit);
+                };
+            }
+
+            if (InvCodeActual != "" && SerialNoActual != "") {
+                var serialNo_InvCodeActual = SerialNoActual + "%_%" + InvCodeActual;
+                if (!arrCheck_SerialNo_InvCode.includes(serialNo_InvCodeActual)) {
+                    arrCheck_SerialNo_InvCode.push(serialNo_InvCodeActual);
+                };
+            }
+            //
+
+            // Lưu ra mảng arrInit
+            var objInit = new Object;
+            objInit.ProductCode = productcode;
+            objInit.SerialNo = SerialNo;
+            objInit.InvCode = InvCode;
+            objInit.FlagExist = "1";
+
+            arrInit.push(objInit);
+            //
+
+            //Lưu mảng arrActual
+            if (SerialNoActual != "" && InvCodeActual != "") {
+                var objActual = new Object;
+                objActual.ProductCode = productcode;
+                objActual.SerialNo = SerialNoActual;
+                objActual.SerialNoActual = SerialNoActual;
+                objActual.InvCode = InvCodeActual;
+                objActual.FlagExist = "0";
+                arrActual.push(objActual);
+            }
+            //
+        });
+
+
+        //arrCheck_LotNo_InvCode
+        var countSerial = arrCheck_SerialNo_InvCode.length;
+        var inventoryAction = "";
+        var flagExist = "";
+        var qtyOut = 0;
+        for (var i = 0; i < countSerial; i++) {
+            //
+            var objResult = new Object();
+            objResult.ProductCode = productcode;
+
+            var SerialNo_InvCode = arrCheck_SerialNo_InvCode[i];
+            var arrSerialNo_InvCode = SerialNo_InvCode.split('%_%');
+            var SerialNo = arrSerialNo_InvCode[0];
+            var InvCode = arrSerialNo_InvCode[1];
+
+            if (!arrayInvCode.includes(InvCode)) {
+                arrayInvCode.push(InvCode);
+                if (lstVitri == "") {
+                    lstVitri += InvCode;
+                }
+                else {
+                    lstVitri += ", " + InvCode;
+                }
+            }
+
+            var checkExistIn_ArrInit = CheckItemExistArr(SerialNo, arrInit);
+            var checkExistIn_ArrActual = CheckItemExistArr(SerialNo, arrActual);
+            debugger;
+            if (checkExistIn_ArrInit.Result == true) {
+                flagExist = "1";
+                var itemInit = checkExistIn_ArrInit.Data;
+                var invCodeInit = itemInit.InvCode;
+                var SerialNoInit = itemInit.SerialNo;
+
+                if (checkExistIn_ArrActual.Result == true) {
+                    var itemActual = checkExistIn_ArrActual.Data;
+                    var invCodeActual = itemActual.InvCode;
+                    var serialNoActual = itemActual.SerialNo;
+
+                    if (invCodeInit == invCodeActual) {
+                        inventoryAction = "NORMAL";
+                    }
+                    else {
+                        inventoryAction = "MOVE";
+                    }
+
+                    // Bổ sung thêm 1 số thông tin
+                    objResult.QtyInit = 1;
+                    objResult.QtyActual = 1;
+                    objResult.SerialNo = SerialNoInit;
+                    objResult.SerialNoActual = serialNoActual;
+                    objResult.InventoryAction = inventoryAction;
+                    objResult.FlagExist = flagExist;
+                    objResult.InvCodeInit = invCodeInit;
+                    objResult.InvCodeActual = invCodeActual;
+                    //
+
+                    var checkexist = CheckSerialExistArr(objResult.SerialNo, objResult.InvCodeInit, objResult.InvCodeActual, arrResult);
+                    if (checkexist == false) {
+                        arrResult.push(objResult);
+                    }
+                }
+                // Không tồn tại thực tế
+                else {
+                    inventoryAction = "OUT";
+                    // Bổ sung thêm 1 số thông tin
+                    objResult.QtyInit = 1;
+                    objResult.QtyActual = 0;
+                    objResult.SerialNo = SerialNoInit;
+                    objResult.SerialNoActual = '';
+                    objResult.InventoryAction = inventoryAction;
+                    objResult.FlagExist = flagExist;
+                    objResult.InvCodeInit = invCodeInit;
+                    objResult.InvCodeActual = invCodeInit;
+                    //
+                    var checkexist = CheckSerialExistArr(objResult.SerialNo, objResult.InvCodeInit, objResult.InvCodeActual, arrResult);
+                    if (checkexist == false) {
+                        arrResult.push(objResult);
+                    }
+                    //arrResult.push(objResult);
+
+                    qtyOut++;
+                }
+            }
+            else if (checkExistIn_ArrActual.Result == true) { // Chỉ tồn tại trong list thực tế
+                flagExist = "0";
+                inventoryAction = "IN";
+                var itemActual = checkExistIn_ArrActual.Data;
+                //
+                var invCodeActual = itemActual.InvCode;
+                var SerialNoActual = itemActual.SerialNo;
+
+                var objResult = new Object();
+                objResult.ProductCode = productcode;
+                //
+
+                // Bổ sung thêm 1 số thông tin
+                objResult.QtyInit = 0;//1;
+                objResult.QtyActual = 1;
+                objResult.SerialNo = SerialNoActual;
+                objResult.SerialNoActual = SerialNoActual;
+                objResult.InventoryAction = inventoryAction;
+                objResult.FlagExist = flagExist;
+                objResult.InvCodeInit = invCodeActual;
+                objResult.InvCodeActual = invCodeActual;
+                //
+                //arrResult.push(objResult);
+                var checkexist = CheckSerialExistArr(objResult.SerialNo, objResult.InvCodeInit, objResult.InvCodeActual, objResult);
+                if (checkexist == false) {
+                    arrResult.push(objResult);
+                }
+            }
+        }
+
+        var countArrResult = arrResult.length;
+
+        var lenItem = $('#table-detailSerial').find('tr[productcode="' + productcode + '"]').length;
+        for (var i = 0; i < countArrResult; i++) {
+            var item = arrResult[i];
+            FillDataToTemplate(item.ProductCode, item.SerialNo, item.SerialNoActual, item.InvCodeInit, item.InvCodeActual, item.FlagExist, item.InventoryAction, lenItem);
+        }
+
+        // Cập nhật lại số lượng theo sl lô
+        var trProduct = $('#table-tbodyID').find('tr[productcode="' + productcode + '"]');
+        var ProductId = trProduct.attr('idx');
+        var rd = trProduct.attr('rd');
+
+        var ipQtyActual = trProduct.find('input.qtyactual-' + rd);
+        ipQtyActual.val(countArrResult - qtyOut);
+        trProduct.find('input.invcode-' + rd).val(lstVitri);
+        ChangeQtyActual(ipQtyActual);
+        TongSoLuongTon();
+        ClosePopupSerial();
+        //
+    }
+
+    function FillDataToTemplate(productcode, SerialNo, SerialNoActual, InvCodeInit, InvCodeActual, FlagExist, InventoryAction, lenItem) {
+        var date = new Date();
+        var randomCur = date.getTime();
+        var randHex = commonUtils.randHex(12);
+        randomCur = randomCur + randHex;
+
+        var invcodeinitCss = 'invcodeinit-' + randomCur;
+        var invcodeactualCss = 'invcodeactual-' + randomCur;
+        var productcodeCss = 'productcode-' + randomCur;
+        var serialnoCss = 'serialno-' + randomCur;
+        var serialnoactualCss = 'serialnoactual-' + randomCur;
+        var flagexistCss = 'flagexist-' + randomCur;
+        var inventoryactionCss = 'inventoryaction-' + randomCur;
+
+        var exData = {
+            invcodeinitCss: invcodeinitCss,
+            invcodeactualCss: invcodeactualCss,
+            productcodeCss: productcodeCss,
+            serialnoCss: serialnoCss,
+            serialnoactualCss: serialnoactualCss,
+            flagexistCss: flagexistCss,
+            inventoryactionCss: inventoryactionCss,
+            rd: randomCur,
+            idx: 99999
+        };
+        strHtml = commonUtils.getHtmlFromTemplate($('#tableSerialKiemKe'), {
+            ProductCode: productcode,
+            SerialNo: SerialNo,
+            SerialNoActual: SerialNoActual,
+            InvCodeInit: InvCodeInit,
+            InvCodeActual: InvCodeActual,
+            InventoryAction: InventoryAction,
+            FlagExist: FlagExist,
+            idx: 999999
+        }, exData);
+        var trLo_Old = $('#table-detailSerial').find('tr[productcode="' + productcode + '"][InvCodeInit="' + InvCodeInit + '"][invcodeactual="' + InvCodeActual + '"][serialno="' + SerialNo + '"]').eq(0);
+        if (trLo_Old.length > 0) {
+            trLo_Old.replaceWith(strHtml);
+        }
+        else {
+            $('#table-detailSerial').append(strHtml);
+        }
+        updateTableTrIdx($('#table-detailSerial tr'), false);
+    }
+    function ValidData() {
+        return true;
+    }
+    function SaveSerialNew() {
+        var listInvCode = JSON.parse('@Html.Raw(Json.Encode(Lst_Mst_Inventory))');
+        var check = ValidData();
+        if (check == false) return;
+        var serialno = $('#SerialNoNew').val();
+        var invcode = $('#InvCodeAudit_New').val();
+
+        var date = new Date();
+        var randomCur = date.getTime();
+        var randHex = commonUtils.randHex(12);
+        randomCur = randomCur + randHex;
+
+        var serialnoactualCss = "serialnoactual-" + randomCur;
+        var invcodeCss = "invcode-" + randomCur;
+        var serialnoCss = "serialno-" + randomCur;
+        var flagexistCss = "flagexist-" + randomCur;
+        var selectinvcodeactualCss = "selectinvcodeactual-" + randomCur;
+
+        var extData = {
+            invcodeCss: invcodeCss,
+            serialnoactualCss: serialnoactualCss,
+            serialnoCss: serialnoCss,
+            flagexistCss: flagexistCss,
+            selectinvcodeactualCss: selectinvcodeactualCss,
+            rd: randomCur,
+            idx: 99999,
+        };
+
+        var $strHtml = $(commonUtils.getHtmlFromTemplate($('#rowtemplateSerialKiemKe'), {
+            SerialNo: serialno,
+            InvCode: invcode,
+            ProductCode: '@ProductCode',
+            idx: 999999
+        }, extData));
+
+        //Danh sách vị trí tồn kho
+        if (listInvCode !== null && listInvCode.length > 0) {
+            for (var i = 0; i < listInvCode.length; i++) {
+                var $optionInvCode = $("<option>");
+                $optionInvCode.attr('value', listInvCode[i].InvCode);
+                $optionInvCode.attr('invBUPattern', listInvCode[i].InvBUPattern);
+                if (invcode === listInvCode[i].InvCode) {
+                    $optionInvCode.attr('selected', 'selected');
+                }
+                $optionInvCode.text(listInvCode[i].InvName);
+                $strHtml.find('.' + selectinvcodeactualCss + ' optgroup').append($optionInvCode);
+            }
+        }
+
+        debugger;
+        var $selectInvCodeActual = $strHtml.find('select.' + selectinvcodeactualCss);
+        if ($selectInvCodeActual !== undefined && $selectInvCodeActual !== null) {
+            $selectInvCodeActual.val(invcode);
+            $selectInvCodeActual.trigger('change');
+        }
+
+        //Check thêm mới hay replace
+        var trOrl = $('#table-tbodyIDSerial tr.trdata[serialno="' + serialno + '"][invcode="' + invcode + '"]');
+        if (trOrl.length == 0) {
+            $('#table-tbodyIDSerial').append($strHtml);
+        }
+        else {
+            trOrl.replaceWith($strHtml);
+        }
+        updateTableTrIdx($('#table-tbodyIDSerial tr'), false);
+        ClosePopupAddSerial();
+        $('.' + selectinvcodeactualCss).select2({
+            minimumResultsForSearch: -1
+        });
+    }
+    function ClosePopupAddSerial() {
+        $('#ShowPopupAddSerial').hide();
+    }
+</script>
+
+<!-- Lst_InvF_InvAuditInstSerial_Actual != null && idx < Lst_InvF_InvAuditInstSerial_Actual.Count && FlagAudit == "1" -->
+<script type="text/template" id="tmplRenderRowSerial1_1">
+    <tr class="data-item trdata" rd="==rd==" idx="==idx==" productcode="==ProductCode==" serialno="==SerialNo==" invcode="==InvCode==">
+        <input type="hidden" class="==serialnoCss==" value="==SerialNo===" />
+        <input type="hidden" class="==invcodeCss==" value="==InvCode===" />
+        <input type="hidden" class="==flagexistCss==" value="1" />
+        <td class="text-center cell-50 action-buttons">
+            <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteSerial(this, '==SerialNo==');">
+                <i class="fas fa-trash-alt"></i>
+            </a>
+        </td>
+        <td class="text-left cell-100">
+            ==SerialNo==
+        </td>
+        <td class="text-left cell-100">
+            ==InvCode==
+        </td>
+        <td class="text-left cell-150">
+            <input value="==SerialNoActual==" class="col-md-12 ==serialnoactualCss==" @disabled/>
+        </td>
+        <td class="text-left cell-150">
+            <input value="==InvCodeActual==" class="col-md-12 ==invcodeactualCss==" @disabled />
+        </td>
+    </tr>
+</script>
+<script type="text/template" id="tmplRenderRowSerial1_2">
+    <tr class="data-item trdata" rd="==rd==" idx="==idx==" productcode="==ProductCode==" serialno="==SerialNo==" invcode="==InvCode==">
+        <input type="hidden" class="==serialnoCss==" value="==SerialNo===" />
+        <input type="hidden" class="==invcodeCss==" value="==InvCode===" />
+        <input type="hidden" class="==flagexistCss==" value="1" />
+        <td class="text-center cell-50 action-buttons">
+            <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteSerial(this, '==SerialNo==');">
+                <i class="fas fa-trash-alt"></i>
+            </a>
+        </td>
+        <td class="text-left cell-100">
+            ==SerialNo==
+        </td>
+        <td class="text-left cell-100">
+            ==InvCode==
+        </td>
+        <td class="text-left cell-150">
+            <input value="==SerialNo==" class="col-md-12 ==serialnoactualCss==" @disabled />
+        </td>
+        <td class="text-left cell-150">
+            <select class="col-md-12 ==selectinvcodeactualCss==" @disabled></select>
+        </td>
+    </tr>
+</script>
+
+<!-- Model.Count < Lst_InvF_InvAuditInstSerial_Actual.Count -->
+<script type="text/template" id="tmplRenderRowSerial2">
+    <tr class="data-item trdata" rd="==rd==" idx="==idx==" productcode="==ProductCode==" serialno="==SerialNo==" invcode="==InvCodeActual==">
+        <input type="hidden" class="==serialnoCss==" value="==SerialNo==" />
+        <input type="hidden" class="==invcodeCss==" value="==InvCodeActual==" />
+        <input type="hidden" class="==flagexistCss==" value="==FlagExist==" />
+        <td fieldId="CONTROL" fieldActive="0" class="text-center cell-50 action-buttons">
+            <a class="icon-delete" title="Xóa" onclick="DeleteSerial(this);"><i class="fas fa-trash-alt"></i></a>
+            <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteSerial(this, '==SerialNo==');"><i class="fas fa-trash-alt"></i></a>
+        </td>
+        <td class="text-left cell-100"></td>
+        <td class="text-left cell-100"></td>
+        <td class="text-left cell-150">
+            <input value="==SerialNo==" class="col-md-12 ==serialnoactualCss==" @disabled />
+        </td>
+        <td class="text-left cell-150">
+            <input value="==InvCodeActual==" class="col-md-12 ==invcodeactualCss==" @disabled />
+        </td>
+    </tr>
+</script>
+
+<script>
+    var Lst_Data1_1 = [];
+    var Lst_Data1_2 = [];//render select option chọn vị trí kho
+    var Lst_Data2 = [];
+    var listInvCode = JSON.parse('@Html.Raw(Json.Encode(Lst_Mst_Inventory))');
+    @{
+        if (Model != null && Model.Count > 0)
+        {
+            var idx = 0;
+            foreach (var item in Model)
+            {
+                var productcode = CUtils.StrValue(item.ProductCode);
+                var serialno = CUtils.StrValue(item.SerialNo);
+                var invcode = CUtils.StrValue(item.InvCode);
+                if (Lst_InvF_InvAuditInstSerial_Actual != null && idx < Lst_InvF_InvAuditInstSerial_Actual.Count && FlagAudit == "1")
+                {
+                <text>
+                    var objSerial = {
+                        ProductCode: '@productcode',
+                        SerialNo: '@serialno',
+                        InvCode: '@invcode',
+                        SerialNoActual: '@Lst_InvF_InvAuditInstSerial_Actual[idx].SerialNo',
+                        InvCodeActual: '@Lst_InvF_InvAuditInstSerial_Actual[idx].InvCodeActual',
+                    }
+                    Lst_Data1_1.push(objSerial);
+                </text>
+                }
+                else
+                {
+                <text>
+                    var objSerial = {
+                        ProductCode: '@productcode',
+                        SerialNo: '@serialno',
+                        InvCode: '@invcode',
+                        SerialNoActual: '@serialno',
+                    }
+                    Lst_Data1_2.push(objSerial);
+                </text>
+                }
+                idx++;
+            }
+            if (Model.Count < Lst_InvF_InvAuditInstSerial_Actual.Count)
+            {
+                var lanlap = Lst_InvF_InvAuditInstSerial_Actual.Count - Model.Count;
+                for (var index = 0; index < lanlap; index++)
+                {
+                    var chiso = idx + index;
+                    var it = Lst_InvF_InvAuditInstSerial_Actual[chiso];
+                    var productcode = CUtils.StrValue(it.ProductCode);
+                    var serialno = CUtils.StrValue(it.SerialNo);
+                    var invcode = CUtils.StrValue(it.InvCodeActual);
+                     <text>
+                        var objSerial = {
+                            ProductCode: '@productcode',
+                            SerialNo: '@serialno',
+                            InvCode: '@invcode',
+                            InvCodeActual: '@invcode',
+                            SerialNoActual: '@serialno',
+                        }
+                        Lst_Data2.push(objSerial);
+                    </text>
+                    }
+                }
+            }
+        }
+</script>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        debugger;
+        @*Add danh sách serial vào Popup*@
+        if (Lst_Data1_1 !== undefined && Lst_Data1_1 !== null && Lst_Data1_1.length > 0) {
+            for (var i = 0; i < Lst_Data1_1.length; i++) {
+                renderRenderRowSerialPopup1_1(Lst_Data1_1[i]);
+            }
+        }
+        if (Lst_Data1_2 !== undefined && Lst_Data1_2 !== null && Lst_Data1_2.length > 0) {
+            for (var i = 0; i < Lst_Data1_2.length; i++) {
+                renderRenderRowSerialPopup1_2(Lst_Data1_2[i], listInvCode);
+            }
+        }
+        if (Lst_Data2 !== undefined && Lst_Data2 !== null && Lst_Data2.length > 0) {
+            for (var i = 0; i < Lst_Data2.length; i++) {
+                renderRenderRowSerialPopup2(Lst_Data2[i]);
+            }
+        }
+        ShowSerialCache('@ProductCode');
+    });
+</script>

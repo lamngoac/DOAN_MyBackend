@@ -1,0 +1,758 @@
+﻿@using System.Reflection
+@model PageInfo<Mst_Spec>
+@{
+    Layout = "~/Views/Shared/_LayoutQuantri.cshtml";
+    var title = "DANH MỤC HÀNG HÓA";
+    ViewBag.Title = title;
+    ViewBag.OverflowX = true;
+    var startCount = 0;
+    var strStartCount = ViewBag.StartCount as string;
+    var datasize = 2000;
+    var isparent = ViewBag.IsParent;
+    if (isparent)
+    {
+        datasize += 120;
+    }
+    if (!CUtils.IsNullOrEmpty(strStartCount))
+    {
+        startCount = Convert.ToInt32(strStartCount);
+    }
+    var listOS_PrdCenter_Mst_Model = ViewBag.ListOS_PrdCenter_Mst_Model as List<Mst_Model>;
+    if (listOS_PrdCenter_Mst_Model == null || listOS_PrdCenter_Mst_Model.Count == 0)
+    {
+        listOS_PrdCenter_Mst_Model = new List<Mst_Model>();
+    }
+    var listOS_PrdCenter_Mst_SpecType1 = ViewBag.ListOS_PrdCenter_Mst_SpecType1 as List<Mst_SpecType1>;
+    if (listOS_PrdCenter_Mst_SpecType1 == null || listOS_PrdCenter_Mst_SpecType1.Count == 0)
+    {
+        listOS_PrdCenter_Mst_SpecType1 = new List<Mst_SpecType1>();
+    }
+    var listOS_PrdCenter_Mst_SpecType2 = ViewBag.ListOS_PrdCenter_Mst_SpecType2 as List<Mst_SpecType2>;
+    if (listOS_PrdCenter_Mst_SpecType2 == null || listOS_PrdCenter_Mst_SpecType2.Count == 0)
+    {
+        listOS_PrdCenter_Mst_SpecType2 = new List<Mst_SpecType2>();
+    }
+    var list_OS_PrdCenter_Mst_SpecCustomField = ViewBag.List_OS_PrdCenter_Mst_SpecCustomField as List<Mst_SpecCustomField>;
+    if (list_OS_PrdCenter_Mst_SpecCustomField == null || list_OS_PrdCenter_Mst_SpecCustomField.Count == 0)
+    {
+        list_OS_PrdCenter_Mst_SpecCustomField = new List<Mst_SpecCustomField>();
+    }
+    else
+    {
+        datasize = datasize + list_OS_PrdCenter_Mst_SpecCustomField.Count * 120;
+    }
+    var listOS_PrdCenter_Mst_Brand = ViewBag.ListOS_PrdCenter_Mst_Brand as List<Mst_Brand>;
+    if (listOS_PrdCenter_Mst_Brand == null || listOS_PrdCenter_Mst_Brand.Count == 0)
+    {
+        listOS_PrdCenter_Mst_Brand = new List<Mst_Brand>();
+    }
+    var listMst_NNT = ViewBag.List_Mst_NNT as List<Mst_NNT>;
+    if (listMst_NNT == null || listMst_NNT.Count == 0)
+    {
+        listMst_NNT = new List<Mst_NNT>();
+    }
+    const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
+    var objectProperties = typeof(Mst_Spec).GetProperties(flags);
+
+    var lstCustomNameSort = new List<string>();
+
+    var waOrgID = ViewBag.WaOrgID as string;
+    if (CUtils.IsNullOrEmpty(waOrgID))
+    {
+        waOrgID = "";
+    }
+}
+
+<style>
+    .ace-scroll, .scroll-content {
+        overflow: hidden !important;
+    }
+</style>
+
+<div class="row no-margin">
+    <div class="row no-margin">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="panel-group" id="steps">
+                <div class="panel panel-info">
+                    <div class="title">
+                        <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                    </div>
+                    <div class="panel-body no-padding" id="panel-body" style="">
+                        <aside class="col-xs-12 no-padding layout-tk">
+                            @using (Html.BeginForm(null, null, FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+                            {
+                                <input type="hidden" value="search" name="init" id="init" />
+                                <div class="col-xs-12 box-shadow-tk">
+                                    <aside class="col-xs-5">
+                                        <div class="form-group margin-bottom-5">
+                                            <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Đơn vị</label>
+                                            <div class="col-xs-12 col-sm-7">
+                                                <span class="block input-icon input-icon-right">
+                                                    @{
+                                                        var orgid = "";
+                                                        if (!CUtils.IsNullOrEmpty(ViewBag.OrgID))
+                                                        {
+                                                            orgid = CUtils.StrValueOrNull(ViewBag.OrgID);
+                                                        }
+                                                    }
+                                                    <select id="orgid" name="orgid" class="col-xs-11">
+                                                        <option></option>
+                                                        @{
+                                                            if (listMst_NNT != null && listMst_NNT.Count > 0)
+                                                            {
+                                                                foreach (var it in listMst_NNT)
+                                                                {
+                                                                    <option value="@MvcHtmlString.Create(it.OrgID.ToString().Trim())" desc="@MvcHtmlString.Create(it.OrgID.ToString().Trim())" @(orgid.Equals(it.OrgID.ToString().Trim()) ? "selected" : "")>@MvcHtmlString.Create(it.MST.ToString().Trim())</option>
+                                                                }
+                                                            }
+                                                        }
+                                                    </select>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group margin-bottom-5">
+                                            <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Mã hàng hóa</label>
+                                            <div class="col-xs-12 col-sm-7">
+                                                <input type="text" id="speccode" name="speccode" class="col-xs-11" value="@MvcHtmlString.Create(ViewBag.SpecCode)" autocomplete="off">
+                                            </div>
+                                        </div>
+                                        <div class="form-group margin-bottom-5">
+                                            <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Tên hàng hóa</label>
+                                            <div class="col-xs-12 col-sm-7">
+                                                <input type="text" id="specname" name="specname" class="col-xs-11" value="@MvcHtmlString.Create(ViewBag.SpecName)" autocomplete="off">
+                                            </div>
+                                        </div>
+
+                                    </aside>
+                                    <aside class="col-xs-4">
+                                        <div class="form-group margin-bottom-5" hidden>
+                                            <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Brand</label>
+                                            <div class="col-xs-12 col-sm-7">
+                                                <span class="block input-icon input-icon-right">
+                                                    @{
+                                                        var brandcode = "";
+                                                        if (!CUtils.IsNullOrEmpty(ViewBag.BrandCode))
+                                                        {
+                                                            brandcode = CUtils.StrValueOrNull(ViewBag.BrandCode);
+                                                        }
+                                                    }
+                                                    <select id="brandcode" name="brandcode" class="col-xs-11">
+                                                        <option></option>
+                                                        @*@{
+                                                                if (listOS_PrdCenter_Mst_Brand != null && listOS_PrdCenter_Mst_Brand.Count > 0)
+                                                                {
+                                                                    foreach (var it in listOS_PrdCenter_Mst_Brand)
+                                                                    {
+                                                                        <option value="@MvcHtmlString.Create(it.BrandCode.ToString().Trim())" desc="@MvcHtmlString.Create(it.BrandName.ToString().Trim())" @(brandcode.Equals(it.BrandCode.ToString().Trim()) ? "selected" : "")>@MvcHtmlString.Create(it.BrandCode.ToString().Trim())</option>
+                                                                    }
+                                                                }
+                                                            }*@
+                                                    </select>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group margin-bottom-5" hidden>
+                                            <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Mã Model</label>
+                                            <div class="col-xs-12 col-sm-7">
+                                                <span class="block input-icon input-icon-right">
+                                                    @{
+                                                        var modelcode = "";
+                                                        if (!CUtils.IsNullOrEmpty(ViewBag.ModelCode))
+                                                        {
+                                                            modelcode = CUtils.StrValueOrNull(ViewBag.ModelCode);
+                                                        }
+                                                    }
+                                                    <select id="modelcode" name="modelcode" class="col-xs-11">
+                                                        <option></option>
+                                                        @*@{
+                                                                if (listOS_PrdCenter_Mst_Model != null && listOS_PrdCenter_Mst_Model.Count > 0)
+                                                                {
+                                                                    foreach (var it in listOS_PrdCenter_Mst_Model)
+                                                                    {
+                                                                        <option value="@MvcHtmlString.Create(it.ModelCode.ToString().Trim())" desc="@MvcHtmlString.Create(it.ModelName.ToString().Trim())" @(modelcode.Equals(it.ModelCode.ToString().Trim()) ? "selected" : "")>@MvcHtmlString.Create(it.ModelCode.ToString().Trim())</option>
+                                                                    }
+                                                                }
+                                                            }*@
+                                                    </select>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                    </aside>
+                                    <aside class="col-xs-5">
+                                        <div class="form-group margin-bottom-5">
+                                            <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Loại sản phẩm</label>
+                                            <div class="col-xs-12 col-sm-7">
+                                                <span class="block input-icon input-icon-right">
+                                                    @{
+                                                        var spectype1 = "";
+                                                        if (!CUtils.IsNullOrEmpty(ViewBag.SpecType1))
+                                                        {
+                                                            spectype1 = CUtils.StrValueOrNull(ViewBag.SpecType1);
+                                                        }
+                                                    }
+                                                    <select id="spectype1" name="spectype1" class="col-xs-11">
+                                                        <option></option>
+                                                        @{
+                                                            if (listOS_PrdCenter_Mst_SpecType1 != null && listOS_PrdCenter_Mst_SpecType1.Count > 0)
+                                                            {
+                                                                foreach (var it in listOS_PrdCenter_Mst_SpecType1)
+                                                                {
+                                                                    <option value="@MvcHtmlString.Create(it.SpecType1.ToString().Trim())" desc="@MvcHtmlString.Create(it.SpecType1Name.ToString().Trim())" @(spectype1.Equals(it.SpecType1.ToString().Trim()) ? "selected" : "")>@MvcHtmlString.Create(it.SpecType1.ToString().Trim())</option>
+                                                                }
+                                                            }
+                                                        }
+                                                    </select>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group margin-bottom-5" hidden>
+                                            <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Nhóm sản phẩm</label>
+                                            <div class="col-xs-12 col-sm-7">
+                                                <span class="block input-icon input-icon-right">
+                                                    @{
+                                                        var spectype2 = "";
+                                                        if (!CUtils.IsNullOrEmpty(ViewBag.SpecType2))
+                                                        {
+                                                            spectype2 = CUtils.StrValueOrNull(ViewBag.SpecType2);
+                                                        }
+                                                    }
+                                                    <select id="spectype2" name="spectype2" class="col-xs-11">
+                                                        <option></option>
+                                                        @*@{
+                                                                if (listOS_PrdCenter_Mst_SpecType2 != null && listOS_PrdCenter_Mst_SpecType2.Count > 0)
+                                                                {
+                                                                    foreach (var it in listOS_PrdCenter_Mst_SpecType2)
+                                                                    {
+                                                                        <option value="@MvcHtmlString.Create(it.SpecType2.ToString().Trim())" desc="@MvcHtmlString.Create(it.SpecType2Name.ToString().Trim())" @(spectype2.Equals(it.SpecType2.ToString().Trim()) ? "selected" : "")>@MvcHtmlString.Create(it.SpecType2Name.ToString().Trim())</option>
+                                                                    }
+                                                                }
+                                                            }*@
+                                                    </select>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group margin-bottom-5">
+                                            <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Trạng thái</label>
+                                            <div class="col-xs-12 col-sm-7">
+                                                <span class="block input-icon input-icon-right">
+                                                    @{
+                                                        var flagactive = "";
+                                                        if (!CUtils.IsNullOrEmpty(ViewBag.FlagActive))
+                                                        {
+                                                            flagactive = CUtils.StrValueOrNull(ViewBag.FlagActive);
+                                                        }
+                                                    }
+                                                    <select id="flagactive" name="flagactive" class="col-xs-11">
+                                                        <option></option>
+                                                        <option value="@MvcHtmlString.Create("1")" @(flagactive.Equals("1") ? "selected" : "")>@MvcHtmlString.Create("Active")</option>
+                                                        <option value="@MvcHtmlString.Create("0")" @(flagactive.Equals("0") ? "selected" : "")>@MvcHtmlString.Create("Inactive")</option>
+                                                    </select>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </aside>
+                                    <div class="button-tk">
+                                        <div class="form-group margin-bottom-5">
+                                            <div class="col-xs-12 col-sm-8">
+                                                <span class="block input-icon input-icon-right">
+                                                    @RenderItemFormat("BTN_QL_OS_PRDCENTER_MST_SPEC_TK", "<a class=\"btn font-color mybtn-Button\" onclick=\"Search()\" href=\"javascript:void(0);\" style=\" \"><img class=\"img-button\" src='" + Url.Content("~/Images/search.svg") + "'></a>", "", "")
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 no-padding">
+                                    <input type="hidden" id="checkmapping" value="true" />
+                                    <a class="btn font-color mybtn-Button dropdown-toggle" data-toggle="dropdown" aria-expanded="false" style="float: right;font-size: 13px;margin-top: 20px;position: relative;">...</a>
+                                    <ul class="dropdown-menu" role="menu" style="">
+                                        <li>
+                                            @RenderItemFormat("BTN_QL_OS_PRDCENTER_MST_SPEC_NHAP_EXCEL", "<a class=\"mybtn-Button-1\" onclick=\"ShowPopupImportExcel(true)\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/import.svg") + "'>Nhập Excel</a>", "", "")
+                                        </li>
+                                        <li>
+                                            @RenderItemFormat("BTN_QL_OS_PRDCENTER_MST_SPEC_XUAT_EXCEL", "<a class=\"mybtn-Button-1\" onclick=\"Export()\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/export.svg") + "'>Xuất Excel</a>", "", "")
+                                        </li>
+                                        <li>
+                                            @RenderItemFormat("BTN_QL_OS_PRDCENTER_MST_SPEC_XUAT_EXCEL_TEM", "<a class=\"mybtn-Button-1\" onclick=\"ExportTemplate(true)\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/export.svg") + "'>Xuất Excel template</a>", "", "")
+                                        </li>
+                                        @if (isparent)
+                                        {
+                                            <li>
+                                                @RenderItemFormat("BTN_QL_OS_PRDCENTER_MST_SPEC_NHAP_EXCEL", "<a class=\"mybtn-Button-1\" onclick=\"ShowPopupImportExcel(false)\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/import.svg") + "'>Nhập Excel Mapping</a>", "", "")
+                                            </li>
+                                            <li>
+                                                @RenderItemFormat("BTN_QL_OS_PRDCENTER_MST_SPEC_XUAT_EXCEL_TEM", "<a class=\"mybtn-Button-1\" onclick=\"ExportTemplate(false)\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/export.svg") + "'>Xuất Excel Mapping template</a>", "", "")
+                                            </li>
+                                        }
+                                    </ul>
+                                    @RenderItemFormat("BTN_QL_OS_PRDCENTER_MST_SPEC_TAO", "<a class=\"btn font-color mybtn-Button\" href=\"" + Url.Action("Create", "OS_PrdCenter_Mst_Spec") + "\" style=\"float: right;font-size: 13px; margin-top: 20px;margin-right: 10px; \"><img class=\"img-button in-acti\" src='" + Url.Content("~/Images/Hoadon/Tao.svg") + "'><img class=\"img-button acti\" src='" + Url.Content("~/Images/Hoadon/Tao.svg") + "'>Tạo</a>", "", "")
+                                </div>
+                                <div class="col-xs-12 no-padding" style="margin-top: 15px;">
+                                    <div class="col-xs-5 no-padding">
+                                        Tổng số @Model.ItemCount kết quả trong @Model.PageCount trang
+                                    </div>
+                                    @if (Model != null && Model.DataList != null)
+                                    {
+                                        <div id="dynamic-table_paginate" class="dataTables_paginate paging_simple_numbers" style="">
+                                            @Html.PagerBootstrap((int)Model.PageSize, -1 + (int)Model.PageIndex, (int)Model.ItemCount, new { orgid = Request["orgid"], brandcode = Request["brandcode"], modelcode = Request["modelcode"], speccode = Request["speccode"], specname = Request["specname"], spectype1 = Request["spectype1"], spectype2 = Request["spectype2"], flagactive = Request["flagactive"], RecordCount = Request["RecordCount"], init = Request["init"] }, "<", ">", "<<", ">>")
+                                        </div>
+                                    }
+                                    @Html.Partial("RecordCount")
+                                </div>
+                            }
+                        </aside>
+                    </div>
+                </div>
+                <div class="panel panel-info">
+                    <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                        @Html.AntiForgeryToken()
+                        <aside class="col-xs-12">
+                            <div class="scrollable-horizontal padding-left-0 padding-right-0 div-scrollable" data-size="@datasize" style="padding-top: 0!important;">
+                                <div style="width: 100%; float: left;">
+                                    <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center cell-50">@MvcHtmlString.Create("STT")</th>
+                                                <th class="text-center cell-120">
+                                                    @MvcHtmlString.Create("Mã Tổ chức")
+                                                </th>
+                                                <th class="text-center cell-120">
+                                                    @MvcHtmlString.Create("Mã hàng hóa")
+                                                </th>
+                                                @if (isparent)
+                                                {
+                                                    <th class="text-center cell-120">
+                                                        @MvcHtmlString.Create("Mã hàng hóa chung")
+                                                    </th>
+                                                }
+
+                                                <th class="text-center cell-300">
+                                                    @MvcHtmlString.Create("Tên hàng hóa")
+                                                </th>
+                                                <th class="text-center cell-120">
+                                                    @MvcHtmlString.Create("Mô tả")
+                                                </th>
+                                                <th class="text-center cell-120">
+                                                    @MvcHtmlString.Create("Loại sản phẩm")
+                                                </th>
+                                                @*<th class="text-center cell-120">
+                                                        @MvcHtmlString.Create("Nhóm sản phẩm")
+                                                    </th>*@
+                                                <th class="text-center cell-120">
+                                                    @MvcHtmlString.Create("Tên màu")
+                                                </th>
+                                                <th class="text-center cell-120">
+                                                    @MvcHtmlString.Create("ĐV thường dùng")
+                                                </th>
+                                                @*<th class="text-center cell-120">
+                                                        @MvcHtmlString.Create("ĐV tiêu chuẩn")
+                                                    </th>*@
+                                                <th class="text-center cell-120">
+                                                    @MvcHtmlString.Create("Cờ QL Serial")
+                                                </th>
+                                                @*<th class="text-center cell-120">
+                                                        @MvcHtmlString.Create("Cờ QL LOT")
+                                                    </th>*@
+                                                @if (list_OS_PrdCenter_Mst_SpecCustomField != null && list_OS_PrdCenter_Mst_SpecCustomField.Count > 0)
+                                                {
+                                                    @*var lstName = new List<int>();
+                                                        foreach (var it in list_OS_PrdCenter_Mst_SpecCustomField)
+                                                        {
+                                                            var CustomFieldCode = it.SpecCustomFieldCode.ToString().Replace("CUSTOMFIELD", "");
+                                                            lstName.Add(Convert.ToInt32(CustomFieldCode));
+                                                        }
+                                                        lstName.Sort();
+
+                                                        foreach (var item in lstName)
+                                                        {
+                                                            var FieldName = "CUSTOMFIELD" + item;
+                                                            lstCustomNameSort.Add(FieldName);
+                                                            <th class="text-center cell-180">
+                                                                @MvcHtmlString.Create(FieldName)
+                                                            </th>
+                                                        }*@
+
+                                                    foreach (var item in list_OS_PrdCenter_Mst_SpecCustomField)
+                                                    {
+                                                        <th class="text-center cell-120">
+                                                            @MvcHtmlString.Create(item.SpecCustomFieldName.ToString().Trim())
+                                                        </th>
+                                                    }
+                                                }
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Trạng thái")
+                                                </th>
+                                                <th class="cell-120">&nbsp;</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="table-tbodyID">
+                                            @if (Model != null && Model.DataList != null && Model.DataList.Count > 0)
+                                            {
+                                                var idx = 0;
+                                                foreach (var item in Model.DataList)
+                                                {
+                                                    var iindex = startCount + (idx + 1);
+                                                    var orgID = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.OrgID))
+                                                    {
+                                                        orgID = CUtils.StrValueOrNull(item.OrgID);
+                                                    }
+                                                    var specCode = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.SpecCode))
+                                                    {
+                                                        specCode = CUtils.StrValueOrNull(item.SpecCode);
+                                                    }
+                                                    var networkSpecCode = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.NetworkSpecCode))
+                                                    {
+                                                        networkSpecCode = CUtils.StrValueOrNull(item.NetworkSpecCode);
+                                                    }
+                                                    var specName = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.SpecName))
+                                                    {
+                                                        specName = CUtils.StrValueOrNull(item.SpecName);
+                                                    }
+                                                    var specDesc = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.SpecDesc))
+                                                    {
+                                                        specDesc = CUtils.StrValueOrNull(item.SpecDesc);
+                                                    }
+                                                    var specType1Name = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.mst1_SpecType1Name))
+                                                    {
+                                                        specType1Name = CUtils.StrValueOrNull(item.mst1_SpecType1Name);
+                                                    }
+                                                    var specType2Name = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.mst2_SpecType2Name))
+                                                    {
+                                                        specType2Name = CUtils.StrValueOrNull(item.mst2_SpecType2Name);
+                                                    }
+                                                    var color = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.Color))
+                                                    {
+                                                        color = CUtils.StrValueOrNull(item.Color);
+                                                    }
+                                                    var defaultUnitCode = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.DefaultUnitCode))
+                                                    {
+                                                        defaultUnitCode = CUtils.StrValueOrNull(item.DefaultUnitCode);
+                                                    }
+                                                    var standardUnitCode = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.StandardUnitCode))
+                                                    {
+                                                        standardUnitCode = CUtils.StrValueOrNull(item.StandardUnitCode);
+                                                    }
+                                                    var flagHasSerial = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.FlagHasSerial))
+                                                    {
+                                                        flagHasSerial = CUtils.StrValueOrNull(item.FlagHasSerial);
+                                                    }
+                                                    var flagHasLOT = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.FlagHasLOT))
+                                                    {
+                                                        flagHasLOT = CUtils.StrValueOrNull(item.FlagHasLOT);
+                                                    }
+                                                    var flagActive = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.FlagActive))
+                                                    {
+                                                        flagActive = CUtils.StrValueOrNull(item.FlagActive);
+                                                    }
+
+
+                                                    <tr idx="@idx" class="data-item trdata">
+                                                        <td class="text-center cell-50" style="background: #D3EDE4;">
+                                                            @MvcHtmlString.Create(iindex.ToString())
+                                                        </td>
+                                                        <td class="text-left cell-120">
+                                                            @MvcHtmlString.Create(orgID)
+                                                        </td>
+                                                        <td class="text-left cell-120">
+                                                            @MvcHtmlString.Create(specCode)
+                                                        </td>
+                                                        @if (isparent)
+                                                        {
+                                                            <td class="text-left cell-120">
+                                                                @MvcHtmlString.Create(networkSpecCode)
+                                                            </td>
+                                                        }
+                                                        <td class="text-left cell-300">
+                                                            @MvcHtmlString.Create(specName)
+                                                        </td>
+                                                        <td class="text-left cell-120">
+                                                            @MvcHtmlString.Create(specDesc)
+                                                        </td>
+                                                        <td class="text-left cell-120">
+                                                            @MvcHtmlString.Create(specType1Name)
+                                                        </td>
+                                                        @*<td class="text-left cell-120">
+                                                                @MvcHtmlString.Create(specType2Name)
+                                                            </td>*@
+                                                        <td class="text-left cell-120">
+                                                            @MvcHtmlString.Create(color)
+                                                        </td>
+                                                        <td class="text-left cell-120">
+                                                            @MvcHtmlString.Create(defaultUnitCode)
+                                                        </td>
+                                                        @*<td class="text-left cell-120">
+                                                                @MvcHtmlString.Create(standardUnitCode)
+                                                            </td>*@
+                                                        <td class="text-left cell-120">
+                                                            @MvcHtmlString.Create(flagHasSerial)
+                                                        </td>
+                                                        @*<td class="text-left cell-120">
+                                                                @MvcHtmlString.Create(flagHasLOT)
+                                                            </td>*@
+                                                        @if (list_OS_PrdCenter_Mst_SpecCustomField != null && list_OS_PrdCenter_Mst_SpecCustomField.Count > 0)
+                                                        {
+                                                            foreach (var itemSpecCustomField in list_OS_PrdCenter_Mst_SpecCustomField)
+                                                            {
+                                                                var specCustomFieldCode = itemSpecCustomField.SpecCustomFieldCode.ToString().Trim();
+                                                                var specCustomFieldName = itemSpecCustomField.SpecCustomFieldName.ToString().Trim();
+                                                                foreach (var properties in objectProperties)
+                                                                {
+                                                                    if (properties.Name.ToString().ToUpper().Trim().Equals(specCustomFieldCode))
+                                                                    {
+                                                                        var valueCur = properties.GetValue(item);
+                                                                        if (!CUtils.IsNullOrEmpty(valueCur))
+                                                                        {
+                                                                            valueCur = valueCur.ToString().Trim();
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            valueCur = "";
+                                                                        }
+                                                                        <td class="text-left cell-180">
+                                                                            @MvcHtmlString.Create(valueCur.ToString().Trim())
+                                                                        </td>
+                                                                        break;
+                                                                    }
+                                                                }
+
+                                                            }
+
+                                                            @*foreach (var specFieldCode in lstCustomNameSort)
+                                                                {
+                                                                    var itSpecField = list_OS_PrdCenter_Mst_SpecCustomField.Where(x => x.SpecCustomFieldCode.ToString() == specFieldCode).FirstOrDefault();
+                                                                    if (itSpecField != null)
+                                                                    {
+                                                                        var specCustomFieldCode = itSpecField.SpecCustomFieldCode.ToString().Trim();
+                                                                        var specCustomFieldName = itSpecField.SpecCustomFieldName.ToString().Trim();
+                                                                        foreach (var properties in objectProperties)
+                                                                        {
+                                                                            if (properties.Name.ToString().ToUpper().Trim().Equals(specCustomFieldCode))
+                                                                            {
+                                                                                var valueCur = properties.GetValue(item);
+                                                                                if (!CUtils.IsNullOrEmpty(valueCur))
+                                                                                {
+                                                                                    valueCur = valueCur.ToString().Trim();
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    valueCur = "";
+                                                                                }
+                                                                                <td class="text-left cell-180">
+                                                                                    @MvcHtmlString.Create(valueCur.ToString().Trim())
+                                                                                </td>
+                                                                                break;
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }*@
+
+                                                        }
+                                                        <td class="text-center cell-100">
+                                                            @if (flagActive.Equals("1"))
+                                                            {
+                                                                <span class="label label-sm label-success">Active</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="label label-sm label-danger">Inactive</span>
+                                                            }
+
+                                                        </td>
+                                                        <td class="text-center cell-120">
+                                                            <div class="action-buttons padding-top-2">
+                                                                @{
+                                                                    var urlDetail = Url.Action("Detail", "OS_PrdCenter_Mst_Spec", new { speccode = item.SpecCode });
+                                                                    var urlUpdate = Url.Action("Update", "OS_PrdCenter_Mst_Spec", new { speccode = item.SpecCode });
+
+                                                                }
+                                                                @RenderItemFormat("BTN_QL_OS_PRDCENTER_MST_SPEC_CHI_TIET", "<a class=\"icon-detail\" href=\'" + urlDetail + "\' title=\"Chi tiết\"><img class=\"img-icon\" src='" + Url.Content("~/Images/Xem.svg") + "'></a>", "", "")
+                                                                @RenderItemFormat("BTN_QL_OS_PRDCENTER_MST_SPEC_SUA", "<a class=\"icon-edit\" href=\'" + urlUpdate + "\' title=\"Sửa\"><img class=\"img-icon\" src='" + Url.Content("~/Images/Sua.svg") + "'></a>", "", "")
+                                                                @if (waOrgID.Equals(orgID))
+                                                                {
+
+                                                                    @RenderItemFormat("BTN_QL_OS_PRDCENTER_MST_SPEC_XOA", "<a href=\"javascript:;\" class=\"icon-delete\" title=\"Xóa\" onclick=\"Delete('" + item.SpecCode.ToString() + "','" + item.SpecName.ToString() + "','" + item.OrgID.ToString() + "')\"><img class=\"img-icon\" src='" + Url.Content("~/Images/Xoa.svg") + "'></a>", "", "")
+                                                                }
+
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    idx++;
+                                                }
+                                            }
+
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+@*Import Excel*@
+<div class="modal fade" id="ImportExcelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/OS_PrdCenter_Mst_Spec.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "OS_PrdCenter_Mst_Spec")');
+        
+
+        @* Set focus *@
+        $(document).ready(function () {
+            $('#SpecCode').focus();
+        });
+
+        @* Scroll *@
+        $(document).ready(function () {
+            $('.scrollable-horizontal').each(function () {
+                var $this = $(this);
+                $(this).ace_scroll(
+                    {
+                        horizontal: true,
+                        //styleClass: 'scroll-top',//show the scrollbars on top(default is bottom)
+                        size: $this.attr('data-size') || 6500,
+                        mouseWheelLock: true
+                    }
+                ).css({ 'padding-top': 0 });
+            });
+        });
+        $('.scrollable').each(function () {
+            var $this = $(this);
+            $(this).ace_scroll({
+                //size: 500,
+                size: $this.attr('data-size') || 1000,
+                mouseWheelLock: true
+                //styleClass: 'scroll-left scroll-margin scroll-thin scroll-dark scroll-light no-track scroll-visible'
+            });
+        });
+
+        @* keypress *@
+        $(document).on('keypress', function (e) {
+            if (e.which == 13) {
+                Search();
+            }
+        });
+
+        function Search()
+        {
+            $('#manageForm').attr('action', '@Url.Action("Index", "OS_PrdCenter_Mst_Spec")').submit();
+        }
+
+        var objOS_PrdCenter_Mst_Spec = new OS_PrdCenter_Mst_Spec();
+        function Delete(speccode, specname, orgID) {
+            var objOS_PrdCenter_Mst_Spec_Delete = {
+                SpecCode: speccode,
+                SpecName: specname,
+                OrgID: orgID,
+            };
+
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Delete", "OS_PrdCenter_Mst_Spec")';
+
+            objOS_PrdCenter_Mst_Spec.Image_Message = "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO";
+            objOS_PrdCenter_Mst_Spec.Confirm_Message = "Đồng ý xóa Spec '" + specname + "' ?";
+            objOS_PrdCenter_Mst_Spec.ajaxSettings = ajaxSettings;
+            objOS_PrdCenter_Mst_Spec.deleteData(objOS_PrdCenter_Mst_Spec_Delete);
+        }
+
+        var objCommonExcel = new CommonExcel();
+        var objVariablesInit = {
+            Id_FormMain: '',
+            Id_FormImportExcel: 'manageFormImportExcel',
+            Id_Modal: 'ImportExcelModal',
+            Id_FileInput: 'file',
+        };
+
+        var ajaxSettings_Excel = {};
+        ajaxSettings_Excel.Type = 'post';
+        ajaxSettings_Excel.DataType = 'json';
+
+        function ShowPopupImportExcel(check) {
+            ajaxSettings_Excel.Url = '@Url.Action("ShowPopupImportExcel", "Admin")';
+            ajaxSettings_Excel.Check = check;
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.variablesInit(objVariablesInit);
+            objCommonExcel.showPopupImportExcel();
+        }
+
+        function ImportFileExcel() {
+            ajaxSettings_Excel.Url = '@Url.Action("Import", "OS_PrdCenter_Mst_Spec")';
+            if (ajaxSettings_Excel.Check === false) {
+                ajaxSettings_Excel.Url = '@Url.Action("ImportMapping", "OS_PrdCenter_Mst_Spec")';
+            }
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.variablesInit(objVariablesInit);
+            objCommonExcel.importFileExcel();
+        }
+
+        function ExportTemplate(check) {
+            ajaxSettings_Excel.Url = '@Url.Action("ExportTemplate", "OS_PrdCenter_Mst_Spec")';
+            if (check==false) {
+                ajaxSettings_Excel.Url = '@Url.Action("ExportTemplateMapping", "OS_PrdCenter_Mst_Spec")';
+            }
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.exportExcel();
+        }
+
+        function Export() {
+            ajaxSettings_Excel.Url = '@Url.Action("Export", "OS_PrdCenter_Mst_Spec")';
+
+            var speccode = commonUtils.returnValueTextOrNull('#speccode');
+            var specname = commonUtils.returnValueTextOrNull('#specname');
+            var brandcode = commonUtils.returnValueTextOrNull('#brandcode');
+            var modelcode = commonUtils.returnValueTextOrNull('#modelcode');
+            var spectype1 = commonUtils.returnValueTextOrNull('#spectype1');
+            var spectype2 = commonUtils.returnValueTextOrNull('#spectype2');
+            var flagactive = commonUtils.returnValueTextOrNull('#flagactive');
+            var orgid = commonUtils.returnValueTextOrNull('#orgid');
+
+            var ListSearchInput = [
+                { Key: 'speccode', Value: speccode },
+                { Key: 'specname', Value: specname },
+                { Key: 'brandcode', Value: brandcode },
+                { Key: 'modelcode', Value: modelcode },
+                { Key: 'spectype1', Value: spectype1 },
+                { Key: 'spectype2', Value: spectype2 },
+                { Key: 'flagactive', Value: flagactive },
+                { Key: 'orgid', Value: orgid },
+            ];
+
+            //objOS_PrdCenter_Mst_Spec.ajaxSettings = ajaxSettings_Excel;
+            //objOS_PrdCenter_Mst_Spec.exportExcel(ListSearchInput);
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.exportExcel(ListSearchInput);
+        }
+
+    </script>
+}

@@ -1,0 +1,291 @@
+﻿@model RT_InvF_InventoryIn
+@{
+    ViewBag.Title = "Sửa phiếu nhập kho";
+    var listMst_InvInType = ViewBag.Lst_Mst_InvInType as List<Mst_InvInType>;
+    var listMst_Inventory = ViewBag.Lst_Mst_Inventory as List<Mst_Inventory>;
+    var listMst_Customer = ViewBag.Lst_MstCustomer as List<Mst_Customer>;
+
+    string viewType = "update";
+    var userState = ViewBag.UserState as UserState;
+
+    var Lst_InvF_InventoryInDtlUI = new List<InvF_InventoryInDtlUI>();
+    if (ViewBag.lstInvF_InventoryInDtlUI != null)
+    {
+        Lst_InvF_InventoryInDtlUI = ViewBag.lstInvF_InventoryInDtlUI as List<InvF_InventoryInDtlUI>;
+    }
+    var lstInvF_InventoryInDtl = ViewBag.lstInvF_InventoryInDtl as List<InvF_InventoryInDtl>;
+    var lstInvF_InventoryInInstLot = ViewBag.lstInvF_InventoryInInstLot as List<InvF_InventoryInInstLot>;
+    var lstInvF_InventoryInInstSerial = ViewBag.lstInvF_InventoryInInstSerial as List<InvF_InventoryInInstSerial>;
+    var lstInvF_InventoryInQR = ViewBag.lstInvF_InventoryInQR as List<InvF_InventoryInQR>;
+    var listProductUI = ViewBag.ListProductUI as List<InvF_InventoryInDtlUI>;
+    if (listProductUI == null || listProductUI.Count == 0)
+    {
+        listProductUI = new List<InvF_InventoryInDtlUI>();
+    }
+    var objInvF_InventoryIn = new InvF_InventoryIn();
+    if (Model != null)
+    {
+        if (Model.Lst_InvF_InventoryIn != null && Model.Lst_InvF_InventoryIn.Count > 0)
+        {
+            objInvF_InventoryIn = Model.Lst_InvF_InventoryIn[0];
+        }
+    }
+}
+
+<script src="~/Content/assets/js/bootbox.js"></script>
+<script src="@Url.Content("~/Scripts/mine/InvF_InventoryIn.js")"></script>
+
+<style>
+    .margin-left-12 {
+        margin-left: 12% !important;
+    }
+
+    .padding-bottom-10 {
+        padding-bottom: 10px;
+    }
+</style>
+
+@Html.Partial("Template", Model, new ViewDataDictionary()
+{
+    {"UserState", userState },
+    { "ViewType", viewType },
+})
+@Html.Partial("Model", Model, new ViewDataDictionary()
+{
+    {"UserState", userState },
+    { "ViewType", viewType },
+})
+@Html.Partial("Template_Scripts", Model, new ViewDataDictionary()
+{
+    {"UserState", userState },
+    { "ViewType", viewType },
+})
+
+@section RenderButton{
+    <aside class="col-md-6 mt-1">
+        <div class="form-group">
+            @if (viewType.Equals("update"))
+            {
+            @RenderItemFormat("BTN_SAVE_INVF_INVENTORYIN", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnSave\" onclick=\"UpdateData(0)\"><i class=\"fa fa-save\" aria-hidden=\"true\"></i> Lưu</a>", "", "")
+            @RenderItemFormat("BTN_SAVE_AND_NEW_INVF_INVENTORYIN", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnSave\" onclick=\"UpdateData(1)\"><i class=\"fa fa-save\" aria-hidden=\"true\"></i> Lưu và tạo mới</a>", "", "")
+            }
+
+        </div>
+    </aside>
+}
+
+<div class="mt-3">
+    @using (Html.BeginForm("Detail", "InvF_InventoryIn", FormMethod.Post, new { @id = "manageForm", @class = "form-horizontal" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+
+        @*Thông tin phiếu nhập kho*@
+        <div class="col-12 row">
+            @Html.Partial("Info_InvF_InventoryIn", Model, new ViewDataDictionary()
+            {
+                {"ListMst_InvInType", listMst_InvInType },
+                {"ListMst_Inventory", listMst_Inventory },
+                {"ListMst_Customer", listMst_Customer },
+                {"UserState", userState },
+                { "ViewType", viewType },
+            })
+        </div>
+
+        <ul class="nav nav-tabs position-relative">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#ProductInformation">@("Danh mục hàng hóa".HtmlItemString("invf_inventoryin"))</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#AuthenticationInformation" onclick="reloadSelectPrd()">@("Thông tin xác thực".HtmlItemString("invf_inventoryin"))</a>
+            </li>
+            <div class="nav-price">
+                <div class="form-group">
+                    <label class="control-label" for="TotalValIn">
+                        @("Tổng tiền hàng:".HtmlItemString("invf_inventoryin"))
+                    </label>
+                    <div class="control-input">
+                        @*<input type="text" class="disabled-fix text-right TotalValIn" name="TotalValIn" id="TotalValIn" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryIn.TotalValIn))" />*@
+                        <input type="text" class="text-right TotalValIn" name="TotalValIn" id="TotalValIn" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryIn.TotalValIn))" readonly />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="TotalValInDesc">
+                        @("Giảm giá:".HtmlItemString("invf_inventoryin"))
+                    </label>
+                    <div class="control-input">
+                        @*<input type="text" class="text-right disabled-fix TotalValInDesc" readonly="readonly" name="TotalValInDesc" id="TotalValInDesc" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryIn.TotalValInDesc))" />*@
+                        <input type="text" class="text-right TotalValInDesc" readonly name="TotalValInDesc" id="TotalValInDesc" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryIn.TotalValInDesc))" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="TotalValInAfterDesc">
+                        @("Tổng tiền trả NCC:".HtmlItemString("invf_inventoryin"))
+                    </label>
+                    <div class="control-input">
+                        @*<input type="text" class="text-right disabled-fix TotalValInAfterDesc" name="TotalValInAfterDesc" id="TotalValInAfterDesc" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryIn.TotalValInAfterDesc))" />*@
+                        <input type="text" class="text-right TotalValInAfterDesc totalAfterDesc" name="TotalValInAfterDesc" id="TotalValInAfterDesc" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryIn.TotalValInAfterDesc))" readonly />
+                    </div>
+                </div>
+            </div>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div id="ProductInformation" class="container-fluid padding-left-right-15 tab-pane active">
+                @*@Html.Partial("ProductInformation", new ViewDataDictionary() {
+                       { "Lst_InvF_InventoryInDtlUI", Lst_InvF_InventoryInDtlUI }
+                    })*@
+                @Html.Partial("Load_Table_InvF_InventoryInDtl", Model, new ViewDataDictionary() {
+                    { "Lst_InvF_InventoryInDtlUI", Lst_InvF_InventoryInDtlUI },
+                    { "Lst_InvF_InventoryInDtl", lstInvF_InventoryInDtl },
+                    { "Lst_InvF_InventoryInInstSerial", lstInvF_InventoryInInstSerial },
+                    { "Lst_InvF_InventoryInInstLot", lstInvF_InventoryInInstLot },
+                    { "ListProductUI", listProductUI },
+                    { "ViewType", viewType },
+                    { "UserState", userState },
+                })
+            </div>
+            <div id="AuthenticationInformation" class="container-fluid padding-left-right-15 tab-pane">
+                @Html.Partial("Load_Table_InvF_InventoryInQR", Model, new ViewDataDictionary() {
+                    { "Lst_InvF_InventoryInQR", lstInvF_InventoryInQR },
+                    { "ViewType", viewType },
+                    { "UserState", userState },
+                })
+            </div>
+        </div>
+    }
+</div>
+
+@*Import excel*@
+<div class="modal fade" id="ImportExcelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="exampleModalLabel">Nhập excel</h3>
+                <a href="javascript:;" onclick="CloseModalImportExcel()" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </a>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "manageFormImportExcel" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="key" name="key" value="" />
+                    <div class="form-group margin-bottom-9">
+                        <input type="file" name="file" id="file" />
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn mybtn-Button" onclick="Import()" id="btnSaveImport" style="padding-left: 10px!important; padding-right: 10px!important; font-size: 16px; font-weight: 500;">Nhập</a>
+            </div>
+        </div>
+    </div>
+</div>
+@*@Html.Partial("_TemplateLotAndSerial", new ViewDataDictionary() { { "lstInvF_InventoryInDtl", lstInvF_InventoryInDtl }, { "lstInvF_InventoryInInstLot", lstInvF_InventoryInInstLot }, { "lstInvF_InventoryInInstSerial", lstInvF_InventoryInInstSerial } })
+    @Html.Partial("_ModalShow")*@
+
+<script>
+    $(document).ready(function () {
+        $('select#InvInType').select2().on('select2:close', function () { commonUtils.showPopup(this); });
+        $('select#InvCodeIn').select2().on('select2:close', function () { commonUtils.showPopup(this); });
+        $('select#CustomerCode').select2().on('select2:close', function () { commonUtils.showPopup(this); });
+        $('select#InvCodeInActualPopup').select2();
+        $('select.InvCodeInActual_Lot').select2();
+        $('select#ProductCodeQR').select2();
+        $('#RefType').select2();
+        //reloadSelectPrd();
+    })
+
+</script>
+
+<script>
+
+    jQuery(function ($) {
+
+
+        format_Number();
+    });
+</script>
+
+<script>
+    function UpdateData(flagRedirect) {
+        var ajaxSettings = {};
+        ajaxSettings.Type = 'post';
+        ajaxSettings.DataType = 'json';
+        ajaxSettings.Url = '@Url.Action("UpdateData", "InvF_InventoryIn")';
+        var objInvF_InventoryIn = new InvF_InventoryIn();
+        objInvF_InventoryIn.ActionType = 'update';
+        objInvF_InventoryIn.ajaxSettings = ajaxSettings;
+        objInvF_InventoryIn.saveData(flagRedirect);
+    }
+
+    var objInvF_InventoryIn = new InvF_InventoryIn();
+    function Approve(if_invinno) {
+        debugger
+
+        if (if_invinno.length == 0) {
+            alert("Số phiếu nhập kho trống!");
+            return false;
+        }
+
+        var listInvF_InventoryIn = [];
+        var objAppr = {};
+        objAppr.IF_InvInNo = if_invinno;
+        var remark = commonUtils.returnValueTextOrNull('#Remark');
+        objAppr.Remark = remark;
+        listInvF_InventoryIn.push(objAppr);
+
+        var ajaxSettings = {};
+        ajaxSettings.Type = 'post';
+        ajaxSettings.DataType = 'json';
+        ajaxSettings.Url = '@Url.Action("Approve", "InvF_InventoryIn")';
+
+        objInvF_InventoryIn.Image_Message = "<i class=\"fas fa-info-circle\"></i> THÔNG BÁO";
+        objInvF_InventoryIn.Confirm_Message = "Đồng ý duyệt phiếu nhập kho " + if_invinno + "?";
+        objInvF_InventoryIn.ajaxSettings = ajaxSettings;
+        objInvF_InventoryIn.approveData(listInvF_InventoryIn);
+    }
+
+    function Cancel(if_invinno) {
+        if (if_invinno.length == 0) {
+            alert("Số phiếu nhập kho trống!");
+            return false;
+        }
+
+        var listInvF_InventoryIn = [];
+        var objCancel = {};
+        objCancel.IF_InvInNo = if_invinno;
+        var remark = commonUtils.returnValueTextOrNull('#Remark');
+        objCancel.Remark = remark;
+        listInvF_InventoryIn.push(objCancel);
+
+        var ajaxSettings = {};
+        ajaxSettings.Type = 'post';
+        ajaxSettings.DataType = 'json';
+        ajaxSettings.Url = '@Url.Action("Cancel", "InvF_InventoryIn")';
+
+        objInvF_InventoryIn.Image_Message = "<i class=\"fas fa-info-circle\"></i> THÔNG BÁO";
+        objInvF_InventoryIn.Confirm_Message = "Đồng ý hủy phiếu nhập kho " + if_invinno + "?";
+        objInvF_InventoryIn.ajaxSettings = ajaxSettings;
+        objInvF_InventoryIn.cancelData(listInvF_InventoryIn);
+    }
+</script>
+
+
+
+<script type="text/javascript">
+    function format_Number() {
+        var tableName = 'InvF_InventoryIn';
+        var totalValInFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValIn');
+        var totalValInDescFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValInDesc');
+        var totalValInAfterDescFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValInAfterDesc');
+        $('#TotalValIn').number(true, totalValInFormat);
+        $('#TotalValInDesc').number(true, totalValInDescFormat);
+
+        $('#TotalValInAfterDesc').number(true, totalValInAfterDescFormat);
+    }
+</script>

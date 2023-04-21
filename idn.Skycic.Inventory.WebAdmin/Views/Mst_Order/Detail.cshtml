@@ -1,0 +1,583 @@
+﻿@using inos.common.Model;
+
+@model RptSv_InosLicOrder_Commission
+@{
+    var title = "Danh sách gói sản phẩm/dịch vụ";
+    ViewBag.Title = title;
+    ViewBag.OverflowX = true;
+
+    var lst_Sys_Modules = ViewBag.Lst_Sys_Modules as List<Sys_Modules>;
+    if (lst_Sys_Modules == null || lst_Sys_Modules.Count == 0)
+    {
+        lst_Sys_Modules = new List<Sys_Modules>();
+    }
+
+    var licOrderDetail = ViewBag.LicOrderDetail as List<LicOrderDetail>;
+    if (licOrderDetail == null || licOrderDetail.Count == 0)
+    {
+        licOrderDetail = new List<LicOrderDetail>();
+    }
+}
+<style>
+    .ace-scroll, .scroll-content {
+        overflow: hidden !important;
+    }
+</style>
+
+<div class="container">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="col-xs-12">
+                        @using (Html.BeginForm("Detail", "Mst_Order", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="row no-margin">
+                                <div class="col-sm-4 no-padding">
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="OrderId" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã đơn hàng")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="OrderId" name="OrderId" class="col-xs-11 OrderId disabled-fix" value="@if (Model != null && Model.OrderId != null){@MvcHtmlString.Create(Model.OrderId.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("MST")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 disabled-fix" value="@if (Model != null && Model.MST != null){@MvcHtmlString.Create(Model.MST.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên tổ chức")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 disabled-fix" value="@if (Model != null && Model.InosLicOrderOrgName != null){@MvcHtmlString.Create(Model.InosLicOrderOrgName.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("OrgID")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 disabled-fix" value="@if (Model != null && Model.InosOrgId != null){@MvcHtmlString.Create(Model.InosOrgId.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("NetworkID")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 disabled-fix" value="@if (Model != null && Model.InosNetworkId != null){@MvcHtmlString.Create(Model.InosNetworkId.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Giới thiệu 1")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 disabled-fix" value="@if (Model != null && Model.Presenter1 != null){@MvcHtmlString.Create(Model.Presenter1.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Giới thiệu 2")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 disabled-fix" value="@if (Model != null && Model.Presenter2 != null){@MvcHtmlString.Create(Model.Presenter2.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Telesale")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 disabled-fix" value="@if (Model != null && Model.Telesale != null){@MvcHtmlString.Create(Model.Telesale.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 no-padding">
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Thành tiền (VND)")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 disabled-fix formatnumber" value="@if (Model != null && Model.InosLicOrderPrice != null){@MvcHtmlString.Create(Model.InosLicOrderPrice.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã giảm giá")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 disabled-fix" value="@if (Model != null && Model.InosLicOrderDiscountCode != null){@MvcHtmlString.Create(Model.InosLicOrderDiscountCode.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Giảm giá (VND)")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 disabled-fix" value="@if (Model != null && Model.InosLicOrderDiscountVal != null){@MvcHtmlString.Create(Model.InosLicOrderDiscountVal.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tổng TT (VND)")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 disabled-fix formatnumber" value="@if (Model != null && Model.InosLicOrderTotalCost != null){@MvcHtmlString.Create(Model.InosLicOrderTotalCost.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    @*<div class="form-group margin-bottom-5">
+                                            <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("PT thanh toán")</label>
+                                            <div class="col-xs-12 col-sm-7">
+                                                <span class="block input-icon input-icon-right">
+                                                    <input type="text" id="" name="" class="col-xs-11 disabled-fix" value="" autocomplete="off" required />
+                                                </span>
+                                            </div>
+                                        </div>*@
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tư vấn ")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 disabled-fix" value="@if (Model != null && Model.Consultants != null){@MvcHtmlString.Create(Model.Consultants.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Triển khai")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 disabled-fix" value="@if (Model != null && Model.Implementer != null){@MvcHtmlString.Create(Model.Implementer.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("HH Giới thiệu 1")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 disabled-fix" value="@if (Model != null && Model.CommissionPresenter1 != null){@MvcHtmlString.Create(Model.CommissionPresenter1.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("HH Giới thiệu 2")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 disabled-fix" value="@if (Model != null && Model.CommissionPresenter2 != null){@MvcHtmlString.Create(Model.CommissionPresenter2.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 no-padding">
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Ngày tạo")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 disabled-fix" value="@if (Model != null && Model.InosLicOrderCreateDTime != null){@MvcHtmlString.Create(DateTime.Parse(Model.InosLicOrderCreateDTime.ToString()).ToString("yyyy-MM-dd"))} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Ngày duyệt")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 disabled-fix" value="@if (Model != null && Model.InosLicOrderApproveDTime != null){@MvcHtmlString.Create(DateTime.Parse(Model.InosLicOrderApproveDTime.ToString()).ToString("yyyy-MM-dd"))} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Người duyệt")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 disabled-fix" value="@if (Model != null && Model.InosLicOrderCreateUserId != null){@MvcHtmlString.Create(Model.InosLicOrderCreateUserId.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Ngày TT")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 disabled-fix" value="" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Trạng thái")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 disabled-fix" value="@if (Model != null && Model.InosLicOrderStatus != null){@MvcHtmlString.Create(Model.InosLicOrderStatus.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("TT duyệt HH")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 disabled-fix" value="@if (Model != null && Model.CommissionStatus != null){@MvcHtmlString.Create(Model.CommissionStatus.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("HH Telesale")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 disabled-fix" value="@if (Model != null && Model.CommissionTelesale != null){@MvcHtmlString.Create(Model.CommissionTelesale.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("HH Tư vấn")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 disabled-fix" value="@if (Model != null && Model.CommissionConsultants != null){@MvcHtmlString.Create(Model.CommissionConsultants.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("HH Triển khai")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="" name="" class="col-xs-11 disabled-fix" value="@if (Model != null && Model.CommissionImplementer != null){@MvcHtmlString.Create(Model.CommissionImplementer.ToString())} else { @("")}" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row no-margin">
+                                <div class="col-sm-12 no-padding">
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="Remark" class="col-xs-12 col-sm-2 control-label no-padding-right font-weight-500 " style="width: 14%">@MvcHtmlString.Create("Ghi chú")</label>
+                                        <div class="col-xs-12 col-sm-10" style="width: 86%">
+                                            <span class="block input-icon input-icon-right">
+                                                <textarea rows="3" type="text" id="Remark" name="Remark" class="col-xs-11 Remark" autocomplete="off">
+                                                    @if (Model != null && Model.Remark != null){@MvcHtmlString.Create(Model.Remark.ToString())} else { @("")}
+                                                </textarea>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="">
+                                <div class="">
+                                    <div class="title">
+                                        <p style="vertical-align: bottom">CHI TIẾT ĐƠN HÀNG</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel panel-info">
+                                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                                    @Html.AntiForgeryToken()
+                                    <aside class="col-xs-12 no-padding">
+                                        <div class="scrollable-horizontal padding-left-0 padding-right-0 div-scrollable" data-size="1235" style="padding-top: 0!important;">
+                                            <div style="width: 100%; float: left;">
+                                                <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center cell-120">
+                                                                @MvcHtmlString.Create("Package")
+                                                            </th>
+                                                            <th class="text-center cell-120">
+                                                                @MvcHtmlString.Create("Tên package")
+                                                            </th>
+                                                            <th class="text-center cell-120">
+                                                                @MvcHtmlString.Create("SL hóa đơn")
+                                                            </th>
+                                                            <th class="text-center cell-120">
+                                                                @MvcHtmlString.Create("Subscription")
+                                                            </th>
+                                                            <th class="text-center cell-120">
+                                                                @MvcHtmlString.Create("Total (VND)")
+                                                            </th>
+                                                            <th class="text-center cell-120">
+                                                                @MvcHtmlString.Create("Status")
+                                                            </th>
+                                                            <th class="text-center cell-120">
+                                                                @MvcHtmlString.Create("StartedDate")
+                                                            </th>
+                                                            <th class="text-center cell-120">
+                                                                @MvcHtmlString.Create("ExpiredDate")
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="table-tbodyID">
+                                                        @if (licOrderDetail != null && licOrderDetail.Count > 0)
+                                                        {
+                                                            var idx = 0;
+                                                            foreach (var item in licOrderDetail)
+                                                            {
+                                                                var packageId = "";
+                                                                if (!CUtils.IsNullOrEmpty(item.PackageId))
+                                                                {
+                                                                    packageId = CUtils.StrValue(item.PackageId);
+                                                                }
+                                                                var packageName = "";
+                                                                if (!CUtils.IsNullOrEmpty(item.Lic.Package.Name))
+                                                                {
+                                                                    packageName = CUtils.StrValue(item.Lic.Package.Name);
+                                                                }
+                                                                var subscription = "";
+                                                                if (!CUtils.IsNullOrEmpty(item.Lic.Package.Subscription))
+                                                                {
+                                                                    subscription = CUtils.StrValue(item.Lic.Package.Subscription);
+                                                                }
+                                                                List<LicModule> lstLicModule = item.GetModuleBySolutionCode("HDDT");
+                                                                int soluong = 0;
+                                                                if (lstLicModule != null && lstLicModule.Count > 0 && !CUtils.IsNullOrEmpty(lstLicModule[0].Code))
+                                                                {
+                                                                    var lst_Sys_ModulesCur = lst_Sys_Modules.Where(x => x.ModuleCode.Equals(lstLicModule[0].Code)).ToList();
+                                                                    soluong = Convert.ToInt32(lst_Sys_ModulesCur[0].QtyInvoice.ToString()) * lstLicModule[0].Count;
+                                                                }
+                                                                var price = "";
+                                                                if (!CUtils.IsNullOrEmpty(item.Price))
+                                                                {
+                                                                    price = CUtils.StrValue(item.Price);
+                                                                }
+                                                                var status = "";
+                                                                if (!CUtils.IsNullOrEmpty(item.Lic.Status))
+                                                                {
+                                                                    status = CUtils.StrValue(item.Lic.Status);
+                                                                }
+                                                                var startDate = "";
+                                                                if (!CUtils.IsNullOrEmpty(item.Lic.StartDate))
+                                                                {
+                                                                    startDate = item.Lic.StartDate.ToString("yyyy-MM-dd");
+                                                                }
+                                                                var endDate = "";
+                                                                if (!CUtils.IsNullOrEmpty(item.Lic.EndDate))
+                                                                {
+                                                                    endDate = item.Lic.EndDate.ToString("yyyy-MM-dd");
+                                                                }
+                                                                <tr idx="@idx" class="data-item trdata">
+                                                                    <td class="text-center cell-120">@MvcHtmlString.Create(packageId)</td> <!--Package-->
+                                                                    <td class="text-center cell-120">@MvcHtmlString.Create(packageName)</td> <!--Tên package-->
+                                                                    <td class="text-center cell-120">@MvcHtmlString.Create(soluong.ToString())</td> <!--SL hóa đơn-->
+                                                                    <td class="text-center cell-120">@MvcHtmlString.Create(subscription)</td> <!--Subscription-->
+                                                                    <td class="text-center cell-120 formatnumber">@MvcHtmlString.Create(price)</td> <!--Total (VND)-->
+                                                                    <td class="text-center cell-120">@MvcHtmlString.Create(status)</td> <!--Status-->
+                                                                    <td class="text-center cell-120">@MvcHtmlString.Create(startDate)</td> <!--StartedDate-->
+                                                                    <td class="text-center cell-120">@MvcHtmlString.Create(endDate)</td> <!--ExpiredDate-->
+                                                                </tr>
+                                                                idx++;
+                                                            }
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </aside>
+                                </div>
+                            </div>
+                        }
+                    </aside>
+                    <div class="col-xs-12 text-center">
+                        <div class="clearfix">
+                            <div class="row no-margin text-center">
+                                
+                                @if (Model != null && Model.InosLicOrderStatus != null && Model.InosLicOrderStatus.ToString().Equals("Processing"))
+                                {
+                                    @RenderItemFormat("BTN_CHI_TIET_DON_HANG_CANCEL", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px; margin-right: 10px!important \" onclick=\"Cancel();\">Hủy</a>", "", "")
+
+                                    @RenderItemFormat("BTN_CHI_TIET_DON_HANG_APPROVE", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px; margin-right: 10px!important \" onclick=\"Approved();\">Duyệt</a>", "", "")
+
+                                    @RenderItemFormat("BTN_CHI_TIET_DON_HANG_PAYMENT", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px; margin-right: 10px!important \" onclick=\"KhoiTaoHeThong();\">Xác nhận thanh toán</a>", "", "")
+
+                                    @RenderItemFormat("BTN_CHI_TIET_DON_HANG_UPDATE", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px; margin-right: 10px!important \" onclick=\"SaveData();\">Cập nhật</a>", "", "")
+                                }
+                                else if (Model.InosLicOrderStatus.ToString().Equals("Cancel"))
+                                {
+
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+@*Active Menu*@
+<script type="text/javascript">
+    setAdminCurrentUrl('@Url.Action("Index", "Mst_Order")');
+</script>
+<script type="text/javascript">
+    processAjaxForm($('#manageForm'), function (response) {
+        processAjaxFormResult(response);
+
+    });
+
+    $(document).ready(function () {
+        $('.scrollable-horizontal').each(function () {
+            var $this = $(this);
+            $(this).ace_scroll(
+                {
+                    horizontal: true,
+                    //styleClass: 'scroll-top',//show the scrollbars on top(default is bottom)
+                    size: $this.attr('data-size') || 6500,
+                    mouseWheelLock: true
+                }
+            ).css({ 'padding-top': 0 });
+        });
+    });
+    jQuery(function ($) {
+        $('.formatnumber').number(true, 0);
+    });
+    $('.scrollable').each(function () {
+        var $this = $(this);
+        $(this).ace_scroll({
+            //size: 500,
+            size: $this.attr('data-size') || 1000,
+            mouseWheelLock: true,
+            //styleClass: 'scroll-left scroll-margin scroll-thin scroll-dark scroll-light no-track scroll-visible'
+        });
+    });
+</script>
+
+
+<script>
+    function SaveData() {
+        var orderId = ReturnValueText('#OrderId');
+        var remark = ReturnValueText('#Remark');
+
+        var tem = new Object();
+        
+        tem.OrderId = orderId;
+        tem.Remark = remark;
+
+        var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+        var modelCur = JSON.stringify(tem);
+        var url = '@Url.Action("Edit", "Mst_Order")';
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: {
+                __RequestVerificationToken: token
+                , model: modelCur
+            },
+            traditional: true,
+            //contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                debugger
+                if (data.Success) {
+                    if (data.Messages !== null && data.Messages !== undefined && data.Messages.length > 0) {
+                        alert(data.Messages[0]);
+                    }
+                    window.location.href = data.RedirectUrl;
+                    //window.location.href = window.location.href;
+                }
+                else {
+                    if (data.Detail != null) {
+                        _showErrorMsg123("Lỗi!", data.Detail);
+                    }
+                }
+            }, error: function (xmlHttpRequest, textStatus, errorThrown) {
+                debugger;
+                if (textStatus === 'Unauthorized') {
+                    alert('custom message. Error: ' + errorThrown);
+                } else {
+                    //alert('custom message. Error2: ' + errorThrown);
+                }
+            }
+        });
+    }
+</script>
+
+<script>
+    function Cancel() {
+        debugger
+        var orderId = ReturnValueText('#OrderId');
+        
+        var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+        var url = '@Url.Action("Cancel", "Mst_Order")';
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: {
+                __RequestVerificationToken: token
+                , orderId: orderId
+            },
+            traditional: true,
+            //contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                debugger
+                if (data.Success) {
+                    if (data.Messages !== null && data.Messages !== undefined && data.Messages.length > 0) {
+                        alert(data.Messages[0]);
+                    }
+                    window.location.href = data.RedirectUrl;
+                    //window.location.href = window.location.href;
+                }
+                else {
+                    if (data.Detail != null) {
+                        _showErrorMsg123("Lỗi!", data.Detail);
+                    }
+                }
+            }, error: function (xmlHttpRequest, textStatus, errorThrown) {
+                debugger;
+                if (textStatus === 'Unauthorized') {
+                    alert('custom message. Error: ' + errorThrown);
+                } else {
+                    //alert('custom message. Error2: ' + errorThrown);
+                }
+            }
+        });
+    }
+</script>
+
+<script>
+    function Approved() {
+        debugger
+        var orderId = ReturnValueText('#OrderId');
+
+        var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+        var url = '@Url.Action("Approved", "Mst_Order")';
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: {
+                __RequestVerificationToken: token
+                , orderId: orderId
+            },
+            traditional: true,
+            //contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                debugger
+                if (data.Success) {
+                    if (data.Messages !== null && data.Messages !== undefined && data.Messages.length > 0) {
+                        alert(data.Messages[0]);
+                    }
+                    window.location.href = data.RedirectUrl;
+                    //window.location.href = window.location.href;
+                }
+                else {
+                    if (data.Detail != null) {
+                        _showErrorMsg123("Lỗi!", data.Detail);
+                    }
+                }
+            }, error: function (xmlHttpRequest, textStatus, errorThrown) {
+                debugger;
+                if (textStatus === 'Unauthorized') {
+                    alert('custom message. Error: ' + errorThrown);
+                } else {
+                    //alert('custom message. Error2: ' + errorThrown);
+                }
+            }
+        });
+    }
+</script>
+

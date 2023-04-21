@@ -1,0 +1,317 @@
+﻿@model Sys_Modules
+@{
+    var title = "SỬA GÓI Module";
+    var titleMng = "Quản lý gói Module";
+    ViewBag.Title = title;
+    var userState = ViewBag.UserState as UserState;
+}
+
+<div class="container">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="col-xs-12">
+                        @using (Html.BeginForm("Update", "Sys_Modules", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="title">
+                                <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                            </div>
+                            <div class="row no-margin">
+                                <div class="col-sm-8">
+                                    @{
+                                        var solutionCode = "";
+                                        var solutionName = "";
+                                        var moduleCode = "";
+                                        var moduleName = "";
+                                        var description = "";
+                                        var qtyInvoice = "";
+                                        var valCapacity = "";
+                                        var flagActive = "";
+                                        var checkActive = "";
+                                        if (Model != null)
+                                        {
+                                            if (!CUtils.IsNullOrEmpty(Model.SolutionCode))
+                                            {
+                                                solutionCode = CUtils.StrValue(Model.SolutionCode);
+                                            }
+                                            if (!CUtils.IsNullOrEmpty(Model.ss_SolutionName))
+                                            {
+                                                solutionName = CUtils.StrValue(Model.ss_SolutionName);
+                                            }
+                                            if (!CUtils.IsNullOrEmpty(Model.ModuleCode))
+                                            {
+                                                moduleCode = CUtils.StrValue(Model.ModuleCode);
+                                            }
+                                            if (!CUtils.IsNullOrEmpty(Model.ModuleName))
+                                            {
+                                                moduleName = CUtils.StrValue(Model.ModuleName);
+                                            }
+                                            if (!CUtils.IsNullOrEmpty(Model.Description))
+                                            {
+                                                description = CUtils.StrValue(Model.Description);
+                                            }
+                                            if (!CUtils.IsNullOrEmpty(Model.QtyInvoice))
+                                            {
+                                                qtyInvoice = CUtils.StrValue(Model.QtyInvoice);
+                                            }
+                                            if (!CUtils.IsNullOrEmpty(Model.ValCapacity))
+                                            {
+                                                valCapacity = CUtils.StrValue(Model.ValCapacity);
+                                            }
+                                            if (!CUtils.IsNullOrEmpty(Model.FlagActive))
+                                            {
+                                                flagActive = CUtils.StrValue(Model.FlagActive);
+                                            }
+                                            checkActive = flagActive.Equals("1") ? "checked" : "";
+                                        }
+                                    }
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã solution")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="SolutionCode" name="SolutionCode" class="col-xs-11 disabled-fix SolutionCode" value="@MvcHtmlString.Create(solutionCode)" autocomplete="off" />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên solution")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="SolutionName" name="SolutionName" class="col-xs-11 disabled-fix SolutionName" value="@MvcHtmlString.Create(solutionName)" autocomplete="off" />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Module")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+
+
+                                                <input type="text" id="ModuleCode" name="ModuleCode" class="col-xs-11 disabled-fix ModuleCode" onkeyup="locdau(this);" value="@MvcHtmlString.Create(moduleCode)" autocomplete="off" required />
+                                            </span>
+                                            <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên module")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="ModuleName" name="ModuleName" class="col-xs-11 ModuleName" value="@MvcHtmlString.Create(moduleName)" autocomplete="off" required />
+                                            </span>
+                                            <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("SL hóa đơn")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="QtyInvoice" name="QtyInvoice" class="col-xs-11 text-right QtyInvoice" value="@MvcHtmlString.Create(qtyInvoice)" autocomplete="off" />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Dung lượng (GB)")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="ValCapacity" name="ValCapacity" class="col-xs-11 text-right ValCapacity" value="@MvcHtmlString.Create(valCapacity)" autocomplete="off" />
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Description")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <textarea rows="4" cols="50" id="Description" name="Description" class="col-xs-11 Description" autocomplete="off">@MvcHtmlString.Create(description)</textarea>
+                                            </span>
+                                            @*<label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>*@
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">Trạng thái</label>
+                                        <div class="col-xs-12 col-sm-5">
+                                            <span class="block input-icon input-icon-right padding-top-5">
+                                                <label>
+                                                    <input name="FlagActive" id="FlagActive" class="ace ace-switch ace-switch-4 FlagActive" type="checkbox" value="1" @checkActive />
+                                                    <span class="lbl"></span>
+                                                    <input name="FlagActive" type="hidden" value="0" />
+                                                </label>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </aside>
+                    <div class="col-xs-12 text-center">
+                        <div class="clearfix">
+                            <div class="row no-margin text-center">
+                                @*@if (userState != null && userState.RptSv_Sys_User.FlagSysAdmin.Equals("1"))
+        {
+            <a href="javascript:void(0);" class="btn font-color mybtn-Button" style="margin-top: 20px; padding-left: 15px !important; padding-right: 15px !important;" onclick="SaveData();"><i class="ace-icon fa fa-floppy-o bigger-110"></i>Cập nhật</a>
+        }*@
+                                @RenderItemFormat("BTN_SUA_MODULE_LUU", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-left: 10px; padding-left: 15px!important; padding-right: 15px!important; \" onclick=\"SaveData();\"><i class=\"ace-icon fa fa-floppy-o bigger-110\"></i>Lưu</a>", "", "")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+@*Active Menu*@
+<script type="text/javascript">
+    setAdminCurrentUrl('@Url.Action("Index", "Sys_Modules")');
+</script>
+<script type="text/javascript">
+    processAjaxForm($('#manageForm'), function (response) {
+        processAjaxFormResult(response);
+
+    });
+</script>
+
+
+@*Set focus*@
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".ModuleName").focus();
+    });
+    jQuery(function ($) {
+        $('.QtyInvoice, .ValCapacity').number(true, 0);
+    });
+</script>
+
+<script>
+    function CheckForm() {
+        if (!CheckIsNullOrEmpty('#ModuleCode', 'has-error-fix', '@MvcHtmlString.Create("Module không được trống!")'))
+        {
+            return false;
+        }
+        if (!CheckIsNullOrEmpty('#ModuleName', 'has-error-fix', '@MvcHtmlString.Create("Tên module không được trống!")'))
+        {
+            return false;
+        }
+        if (CheckElementExists('#QtyInvoice'))
+        {
+            var qtyInvoice = $('#QtyInvoice').val();
+            if (!IsNullOrEmpty(qtyInvoice))
+            {
+                if (!CheckIsNumber('#QtyInvoice', 'has-error-fix', '@MvcHtmlString.Create("SL hóa đơn không phải số!")'))
+                {
+                    return false;
+                }
+                if (!CheckIsNumberLonHonBang0('#QtyInvoice', 'has-error-fix', '@MvcHtmlString.Create("SL hóa đơn >= 0!")'))
+                {
+                    return false;
+                }
+            }
+        }
+
+        if (CheckElementExists('#ValCapacity'))
+        {
+            var valCapacity = $('#ValCapacity').val();
+            if (!IsNullOrEmpty(valCapacity))
+            {
+                if (!CheckIsNumber('#ValCapacity', 'has-error-fix', '@MvcHtmlString.Create("Dung lượng (GB) không phải số!")'))
+                {
+                    return false;
+                }
+                if (!CheckIsNumberLonHonBang0('#ValCapacity', 'has-error-fix', '@MvcHtmlString.Create("Dung lượng (GB) >= 0!")'))
+                {
+                    return false;
+                }
+            }
+        }
+
+        @*if (!CheckIsNullOrEmpty('#Description', 'has-error-fix', '@MvcHtmlString.Create("Description không được trống!")'))
+        {
+            return false;
+        }*@
+        return true;
+    }
+
+    function SaveData()
+    {
+        var check = CheckForm();
+
+        if (check)
+        {
+            var solutionCode = ReturnValueText('#SolutionCode');
+            var moduleCode = ReturnValueText('#ModuleCode');
+            var moduleName = ReturnValueText('#ModuleName');
+            var qtyInvoice = ReturnValueText('#QtyInvoice');
+            var valCapacity = ReturnValueText('#ValCapacity');
+            var description = ReturnValueText('#Description');
+            var flagActive = '0';
+            var inputFlagActive = $('#FlagActive');
+            if (inputFlagActive !== undefined && inputFlagActive !== null) {
+                if (inputFlagActive.prop('checked')) {
+                    flagActive = '1';
+                }
+            }
+            var tem = new Object();
+            tem.SolutionCode = solutionCode;
+            tem.ModuleCode = moduleCode;
+            tem.ModuleName = moduleName;
+            tem.QtyInvoice = qtyInvoice;
+            tem.ValCapacity = valCapacity;
+            tem.Description = description;
+            tem.FlagActive = flagActive;
+
+            var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+            var modelCur = JSON.stringify(tem);
+            var url = '@Url.Action("Edit", "Sys_Modules")';
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    __RequestVerificationToken: token
+                    , model: modelCur
+                },
+                traditional: true,
+                //contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    if (data.Success) {
+                        if (data.Messages !== null && data.Messages !== undefined && data.Messages.length > 0) {
+                            alert(data.Messages[0]);
+                        }
+                        window.location.href = data.RedirectUrl;
+                    }
+                    else {
+                        if (data.Detail != null) {
+                            _showErrorMsg123("Lỗi!", data.Detail);
+                        }
+                    }
+                }, error: function (xmlHttpRequest, textStatus, errorThrown) {
+                    debugger;
+                    if (textStatus === 'Unauthorized') {
+                        alert('custom message. Error: ' + errorThrown);
+                    } else {
+                        //alert('custom message. Error2: ' + errorThrown);
+                    }
+                }
+            });
+
+
+        }
+    }
+</script>
+
+
+
+
+
+

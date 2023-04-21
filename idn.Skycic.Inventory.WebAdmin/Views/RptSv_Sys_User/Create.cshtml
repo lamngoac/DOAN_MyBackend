@@ -1,0 +1,342 @@
+﻿@model RptSv_Sys_User
+@{
+    var title = "TẠO TÀI KHOẢN";
+    var titleMng = "Quản lý tài khoản";
+    ViewBag.Title = title;
+    var listMst_Dealer = ViewBag.ListMst_Dealer as List<Mst_Dealer>;
+    if (listMst_Dealer == null || listMst_Dealer.Count == 0)
+    {
+        listMst_Dealer = new List<Mst_Dealer>();
+    }
+    var userState = ViewBag.UserState as UserState;
+
+    var display = "display-none";
+    if (userState.RptSv_Sys_User.FlagSysAdmin.Equals("1"))
+    {
+        display = "";
+    }
+}
+<script type="text/javascript">
+var parents = new Array();
+parents.push("@Url.Action("Index", "RptSv_Sys_User")");
+parents.push("");
+var parentsText = new Array();
+parentsText.push("@MvcHtmlString.Create(titleMng)");
+parentsText.push("@MvcHtmlString.Create(title)");
+setAdminCurrentTag(parents, parentsText);
+</script>
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="title">
+                    <p style="vertical-align: bottom"> @MvcHtmlString.Create(title) </p>
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="row no-margin box-shadow-tk">
+                        @using (Html.BeginForm("Create", "RptSv_Sys_User", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="col-xs-5 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã người dùng <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="UserCode" name="UserCode" class="col-xs-11  UserCode" value="@if (Model != null && Model.UserCode != null){@MvcHtmlString.Create(Model.UserCode.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group margin-bottom-5">
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên người dùng <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="UserName" name="UserName" class="col-xs-11  UserName" value="@if (Model != null && Model.UserName != null){@MvcHtmlString.Create(Model.UserName.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mật khẩu <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="password" id="UserPassword" name="UserPassword" class="col-xs-11 UserPassword" value="@if (Model != null && Model.UserPassword != null){@MvcHtmlString.Create(Model.UserPassword.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group margin-bottom-5">
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Nhập lại mật khẩu <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="password" id="ConfirmPassword" name="ConfirmPassword" class="col-xs-11 ConfirmPassword" value="@if (Model != null && Model.UserPassword != null){@MvcHtmlString.Create(Model.UserPassword.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-5 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="DLCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã đại lý <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <select id="DLCode" name="DLCode" class="col-xs-11">
+                                                <option></option>
+                                                @{
+                                                    if (listMst_Dealer != null)
+                                                    {
+                                                        foreach (var it in listMst_Dealer)
+                                                        {
+                                                            var dlcode = "";
+                                                            var dlname = "";
+                                                            if (!CUtils.IsNullOrEmpty(it.DLCode))
+                                                            {
+                                                                dlcode = CUtils.StrValue(it.DLCode);
+                                                            }
+                                                            if (!CUtils.IsNullOrEmpty(it.DLName))
+                                                            {
+                                                                dlname = CUtils.StrValue(it.DLName);
+                                                            }
+                                                            <option value="@MvcHtmlString.Create(dlcode)" desc="@MvcHtmlString.Create(dlname)">@MvcHtmlString.Create(dlcode + " - " + dlname)</option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </span>
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group margin-bottom-5">
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Điện thoại")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" maxlength="11" id="PhoneNo" name="PhoneNo" class="col-xs-11 PhoneNo" value="@if (Model != null && Model.PhoneNo != null){@MvcHtmlString.Create(Model.PhoneNo.ToString())} else { @("")}" autocomplete="off" />
+                                        </span>
+                                    </div>
+                                </div>
+
+                                @*<div class="form-group margin-bottom-5">
+                                    <label for="FlagRanking" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Ranking <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <select id="FlagRanking" name="FlagRanking" class="col-xs-11">
+                                                <option value="0">@CLientTypeData_Ranking.R0</option>
+                                                <option value="1">@CLientTypeData_Ranking.R1</option>
+                                            </select>
+                                        </span>
+                                    </div>
+
+                                </div>*@
+
+                                <div class="form-group margin-bottom-5 @display">
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">Cờ Quản trị HT</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right padding-top-5">
+                                            <label>
+                                                <input name="FlagSysAdmin" id="FlagSysAdmin" class="ace ace-switch ace-switch-4 FlagSysAdmin" type="checkbox" value="1" />
+                                                <span class="lbl"></span>
+                                                <input name="FlagSysAdmin" type="hidden" value="0" />
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </aside>
+                    <div class="col-xs-12 no-padding">
+                        <div class="clearfix">
+                            <div class="row no-margin" style="float: right">
+                                @*@if (userState != null && userState.RptSv_Sys_User.FlagSysAdmin.Equals("1"))
+                                    {
+                                        <a href="javascript:void(0);" class="btn font-color mybtn-Button" style="margin-top: 20px; padding-left: 15px !important; padding-right: 15px !important;" onclick="SaveData();"><i class="ace-icon fa fa-floppy-o bigger-110"></i>Lưu</a>
+                                    }*@
+                                @RenderItemFormat("	BTN_TAO_MOI_ND_LUU", "<a href=\"javascript: void(0); \" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px; padding-left: 15px!important; padding-right: 15px!important;\" onclick=\"SaveData();\">Lưu</a>", "", "")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+<script type="text/javascript">
+    processAjaxForm($('#manageForm'), function (response) {
+        processAjaxFormResult(response);
+
+    });
+</script>
+
+@*Active Menu*@
+<script type="text/javascript">
+    setAdminCurrentUrl('@Url.Action("Index", "RptSv_Sys_User")');
+</script>
+@*Set focus*@
+<script>
+    var _getForm = document.getElementById("manageForm");
+    _getForm.addEventListener('reset', function () {
+        document.getElementById("UserCode").focus();
+    });
+</script>
+
+<script>
+    function CheckForm() {
+        if (!CheckIsNullOrEmpty('#UserCode',
+            'has-error-fix',
+            '@MvcHtmlString.Create("Mã người dùng không được trống!")')) {
+            return false;
+        } else {
+            var usercode = $('#UserCode').val();
+            if (!IsNullOrEmpty(usercode)) {
+                if (!ValidateEmail(usercode)) {
+                    AddClassCss('#UserCode', 'has-error-fix');
+                    $('#Email').focus();
+                    alert('@MvcHtmlString.Create("Mã người dùng không hợp lệ!")');
+                    return false;
+                }
+                else {
+                    RemoveClassCss('#UserCode', 'has-error-fix');
+                }
+            }
+        }
+        if (!CheckIsNullOrEmpty('#UserName', 'has-error-fix', '@MvcHtmlString.Create("Tên người dùng không được trống!")'))
+        {
+            return false;
+            }
+
+        if (!CheckIsNullOrEmpty('#DLCode', 'has-error-fix', '@MvcHtmlString.Create("Mã đại lý không được trống!")'))
+        {
+            return false;
+        }
+        if (!CheckIsNullOrEmpty('#UserPassword', 'has-error-fix', '@MvcHtmlString.Create("Mật khẩu không được trống!")'))
+        {
+            return false;
+        }
+        var password = ReturnValueText('#UserPassword');
+        if (password.trim().length < 6)
+        {
+            alert('@MvcHtmlString.Create("Mật khẩu > 5 ký tự!")');
+            AddClassCss('#UserPassword', 'has-error-fix');
+            $('#Password').focus();
+            return false;
+        }
+        else
+        {
+            RemoveClassCss('#UserPassword', 'has-error-fix');
+        }
+        if (!CheckIsNullOrEmpty('#ConfirmPassword', 'has-error-fix', '@MvcHtmlString.Create("Nhập lại mật khẩu không được trống!")'))
+        {
+            return false;
+        }
+        var confirmpassword = ReturnValueText('#ConfirmPassword');
+        if (password !== confirmpassword)
+        {
+            alert('@MvcHtmlString.Create("Nhập lại mật khẩu không đúng, xin vui lòng nhập lại!")');
+            AddClassCss('#ConfirmPassword', 'has-error-fix');
+            $('#ConfirmPassword').focus();
+            return false;
+        }
+        else
+        {
+            RemoveClassCss('#ConfirmPassword', 'has-error-fix');
+        }
+        if (confirmpassword.trim().length < 6)
+        {
+            alert('@MvcHtmlString.Create("Nhập lại mật khẩu > 5 ký tự!")');
+            AddClassCss('#ConfirmPassword', 'has-error-fix');
+            $('#ConfirmPassword').focus();
+            return false;
+        }
+        else {
+            RemoveClassCss('#ConfirmPassword', 'has-error-fix');
+        }
+
+        return true;
+    }
+
+    function SaveData()
+    {
+        debugger;
+        var check = CheckForm();
+
+        if (check)
+        {
+            var userCode = ReturnValueText('#UserCode');
+            var userName = ReturnValueText('#UserName');
+            var userPassword = ReturnValueText('#UserPassword');
+            var dlcode = ReturnValueText('#DLCode');
+            var phoneNo = ReturnValueText('#PhoneNo');
+            var flagRanking = ReturnValueText('#FlagRanking');
+
+            var flagSysAdmin = '0';
+            var inputFlagSysAdmin = $('#FlagSysAdmin');
+            if (inputFlagSysAdmin !== undefined && inputFlagSysAdmin !== null) {
+                if (inputFlagSysAdmin.prop('checked')) {
+                    flagSysAdmin = '1';
+                }
+            }
+
+
+            var tem = new Object();
+            tem.UserCode = userCode;
+            tem.UserName = userName;
+            tem.UserPassword = userPassword;
+            tem.DLCode = dlcode;
+            tem.PhoneNo = phoneNo;
+            tem.FlagRanking = flagRanking;
+            tem.FlagSysAdmin = flagSysAdmin;
+
+            var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+            var modelCur = JSON.stringify(tem);
+            var url = '@Url.Action("Create", "RptSv_Sys_User")';
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    __RequestVerificationToken: token
+                    , model: modelCur
+                },
+                traditional: true,
+                //contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    if (data.Success) {
+                        if (data.Messages !== null && data.Messages !== undefined && data.Messages.length > 0) {
+                            alert(data.Messages[0]);
+                        }
+                        window.location.href = data.RedirectUrl;
+                    }
+                    else {
+                        if (data.Detail != null) {
+                            _showErrorMsg123("Lỗi!", data.Detail);
+                        }
+                    }
+                }, error: function (xmlHttpRequest, textStatus, errorThrown) {
+                    debugger;
+                    if (textStatus === 'Unauthorized') {
+                        alert('custom message. Error: ' + errorThrown);
+                    } else {
+                        //alert('custom message. Error2: ' + errorThrown);
+                    }
+                }
+            });
+
+
+        }
+    }
+</script>
+
+
+
+
+
+
+
+
+

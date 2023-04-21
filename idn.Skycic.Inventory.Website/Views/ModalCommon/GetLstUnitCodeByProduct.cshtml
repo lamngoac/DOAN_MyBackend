@@ -1,0 +1,10 @@
+﻿@model List<Mst_ProductUI>
+@{ 
+    if (Model != null && Model.Count != 0)
+    {
+        foreach(var it in Model)
+        {
+            <option ProductCodeRoot ="@CUtils.StrValue(it.ProductCodeRoot)" ProductCodeBase ="@it.ProductCodeBase" ProductCodeUser ="@it.ProductCodeUser" value="@it.UnitCode" valconvert ="@(it.ValConvert == null ? "" : it.ValConvert)" InvCode="@(it.InvCode == null ? "" : it.InvCode)" ProductCode="@it.ProductCode" ProductName="@it.ProductName" UnitCode="@it.UnitCode" SellPrice="@(it.SellPrice == null ? "0" : it.SellPrice.ToString())" SellOrder="@(it.SellOrder == null ? "0" : it.SellOrder.ToString())" QtyTotalOK="@(it.QtyTotalOK == null ? "0" : it.QtyTotalOK.ToString())" DiscountPrice="@(it.DiscountPrice == null ? "0": it.DiscountPrice)" FlagLot="@it.FlagLot"  FlagSerial="@it.FlagSerial" ProductType="@(it.ProductType == null ? "" : it.ProductType.ToString())">@it.UnitCode</option>
+        }
+    }
+}

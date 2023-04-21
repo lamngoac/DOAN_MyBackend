@@ -1,0 +1,43 @@
+﻿@using System.Globalization
+@model List<RptSv_Sys_Access>
+@{
+    Layout = null;
+    var totalRow = 0;
+    //var totalRowActive = 0;
+    //var totalRowInactive = 0;
+}
+<table id="dynamic-table1" class="table table-striped table-bordered table-hover table-cus">
+    <thead>
+        <tr>
+            <th class="text-center cell-150">Mã nhóm người dùng</th>
+        </tr>
+    </thead>
+    <tbody id="tbodyDtlID">
+        @if (Model != null && Model.Count > 0)
+        {
+            totalRow = Model.Count;
+            var idx = 0;
+            foreach (var item in Model)
+            {
+                <tr class="data-item trdata" idx="@idx" groupcode="@MvcHtmlString.Create(item.GroupCode)">
+                    <td class="text-left cell-150" style="padding-top: 15px;">
+                        @MvcHtmlString.Create(item.GroupCode)
+                    </td>
+                </tr>
+                idx++;
+            }
+        }
+    </tbody>
+</table>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        dataTable('1', '@MvcHtmlString.Create(totalRow.ToString(CultureInfo.InvariantCulture))', '', '');
+    });
+</script>
+
+
+
+
+
+

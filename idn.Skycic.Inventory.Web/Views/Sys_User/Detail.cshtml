@@ -1,0 +1,176 @@
+﻿
+@model Sys_User
+@{
+    Layout = "~/Views/Shared/CoreLayoutQuanTri.cshtml";
+    var title = "CHI TIẾT NGƯỜI DÙNG";
+    var titleMng = "Quản lý người dùng";
+    ViewBag.Title = title;
+    var ListMst_Department = ViewBag.ListMst_Department as List<Mst_Department>;
+}
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="row no-margin box-shadow-tk">
+                        @using (Html.BeginForm("Update", "Sys_User", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="col-xs-4 no-padding">
+                                <div class="form-group  margin-bottom-9">
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã người dùng <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="UserCode" name="UserCode" class="col-xs-12 disabled-fix UserCode" value="@if (Model != null && Model.UserCode != null){@MvcHtmlString.Create(Model.UserCode.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group  margin-bottom-9">
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên người dùng <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="UserName" name="UserName" class="col-xs-12 disabled-fix UserName" value="@if (Model != null && Model.UserName != null){@MvcHtmlString.Create(Model.UserName.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group  margin-bottom-9">
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Điện thoại")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="PhoneNo" name="PhoneNo" maxlength="11" class="col-xs-12 disabled-fix PhoneNo" onKeyPress="return isNumberKey(event)" value="@if (Model != null && Model.PhoneNo != null){@MvcHtmlString.Create(Model.PhoneNo.ToString())} else { @("")}" autocomplete="off" />
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-4 no-padding">
+                                <div class="form-group  margin-bottom-9">
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Trực thuộc đơn vị <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="MST" name="MST" class="col-xs-12 MST disabled-fix" value="@if (Model != null && Model.MST != null){@MvcHtmlString.Create(Model.MST.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group  margin-bottom-9">
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Bộ phận/phòng ban <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <select id="DepartmentCode" name="DepartmentCode" class="col-xs-12 disabled-fix">
+                                                <option></option>
+                                                @{
+                                                    if (ListMst_Department != null)
+                                                    {
+                                                        foreach (var it in ListMst_Department)
+                                                        {
+                                                            var departmentCode = "";
+                                                            if (Model != null && !CUtils.IsNullOrEmpty(Model.DepartmentCode))
+                                                            {
+                                                                departmentCode = Model.DepartmentCode.ToString().Trim();
+                                                            }
+                                                            <option value="@it.DepartmentCode" @(departmentCode.Equals(it.DepartmentCode.ToString().Trim()) ? "selected" : "")> @MvcHtmlString.Create(it.DepartmentCode + " - " + it.DepartmentName)</option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                            @*<input type="text" id="DepartmentCode" name="DepartmentCode" class="col-xs-12 disabled-fix DepartmentCode"  value="@if (Model != null && Model.DepartmentCode != null){@MvcHtmlString.Create(Model.DepartmentCode.ToString())} else { @("")}" autocomplete="off" required />*@
+                                        </span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group  margin-bottom-9">
+                                    @{
+                                        var checkActive = "";
+                                        if (Model != null && Model.FlagActive.Equals("1"))
+                                        {
+                                            checkActive = "checked";
+                                        }
+                                        else
+                                        {
+                                            checkActive = "";
+                                        }
+                                    }
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">Trạng thái</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right padding-top-5">
+                                            <label class="disabled-checkbox-fix">
+                                                <input name="FlagActive" id="FlagActive" class="ace ace-switch ace-switch-4 FlagActive" type="checkbox" value="1" @checkActive />
+                                                <span class="lbl"></span>
+                                                <input name="FlagActive" type="hidden" value="1" />
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-4 no-padding">
+                                <div class="form-group  margin-bottom-9">
+                                    @{
+                                        var checkFlagSysAdmin = "";
+                                        if (Model != null && Model.FlagSysAdmin.Equals("1"))
+                                        {
+                                            checkFlagSysAdmin = "checked";
+                                        }
+                                        else
+                                        {
+                                            checkFlagSysAdmin = "";
+                                        }
+                                    }
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">Cờ Quản trị HT</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right padding-top-5">
+                                            <label class="disabled-checkbox-fix">
+                                                <input name="FlagSysAdmin" id="FlagSysAdmin" class="ace ace-switch ace-switch-4 FlagSysAdmin" type="checkbox" value="1" @checkFlagSysAdmin />
+                                                <span class="lbl"></span>
+                                                <input name="FlagSysAdmin" type="hidden" value="0" />
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-4 no-padding">
+
+                                <div class="form-group  margin-bottom-9">
+                                    @{
+                                        var checkFlagNNTAdmin = "";
+                                        if (Model != null && Model.FlagNNTAdmin.Equals("1"))
+                                        {
+                                            checkFlagNNTAdmin = "checked";
+                                        }
+                                        else
+                                        {
+                                            checkFlagNNTAdmin = "";
+                                        }
+                                    }
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">Cờ Quản trị đơn vị</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right padding-top-5">
+                                            <label class="disabled-checkbox-fix">
+                                                <input name="FlagNNTAdmin" id="FlagNNTAdmin" class="ace ace-switch ace-switch-4 FlagNNTAdmin" type="checkbox" value="1" @checkFlagNNTAdmin />
+                                                <span class="lbl"></span>
+                                                <input name="FlagNNTAdmin" type="hidden" value="0" />
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </aside>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+@*Active Menu*@
+<script type="text/javascript">
+    setAdminCurrentUrl('@Url.Action("Index", "Sys_User")');
+</script>

@@ -1,0 +1,153 @@
+﻿@model Mst_ProductGroup
+@{
+    var listMstProductGroupParent = new List<Mst_ProductGroup>();
+    if (ViewBag.ListMstProductGroupParent != null)
+    {
+        listMstProductGroupParent = ViewBag.ListMstProductGroupParent;
+    }
+}
+<div class="modal-dialog" style="width: 500px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="exampleModalLabel">Chi tiết nhóm hàng</h3>
+            <a href="javascript:;" onclick="ClosePopupDetail()" class="close" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </a>
+        </div>
+        <div class="modal-body">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "manageUpdate" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="row form-group margin-bottom-9">
+                    <label for="ProductGrpCode_Update" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Mã nhóm hàng".HtmlItemString("modelcode"))<span style="color: red "> *</span></label>
+                    <div class="col-12 col-sm-8">
+                        <span class="block input-icon input-icon-right">
+                            @*<input type="hidden" id="ProductGrpCode_Update" name="ProductGrpCode" class="col-12 ProductGrpCode_Update" value="@Model.ProductGrpCode" autocomplete="off">*@
+                            <input type="text" id="ProductGrpName_Update" readonly="readonly" name="ProductGrpName" class="col-12 ProductGrpName_Update" value="@Model.ProductGrpName" autocomplete="off">
+                        </span>
+                    </div>
+                </div>
+
+                <div class="row form-group margin-bottom-9">
+                    <label for="ProductGrpName_Update" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Tên nhóm hàng".HtmlItemString("modelname"))<span style="color: red "> *</span></label>
+                    <div class="col-12 col-sm-8">
+                        <span class="block input-icon input-icon-right">
+                            <input type="text" id="ProductGrpDesc_Update" name="ProductGrpDesc" class="col-12 ProductGrpDesc_Update" value="@Model.ProductGrpDesc" autocomplete="off">
+                        </span>
+                    </div>
+                </div>
+
+                <div class="row form-group margin-bottom-9">
+                    <input hidden name="ProductGrpCode" value="@Model.ProductGrpCode" />
+                    <input hidden name="ProductGrpCodeParent" value="@Model.ProductGrpCodeParent" />
+                    <label for="BrandCode" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Nhóm hàng cha".HtmlItemString("brandcode"))</label>
+                    <div class="col-12 col-sm-8">
+                        <span class="block input-icon input-icon-right">
+                            <select class="col-12 BrandCode" name="ProductGrpCodeParent" disabled>
+                                @{
+                                    <option></option>
+                                    foreach (var it in listMstProductGroupParent)
+                                    {
+                                        <option @(Model.ProductGrpCodeParent != null && Model.ProductGrpCodeParent.Equals(it.ProductGrpCode) ? "selected" : "") value="@CUtils.StrValue(it.ProductGrpCode)">@CUtils.StrValue(it.ProductGrpName) (@CUtils.StrValue(it.ProductGrpCode))</option>
+                                    }
+                                }
+                            </select>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="row form-group margin-bottom-9">
+                    <label for="FlagActive" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Trạng thái".HtmlItemString("flagactive"))</label>
+                    <div class="col-12 col-sm-8">
+                        <span class="block input-icon input-icon-right">
+                            <select type="text" id="FlagActive_Update" name="FlagActive" class="col-12 FlagActive">
+                                <option @(Model.FlagActive.Equals("1") ? "selected" : "")>1</option>
+                                <option @(Model.FlagActive.Equals("0") ? "selected" : "")>0</option>
+                            </select>
+                        </span>
+                    </div>
+                </div>
+            }
+
+        </div>
+        <div class="modal-footer">
+            @RenderItemFormat("BTN_SUA_NHOM_HANG", "<a href=\"javascript:void(0);\" class=\"btn mybtn-Button\" onclick=\"SaveUpdate()\" id=\"btnUpdate\" style=\"padding-left: 10px!important; padding-right: 10px!important; font-size: 16px; font-weight: 500;\">Lưu</a>", "", "")
+        </div>
+    </div>
+</div>
+
+<script>
+     function CheckForm() {
+         var productGrpDesc = $('#ProductGrpDesc_Update').val();
+         var productGrpName = $('#ProductGrpName_Update').val();
+
+
+         if (productGrpName == "") {
+
+             alert("Mã nhóm hàng không được trống.");
+             return false;
+         }
+         if (productGrpDesc == "") {
+             alert("Tên nhóm hàng không được trống.");
+             return false;
+         }
+        return true;
+    }
+    function SaveUpdate() {
+        var check = CheckForm();
+        if (check == false) return false;
+        var formdata = new window.FormData($('#manageUpdate')[0]);
+         $.ajax({
+            url: '@Url.Action("Update","Mst_ProductGroupSub")',
+            data: formdata,
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            type: 'POST',
+            success: function (data) {
+                if (data.Success) {
+                     if (data !== null) {
+                        alert(data.Messages[0]);
+                        window.location.href = data.RedirectUrl;
+                     }
+                } else {
+                    showErrorDialog(data.Detail);
+                }
+            }
+        });
+    }
+
+    function SaveUpdateAndCreate() {
+        var check = CheckForm();
+        if (check == false) return false;
+        var formdata = new window.FormData($('#manageUpdate')[0]);
+         $.ajax({
+            url: '@Url.Action("Update","MstBrand")',
+            data: formdata,
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            type: 'POST',
+            success: function (data) {
+                if (data.Success) {
+                    if (data !== null) {
+                        alert(data.Title);
+                        ClosePopupDetail();
+
+                        ClearDataModal();
+                        ShowPopupCreate();
+                    }
+                } else {
+                    showErrorDialog(data.Detail);
+                }
+            }
+        });
+    }
+
+    function ClearDataModal() {
+        $('#ProductGrpName').val("");
+        $('#ProductGrpCodeParent').val("");
+        $('#ProductGrpCode').val("");
+        $('#FlagActive').val("");
+    }
+</script>

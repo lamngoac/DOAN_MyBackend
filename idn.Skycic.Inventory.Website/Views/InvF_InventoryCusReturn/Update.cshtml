@@ -1,0 +1,233 @@
+﻿@model RT_InvF_InventoryCusReturn
+@{
+    ViewBag.Title = "Sửa phiếu khách hàng trả hàng";
+    var invInType = ViewBag.InvInType as string;
+    var listMst_Inventory = ViewBag.Lst_Mst_Inventory as List<Mst_Inventory>;
+    var listMst_Customer = ViewBag.Lst_MstCustomer as List<Mst_Customer>;
+    var IF_InvCusReturnNo = ViewBag.IF_InvCusReturnNo as string;
+    string viewType = "update";
+    var userState = ViewBag.UserState as UserState;
+    var iF_InvCusReturnStatus = ViewBag.If_InvCusReturnStatus as string;
+
+    var Lst_InvF_InventoryCusReturnCoverUI = new List<InvF_InventoryCusReturnCoverUI>();
+    if (ViewBag.lstInvF_InventoryCusReturnCoverUI != null)
+    {
+        Lst_InvF_InventoryCusReturnCoverUI = ViewBag.lstInvF_InventoryCusReturnCoverUI as List<InvF_InventoryCusReturnCoverUI>;
+    }
+    var lstInvF_InventoryCusReturnDtl = ViewBag.lstInvF_InventoryCusReturnDtl as List<InvF_InventoryCusReturnDtl>;
+    var lstInvF_InventoryCusReturnInstLot = ViewBag.lstInvF_InventoryCusReturnInstLot as List<InvF_InventoryCusReturnInstLot>;
+    var lstInvF_InventoryCusReturnInstSerial = ViewBag.lstInvF_InventoryCusReturnInstSerial as List<InvF_InventoryCusReturnInstSerial>;
+    var lstInvF_InventoryCusReturnDtlCombo = ViewBag.lstInvF_InventoryCusReturnDtlCombo as List<InvF_InventoryCusReturnDtlUI>;
+
+    var objInvF_InventoryCusReturn = new InvF_InventoryCusReturn();
+    var iF_InvCusReturnNo = "";
+    if (Model != null)
+    {
+        if (Model.Lst_InvF_InventoryCusReturn != null && Model.Lst_InvF_InventoryCusReturn.Count > 0)
+        {
+            objInvF_InventoryCusReturn = Model.Lst_InvF_InventoryCusReturn[0];
+            iF_InvCusReturnNo = CUtils.StrValue(objInvF_InventoryCusReturn.IF_InvCusReturnNo);
+            iF_InvCusReturnStatus = CUtils.StrValue(objInvF_InventoryCusReturn.IF_InvCusReturnStatus);
+        }
+    }
+}
+<script>
+    setAdminCurrentUrl('@Url.Action("Index", "InvF_InventoryCusReturn")');
+</script>
+<script src="~/Content/assets/js/bootbox.js"></script>
+<script src="@Url.Content("~/Scripts/mine/InvF_InventoryCusReturn.js")"></script>
+
+<style>
+    .margin-left-12 {
+        margin-left: 12% !important;
+    }
+</style>
+
+<div class="mt-3">
+    @using (Html.BeginForm("Update", "InvF_InventoryCusReturn", FormMethod.Post, new { @id = "manageForm", @class = "form-horizontal" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+
+        @*Thông tin phiếu KH trả hàng*@
+        <div class="col-12 row">
+            @Html.Partial("Info_InvF_InventoryCusReturn", Model, new ViewDataDictionary()
+            {
+                {"ListMst_Inventory", listMst_Inventory },
+                {"ListMst_Customer", listMst_Customer },
+                {"InvInType", invInType },
+                {"IF_InvCusReturnNo", IF_InvCusReturnNo },
+                {"If_InvCusReturnStatus", iF_InvCusReturnStatus },
+                {"UserState", userState },
+                { "ViewType", viewType },
+            })
+        </div>
+
+        <ul class="nav nav-tabs position-relative">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#ProductInformation">@("Danh mục hàng hóa".HtmlItemString("invf_inventorycusreturn"))</a>
+            </li>
+
+            <div class="nav-price">
+                <div class="form-group">
+                    <label class="control-label" for="TotalValCusReturn">
+                        @("Tổng tiền hàng:".HtmlItemString("invf_inventorycusreturn"))
+                    </label>
+                    <div class="control-input">
+                        <input type="text" class="text-right TotalValCusReturn" readonly="readonly" name="TotalValCusReturn" id="TotalValCusReturn" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryCusReturn.TotalValCusReturn))" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="TotalValCusReturnDesc">
+                        @("Giảm giá:".HtmlItemString("invf_inventorycusreturn"))
+
+                    </label>
+                    <div class="control-input">
+                        <input type="text" class="text-right TotalValCusReturnDesc" readonly="readonly" name="TotalValCusReturnDesc" id="TotalValCusReturnDesc" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryCusReturn.TotalValCusReturnDesc))" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="TotalValCusReturnAfterDesc">
+                        @("Tổng tiền trả NCC:".HtmlItemString("invf_inventorycusreturn"))
+                    </label>
+                    <div class="control-input">
+                        <input type="text" class="text-right TotalValCusReturnAfterDesc totalAfterDesc" readonly="readonly" name="TotalValCusReturnAfterDesc" id="TotalValCusReturnAfterDesc" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryCusReturn.TotalValCusReturnAfterDesc))" />
+                    </div>
+                </div>
+            </div>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div id="ProductInformation" class="container-fluid padding-left-right-15 tab-pane active">
+                @Html.Partial("Load_Table_InvF_InventoryCusReturnDtl", Model, new ViewDataDictionary() {
+                    { "Lst_InvF_InventoryCusReturnCoverUI", Lst_InvF_InventoryCusReturnCoverUI },
+                    { "LstInvF_InventoryCusReturnDtl", lstInvF_InventoryCusReturnDtl },
+                    { "LstInvF_InventoryCusReturnInstLot", lstInvF_InventoryCusReturnInstLot },
+                    { "LstInvF_InventoryCusReturnInstSerial", lstInvF_InventoryCusReturnInstSerial },
+                    { "LstInvF_InventoryCusReturnDtlCombo", lstInvF_InventoryCusReturnDtlCombo },
+                    { "ViewType", viewType },
+                    { "UserState", userState },
+                })
+            </div>
+        </div>
+    }
+</div>
+
+
+@*@Html.Partial("_TemplateLotAndSerial", new ViewDataDictionary() { { "lstInvF_InventoryCusReturnDtl", lstInvF_InventoryCusReturnDtl }, { "lstInvF_InventoryCusReturnInstLot", lstInvF_InventoryCusReturnInstLot }, { "lstInvF_InventoryCusReturnInstSerial", lstInvF_InventoryCusReturnInstSerial }, { "lstInvF_InventoryCusReturnDtlCombo", lstInvF_InventoryCusReturnDtlCombo } })
+    @Html.Partial("_ModalShow")*@
+
+<script>
+    $(document).ready(function () {
+        $('select#InvInType').select2().on('select2:close', function () { commonUtils.showPopup(this); });
+        $('select#InvCodeIn').select2().on('select2:close', function () { commonUtils.showPopup(this); });
+        $('select#CustomerCode').select2().on('select2:close', function () { commonUtils.showPopup(this); });
+        $('select#InvCodeInActualPopup').select2();
+        $('select.InvCodeInActual_Lot').select2();
+    })
+
+</script>
+
+<script>
+
+    jQuery(function ($) {
+        if ($('#TotalValCusReturn').length) {
+            //$('#TotalValCusReturn').number(true, 2);
+        }
+        if ($('#TotalValCusReturnDesc').length) {
+            //$('#TotalValCusReturnDesc').number(true, 2);
+        }
+        if ($('#TotalValCusReturnAfterDesc').length) {
+            //$('#TotalValCusReturnAfterDesc').number(true, 2);
+        }
+        if ($('.number').length) {
+            $('.number').number(true, 2);
+        }
+
+
+    format_Number();
+    });
+</script>
+
+<script>
+    function UpdateData(flagRedirect) {
+        var ajaxSettings = {};
+        ajaxSettings.Type = 'post';
+        ajaxSettings.DataType = 'json';
+        ajaxSettings.Url = '@Url.Action("UpdateData", "InvF_InventoryCusReturn")';
+        var objInvF_InventoryCusReturn = new InvF_InventoryCusReturn();
+        objInvF_InventoryCusReturn.ActionType = 'update';
+        objInvF_InventoryCusReturn.ajaxSettings = ajaxSettings;
+        objInvF_InventoryCusReturn.saveData(flagRedirect);
+    }
+
+    var objInvF_InventoryCusReturn = new InvF_InventoryCusReturn();
+    function Approve(if_invinno) {
+        debugger
+
+        if (if_invinno.length == 0) {
+            alert("Số phiếu KH trả hàng trống!");
+            return false;
+        }
+
+        var listInvF_InventoryCusReturn = [];
+        var remark = commonUtils.returnValueText('#Remark');
+        var objAppr = {};
+        objAppr.IF_InvCusReturnNo = if_invinno;
+        objAppr.Remark = remark;
+        listInvF_InventoryCusReturn.push(objAppr);
+
+        var ajaxSettings = {};
+        ajaxSettings.Type = 'post';
+        ajaxSettings.DataType = 'json';
+        ajaxSettings.Url = '@Url.Action("Approve", "InvF_InventoryCusReturn")';
+
+        objInvF_InventoryCusReturn.Image_Message = "<i class=\"fas fa-info-circle\"></i> THÔNG BÁO";
+        objInvF_InventoryCusReturn.Confirm_Message = "Đồng ý duyệt phiếu KH trả hàng " + if_invinno + "?";
+        objInvF_InventoryCusReturn.ajaxSettings = ajaxSettings;
+        objInvF_InventoryCusReturn.approveData(listInvF_InventoryCusReturn);
+    }
+
+    function Cancel(if_invinno) {
+        if (if_invinno.length == 0) {
+            alert("Số phiếu KH trả hàng trống!");
+            return false;
+        }
+
+        var listInvF_InventoryCusReturn = [];
+        var objCancel = {};
+        var remark = commonUtils.returnValueText('#Remark');
+        objCancel.IF_InvCusReturnNo = if_invinno;
+        objCancel.Remark = remark;
+        listInvF_InventoryCusReturn.push(objCancel);
+
+        var ajaxSettings = {};
+        ajaxSettings.Type = 'post';
+        ajaxSettings.DataType = 'json';
+        ajaxSettings.Url = '@Url.Action("Cancel", "InvF_InventoryCusReturn")';
+
+        objInvF_InventoryCusReturn.Image_Message = "<i class=\"fas fa-info-circle\"></i> THÔNG BÁO";
+        objInvF_InventoryCusReturn.Confirm_Message = "Đồng ý hủy phiếu KH trả hàng " + if_invinno + "?";
+        objInvF_InventoryCusReturn.ajaxSettings = ajaxSettings;
+        objInvF_InventoryCusReturn.cancelData(listInvF_InventoryCusReturn);
+    }
+</script>
+
+
+
+<script>
+    function format_Number(){
+        var tableName = 'InvF_InventoryCusReturn';
+        var totalValCusReturnFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValCusReturn');
+        var totalValCusReturnDescFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValCusReturnDesc');
+        var totalValCusReturnAfterDescFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValCusReturnAfterDesc');
+
+
+        $('#TotalValCusReturn').number(true, totalValCusReturnFormat);
+        $('#TotalValCusReturnDesc').number(true, totalValCusReturnDescFormat);
+        $('#TotalValCusReturnAfterDesc').number(true, totalValCusReturnAfterDescFormat);
+
+    }
+</script>

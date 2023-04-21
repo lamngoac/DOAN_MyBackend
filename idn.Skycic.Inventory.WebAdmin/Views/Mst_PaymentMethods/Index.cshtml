@@ -1,0 +1,345 @@
+﻿@model List<Mst_PaymentMethods>
+@{
+    var title = "Quản lý hình thức thanh toán";
+    ViewBag.Title = title;
+    var startCount = 0;
+    var strStartCount = ViewBag.StartCount as string;
+    if (!CUtils.IsNullOrEmpty(strStartCount))
+    {
+        startCount = Convert.ToInt32(strStartCount);
+    }
+    var userState = ViewBag.UserState as UserState;
+}
+
+<div class="row no-margin">
+    <div class="row no-margin">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="panel-group" id="steps">
+                <div class="panel panel-info">
+                    <div class="title">
+                        <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                    </div>
+                    <div class="panel-body no-padding" id="panel-body" style="">
+                        @*<aside class="col-xs-12 no-padding layout-tk">
+                                @if (userState != null && userState.RptSv_Sys_User.FlagSysAdmin.Equals("1"))
+                                {
+                                    <a class="btn font-color mybtn-Button dropdown-toggle" data-toggle="dropdown" aria-expanded="false" style="float: right; font-size: 13px; margin-top: 20px; position: relative;">...</a>
+                                    <ul class="dropdown-menu" role="menu" style="">
+                                        <li>
+                                            <a class="mybtn-Button-1" onclick="ShowPopupImportExcel()" href="javascript:void(0);" style=""><img class="img-button" src="~/Images/import.svg">Nhập Excel</a>
+                                        </li>
+                                        <li>
+                                            <a class="mybtn-Button-1" onclick="Export()" href="javascript:void(0);" style=""><img class="img-button" src="~/Images/export.svg">Xuất Excel</a>
+                                        </li>
+                                        <li>
+                                            <a class="mybtn-Button-1" onclick="ExportTemplate()" href="javascript:void(0);" style=""><img class="img-button" src="~/Images/export.svg">Xuất Excel template</a>
+                                        </li>
+                                    </ul>
+
+                                    <a class="btn font-color mybtn-Button" href="@Url.Action("Create", "Mst_InvoiceType")" style="float: right; font-size: 13px; margin-top: 20px; margin-right: 10px;">
+                                        <img class="img-button in-acti" src="~/Images/Hoadon/Tao.svg">
+                                        <img class="img-button acti" src="~/Images/Hoadon/TaoHDDieuChinh.svg">Tạo
+                                    </a>
+                                }
+
+                            </aside>*@
+                    </div>
+                </div>
+                <div class="panel panel-info">
+                    <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                        @Html.AntiForgeryToken()
+                        <aside class="col-xs-12 no-padding">
+
+                            <div class="scrollable-horizontal padding-left-0 padding-right-0 div-scrollable" data-size="1116" style="padding-top: 0!important;">
+                                <div style="width: 100%; float: left;">
+                                    <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center cell-50">@MvcHtmlString.Create("TT")</th>
+                                                <th class="text-center cell-200">
+                                                    @MvcHtmlString.Create("Mã phương thức thanh toán")
+                                                </th>
+                                                <th class="text-center cell-200">
+                                                    @MvcHtmlString.Create("Tên phương thức thanh toán")
+                                                </th>
+                                                <th class="text-center cell-200">
+                                                    @MvcHtmlString.Create("Ghi chú")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Trạng thái")
+                                                </th>
+                                                @*<th class="cell-120">&nbsp;</th>*@
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                                <div class="scrollable" data-size="500" style="width: 100%; float: left;">
+                                    <table id="dynamic-table-tbody" class="table table-striped table-bordered table-hover table-tbody">
+                                        <tbody id="table-tbodyID">
+
+                                            @if (Model != null)
+                                            {
+                                                var idx = 0;
+                                                foreach (var item in Model)
+                                                {
+                                                    var iindex = startCount + (idx + 1);
+                                                    var flagactive = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.FlagActive))
+                                                    {
+                                                        flagactive = CUtils.StrValue(item.FlagActive);
+                                                    }
+                                                    <tr idx="@idx" class="data-item trdata">
+                                                        <td class="text-center cell-50" style="background: #D3EDE4;">
+                                                            @MvcHtmlString.Create(iindex.ToString())
+                                                        </td>
+                                                        <td class="text-center cell-200">
+                                                            @MvcHtmlString.Create(item.PaymentMethodCode.ToString())
+                                                        </td>
+                                                        <td class="text-center cell-200">
+                                                            @MvcHtmlString.Create(item.PaymentMethodName.ToString())
+                                                        </td>
+                                                        <td class="text-center cell-200">
+                                                            @MvcHtmlString.Create(item.Remark.ToString())
+                                                        </td>
+                                                        <td class="text-center cell-100">
+                                                            @if (flagactive.Equals("1"))
+                                                            {
+                                                                <span class="label label-sm label-success">Active</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="label label-sm label-danger">Inactive</span>
+                                                            } <!--Trạng thái-->
+                                                        </td>
+                                                        @*<td class="text-center cell-120">
+                                                            <div class="action-buttons padding-top-2">
+                                                                @{
+                                                                        var urlDetail = Url.Action("Detail", "Mst_InvoiceType", new { invoiceType = item.InvoiceType });
+                                                                        var urlUpdate = Url.Action("Update", "Mst_InvoiceType", new { invoiceType = item.InvoiceType });
+
+                                                                    }
+                                                                    @if (userState != null && userState.RptSv_Sys_User.FlagSysAdmin.Equals("1"))
+                                                                    {
+                                                                        <a class="icon-detail" href="@urlDetail" title="Chi tiết"><img class="img-icon" src="~/Images/Xem.svg"></a>
+                                                                        <a class="icon-edit" href="@urlUpdate" title="Sửa"><img class="img-icon" src="~/Images/Sua.svg"></a>
+                                                                        <a href="javascript:;" class="icon-delete" title="Xóa" onclick="Delete('@item.InvoiceType')"><img class="img-icon" src="~/Images/Xoa.svg"></a>
+                                                                    }
+                                                            </div>
+                                                        </td>*@
+                                                    </tr>
+                                                    idx++;
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+@*Active Menu*@
+<script type="text/javascript">
+    setAdminCurrentUrl('@Url.Action("Index", "Mst_PaymentMethods")');
+</script>
+
+@*Import Excel*@
+<div class="modal fade" id="ImportExcelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+
+<script type="text/javascript">
+    @*function ShowPopupImportExcel() {
+        var url = '@Url.Action("ShowPopupImportExcel", "Home")';
+        $.ajax({
+            url: url,
+            data: {},
+            type: 'post',
+            dataType: 'json',
+            traditional: true,
+            success: function (data) {
+                if (data.Success) {
+                    $('#ImportExcelModal').modal({
+                        backdrop: false,
+                        keyboard: true,
+                    });
+                    $("#ImportExcelModal").html(data.Html); // truyen html vao #form
+                } else {
+                    _showErrorMsg123('@MvcHtmlString.Create("Lỗi")', data.Detail);
+                }
+
+            }
+        });
+    }
+
+    function ImportFileExcel() {
+        var url = '@Url.Action("Import", "Mst_InvoiceType")';
+        var formData = new window.FormData($('#manageFormImportExcel')[0]);
+        formData.append('tax_file', $('input[type=file]')[0].files[0]);
+        $.ajax({
+            url: url,
+            type: 'post',
+            beforeSend: function(){},
+            success: function (result) {
+                var mes = '';
+                if (result.Success) {
+                    mes = result.Messages[0];
+                    alert(mes);
+                    window.location.href = window.location.href;
+                } else {
+                    if (result.Messages !== null && result.Messages !== undefined && result.Messages.length > 0) {
+                        alert(result.Messages[0]);
+                    }
+                    else{
+                        mes = result.Detail;
+                        _showErrorMsg123("Lỗi!", mes);
+                    }
+                }
+
+            },
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    }*@
+</script>
+
+<script>
+    @*function Delete(invoicetype) {
+        if (!IsNullOrEmpty(invoicetype)) {
+            bootbox.confirm({
+                title: "Thông báo!",
+                message: "Đồng ý xóa loại hóa đơn'" + invoicetype + "' ?",
+                buttons: {
+                    'cancel': {
+                        label: 'Cancel',
+                        className: 'btn mybtn-Button btnButton'
+                    },
+                    'confirm': {
+                        label: 'OK',
+                        className: 'btn mybtn-Button btnButton'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        var url = '@Url.Action("Delete", "Mst_InvoiceType")';
+                        var token = $('input[name=__RequestVerificationToken]').val();
+                        $.ajax({
+                            url: url,
+                            data: {
+                                invoicetype: invoicetype,
+                                __RequestVerificationToken: token
+                            },
+                            type: 'post',
+                            dataType: 'json',
+                            success: function (data) {
+                                if (data.Success) {
+                                    if (data.Messages != null && data.Messages !== undefined && data.Messages.length > 0) {
+                                        alert(data.Messages[0]);
+                                    }
+                                    window.location.href = window.location.href;
+                                } else {
+                                    _showErrorMsg123("Lỗi!",data.Detail);
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        } else {
+            alert("Chưa chọn bản ghi cần xóa!");
+            return;
+        }
+    }*@
+</script>
+
+
+@*Export*@
+<script type="text/javascript">
+    @*function ExportTemplate()
+    {
+        var token = $('input[name=__RequestVerificationToken]').val();
+        var url = '@Url.Action("ExportTemplate", "Mst_InvoiceType")';
+        ExportExcelTemplate(url, token);
+    }
+
+    function Export()
+    {
+        var token = $('input[name=__RequestVerificationToken]').val();
+        var url = '@Url.Action("Export", "Mst_InvoiceType")';
+        $.ajax({
+            url: url,
+            data: {
+                __RequestVerificationToken: token
+            },
+            type: 'post',
+            dataType: 'JSON',
+            contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+            traditional: true,
+            beforeSend: function () {
+                //bodycur.addClass("my-loading");
+            },
+            success: function (data) {
+                try {
+                    var getData = data;
+                    if (getData.Success === false || getData.Success === 'false') {
+                        _showErrorMsg123("Lỗi!", getData.Detail);
+                    } else {
+                        alert(getData.Title);
+                        if (getData.CheckSuccess === "1") {
+                            if (getData.strUrl !== null && getData.strUrl.length > 0) {
+                                window.location = getData.strUrl;
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.log(e.message);
+                }
+            },
+            complete: function (data) {
+                // Hide image container
+                //bodycur.removeClass("my-loading");
+            }
+        });
+    }*@
+</script>
+
+@*scroll*@
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.scrollable-horizontal').each(function () {
+            var $this = $(this);
+            $(this).ace_scroll(
+                {
+                    horizontal: true,
+                    //styleClass: 'scroll-top',//show the scrollbars on top(default is bottom)
+                    size: $this.attr('data-size') || 6500,
+                    mouseWheelLock: true
+                }
+            ).css({ 'padding-top': 0 });
+        });
+    });
+    $('.scrollable').each(function () {
+        var $this = $(this);
+        $(this).ace_scroll({
+            //size: 500,
+            size: $this.attr('data-size') || 1000,
+            mouseWheelLock: true,
+            //styleClass: 'scroll-left scroll-margin scroll-thin scroll-dark scroll-light no-track scroll-visible'
+        });
+    });
+</script>
+
+<script>
+    $(document).on('keypress', function (e) {
+        if (e.which == 13) {
+            Search();
+        }
+    });
+</script>
+

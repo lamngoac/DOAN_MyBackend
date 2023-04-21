@@ -1,0 +1,436 @@
+﻿@model RT_InvF_InventoryIn
+@{
+    string viewType = CUtils.StrValue(ViewBag.ViewType);
+    var userState = ViewBag.UserState as UserState;
+    var listMst_InvInType = ViewBag.ListMst_InvInType as List<Mst_InvInType>;
+    var listMst_Inventory = ViewBag.ListMst_Inventory as List<Mst_Inventory>;
+    var listMst_Customer = ViewBag.ListMst_Customer as List<Mst_Customer>;
+    var objInvF_InventoryIn = new InvF_InventoryIn();
+    var iF_InvInNo = "";
+    var iF_InvInStatus = "";
+    var customerCodeCur = "";
+    var customerCodeSysCur = "";
+    var customerNameCur = "";
+    var customerAddressCur = "";
+    if (Model != null)
+    {
+        if (Model.Lst_InvF_InventoryIn != null && Model.Lst_InvF_InventoryIn.Count > 0)
+        {
+            objInvF_InventoryIn = Model.Lst_InvF_InventoryIn[0];
+            iF_InvInStatus = CUtils.StrValue(objInvF_InventoryIn.IF_InvInStatus);
+            iF_InvInNo = CUtils.StrValue(objInvF_InventoryIn.IF_InvInNo);
+            customerCodeSysCur = CUtils.StrValue(objInvF_InventoryIn.CustomerCode);
+        }
+
+        if (listMst_Customer == null || listMst_Customer.Count == 0)
+        {
+            listMst_Customer = new List<Mst_Customer>();
+        }
+        else
+        {
+            var listMst_CustomerCur = listMst_Customer.Where(it => !CUtils.IsNullOrEmpty(it.CustomerCodeSys) && !CUtils.IsNullOrEmpty(Model.Lst_InvF_InventoryIn[0].CustomerCode) && CUtils.StrValue(it.CustomerCodeSys).Equals(Model.Lst_InvF_InventoryIn[0].CustomerCode)).ToList();
+            if (listMst_CustomerCur != null && listMst_CustomerCur.Count > 0)
+            {
+                customerCodeCur = CUtils.StrValue(listMst_CustomerCur[0].CustomerCode);
+                customerNameCur = CUtils.StrValue(listMst_CustomerCur[0].CustomerName);
+                customerAddressCur = CUtils.StrValue(listMst_CustomerCur[0].CustomerAddress);
+            }
+        }
+    }
+
+    var listInvF_InventoryInDtlUI = ViewBag.ListInvF_InventoryInDtlUI as List<InvF_InventoryInDtlUI>;
+    if (listInvF_InventoryInDtlUI == null || listInvF_InventoryInDtlUI.Count == 0)
+    {
+        listInvF_InventoryInDtlUI = new List<InvF_InventoryInDtlUI>();
+    }
+    var listInvF_InventoryInQR = ViewBag.ListInvF_InventoryInQR as List<InvF_InventoryInQR>;
+    if (listInvF_InventoryInQR == null || listInvF_InventoryInQR.Count == 0)
+    {
+        listInvF_InventoryInQR = new List<InvF_InventoryInQR>();
+    }
+    var disabled = "";
+    var disabledupdate = "disabled-fix";
+    if (viewType.Equals("detail"))
+    {
+        disabled = "disabled-fix";
+    }
+    if (viewType.Equals("update") && iF_InvInStatus.Equals(Client_Status.PENDING))
+    {
+        disabledupdate = "";
+    }
+    var checkedOrderNo = "";
+    var disabledOrderNo = "";
+    var refNo = CUtils.StrValue(objInvF_InventoryIn.RefNo);
+    if (!CUtils.IsNullOrEmpty(refNo))
+    {
+        checkedOrderNo = "checked";
+    }
+    else
+    {
+        disabledOrderNo = "disabled-fix";
+        checkedOrderNo = "";
+    }
+    var flagActive = "0";
+    var flagdisable = "";
+    if (userState.RT_Mst_Sys_Config != null)
+    {
+        if (userState.RT_Mst_Sys_Config.Lst_Mst_Sys_Config != null && userState.RT_Mst_Sys_Config.Lst_Mst_Sys_Config.Count > 0)
+        {
+            foreach (var item in userState.RT_Mst_Sys_Config.Lst_Mst_Sys_Config)
+            {
+                if (item.SysConfigID.Equals("IF_InvIn"))
+                {
+                    flagActive = CUtils.StrValue(item.FlagActive);
+                }
+            }
+        }
+    }
+
+
+    if (flagActive.Equals("0"))
+    {
+        flagdisable = "display-none";
+    }
+
+
+}
+
+<style>
+    /*Auto complete*/
+    .ui-front {
+        z-index: 999999;
+    }
+
+    .ui-autocomplete {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        display: none;
+        float: left;
+        min-width: 160px;
+        padding: 5px 0;
+        margin: 2px 0 0;
+        list-style: none;
+        font-size: 14px;
+        text-align: left;
+        background-color: #ffffff;
+        border: 1px solid #cccccc;
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        border-radius: 4px;
+        -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+        background-clip: padding-box;
+    }
+
+        .ui-autocomplete > li {
+            display: block;
+            padding: 3px 20px;
+            clear: both;
+            font-weight: normal;
+            line-height: 1.42857143;
+            color: #333333;
+            white-space: nowrap;
+        }
+
+            .ui-autocomplete > li:hover {
+                color: lightblue;
+            }
+
+    .ui-state-hover,
+    .ui-state-active,
+    .ui-state-focus {
+        text-decoration: none;
+        color: #262626;
+        background-color: #f5f5f5;
+        cursor: pointer;
+    }
+
+    .ui-helper-hidden-accessible {
+        border: 0;
+        clip: rect(0 0 0 0);
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 1px;
+    }
+
+    li.showall {
+        color: Highlight;
+    }
+</style>
+
+@Html.Partial("Template", Model, new ViewDataDictionary()
+{
+    {"UserState", userState },
+    { "ViewType", viewType },
+})
+@Html.Partial("Model", Model, new ViewDataDictionary()
+{
+    {"UserState", userState },
+    { "ViewType", viewType },
+})
+@Html.Partial("Template_Scripts", Model, new ViewDataDictionary()
+{
+    {"UserState", userState },
+    { "ViewType", viewType },
+})
+@*Thông tin phiếu nhập kho*@
+
+
+
+
+<div class="col-12 row">
+    <aside class="col-md-4">
+        <div class="form-group margin-bottom-9">
+            <label class="control-label col-md-4" for="IF_InvInNo">
+                @("Số phiếu nhập".HtmlItemString("invf_inventoryin"))
+            </label>
+            <div class="col-md-8">
+                <input type="text" class="col-md-12 disabled-fix text-bold" name="IF_InvInNo" id="IF_InvInNo" value="@MvcHtmlString.Create(iF_InvInNo)" />
+                <input type="hidden" name="IF_InvInStatus" id="IF_InvInStatus" class="IF_InvInStatus" value="@MvcHtmlString.Create(iF_InvInStatus)" />
+                <input type="hidden" name="ViewType" class="ViewType" value="@MvcHtmlString.Create(viewType)" />
+            </div>
+        </div>
+        <div class="form-group margin-bottom-9">
+            <label class="control-label col-md-4" for="InvInType">
+                @("Loại nhập kho".HtmlItemString("invf_inventoryin"))
+                <span style="color: red "> *</span>
+            </label>
+            <div class="col-md-8 @disabled">
+                <span class="block input-icon input-icon-right">
+                    <select id="InvInType" name="InvInType" showpopup-control-searchdata="#ShowPopupInvInType" class="col-md-12 InvInType">
+                        <optgroup label="">
+                            <option value="">--Chọn Loại nhập kho--</option>
+                            @if (listMst_InvInType != null && listMst_InvInType.Count > 0)
+                            {
+                                var invInType = CUtils.StrValue(objInvF_InventoryIn.InvInType);
+                                foreach (var item in listMst_InvInType)
+                                {
+                                    var invInTypeCur = CUtils.StrValue(item.InvInType);
+                                    var invInTypeNameCur = CUtils.StrValue(item.InvInTypeName);
+                                    <option value="@MvcHtmlString.Create(invInTypeCur)" @(invInType.Equals(invInTypeCur) ? "selected" : "")>@MvcHtmlString.Create(invInTypeNameCur)</option>
+                                }
+                            }
+                        </optgroup>
+                        <option value="SEARCHDATA">@("Tìm kiếm".HtmlItemString("invf_inventoryin"))</option>
+                    </select>
+                </span>
+            </div>
+        </div>
+        <div class="form-group margin-bottom-9">
+            <label class="control-label col-md-4" for="InvCodeIn">
+                @("Kho nhập".HtmlItemString("invf_inventoryin"))
+                <span style="color: red "> *</span>
+            </label>
+            <div class="col-md-8 @disabled">
+                <span class="block input-icon input-icon-right">
+                    <select id="InvCodeIn" name="InvCodeIn" showpopup-control-searchdata="#ShowPopupInvCodeIn" class="col-md-12 InvCodeIn">
+                        <optgroup label="">
+                            <option value="">--Chọn kho nhập--</option>
+                            @if (listMst_Inventory != null && listMst_Inventory.Count > 0)
+                            {
+                                var invCodeIn = CUtils.StrValue(objInvF_InventoryIn.InvCodeIn);
+                                foreach (var item in listMst_Inventory)
+                                {
+                                    var invCode = CUtils.StrValue(item.InvCode);
+                                    var invName = CUtils.StrValue(item.InvName);
+                                    <option InvBUPattern="@CUtils.StrValue(item.InvBUPattern)" value="@MvcHtmlString.Create(invCode)" @(invCodeIn.Equals(invCode) ? "selected" : "")>@MvcHtmlString.Create(invCode + " - " + invName)</option>
+                                }
+                            }
+                        </optgroup>
+                        <option value="SEARCHDATA">@("Tìm kiếm".HtmlItemString("invf_inventoryin"))</option>
+                    </select>
+                </span>
+            </div>
+        </div>
+        <div class="form-group margin-bottom-9">
+            <label class="control-label col-md-4" for="input1">
+                @("Nhà cung cấp".HtmlItemString("invf_inventoryin"))
+                <span style="color: red "> *</span>
+            </label>
+            <div class="col-md-7 @disabled">
+                <span class="block input-icon input-icon-right">
+                    <select id="CustomerCode" name="CustomerCode" showpopup-control-searchdata="#ShowPopupCustomer" class="col-md-12 CustomerCode" onchange="changeCustomer(this)">
+                        <optgroup label="">
+                            <option value="">--Chọn nhà cung cấp--</option>
+                            @if (listMst_Customer != null && listMst_Customer.Count > 0)
+                            {
+                                var customerCode = CUtils.StrValue(objInvF_InventoryIn.CustomerCode);
+                                foreach (var item in listMst_Customer)
+                                {
+                                    var cusCodeSys = CUtils.StrValue(item.CustomerCodeSys);
+                                    var cusCode = CUtils.StrValue(item.CustomerCode);
+                                    var cusName = CUtils.StrValue(item.CustomerName);
+                                    var cusAddress = CUtils.StrValue(item.CustomerAddress);
+                                    <option cusCodeSys="@cusCodeSys" cusCode="@cusCode" cusName="@cusName" cusAddress="@cusAddress" value="@MvcHtmlString.Create(cusCodeSys)" @(customerCode.Equals(cusCodeSys) ? "selected" : "")>@MvcHtmlString.Create(cusCode + " - " + cusName)</option>
+                                }
+                            }
+                        </optgroup>
+                        <option value="SEARCHDATA">@("Tìm kiếm".HtmlItemString("invf_inventoryin"))</option>
+                    </select>
+                </span>
+            </div>
+            <div class="col-md-7 no-padding @disabled" style="padding-top: 7px !important;">
+                <a href="javascript:void(0);" onclick="ToggleInfoBoxDealer()">
+                    <i class="fas fa-external-link-alt" style="color: #098850;"></i>
+                </a>
+            </div>
+        </div>
+    </aside>
+    <aside class="col-md-4">
+        <div class="form-group margin-bottom-9">
+            <label class="control-label col-md-4" for="RefNo">
+            </label>
+            <div class="col-md-8">
+                <input type="checkbox" id="FlagNhapTuDH" class="" onchange="ChangeNhapTuDH(this);" @checkedOrderNo />
+                <label>
+                    @("Nhập theo yêu cầu nghiệp vụ".HtmlItemString("invf_inventoryin"))
+                </label>
+            </div>
+        </div>
+        <div class="form-group margin-bottom-9">
+            <label class="control-label col-md-4" for="RefType">
+                @("RefType".HtmlItemString("invf_inventoryin"))
+            </label>
+            <div class="col-md-8 @disabled">
+                <span class="block input-icon input-icon-right">
+                    <select id="RefType" name="RefType" class="col-md-12 RefType">
+                        <optgroup label="">
+                            <option value="">--Chọn RefType--</option>
+                            <option value="PRINTERORDER" @(CUtils.StrValue(objInvF_InventoryIn.RefType).Equals("PRINTERORDER") ? "selected" : "")>Đơn hàng sản xuất</option>
+                            @*<option value="ADJUST" @(CUtils.StrValue(objInvF_InventoryIn.RefType).Equals("ADJUST") ? "selected" : "")>Xuất nhập kho điều chỉnh</option>*@
+                        </optgroup>
+                    </select>
+                </span>
+            </div>
+        </div>
+        <div class="form-group margin-bottom-9">
+            <label class="control-label col-md-4" for="OrderNo">
+                @("Số RefNo".HtmlItemString("invf_inventoryin"))
+            </label>
+            <div class="col-md-8">
+                <input type="text" class="col-md-12 @disabledupdate @disabledOrderNo @disabled RefNo" name="RefNo" id="RefNo" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryIn.RefNo))" />
+                <input type="hidden" class="RefNoSys" id="RefNoSys" name="RefNoSys" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryIn.RefNoSys))" />
+                <input type="hidden" class="PlanQty" id="PlanQty" name="PlanQty" value="" />
+            </div>
+        </div>
+        <div class="form-group margin-bottom-9">
+            <label class="control-label col-md-4" for="InvFCFInCode02">
+                @("Số Container".HtmlItemString("invf_inventoryin"))
+            </label>
+            <div class="col-md-8">
+                <input type="text" class="col-md-12 InvFCFInCode02 @disabled" name="InvFCFInCode02" id="InvFCFInCode02" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryIn.InvFCFInCode02))" />
+            </div>
+        </div>
+    </aside>
+    <aside class="col-md-4">
+        <div class="form-group margin-bottom-9">
+            <label class="control-label col-md-4" for="InvFCFInCode01">
+                @("Số hợp đồng".HtmlItemString("invf_inventoryin"))
+            </label>
+            <div class="col-md-8">
+                <input type="text" class="col-md-12 InvFCFInCode01 @disabled" name="InvFCFInCode01" id="InvFCFInCode01" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryIn.InvFCFInCode01))" />
+            </div>
+        </div>
+        <div class="form-group margin-bottom-9">
+            <label class="control-label col-md-4" for="InvoiceNo">
+                @("Số hóa đơn".HtmlItemString("invf_inventoryin"))
+            </label>
+            <div class="col-md-8">
+                <input type="text" id="InvoiceNo" name="InvoiceNo" class="col-md-12 InvoiceNo @disabled" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryIn.InvoiceNo))" />
+            </div>
+        </div>
+        <div class="form-group margin-bottom-9">
+            <label class="control-label col-md-4" for="InvFCFInCode03">
+                @("Biển số xe".HtmlItemString("invf_inventoryin"))
+            </label>
+            <div class="col-md-8">
+                @{
+                    var invFCFInCode03 = CUtils.StrValue(objInvF_InventoryIn.InvFCFInCode03);
+                }
+                <input type="text" class="col-md-12 InvFCFInCode03 @disabled" name="InvFCFInCode03" id="InvFCFInCode03" value="@MvcHtmlString.Create(invFCFInCode03)" />
+            </div>
+        </div>
+        <div class="form-group margin-bottom-9">
+            <label class="control-label col-md-4" for="Remark">
+                @("Nội dung nhập".HtmlItemString("invf_inventoryin"))
+            </label>
+            <div class="col-md-8">
+                @{
+                    var remark = CUtils.StrValue(objInvF_InventoryIn.Remark);
+                }
+                <textarea class="col-md-12 Remark @disabled" name="Remark" id="Remark" rows="2">@MvcHtmlString.Create(remark)</textarea>
+            </div>
+        </div>
+    </aside>
+</div>
+@*<div class="col-12 row">
+    <aside class="col-md-4 @flagdisable" style="left: 66.6%">
+        <div class="form-group margin-bottom-9 ">
+            <label class="control-label col-md-4" for="TotalValIn">
+                @("Tổng tiền hàng (VNĐ)".HtmlItemString("invf_inventoryin"))
+            </label>
+            <div class="col-md-8">
+                <input type="text" class="col-md-12 disabled-fix text-right TotalValIn" name="TotalValIn" id="TotalValIn" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryIn.TotalValIn))" />
+            </div>
+        </div>
+
+        <div class="form-group margin-bottom-9">
+            <label class="control-label col-md-4" for="TotalValInDesc">
+                @("Giảm giá (VNĐ)".HtmlItemString("invf_inventoryin"))
+            </label>
+            <div class="col-md-8">
+                <input type="text" class="col-md-12 text-right disabled-fix TotalValInDesc" readonly="readonly" name="TotalValInDesc" id="TotalValInDesc" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryIn.TotalValInDesc))" />
+            </div>
+        </div>
+        <div class="form-group margin-bottom-9">
+            <label class="control-label col-md-4" for="TotalValInAfterDesc">
+                @("Tổng tiền trả NCC (VNĐ)".HtmlItemString("invf_inventoryin"))
+            </label>
+            <div class="col-md-8">
+                <input type="text" class="col-md-12 text-right disabled-fix TotalValInAfterDesc" name="TotalValInAfterDesc" id="TotalValInAfterDesc" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryIn.TotalValInAfterDesc))" />
+            </div>
+        </div>
+    </aside>
+</div>*@
+@* Popup Ncc *@
+<div class="infobox info-box-dealer display-none row no-margin" style="width: 370px; position: absolute; top: 220px;left:42px; z-index: 3">
+    <div class="row no-margin col-12 no-padding" style="background: #fff; border-radius: 4px; box-shadow: -3px 5px 5px #968982; border: 1px solid #dacfcf;">
+        <div class="col-2 margin-bottom-9 text-right">
+            Mã KH:
+        </div>
+        <div id="madaily" class="col-10 margin-bottom-9 text-left fontbold">
+            <input type="text" class="col-12 customerCodeCur no-border disabled-fix" value="@MvcHtmlString.Create(customerCodeCur)" />
+        </div>
+        <div class="col-2 margin-bottom-9 text-right ">
+            Tên KH:
+        </div>
+        <div id="tendaily" class="col-10 margin-bottom-9 text-left fontbold">
+            <input type="text" class="col-12 customerNameCur no-border disabled-fix" value="@MvcHtmlString.Create(customerNameCur)" />
+        </div>
+        <div class="col-2 margin-bottom-9 text-right">
+            Địa chỉ:
+        </div>
+        <div id="diachi" class="col-10 margin-bottom-9 text-left fontbold">
+            <input type="text" class="col-12 customerAddressCur no-border disabled-fix" value="@MvcHtmlString.Create(customerAddressCur)" />
+        </div>
+    </div>
+</div>
+@* End popup Ncc *@
+<script type="text/javascript">
+    function ToggleInfoBoxDealer() {
+        $('.info-box-dealer').toggleClass('display-none');
+    }
+    function changeCustomer(thiz) {
+        debugger
+        var $customer = $(thiz);
+        var cusCode = $customer.find('option:selected').attr('cusCode');
+        var cusName = $customer.find('option:selected').attr('cusName');
+        var cusAddress = $customer.find('option:selected').attr('cusAddress');
+        $('.customerCodeCur').val(cusCode);
+        $('.customerNameCur').val(cusName);
+        $('.customerAddressCur').val(cusAddress);
+    }
+</script>

@@ -1,0 +1,20 @@
+﻿@model List<InvF_InventoryCusReturnInstLot>
+
+@if (Model != null && Model.Count > 0)
+{
+    var idx = 0;
+    foreach (var item in Model)
+    {
+        <tr class="data-item trdata" idx="@idx" productcode="@item.ProductCode">
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnInstLot[@idx].ProductCode" value="@item.ProductCode" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnInstLot[@idx].ProductCodeRoot" value="@item.ProductCodeRoot" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnInstLot[@idx].ProductLotNo" value="@item.ProductLotNo" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnInstLot[@idx].ProductionDate" value="@item.ProductionDate" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnInstLot[@idx].ExpiredDate" value="@item.ExpiredDate" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnInstLot[@idx].InvCodeInActual" value="@item.InvCodeInActual" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnInstLot[@idx].Qty" value="@item.Qty">
+        </tr>
+        idx++;
+    }
+}
+

@@ -1,0 +1,167 @@
+﻿@{
+    var lstInvF_InventoryCusReturnInstLot = ViewBag.lstInvF_InventoryCusReturnInstLot as List<InvF_InventoryCusReturnInstLot>;
+    var lstInvF_InventoryCusReturnInstSerial = ViewBag.lstInvF_InventoryCusReturnInstSerial as List<InvF_InventoryCusReturnInstSerial>;
+    var lstInvF_InventoryCusReturnDtlCombo = new List<InvF_InventoryCusReturnDtlUI>();
+    if (ViewBag.lstInvF_InventoryCusReturnDtlCombo != null)
+    {
+        lstInvF_InventoryCusReturnDtlCombo = ViewBag.lstInvF_InventoryCusReturnDtlCombo as List<InvF_InventoryCusReturnDtlUI>;
+    }
+    var lstInvF_InventoryCusReturnDtl = ViewBag.lstInvF_InventoryCusReturnDtl as List<InvF_InventoryCusReturnDtl>;
+ }
+
+<table>
+    <tbody id="table-detailLot">
+        @{
+            if (lstInvF_InventoryCusReturnInstLot != null && lstInvF_InventoryCusReturnInstLot.Count > 0)
+            {
+                var idx = 0;
+                foreach (var it in lstInvF_InventoryCusReturnInstLot)
+                {
+                    <tr class="data-item trdata" idx="@idx" productcode="@it.ProductCode">
+                        <input type="hidden" name="Lst_InvF_InventoryCusReturnInstLot[@idx].ProductCode" value="@it.ProductCode" />
+                        <input type="hidden" name="Lst_InvF_InventoryCusReturnInstLot[@idx].ProductCodeRoot" value="@it.ProductCodeRoot" />
+                        <input type="hidden" name="Lst_InvF_InventoryCusReturnInstLot[@idx].ProductLotNo" value="@it.ProductLotNo" />
+                        <input type="hidden" name="Lst_InvF_InventoryCusReturnInstLot[@idx].ProductionDate" value="@it.ProductionDate" />
+                        <input type="hidden" name="Lst_InvF_InventoryCusReturnInstLot[@idx].ExpiredDate" value="@it.ExpiredDate" />
+                        <input type="hidden" name="Lst_InvF_InventoryCusReturnInstLot[@idx].InvCodeInActual" value="@it.InvCodeInActual" />
+                        <input type="hidden" name="Lst_InvF_InventoryCusReturnInstLot[@idx].Qty" value="@it.Qty">
+                    </tr>
+
+                    idx++;
+                }
+            }
+        }
+    </tbody>
+</table>
+
+<table>
+    <tbody id="table-detailSerial">
+        @{
+            if (lstInvF_InventoryCusReturnInstSerial != null && lstInvF_InventoryCusReturnInstSerial.Count > 0)
+            {
+                var idx = 0;
+                foreach (var it in lstInvF_InventoryCusReturnInstSerial)
+                {
+                    <tr class="data-item trdata" idx="@idx" productcode="@it.ProductCode">
+                        <input type="hidden" name="Lst_InvF_InventoryCusReturnInstSerial[@idx].ProductCode" value="@it.ProductCode" />
+                        <input type="hidden" name="Lst_InvF_InventoryCusReturnInstSerial[@idx].ProductCodeRoot" value="@it.ProductCodeRoot" />
+                        <input type="hidden" name="Lst_InvF_InventoryCusReturnInstSerial[@idx].SerialNo" value="@it.SerialNo" />
+                        <input type="hidden" name="Lst_InvF_InventoryCusReturnInstSerial[@idx].InvCodeInActual" value="@it.InvCodeInActual" />
+                    </tr>
+
+                    idx++;
+                }
+            }
+        }
+    </tbody>
+</table>
+
+<table>
+    <tbody id="table-detailCombo">
+        @{
+            if (lstInvF_InventoryCusReturnDtlCombo != null)
+            {
+                var idx = 0;
+                foreach (var it in lstInvF_InventoryCusReturnDtlCombo)
+                {
+        <tr class="data-item trdata" idx="@idx" productCodeRoot="@(it.ProductCodeRoot == null ? "" : it.ProductCodeRoot)" productCode="@(it.ProductCode == null ? "" : it.ProductCode)" invCodeInActual ="@it.InvCodeInActual">
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnComboDtl[@idx].ProductCode" value="@(it.ProductCode == null ? "" : it.ProductCode)" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnComboDtl[@idx].ProductCodeRoot" value="@(it.ProductCodeRoot == null ? "" : it.ProductCodeRoot)" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnComboDtl[@idx].Qty" value="@(it.Qty == null ? "" : it.Qty)" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnComboDtl[@idx].QtyRoot" value="@(it.QtyRoot == null ? "" : it.QtyRoot)" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnComboDtl[@idx].InvCodeInActual" value="@(it.InvCodeInActual == null ? "" : it.InvCodeInActual)" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnComboDtl[@idx].UnitCode" value="@(it.UnitCode == null ? "" : it.UnitCode)" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnComboDtl[@idx].Remark" value="@(it.Remark == null ? "" : it.Remark)" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnComboDtl[@idx].ProductName" value="@(it.mp_ProductName == null ? "" : it.mp_ProductName)" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnComboDtl[@idx].UPSell" value="@(it.ificrc_UPCusReturn == null ? "" : it.ificrc_UPCusReturn)" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnComboDtl[@idx].ProductCodeUser" value="@(it.mp_ProductCodeUser == null ? "" : it.mp_ProductCodeUser)" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnComboDtl[@idx].ProductCodeBase" value="@(it.mp_ProductCodeBase == null ? "" : it.mp_ProductCodeBase)" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnComboDtl[@idx].QtyTotalOK" value="" />
+        </tr>
+                    idx++;
+                }
+
+            }
+        }
+    </tbody>
+</table>
+
+<table>
+    <tbody id="table-detailInvCodeInActual">
+        @{
+            if (lstInvF_InventoryCusReturnDtl != null && lstInvF_InventoryCusReturnDtl.Count > 0)
+            {
+                var idx = 0;
+                foreach (var it in lstInvF_InventoryCusReturnDtl)
+                {
+        <tr class="data-item trdata" idx="@idx" productcode="@it.ProductCode">
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlTemp[@idx].ProductCode" value="@it.ProductCode" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlTemp[@idx].ProductCodeRoot" value="@it.ProductCodeRoot" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlTemp[@idx].InvCodeInActual" value="@it.InvCodeInActual" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlTemp[@idx].Qty" value="@it.Qty" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlTemp[@idx].ProductCodeBase" value="@it.mp_ProductCodeBase" />
+        </tr>
+
+                    idx++;
+                }
+            }
+        }
+    </tbody>
+</table>
+
+<table hidden>
+    <tbody id="rowtemplateLoDetail">
+        <tr class="data-item trdata" idx="==idx==" productcode="==ProductCode==">
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnInstLot[==idx==].ProductCode" value="==ProductCode==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnInstLot[==idx==].ProductCodeRoot" value="==ProductCode==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnInstLot[==idx==].ProductLotNo" value="==ProductLotNo==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnInstLot[==idx==].ProductionDate" value="==ProductionDate==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnInstLot[==idx==].ExpiredDate" value="==ExpiredDate==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnInstLot[==idx==].InvCodeInActual" value="==InvCodeInActual==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnInstLot[==idx==].Qty" value="==Qty==">
+        </tr>
+    </tbody>
+</table>
+
+
+<table hidden>
+    <tbody id="rowtemplateSerialDetail">
+        <tr class="data-item trdata" idx="==idx==" productcode="==ProductCode==">
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnInstSerial[==idx==].ProductCode" value="==ProductCode==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnInstSerial[==idx==].ProductCodeRoot" value="==ProductCode==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnInstSerial[==idx==].SerialNo" value="==SerialNo==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnInstSerial[==idx==].InvCodeInActual" value="==InvCodeInActual==" />            
+        </tr>
+    </tbody>
+</table>
+
+<table hidden>
+    <tbody id="rowtemplateComboDetail">
+        <tr class="data-item trdata" idx="==idx==" productCodeRoot="==ProductCodeRoot==" productCode="==ProductCode==" invCodeInActual ="==InvCodeInActual==">
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnComboDtl[==idx==].ProductCode" value="==ProductCode==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnComboDtl[==idx==].ProductCodeRoot" value="==ProductCodeRoot==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnComboDtl[==idx==].Qty" value="==Qty==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnComboDtl[==idx==].QtyRoot" value="==QtyRoot==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnComboDtl[==idx==].InvCodeInActual" value="==InvCodeInActual==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnComboDtl[==idx==].UnitCode" value="==UnitCode==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnComboDtl[==idx==].Remark" value="==Remark==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnComboDtl[==idx==].ProductCodeUser" value="==ProductCodeUser==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnComboDtl[==idx==].ProductCodeBase" value="==ProductCodeBase==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnComboDtl[==idx==].ProductName" value="==ProductName==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnComboDtl[==idx==].QtyTotalOK" value="==QtyTotalOK==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnComboDtl[==idx==].UPSell" value="==UPSell==" />
+        </tr>
+    </tbody>
+</table>
+
+<table hidden>
+    <tbody id="rowtemplateInvCodeInActual">
+        <tr class="data-item trdata" idx="==idx==" productcode="==ProductCode==">
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlTemp[==idx==].ProductCode" value="==ProductCode==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlTemp[==idx==].ProductCodeRoot" value="==ProductCodeRoot==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlTemp[==idx==].ProductCodeBase" value="==ProductCodeBase==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlTemp[==idx==].InvCodeInActual" value="==InvCodeInActual==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnDtlTemp[==idx==].Qty" value="==Qty==" />
+        </tr>
+    </tbody>
+</table>

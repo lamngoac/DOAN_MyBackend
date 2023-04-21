@@ -1,0 +1,17 @@
+﻿@model List<InvF_InventoryOutDtl>
+@{
+    string customerCodeSys = ViewBag.CustomerCodeSys as string;
+}
+@{
+    if (Model != null && Model.Count != 0)
+    {
+        <optgroup label="">
+            <option value="" CustomerCodeSys="@customerCodeSys">--Chọn hàng hóa--</option>
+            @foreach (var it in Model)
+            {
+                <option value="@it.ProductCode" ProductCodeBase="@it.mp_ProductCodeBase" ProductCodeUser="@it.mp_ProductCodeUser" ProductName="@it.mp_ProductName" UnitCode="@it.UnitCode" UPCusReturn="@(it.UPOut == null ? "0" : it.UPOut.ToString())" Qty="@(it.Qty == null ? "0" : it.Qty.ToString())" FlagLot="@it.FlagLot" FlagSerial="@it.FlagSerial" ValConvert="@it.ValConvert">@it.mp_ProductCodeUser - @it.mp_ProductName</option>
+            }
+        </optgroup>
+        <option value="SEARCHDATA">@("Tìm kiếm".HtmlItemString("invf_inventorycusreturn"))</option>
+    }
+}

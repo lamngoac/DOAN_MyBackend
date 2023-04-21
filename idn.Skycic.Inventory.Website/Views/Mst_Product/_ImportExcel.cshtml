@@ -1,0 +1,78 @@
+﻿
+
+<div class="modal-dialog" style="width: 500px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="exampleModalLabel">Nhập hàng hóa từ file Excel</h3>
+            <a href="javascript:;" onclick="CloseModalImportExcel()" class="close" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </a>
+        </div>
+        <div class="modal-body">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "manageFormImportExcel" }))
+            {//id="importErrorAndStop" => 1: tạo mới; 0: sửa
+                @Html.AntiForgeryToken()
+                <div class="form-group margin-bottom-9 layout-search">
+                    <div class="title-excel">
+                        <p>Xử lý trùng mã hàng, khác các thông tin khác của hàng hóa?</p>
+                        <input type="radio" id="importErrorAndStop" name="importChoose" value="1" checked>
+                        <label for="importErrorAndStop">Báo lỗi và dừng import</label><br>
+                        <input type="radio" id="importReplaceProduct" name="importChoose" value="0">
+                        <label for="importReplaceProduct">Cập nhật thông tin mới cho hàng hóa</label><br>
+                    </div>
+                </div>
+
+                <div class="form-group margin-bottom-9">
+                    <input type="file" name="file" id="file" />
+                </div>
+            }
+
+        </div>
+        <div class="modal-footer">
+            <a href="javascript:void(0);" class="btn mybtn-Button" onclick="Import()" id="btnSaveImport" style="padding-left: 10px!important; padding-right: 10px!important; font-size: 16px; font-weight: 500;">Nhập</a>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    //$(document).ready(function () {
+    //    $('input[type="file"]').change(function (e) {
+    //        checkFileExcelImport(this, e);
+    //    });
+
+    //});
+
+    function Import(title) {        
+        var file = $("#file").val();
+        var listCheck = $('input[name="importChoose"]');
+        var flagImport = '';
+        listCheck.each(function () {
+            if ($(this).is(':checked')) {
+                flagImport = $(this).val();
+            }
+        });
+        if (file.length === 0) {
+            alert("Nhập file cần Import");
+            $("#file").val('');
+            return false;
+        } else {
+            var checkFile = false;
+            var _index = file.lastIndexOf('.');
+            if (_index !== undefined && _index !== null && _index > 0) {
+                var fileType = file.substring(_index + 1, file.length).toLowerCase();
+                if (fileType === 'xls' || fileType.toLowerCase() === 'xlsx') {
+                    checkFile = true;
+                }
+            }
+            if (checkFile) {
+                ImportFileExcel();
+            } else {
+                alert("File Excel Import không hợp lệ!");
+            }
+        }
+    }
+</script>
+
+
+
+

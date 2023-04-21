@@ -1,0 +1,81 @@
+﻿@model List<InvF_InventoryOutFGDtlUI>
+@{
+    var disabled = ViewBag.Disabled as string;
+    var isDisabled = false;
+    if (!CUtils.IsNullOrEmpty(disabled))
+    {
+        if (disabled.ToLower().Trim().Equals("disabled"))
+        {
+            isDisabled = true;
+        }
+    }
+    var IsEdit = ViewBag.IsEdit as string;
+    var chked = "";
+    if (!CUtils.IsNullOrEmpty(IsEdit))
+    {
+        chked = "checked=\"checked\"";
+    }
+}
+
+
+@if (Model != null && Model.Count > 0)
+{
+    var idx = 0;
+    foreach (var item in Model)
+    {
+        var partname = "";
+        if (item != null && !CUtils.IsNullOrEmpty(item.PartName))
+        {
+            partname = item.PartName.ToString();
+        }
+        else
+        {
+            partname = item.PartCode.ToString();
+        }
+        var qty = "0";
+        if (!CUtils.IsNullOrEmpty(item.Qty))
+        {
+            qty = CUtils.formatNumeric(Convert.ToDouble(item.Qty.ToString()), "{0:0,0}");
+        }
+        <tr idx="@idx" class="data-item trdata" partcode="@MvcHtmlString.Create(item.PartCode.ToString())">
+            <input type="hidden" name="ListInvF_InventoryOutFGDtl[@idx].PartCode" value="@MvcHtmlString.Create(item.PartCode.ToString())" />
+            <input type="hidden" name="ListInvF_InventoryOutFGDtl[@idx].PartName" value="@MvcHtmlString.Create(partname)" />
+            @*<input type="hidden" name="ListInvF_InventoryOutFGDtl[@idx].Qty" value="@MvcHtmlString.Create(item.Qty.ToString().Trim())" />*@
+
+            @if (CUtils.IsNullOrEmpty(IsEdit) && !CUtils.IsNullOrEmpty(item.FormOutType))
+            {
+                if (item.FormOutType.ToString().Equals("MAVACH"))
+                {
+                    <td class="text-center cell-50">
+                        <a class="icon-detail" href="javascript:void(0);" title="Chi tiết" onclick="ShowPopupSerial('@item.IF_InvOutFGNo','@item.PartCode')">
+                            <img class="img-icon" src="/Images/Xem.svg">
+                        </a>
+                    </td>
+                }
+            }
+            <td class="text-center cell-30">
+                <label class="pos-rel">
+                    <input type="checkbox" class="cl-check" onclick="CheckBox(this);" name="ckb" @chked @(isDisabled ? "disabled" : "") />
+                    <span class="checkmark"></span>
+                </label>
+            </td>
+            <td class="cell-150">
+                @MvcHtmlString.Create(item.PartCode.ToString())
+            </td>
+            <td class="cell-200">
+                @MvcHtmlString.Create(partname)
+            </td>
+            <td class="cell-200">
+                <input type="text" class="col-xs-12 text-right QtyImportExcel" name="ListInvF_InventoryOutFGDtl[@idx].Qty" value="@MvcHtmlString.Create(item.Qty.ToString().Trim())" @(isDisabled ? "readonly" : "") style="border-radius: 4px;line-height: 20px;" />
+            </td>
+
+        </tr>
+        idx++;
+    }
+}
+
+<script type="text/javascript">
+    jQuery(function ($) {
+        $('.QtyImportExcel').number(true, 0);
+    });
+</script>

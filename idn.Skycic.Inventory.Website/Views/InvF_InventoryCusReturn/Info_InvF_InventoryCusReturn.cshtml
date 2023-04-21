@@ -1,0 +1,255 @@
+﻿@model RT_InvF_InventoryCusReturn
+@{
+    /**/
+
+    string viewType = CUtils.StrValue(ViewBag.ViewType);
+    var userState = ViewBag.UserState as UserState;
+    var listMstInvInType = ViewBag.ListMst_InvInType as List<Mst_InvInType>;
+    var listMstInventory = ViewBag.ListMst_Inventory as List<Mst_Inventory>;
+    var listMstCustomer = ViewBag.ListMst_Customer as List<Mst_Customer>;
+    var invInType = ViewBag.InvInType as string;
+    //var IF_InvCusReturnNo = ViewBag.IF_InvCusReturnNo as string;
+    //var iF_InvCusReturnStatus = ViewBag.If_InvCusReturnStatus as string;
+    var objInvF_InventoryCusReturn = new InvF_InventoryCusReturn();
+    var iF_InvCusReturnNo = "";
+    var iF_InvCusReturnStatus = "";
+    if (Model != null)
+    {
+        if(Model.Lst_InvF_InventoryCusReturn != null && Model.Lst_InvF_InventoryCusReturn.Count > 0)
+        {
+            objInvF_InventoryCusReturn = Model.Lst_InvF_InventoryCusReturn[0];
+            iF_InvCusReturnNo = CUtils.StrValue(objInvF_InventoryCusReturn.IF_InvCusReturnNo);
+            iF_InvCusReturnStatus = CUtils.StrValue(objInvF_InventoryCusReturn.IF_InvCusReturnStatus);
+        }
+    }
+    var disabled = "";
+    if (viewType.Equals("detail"))
+    {
+        disabled = "disabled-fix";
+    }
+
+
+    var flagActive = "0";
+    var flagdisplaynone = "";
+
+    if (userState.RT_Mst_Sys_Config != null && userState.RT_Mst_Sys_Config.Lst_Mst_Sys_Config != null && userState.RT_Mst_Sys_Config.Lst_Mst_Sys_Config.Count > 0)
+    {
+        foreach (var item in userState.RT_Mst_Sys_Config.Lst_Mst_Sys_Config)
+        {
+            if (item.SysConfigID.Equals("IF_InvCusReturn"))
+            {
+                flagActive = CUtils.StrValue(item.FlagActive);
+            }
+        }
+    }
+
+    if (flagActive.Equals("0"))
+    {
+        flagdisplaynone = "display-none";
+    }
+}
+
+@Html.Partial("Template", Model, new ViewDataDictionary()
+{
+    {"UserState", userState },
+    { "ViewType", viewType },
+})
+@Html.Partial("Model", Model, new ViewDataDictionary()
+{
+    {"UserState", userState },
+    { "ViewType", viewType },
+})
+@Html.Partial("Template_Scripts", Model, new ViewDataDictionary()
+{
+    {"UserState", userState },
+    { "ViewType", viewType },
+})
+
+
+@*Thông tin phiếu nhập kho*@
+<div class="col-12 row d-none">
+    <aside class="col-md-8">
+        <div class="form-group" style="float: left; margin-top: 0px; margin-bottom: 13px;">
+            @if (viewType.Equals("create"))
+            {
+                @RenderItemFormat("BTN_CREATE_INVF_INVENTORYCUSRETURN", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnSave\" onclick=\"SaveData(0)\"><i class=\"fa fa-save\" aria-hidden=\"true\"></i> Lưu</a>", "", "")
+                @RenderItemFormat("BTN_CREATE_AND_NEW_INVF_INVENTORYCUSRETURN", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnSaveNew\" onclick=\"SaveData(1)\"><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i> Lưu và tạo mới</a>", "", "")
+            }
+            else if (viewType.Equals("detail"))
+            {
+                var status = Convert.ToString(objInvF_InventoryCusReturn.IF_InvCusReturnStatus);
+                if (status == "PENDING")
+                {
+                    @RenderItemFormat("BTN_APPR_INVF_INVENTORYCUSRETURN", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnApprove\" onclick=\"Approve()\"><i class=\"fa fa-check-circle\" aria-hidden=\"true\"></i> Duyệt</a>", "", "")
+                    @RenderItemFormat("BTN_EDIT_INVF_INVENTORYCUSRETURN", "<a class=\"btn btn-nc-button\" id=\"btnEdit\" href=\"" + Url.Action("Update", "InvF_InventoryCusReturn", new { if_invcusreturnno = objInvF_InventoryCusReturn.IF_InvCusReturnNo }) + "\"><i class=\"fa fa-edit\" aria-hidden=\"true\"></i> Sửa</a>", "", "")
+                    @RenderItemFormat("BTN_CANCEL_INVF_INVENTORYCUSRETURN", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnCancel\" onclick=\"Cancel()\"><i class=\"fa fa-ban\" aria-hidden=\"true\"></i> Hủy</a>", "", "")
+                }
+            }
+            else if (viewType.Equals("update"))
+            {
+                @RenderItemFormat("BTN_SAVE_INVF_INVENTORYCUSRETURN", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnSave\" onclick=\"UpdateData(0)\"><i class=\"fa fa-save\" aria-hidden=\"true\"></i> Lưu</a>", "", "")
+            }
+        </div>
+    </aside>
+</div>
+<div class="col-12 row">
+    <div class="col-12 row">
+        <aside class="col-md-4">
+            <div class="form-group margin-bottom-9">
+                <label class="control-label col-md-4" for="IF_InvCusReturnNo">
+                    @("Số phiếu KH trả hàng".HtmlItemString("invf_inventorycusreturn"))
+                </label>
+                <div class="col-md-8">
+                    <input type="text" class="col-md-12 text-bold" name="IF_InvCusReturnNo" id="IF_InvCusReturnNo" readonly="readonly" value="@iF_InvCusReturnNo" />
+                    <input type="hidden" name="IF_InvCusReturnStatus" id="IF_InvCusReturnStatus" class="IF_InvCusReturnStatus" value="@MvcHtmlString.Create(iF_InvCusReturnStatus)" />
+                    <input type="hidden" name="ViewType" class="ViewType" value="@MvcHtmlString.Create(viewType)" />
+                </div>
+            </div>
+
+            <div class="form-group margin-bottom-9" style="display: none">
+                <label class="control-label col-md-4" for="InvInType">
+                    @("Loại nhập kho".HtmlItemString("invf_inventorycusreturn"))
+                    <span style="color: red "> *</span>
+                </label>
+                <div class="col-md-8">
+                    <input type="text" class="col-md-12" name="InvInType" id="InvInType" readonly="readonly" value="CUSTOMERRETURN" />
+                </div>
+            </div>
+            <div class="form-group margin-bottom-9">
+                <label class="control-label col-md-4" for="input1">
+                    @("Khách hàng".HtmlItemString("invf_inventorycusreturn"))
+                    <span style="color: red "> *</span>
+                </label>
+                <div class="col-md-8 @disabled">
+                    <span class="block input-icon input-icon-right">
+                        <select id="CustomerCode" name="CustomerCode" showpopup-control-searchdata="#ShowPopupCustomer" class="col-md-12">
+                            <optgroup label="">
+                                <option value="">--Chọn khách hàng--</option>
+                                @if (listMstCustomer != null && listMstCustomer.Count > 0)
+                                {
+                                    var customerCode = CUtils.StrValue(objInvF_InventoryCusReturn.CustomerCode);
+                                    foreach (var item in listMstCustomer)
+                                    {
+                                        var cusCodeSys = CUtils.StrValue(item.CustomerCodeSys);
+                                        var cusCode = CUtils.StrValue(item.CustomerCode);
+                                        var cusName = CUtils.StrValue(item.CustomerName);
+                                        <option value="@MvcHtmlString.Create(cusCodeSys)"  @(customerCode.Equals(cusCodeSys) ? "selected" : "")>@MvcHtmlString.Create(cusCode + " - " + cusName)</option>
+                                    }
+                                }
+                            </optgroup>
+                            <option value="SEARCHDATA">@("Tìm kiếm".HtmlItemString("invf_inventorycusreturn"))</option>
+                        </select>
+                    </span>
+                </div>
+            </div>
+            <div class="form-group margin-bottom-9">
+                <label class="control-label col-md-4" for="InvCodeIn">
+                    @("Kho nhập".HtmlItemString("invf_inventorycusreturn"))
+                    <span style="color: red "> *</span>
+                </label>
+                <div class="col-md-8 @disabled">
+                    <span class="block input-icon input-icon-right">
+                        <select id="InvCodeIn" name="InvCodeIn" showpopup-control-searchdata="#ShowPopupInvCodeIn" class="col-md-12 InvCodeIn">
+                            <optgroup label="">
+                                <option value="">--Chọn kho nhập--</option>
+                                @if (listMstInventory != null && listMstInventory.Count > 0)
+                                {
+                                    var invCodeIn = CUtils.StrValue(objInvF_InventoryCusReturn.InvCodeIn);
+                                    foreach (var item in listMstInventory)
+                                    {
+                                        var invCode = CUtils.StrValue(item.InvCode);
+                                        var invName = CUtils.StrValue(item.InvName);
+                                        <option InvBUPattern="@CUtils.StrValue(item.InvBUPattern)" value="@MvcHtmlString.Create(invCode)" @(invCodeIn.Equals(invCode) ? "selected" : "")>@MvcHtmlString.Create(invCode + " - " + invName)</option>
+                                    }
+                                }
+                            </optgroup>
+                            <option value="SEARCHDATA">@("Tìm kiếm".HtmlItemString("invf_inventorycusreturn"))</option>
+                        </select>
+                    </span>
+                </div>
+            </div>
+
+        </aside>
+        <aside class="col-md-4">
+            <div class="form-group margin-bottom-9">
+                <label class="control-label col-md-4" for="InvoiceNo">
+                    @("Số hóa đơn".HtmlItemString("invf_inventorycusreturn"))
+                </label>
+                <div class="col-md-8">
+                    <input type="text" class="col-md-12 @disabled" name="InvoiceNo" id="InvoiceNo" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryCusReturn.InvoiceNo))" />
+                </div>
+            </div>
+            <div class="form-group margin-bottom-9">
+                <label class="control-label col-md-4" for="RefNo">
+                    @("Số phiếu xuất".HtmlItemString("invf_inventorycusreturn"))
+                </label>
+                <div class="col-md-8 ">
+                    <input type="text" class="col-md-12 @disabled" name="RefNo" id="RefNo" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryCusReturn.RefNo))" />
+                    <input type="hidden" name="RefNoSys" id="RefNoSys" value="@MvcHtmlString.Create(CUtils.StrValue(objInvF_InventoryCusReturn.RefNoSys))" />
+                    
+                    @*@if (viewType.Equals("detail"))
+                {
+                    <input type="checkbox" class="@disabled" id="FlagTraTuDH" onchange="ChangeTraTuDH(this);" />
+                    <label>
+                        @("Trả từ đơn hàng".HtmlItemString("invf_inventorycusreturn"))
+                    </label>
+                }*@
+                </div>
+            </div>
+            <div class="form-group margin-bottom-9" style="display:none;">
+                <label class="control-label col-md-4" for="RefType">
+                    @("RefType".HtmlItemString("invf_inventorycusreturn"))
+                </label>
+                <div class="col-md-8">
+                    <input type="text" name="RefType" id="RefType" class="col-12 disabled-fix" value="STOCKOUT" />
+                </div>
+            </div>
+        </aside>
+        <aside class="col-md-4">
+
+            <div class="form-group margin-bottom-9">
+                <label class="control-label col-md-4" for="Remark">
+                    @("Nội dung KH trả hàng".HtmlItemString("invf_inventoryin"))
+                </label>
+                <div class="col-md-8">
+                    @{
+                        var remark = CUtils.StrValue(objInvF_InventoryCusReturn.Remark);
+                    }
+                    <textarea class="col-md-12 Remark @disabled" name="Remark" id="Remark" rows="3">@MvcHtmlString.Create(remark)</textarea>
+                </div>
+            </div>
+        </aside>
+    </div>
+    
+</div>
+
+<script>
+
+    function StartScan() {
+        if (FlagScan === '0') {
+            var listToastr = [];
+            objToastr = { ToastrType: 'success', ToastrMessage: '@MvcHtmlString.Create("Bắt đầu chuyển sang chế độ quét".HtmlItemString("invf_inventorycusreturn"))' };
+            listToastr.push(objToastr);
+            commonUtils.showToastr(listToastr);
+            FlagScan = '1';
+            //Ẩn hiện ô quét
+            $('#quetmavach').show();
+            $('#divPrdOrder').hide();
+            $('#myInput').val('');
+            $('#myInput').hide();
+            $('#quetmavach').focus();
+        }
+        else {
+            var listToastr = [];
+            objToastr = { ToastrType: 'success', ToastrMessage: '@MvcHtmlString.Create("Đã tắt chế độ quét".HtmlItemString("invf_inventorycusreturn"))' };
+            listToastr.push(objToastr);
+            commonUtils.showToastr(listToastr);
+            FlagScan = '0';
+            //Ẩn hiện ô quét
+            $('#quetmavach').val('');
+            $('#quetmavach').hide();
+            let elementFlagTraTuDH = document.getElementById('FlagTraTuDH');
+            ChangeTraTuDH(elementFlagTraTuDH);
+        }
+}
+</script>

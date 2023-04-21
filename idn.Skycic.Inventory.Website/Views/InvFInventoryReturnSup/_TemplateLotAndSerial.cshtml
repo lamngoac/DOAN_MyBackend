@@ -1,0 +1,122 @@
+﻿@{
+    var Lst_InvF_InventoryReturnSupInstLot = new List<InvF_InventoryReturnSupInstLot>();
+    if (ViewBag.Lst_InvF_InventoryReturnSupInstLot != null)
+    {
+        Lst_InvF_InventoryReturnSupInstLot = ViewBag.Lst_InvF_InventoryReturnSupInstLot as List<InvF_InventoryReturnSupInstLot>;
+    }
+
+    var Lst_InvF_InventoryReturnSupInstSerial = new List<InvF_InventoryReturnSupInstSerial>();
+    if (ViewBag.Lst_InvF_InventoryReturnSupInstSerial != null)
+    {
+        Lst_InvF_InventoryReturnSupInstSerial = ViewBag.Lst_InvF_InventoryReturnSupInstSerial as List<InvF_InventoryReturnSupInstSerial>;
+    }
+
+    var lstInvF_InventoryReturnSupDtl = new List<InvF_InventoryReturnSupDtlUI>();
+    if (ViewBag.Lst_InvF_InventoryReturnSupDtl != null)
+    {
+        lstInvF_InventoryReturnSupDtl = ViewBag.Lst_InvF_InventoryReturnSupDtl as List<InvF_InventoryReturnSupDtlUI>;
+    }
+}
+<table>
+    <tbody id="table-detailLot">
+        @{
+            if (Lst_InvF_InventoryReturnSupInstLot != null)
+            {
+                var idx = 0;
+                foreach (var it in Lst_InvF_InventoryReturnSupInstLot)
+                {
+        <tr class="data-item trdata" idx="@idx" productCode="@it.ProductCode" productLotNo ="@(it.ProductLotNo == null ? "" : it.ProductLotNo)">
+            <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].ProductCode" value="@it.ProductCode" />
+            @*<input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].ProductCodeRoot" value="@(it.ProductCodeRoot == null ? "" : it.ProductCodeRoot)" />*@
+            <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].ProductLotNo" value="@(it.ProductLotNo == null ? "" : it.ProductLotNo)" />
+            @*<input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].ProductionDate" value="@(it.ProductionDate == null ? "" : Convert.ToDateTime(it.ProductionDate)" />
+        <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].ValDateExpired" value="@(it.ValDateExpired == null ? "" : Convert.ToDateTime(it.ValDateExpired) />*@
+            <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].InvCodeOutActual" value="@(it.InvCodeOutActual == null ? "" : it.InvCodeOutActual)" />
+            <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[@idx].Qty" value="@(it.Qty == null ? "0" : it.Qty)">
+        </tr>
+                    idx++;
+                }
+            }
+        }
+    </tbody>
+</table>
+
+<table>
+    <tbody id="table-detailSerial">
+        @{
+            if (Lst_InvF_InventoryReturnSupInstSerial != null)
+            {
+                var idx = 0;
+                foreach (var it in Lst_InvF_InventoryReturnSupInstSerial)
+                {
+                    <tr class="data-item trdata" idx="@idx" productCode="@(it.ProductCode == null ? "" : it.ProductCode)" serialNo="@(it.SerialNo == null ? "" : it.SerialNo)">
+                        <input type="hidden" name="Lst_InvF_InventoryOutSerialDtl[@idx].ProductCode" value="@(it.ProductCode == null ? "" : it.ProductCode)" />
+                        @*<input type="hidden" name="Lst_InvF_InventoryOutSerialDtl[@idx].ProductCodeRoot" value="@(it.ProductCodeRoot == null ? "" : it.ProductCodeRoot)" />*@
+                        <input type="hidden" name="Lst_InvF_InventoryOutSerialDtl[@idx].SerialNo" value="@(it.SerialNo == null ? "" : it.SerialNo)" />
+                        <input type="hidden" name="Lst_InvF_InventoryOutSerialDtl[@idx].InvCodeOutActual" value="@(it.InvCodeOutActual == null ? "" : it.InvCodeOutActual)" />
+                    </tr>
+
+                    idx++;
+                }
+            }
+        }
+    </tbody>
+</table>
+
+<table>
+    <tbody id="table-detailInvCodeOutActual">
+        @{
+            if (lstInvF_InventoryReturnSupDtl != null && lstInvF_InventoryReturnSupDtl.Count > 0)
+            {
+                var idx = 0;
+                foreach (var it in lstInvF_InventoryReturnSupDtl)
+                {
+                    <tr class="data-item trdata" idx="@idx" productcode="@it.ProductCode" invcodeoutactual ="@it.InvCodeOutActual">
+                        <input type="hidden" name="Lst_InvF_InventoryReturnSupDtlTemp[@idx].ProductCode" value="@it.ProductCode" />
+                        <input type="hidden" name="Lst_InvF_InventoryReturnSupDtlTemp[@idx].InvCodeOutActual" value="@it.InvCodeOutActual" />
+                        <input type="hidden" name="Lst_InvF_InventoryReturnSupDtlTemp[@idx].Qty" value="@it.Qty" />
+                    </tr>
+
+                    idx++;
+                }
+            }
+        }
+    </tbody>
+</table>
+
+<table hidden>
+    <tbody id="rowtemplateLoDetail">
+        <tr class="data-item trdata" idx="==idx==" productCode="==ProductCode==" productLotNo ="==ProductLotNo==">
+            <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[==idx==].ProductCode" value="==ProductCode==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[==idx==].ProductCodeRoot" value="==ProductCode==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[==idx==].ProductLotNo" value="==ProductLotNo==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[==idx==].ProductionDate" value="==ProductionDate==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[==idx==].ValDateExpired" value="==ValDateExpired==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[==idx==].InvCodeOutActual" value="==InvCodeOutActual==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutLotDtl[==idx==].Qty" value="==Qty==">
+        </tr>
+    </tbody>
+</table>
+
+
+<table hidden>
+    <tbody id="rowtemplateSerialDetail">
+        <tr class="data-item trdata" idx="==idx==" productCode="==ProductCode==" serialNo="==SerialNo==">
+            <input type="hidden" name="Lst_InvF_InventoryOutSerialDtl[==idx==].ProductCode" value="==ProductCode==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutSerialDtl[==idx==].ProductCodeRoot" value="==ProductCode==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutSerialDtl[==idx==].SerialNo" value="==SerialNo==" />
+            <input type="hidden" name="Lst_InvF_InventoryOutSerialDtl[==idx==].InvCodeOutActual" value="==InvCodeOutActual==" />
+        </tr>
+    </tbody>
+</table>
+
+<table hidden>
+    <tbody id="rowtemplateInvCodeOutActual">
+        <tr class="data-item trdata" idx="==idx==" productcode="==ProductCode==" invcodeoutactual ="==InvCodeOutActual==">
+            <input type="hidden" name="Lst_InvF_InventoryReturnSupDtlTemp[==idx==].ProductCode" value="==ProductCode==" />
+            <input type="hidden" name="Lst_InvF_InventoryReturnSupDtlTemp[==idx==].InvCodeOutActual" value="==InvCodeOutActual==" />
+            <input type="hidden" name="Lst_InvF_InventoryReturnSupDtlTemp[==idx==].Qty" value="==Qty==" />
+        </tr>
+    </tbody>
+</table>
+

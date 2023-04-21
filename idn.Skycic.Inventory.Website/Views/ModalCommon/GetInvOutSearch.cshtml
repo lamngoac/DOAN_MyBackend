@@ -1,0 +1,138 @@
+﻿@model List<Mst_Inventory>
+<div class="modal-dialog" style="width: 500px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel"><b>Tìm kiếm kho</b></h2>
+            <a href="javascript:;" onclick="ClosePopupMstInventory()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body" style="">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupMstInventory" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="col-xs-10">
+                    <div class="form-group margin-bottom-5">
+                        @*<label for="ParentCode" class="col-xs-3 col-sm-2 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tìm số mã/tên <span style=\"color: red\">*</span>")</label>*@
+                        <input hidden id="selectid" value="@(ViewBag.selectid == null ? "" : ViewBag.selectid)"/>
+                        <div class="col-xs-3 col-sm-4">
+                            <input class="col-md-12" placeholder="Nhập tìm kiếm" style="height: 30px" id="invoutSearch" value="@(Request["invoutSearch"] == null ? "" : Request["invoutSearch"])" />
+                        </div>
+                        <div class="col-xs-2">
+                            <a href="javascript:void(0);" class="btn btn-nc-button" onclick="SearchMstInventory();">Tìm kiếm</a>
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+                <div style="width: 100%; float: left;">
+                    <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                        <thead>
+                            <tr class="trthead">
+                                <th class="text-center cell-50">
+                                </th>
+                                <th fieldId="InvCode" sorttype="T" fieldName="Mã kho" fieldActive="0" class="text-left cell-150">
+                                    @("Mã kho".HtmlItemString("CustomerCode"))
+                                </th>
+                                <th fieldId="InvName" sorttype="T" fieldName="Tên kho" fieldActive="0" class="text-left cell-150">
+                                    @("Tên kho".HtmlItemString("CustomerName"))
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                    <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                        <tbody id="table-tbodyIDMstInventory">
+                            @{
+                                if (Model != null && Model.Count != 0)
+                                {
+                                    var idx = 0;
+                                    foreach (var it in Model)
+                                    {
+                                        <tr class="data-item trdata" idx="@idx">
+                                            <input type="hidden" name="Lst_MstInventory[@idx].InvCode" value="@(it.InvCode == null ? "" : it.InvCode)" />
+                                            <input type="hidden" name="Lst_MstInventory[@idx].InvName" value="@(it.InvName == null ? "" : it.InvName)" />
+
+                                            <td fieldId="CONTROL" fieldActive="0" class="text-center cell-50 action-buttons">
+                                                <input type="radio" name="checkMstInventory" />
+                                            </td>
+                                            <td fieldActive="InvCode" class="text-left cell-150">
+                                                @(it.InvCode == null ? "" : it.InvCode)
+                                            </td>
+                                            <td fieldId="InvName" fieldActive="0" class="text-left cell-150">
+                                                @(it.InvName == null ? "" : it.InvName)
+                                            </td>
+                                        </tr>
+                                        idx++;
+                                    }
+
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="SelectMstInventory()" style="float: right;font-size: 13px;">Chọn</a>
+            @*<a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="SaveProduct()" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i>Lưu</a>*@
+        </div>
+    </div>
+</div>
+
+<script>
+    function SearchMstInventory() {
+        debugger;               
+        var invoutSearch = $('#invoutSearch').val();
+        $.ajax({
+                url: '@Url.Action("GetInvOutSearch", "ModalCommon")',
+                data: {
+                    invoutSearch: invoutSearch                    
+                },
+                type: 'post',
+                dataType: 'json',
+                traditional: true,
+                success: function (data) {
+                    if (data.Success) {
+                        $('#ShowPopupMstInventory').modal({
+                            backdrop: false,
+                            keyboard: true,
+                        });
+                        $("#ShowPopupMstInventory").html(data.Html);
+                        var display = $("#ShowPopupMstInventory").css('display');
+                        if (display == "none") {
+                            $("#ShowPopupMstInventory").show();
+                        }
+                    } else {
+                        showErrorDialog(data.Detail);
+                    }
+                }
+            });
+    }
+
+    function SelectMstInventory() {
+        debugger;
+        var selectid = $('#selectid').val();
+        var length = $("tbody#table-tbodyIDMstInventory tr.trdata input:checked").length;
+        if (length == 0) {
+            alert("Không có hàng hóa nào được chọn");
+            return;
+        }
+        $("tbody#table-tbodyIDMstInventory tr.trdata input:checked").each(function () {
+            var tr = $(this).parents('tr');
+            var idx = $(tr).attr('idx');
+            var strInvCode = tr.find('input[name="Lst_MstInventory[' + idx + '].InvCode"]').val();
+
+            if (strInvCode != undefined && strInvCode != "") {
+                if (selectid != "") {
+                    $('#' + selectid).val(strInvCode);
+                    $('#' + selectid).trigger('change');
+                }
+                else {
+                    $('#InvCodeOut').val(strInvCode);
+                    $('#InvCodeOut').trigger('change');
+                }
+            }
+            ClosePopupMstInventory();
+        });
+    }
+</script>

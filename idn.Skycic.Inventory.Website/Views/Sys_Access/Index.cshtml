@@ -1,0 +1,240 @@
+﻿@using System.Globalization;
+@model List<Sys_Object>
+@{
+    const string title = "Danh sách Menu";
+    ViewBag.Title = title;
+    var totalRow = 0;
+    var totalRowActive = 0;
+    var totalRowInactive = 0;
+    var listSysAccess = ViewBag.ListSysAccess as List<Sys_Access>;
+    if (listSysAccess == null || listSysAccess.Count == 0)
+    {
+        listSysAccess = new List<Sys_Access>();
+    }
+    var currentUser = ViewBag.CurrentUser as Sys_User;
+}
+<script type="text/javascript">
+    @*var parents = new Array();
+    parents.push("@Url.Action("Index", "Sys_Access")");
+    var parentsText = new Array();
+    parentsText.push("@MvcHtmlString.Create("Danh sách Menu")");
+    setAdminCurrentTag(parents, parentsText);*@
+</script>
+
+<style>
+    .cell-80 {
+        min-width: 80px !important;
+        width: 80px !important;
+        max-width: 80px !important;
+    }
+
+    .cell-85 {
+        min-width: 85px !important;
+        width: 85px !important;
+        max-width: 85px !important;
+    }
+
+    .cell-60 {
+        min-width: 60px !important;
+        width: 60px !important;
+        max-width: 60px !important;
+    }
+    .modal-open{
+        overflow: auto!important;
+    }
+</style>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="panel-group" id="steps">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <div class="row col-12 ">
+                            <div class="col-4">
+                                <p class="" style="padding: 10px; margin-bottom: 0; font-size: 15px; font-weight: bold;">@MvcHtmlString.Create(title)</p>
+                            </div>
+                            <div class="col-8" style="float: right;">
+                                <div class="form-group margin-bottom-9" style="float: right;padding: 10px 0;">
+                                    <input type="search" id="txtSearchObjMenu" placeholder="search" style="border-radius:5px!important;" class="col-12">
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+                    <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px; max-height: 400px;overflow-x: hidden;">
+                        <aside class="col-12">
+                            @using (Html.BeginForm(null, null, FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <div class="scrollable-horizontal padding-left-0 padding-right-0" style="padding-top: 0!important;">
+                                    <div style="width: 100%; float: left;">
+                                        <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                                            <thead>
+                                                <tr>
+                                                    <th class="cell-30">&nbsp;</th>
+                                                    <th class="text-center cell-250">Object Code</th>
+                                                    <th class="text-center cell-250">Object Name</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div id="scrollable_1" class="scrollable" style="width: 100%; float: left;">
+                                    <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                                        <tbody id="tbodyID">
+                                            @if (Model != null && Model.Count > 0)
+                                            {
+                                                var i = 0;
+                                                totalRow = Model.Count;
+                                                foreach (var item in Model)
+                                                {
+                                                    if (item.FlagActive.Equals("1"))
+                                                    {
+                                                        totalRowActive += 1;
+                                                    }
+                                                    else
+                                                    {
+                                                        totalRowInactive += 1;
+                                                    }
+                                                    <tr idx="@i" class="trdata @(i == 0 ? "selected" : "")" ondblclick="ShowDetailData(this)" objectcode="@MvcHtmlString.Create(item.ObjectCode)">
+                                                        <td class="cell-30 padding-0 center padding-left-right-0">
+                                                            <div class="action-buttons padding-top-2 text-center">
+                                                                <a onclick="GetFunction('@item.ObjectCode')" id="btnAddUserInGroup" class="icon-cardrenew" href="javascript:" title="Gán Func vào Menu">
+                                                                    <i class="fa fa-th bigger-130"></i>
+                                                                </a>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-left cell-250">
+                                                            @MvcHtmlString.Create(item.ObjectCode)
+                                                        </td>
+                                                        <td class="text-left cell-250">
+                                                            @MvcHtmlString.Create(item.ObjectName)
+                                                        </td>
+                                                    </tr>
+                                                    i++;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td colspan="3">
+                                                        <p>Dữ liệu không tồn tại!</p>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="hr hr-18 hr-double dotted">
+
+                                </div>
+
+                            }
+                        </aside>
+                    </div>
+                </div>
+
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <p class="" style="padding: 10px; margin-bottom: 0; font-size: 15px; font-weight: bold;">@MvcHtmlString.Create("Danh sách nhóm người dùng")</p>
+                    </div>
+                    <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                        <aside class="col-12">
+                            <div class="col-12 padding-left-0 padding-right-0" id="divDtl">
+                                @Html.Partial("ShowDetailData", listSysAccess)
+                            </div>
+                        </aside>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE CONTENT ENDS -->
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+</div>
+
+
+<div class="modal fade" id="ShowPopup" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Sys_Access.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "Sys_Access")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+        });
+        @* Set focus *@
+        $(document).ready(function () {
+            $('#UnitCode').focus();
+        });
+        
+        $(document).ready(function () {
+            (function ($) {
+                var body = $('body');
+                body.on('keyup', '#txtSearchObjMenu', function () {
+                    var datafilter = $(this).val();
+                    if (datafilter !== undefined && datafilter !== null && datafilter.toString().trim()) {
+                        datafilter = datafilter.toUpperCase().trim();
+                    }
+                    var rex = new RegExp($(this).val(), 'i');
+                    $('#dynamic-table-thead-tbody tr').hide();
+                    $('#dynamic-table-thead-tbody tr').filter(function () {
+                        var dataOfRow = $(this).text();
+                        if (dataOfRow !== undefined && dataOfRow !== null && dataOfRow.toString().trim().length > 0) {
+                            dataOfRow = dataOfRow.toUpperCase().trim();
+                        }
+                        if (dataOfRow.toUpperCase().indexOf(datafilter) > -1) {
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }
+                    }).show();
+                });
+
+            }(jQuery));
+
+        });
+
+        var objSys_Access = new Sys_Access();
+        function ClosePopup() {
+            objSys_Access.closePopup();
+        }
+
+        function GetFunction(objectcode) {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("GetFunction", "Sys_Access")';
+            objSys_Access.ajaxSettings = ajaxSettings;
+            objSys_Access.getFunction(objectcode);
+        }
+
+        function ShowDetailData(thiz) {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("GetDetailData", "Sys_Access")';
+
+            $('.selected').removeClass('selected');
+            $(thiz).addClass('selected');
+            var objectcode = $(thiz).attr('objectcode');
+            if (!commonUtils.isNullOrEmpty(objectcode)) {
+                objSys_Access.ajaxSettings = ajaxSettings;
+                objSys_Access.getDetailData(objectcode);
+            }
+        }
+        function SaveData() {
+        var ajaxSettings = {};
+        ajaxSettings.Type = 'post';
+        ajaxSettings.DataType = 'json';
+        ajaxSettings.Url = '@Url.Action("SaveFuncObjectInMenu", "Sys_Access")';
+        var objSys_Access = new Sys_Access();
+        objSys_Access.ActionType = 'create';
+        objSys_Access.ajaxSettings = ajaxSettings;
+        objSys_Access.saveData();
+    }
+    </script>
+}

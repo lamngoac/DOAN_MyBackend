@@ -1,0 +1,557 @@
+﻿@model PageInfo<Invoice_licenseCreHist>
+@{
+    Layout = "~/Views/Shared/CoreLayout.cshtml";
+    var title = "LICENSE";
+    ViewBag.Title = title;
+    var startCount = 0;
+    var strStartCount = ViewBag.StartCount as string;
+    if (!CUtils.IsNullOrEmpty(strStartCount))
+    {
+        startCount = Convert.ToInt32(strStartCount);
+    }
+    var fromdate = ViewBag.FromDate as string;
+    var todate = ViewBag.ToDate as string;
+    var now = DateTime.Now;
+    var invoice_license = ViewBag.Invoice_license as Invoice_license;
+    var listOS_Inos_Package = ViewBag.ListOS_Inos_Package as List<OS_Inos_Package>;
+    var offset = ViewBag.Offset;
+
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+
+    var showtext = "";
+    if (Model.ItemCount > 0)
+    {
+        var recordstart = (Model.PageIndex) * Model.PageSize + 1;
+        var recordend = (Model.PageIndex + 1) * Model.PageSize;
+        if (recordend > Model.ItemCount)
+        {
+            recordend = Model.ItemCount;
+        }
+        showtext = recordstart + "-" + recordend + " trong số " + Model.ItemCount;
+    }
+}
+
+<style>
+    table:before, table:after {
+        content: none !important;
+    }
+
+    table td {
+        padding: 5px 20px;
+    }
+
+    .bold-package {
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+
+    table input {
+        border: 1px solid #d8d8d8 !important;
+        text-align: right;
+        padding: 5px 10px;
+        /*width: 70px;*/
+    }
+
+    .fee-row td:first-child {
+        padding: 20px 40px;
+    }
+
+    table tr {
+        border: 1px solid #d8d8d8;
+    }
+
+    tr.trdata button {
+        width: 25px;
+    }
+</style>
+
+<div class="clearfix"></div>
+<div class="row no-margin">
+    <div class="col-xs-12 no-padding">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="row no-margin layout-tk">
+                    @using (Html.BeginForm("Index", "Invoice_TempInvoice", FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true)
+                        <div class="col-xs-12">
+                            <div>
+                                <input hidden id="init" name="init" value="search" />
+                                <aside class="col-xs-9 box-shadow-tk">
+                                    <div class="col-xs-11">
+                                        <div class="form-group margin-bottom-5">
+                                            <div class="col-xs-4">
+                                                <label for="" class="col-xs-12 col-sm-4 control-label font-weight-500" style="">Ngày mua</label>
+                                                <div class="col-xs-12 col-sm-8">
+                                                    <div class="col-xs-12" style="padding-left: 0;padding-right: 17px;">
+                                                        <div class="input-group" id="dtfromdate">
+                                                            @*@{
+                                                                    var fromdate = "";
+                                                                    if (Request["fromdate"] == null)
+                                                                    {
+                                                                        fromdate = new DateTime(now.Year, 1, 1).ToString("yyyy-MM-dd");
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        fromdate = Request["fromdate"];
+                                                                    }
+                                                                }
+                                                                <input type="text" id="fromdate" name="fromdate" class="col-xs-12 fromdate" data-date-format="yyyy-mm-dd" value="@MvcHtmlString.Create(fromdate)" autocomplete="off">*@
+                                                            <input type="text" id="fromdate" name="fromdate" class="col-xs-12 fromdate" data-date-format="yyyy-mm-dd" value="@MvcHtmlString.Create(fromdate)" autocomplete="off" />
+                                                            <span class="input-group-addon">
+                                                                <i class="fa fa-calendar bigger-100"></i>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-4">
+                                                <label for="" class="col-xs-12 col-sm-4 control-label font-weight-500" style="">đến</label>
+                                                <div class="col-xs-12 col-sm-8">
+                                                    <div class="col-xs-12" style="padding-left: 0;padding-right: 17px;">
+                                                        <div class="input-group" id="dttodate">
+                                                            @{
+                                                                if (Request["todate"] == null)
+                                                                {
+                                                                    todate = now.ToString("yyyy-MM-dd");
+                                                                }
+                                                                else
+                                                                {
+                                                                    todate = Request["todate"];
+                                                                }
+                                                            }@*
+                                                                <input type="text" id="todate" name="todate" class="col-xs-12 todate" data-date-format="yyyy-mm-dd" value="@MvcHtmlString.Create(todate)" autocomplete="off">*@
+                                                            <input type="text" id="todate" name="todate" class="col-xs-12 todate" data-date-format="yyyy-mm-dd" value="@MvcHtmlString.Create(todate)" autocomplete="off" />
+                                                            <span class="input-group-addon">
+                                                                <i class="fa fa-calendar bigger-100"></i>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-4">
+                                                <label for="" class="col-xs-12 col-sm-4 control-label font-weight-500 ">@MvcHtmlString.Create("Trạng thái")</label>
+                                                <div class="col-xs-12 col-sm-8 no-padding-right">
+                                                    <span class="block input-icon input-icon-right">
+                                                        <select class="col-xs-11 licstatus" id="licstatus" name="licstatus">
+                                                            <option value="">Tất cả</option>
+                                                            @{
+                                                                var trangthai = Request["licstatus"] == null ? "" : Request["licstatus"].ToString();
+                                                                var init = Request["init"] == null ? "" : Request["init"].ToString();
+                                                            }
+                                                            @*@if (init == "")
+                                                                {
+                                                                    <option value="Approved" selected>Approved</option>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <option value="Approved" @(trangthai == "Approved" ? "selected" : "")>Approved</option>
+                                                                }*@
+                                                            <option value="Pending" @(trangthai == "Pending" ? "selected" : "")>Pending</option>
+                                                            <option value="Cancel" @(trangthai == "Cancelled" ? "selected" : "")>Cancel</option>
+                                                            <option value="Active" @(trangthai == "Active" ? "selected" : "")>Active</option>
+                                                            @*<option value="Inactive" @(trangthai == "Inactive" ? "selected" : "")>Inactive</option>*@
+                                                        </select>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="button-tk">
+                                        <div class="form-group margin-bottom-5">
+                                            <div class="col-xs-12 col-sm-8 no-padding-right ">
+                                                <div class="col-xs-11" style="padding: 0">
+                                                    <span class="block input-icon input-icon-right" style="">
+                                                        @RenderItemFormat("BTN_QL_LICENSE_TK", "<a class=\"btn font-color mybtn-Button\" onclick=\"Search()\" href=\"javascript:void(0);\" style=\" \"><img class=\"img-button\" src='" + Url.Content("~/Images/search.svg") + "'></a>", "", "")
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </aside>
+                                <aside class="col-xs-3 left-ton no-padding-right" style="margin-top: 4px;">
+                                    @{
+                                        var tongSLconlai = 0;
+                                        var tongsl = invoice_license.TotalQty == null ? 0 : Convert.ToInt32(invoice_license.TotalQty);
+                                        var tongsldadung = invoice_license.TotalQtyIssued == null ? 0 : Convert.ToInt32(invoice_license.TotalQtyIssued);
+                                        tongSLconlai = tongsl - tongsldadung;
+                                    }
+                                    <div class="row no-margin">
+                                        <div class="col-xs-7 no-padding ton-1" style="">
+                                            <p>Đã mua @MvcHtmlString.Create(CUtils.formatInteger(tongsl, Nonsense.INTEGER_DB_FORMAT).ToString())</p>
+                                        </div>
+                                        <div class="col-xs-5 no-padding ton-2" style="">
+                                            <p>Đã dùng @MvcHtmlString.Create(CUtils.formatInteger(invoice_license.TotalQtyUsed == null ? 0 : Convert.ToInt32(invoice_license.TotalQtyUsed), Nonsense.INTEGER_DB_FORMAT).ToString())</p>
+                                        </div>
+                                    </div>
+                                    <div class="row no-margin">
+                                        <div class="col-xs-7 no-padding ton-3" style="">
+                                            <p>Đã phát hành @MvcHtmlString.Create(CUtils.formatInteger(invoice_license.TotalQtyIssued == null ? 0 : Convert.ToInt32(invoice_license.TotalQtyIssued), Nonsense.INTEGER_DB_FORMAT).ToString())</p>
+                                        </div>
+                                        <div class="col-xs-5 no-padding ton-4" style="">
+                                            <input type="hidden" id="TongSLConLai" name="TongSLConLai" value="@MvcHtmlString.Create(tongSLconlai.ToString())" />
+                                            <p>Còn lại @MvcHtmlString.Create(CUtils.formatInteger(tongSLconlai, Nonsense.INTEGER_DB_FORMAT).ToString())</p>
+                                        </div>
+                                    </div>
+                                </aside>
+                            </div>
+
+                        </div>
+                        <div class="col-xs-12 layout-bot-top-16" style="">
+                            @RenderItemFormat("BTN_QL_LICENSE_POPUP_MUA_LICENSE", " <a class=\"btn font-color mybtn-Button\" href=\"javascript:void(0);\" onclick=\"ShowPopupLicense()\" style=\"font-size: 13px; \"><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i> Mua License</a>", "", "")
+                            @RenderItemFormat("BTN_QL_LICENSE_POPUP_GEN_SO", " <a class=\"btn font-color mybtn-Button\" href=\"javascript:void(0);\" onclick=\"ShowPopupSinhSo()\" style=\"font-size: 13px; margin-right: 5px\"><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i> Sinh số</a>", "", "")
+                            <span class="search-bar">
+                                <input type="text" id="dynamic-table-thead-search" class="quicksearch txtSearchObj" name="search">
+                                <input type="text" class="quicksearch1 txtSearchObj1" name="search" style="z-index: -1000; height: 0; padding: 0; margin: 0; border: 0">
+                            </span>
+                            @*@Html.Partial("Pagination", null, new ViewDataDictionary() { { "PageCur", MvcHtmlString.Create("1") }, { "RecordCount", MvcHtmlString.Create(Model.PageSize.ToString()) }, { "ShowText", showtext } })*@
+                        </div>
+                        <input type="hidden" value="@MvcHtmlString.Create(pageCur)" name="page" id="page" />
+                    }
+                    <input type="hidden" value="@MvcHtmlString.Create(Model.PageCount.ToString())" name="totalpage" id="totalpage" />
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    @Html.AntiForgeryToken()
+                    <aside class="col-xs-12 no-padding">
+
+                        <div class="scrollable-horizontal no-sc padding-left-0 padding-right-0 div-scrollable" style="padding-top: 0!important;">
+                            <div style="width: 100%; float: left;">
+                                <table id="dynamic-table-thead" class="table table-striped table-bordered table-hover table-cus table-bottom-0 no-margin">
+                                    <thead>
+                                        <tr class="trthead">
+                                            <th fieldId="PACKAGEID" sorttype="T" class="text-center cell-100">
+                                                @MvcHtmlString.Create("Mã package")
+                                            </th>
+                                            <th fieldId="DAY" sorttype="D" sortfomart="yyyy-MM-dd" class="text-center cell-100">
+                                                @MvcHtmlString.Create("Ngày")
+                                            </th>
+                                            <th fieldId="ORGID" sorttype="T" class="text-center cell-100">
+                                                @MvcHtmlString.Create("Tổ chức mua")
+                                            </th>
+                                            <th fieldId="OSIP_PACKAGENAME" sorttype="T" class="text-center cell-100">
+                                                @MvcHtmlString.Create("Tên package")
+                                            </th>
+                                            <th fieldId="OSIP_PRICE" sorttype="N" class="text-center cell-100">
+                                                @MvcHtmlString.Create("Giá (VND)")
+                                            </th>
+                                            <th fieldId="OSIP_SUBSCRIPTION" sorttype="T" class="text-center cell-100">
+                                                @MvcHtmlString.Create("Kiểu thanh toán")
+                                            </th>
+                                            <th fieldId="MODULEQTYINVOICE" sorttype="N" class="text-center cell-100">
+                                                @MvcHtmlString.Create("SL hóa đơn")
+                                            </th>
+                                            <th fieldId="LICSTATUS" sorttype="T" class="text-center cell-100">
+                                                @MvcHtmlString.Create("Trạng thái")
+                                            </th>
+                                            <th fieldId="STARTDATE" sorttype="D" sortfomart="yyyy-MM-dd" class="text-center cell-100">
+                                                @MvcHtmlString.Create("Ngày bắt đầu")
+                                            </th>
+                                            <th fieldId="ENDDATE" sorttype="D" sortfomart="yyyy-MM-dd" class="text-center cell-100">
+                                                @MvcHtmlString.Create("Ngày hết hiệu lực")
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                            <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                                <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody">
+                                    <tbody id="table-tbodyID">
+
+                                        @if (Model != null && Model.DataList != null && Model.DataList.Count > 0)
+                                        {
+                                            var idx = 0;
+                                            foreach (var item in Model.DataList)
+                                            {
+                                                var iindex = startCount + (idx + 1);
+                                                var packageId = ""; //mã package
+                                                if (!CUtils.IsNullOrEmpty(item.PackageId))
+                                                {
+                                                    packageId = CUtils.StrValue(item.PackageId);
+                                                }
+                                                var orgID = ""; //tổ chức mua
+                                                if (!CUtils.IsNullOrEmpty(item.OrgID))
+                                                {
+                                                    orgID = CUtils.StrValue(item.OrgID);
+                                                }
+                                                var osip_PackageName = ""; //tên package
+                                                if (!CUtils.IsNullOrEmpty(item.osip_PackageName))
+                                                {
+                                                    osip_PackageName = CUtils.StrValue(item.osip_PackageName);
+                                                }
+                                                var osip_Price = ""; //giá
+                                                if (!CUtils.IsNullOrEmpty(item.osip_Price))
+                                                {
+                                                    osip_Price = CUtils.StrValue(item.osip_Price);
+                                                }
+                                                var osip_Subscription = ""; //kiểu thanh toán
+                                                if (!CUtils.IsNullOrEmpty(item.osip_Subscription))
+                                                {
+                                                    osip_Subscription = CUtils.StrValue(item.osip_Subscription);
+                                                }
+                                                var moduleQtyInvoice = ""; //số lượng hóa đơn
+                                                if (!CUtils.IsNullOrEmpty(item.ModuleQtyInvoice))
+                                                {
+                                                    moduleQtyInvoice = CUtils.StrValue(item.ModuleQtyInvoice);
+                                                }
+                                                var licStatus = ""; //trạng thái
+                                                if (!CUtils.IsNullOrEmpty(item.LicStatus))
+                                                {
+                                                    licStatus = CUtils.StrValue(item.LicStatus);
+                                                }
+                                                var startDate = ""; //ngày bắt đầu
+                                                if (!CUtils.IsNullOrEmpty(item.StartDate))
+                                                {
+                                                    startDate = CUtils.ReturnDateTimeUtcToLocalTime(CUtils.StrValue(item.StartDate), Nonsense.DATE_TIME_FORMAT, offset);
+                                                }
+                                                var endDate = ""; //ngày hết hiệu lực
+                                                if (!CUtils.IsNullOrEmpty(item.EndDate))
+                                                {
+                                                    endDate = CUtils.ReturnDateTimeUtcToLocalTime(CUtils.StrValue(item.EndDate), Nonsense.DATE_TIME_FORMAT, offset);
+                                                }
+                                                <tr idx="@idx" class="data-item trdata">
+                                                    <td fieldId="PACKAGEID" class="text-center cell-100">
+                                                        @MvcHtmlString.Create(packageId)
+                                                    </td>
+                                                    <td fieldId="DAY" class="text-center cell-100">
+                                                        @MvcHtmlString.Create(startDate)
+                                                    </td>
+                                                    <td fieldId="ORGID" class="text-center cell-100">
+                                                        @MvcHtmlString.Create(orgID)
+                                                    </td>
+                                                    <td fieldId="OSIP_PACKAGENAME" class="text-center cell-100">
+                                                        @MvcHtmlString.Create(osip_PackageName)
+                                                    </td>
+                                                    <td fieldId="OSIP_PRICE" class="text-center cell-100">
+                                                        @MvcHtmlString.Create(osip_Price)
+                                                    </td>
+                                                    <td fieldId="OSIP_SUBSCRIPTION" class="text-center cell-100">
+                                                        @MvcHtmlString.Create(osip_Subscription)
+                                                    </td>
+                                                    <td fieldId="MODULEQTYINVOICE" class="text-center cell-100">
+                                                        @MvcHtmlString.Create(moduleQtyInvoice)
+                                                    </td>
+                                                    <td fieldId="LICSTATUS" class="text-center cell-100">
+                                                        @MvcHtmlString.Create(licStatus)
+                                                    </td>
+                                                    <td fieldId="STARTDATE" class="text-center cell-100">
+                                                        @MvcHtmlString.Create(startDate)
+                                                    </td>
+                                                    <td fieldId="ENDDATE" class="text-center cell-100">
+                                                        @MvcHtmlString.Create(endDate)
+                                                    </td>
+                                                </tr>
+                                                idx++;
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- PAGE CONTENT ENDS -->
+</div><!-- /.row -->
+@*Sinh số*@
+<div class="modal fade" id="ShowPopupSinhSo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 280px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Sinh Số</b></h2>
+                <a href="javascript:;" onclick="ClosePopupSinhSo()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="height: 50px;">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupSinhSo" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group margin-bottom-5">
+                        <label for="Qty_SinhSo" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Sinh số <span style=\"color: red\">*</span>")</label>
+                        <div class="col-xs-12 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <input type="text" id="Qty_SinhSo" name="Qty_SinhSo" class="col-xs-11 text-right Qty_SinhSo" value="" autocomplete="off" required />
+                            </span>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                @RenderItemFormat("BTN_QL_LICENSE_POPUP_GEN_SO_SINH_SO", " <a class=\"btn font-color mybtn-Button\" href=\"javascript:void(0);\" onclick=\"SinhSo()\" style=\"float: right;font-size: 13px; \"><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i>Sinh số</a>", "", "")
+                @*<a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="SinhSo()" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Sinh số</a>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ShowPopupLicense" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+
+<input type="hidden" id="Payment_Id" value="" />
+<input type="hidden" id="Payment_OrgID" value="" />
+<input type="hidden" id="Payment_PaymentCode" value="" />
+<input type="hidden" id="Payment_TotalCost" value="" />
+<input type="hidden" id="Payment_CreateDTime" value="" />
+<input type="hidden" id="Payment_Remark" value="" />
+<input type="hidden" id="Payment_PackageId" value="" />
+
+
+@section scripts
+{
+    <link href="https://pay.vnpay.vn/lib/vnpay/vnpay.css" rel="stylesheet" type="text/css" />
+    <script src="https://pay.vnpay.vn/lib/vnpay/vnpay.js"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/mine/License.js")"></script>
+
+    <script type="text/javascript">
+        jQuery(function ($) {
+            $('.Qty_SinhSo').number(true, 0);
+        });
+
+        var objLicense = new License();
+        var _ajaxSettings = {};
+        _ajaxSettings.Type = 'post';
+        _ajaxSettings.DataType = 'json';
+        // Gen số
+        function ShowPopupSinhSo() {
+            objLicense.showPopupSinhSo();
+        }
+
+        function ClosePopupSinhSo() {
+            objLicense.closePopupSinhSo();
+        }
+
+        function SinhSo() {
+            _ajaxSettings.Url = '@Url.Action("SinhSo", "License")';
+            objLicense.ActionType = 'sinhso';
+            objLicense.ajaxSettings = _ajaxSettings;
+            objLicense.sinhSo();
+        }
+        // End Gen số
+
+        // Mua License
+        function ShowPopupLicense() {
+            _ajaxSettings.Url = '@Url.Action("ShowPopupLicense", "License")';
+
+            objLicense.ajaxSettingsInit();
+            objLicense.ajaxSettings = _ajaxSettings;
+            objLicense.showPopupLicense();
+        }
+        // End mua License
+    </script>
+
+
+
+
+    @*Active Menu*@
+    <script type="text/javascript">
+        setAdminCurrentUrl('@Url.Action("Index", "License")');
+    </script>
+    @*done*@
+    <script type="text/javascript">
+        $(document).ready(function () {
+            //$('.scrollable-horizontal').each(function () {
+            //    var $this = $(this);
+            //    $(this).ace_scroll(
+            //        {
+            //            horizontal: true,
+            //            //styleClass: 'scroll-top',//show the scrollbars on top(default is bottom)
+            //            size: $this.attr('data-size') || 6500,
+            //            mouseWheelLock: true
+            //        }
+            //    ).css({ 'padding-top': 0 });
+            //});
+
+            //
+            $('#fromdate, #todate').datepicker({
+                autoclose: true,
+                todayHighlight: true,
+                dateFormat: 'yy-mm-dd'
+            })
+                //show datepicker when clicking on the icon
+                .next().on(ace.click_event, function () {
+                    $(this).prev().focus();
+                });
+        });
+        //$('.scrollable').each(function () {
+        //    var $this = $(this);
+        //    $(this).ace_scroll({
+        //        //size: 500,
+        //        size: $this.attr('data-size') || 1000,
+        //        mouseWheelLock: true,
+        //        //styleClass: 'scroll-left scroll-margin scroll-thin scroll-dark scroll-light no-track scroll-visible'
+        //    });
+        //});
+
+    </script>
+    @*done*@
+    <script>
+        $(document).on('keypress', function (e) {
+            if (e.which == 13) {
+                Search();
+            }
+        });
+
+        //$(document).ready(function () {
+        //    totalPrice();
+        //    $('.formatnumber, .unitprice').number(true, 0);
+        //});
+
+        function CheckForm() {
+            var fromdate = $('#fromdate').val();
+            var todate = $('#todate').val();
+
+            if (fromdate != "" && fromdate != null) {
+                if (!CheckIsDate('#fromdate', 'has-error-fix', '@MvcHtmlString.Create("ngày từ không hợp lệ!")'))
+                {
+                    return false;
+                }
+            }
+
+            if (todate != "" && todate != null) {
+                if (!CheckIsDate('#todate', 'has-error-fix', '@MvcHtmlString.Create("ngày đến không hợp lệ!")'))
+                {
+                    return false;
+                }
+            }
+
+            if (fromdate != null && fromdate != null && todate != null && todate != null) {
+                if (CompareTwoDates(fromdate, todate))
+                {
+                    AddClassCss('#todate', 'has-error-fix')
+                    $('#todate').focus();
+                    alert('Ngày mua phải lớn hơn hoặc bằng ngày đến');
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function Search()
+        {
+            var check = CheckForm();
+            if (check) {
+                $('#manageForm').attr('action', '@Url.Action("Index", "License")').submit();
+            }
+        }
+    </script>
+
+    <script type="text/javascript">
+        var listColumns = {
+            'PACKAGEID': []
+            ,'DAY': []
+            ,'ORGID': []
+            ,'OSIP_PACKAGENAME': []
+            ,'OSIP_PRICE': []
+            , 'OSIP_SUBSCRIPTION': []
+            ,'MODULEQTYINVOICE': []
+            , 'LICSTATUS': []
+            , 'STARTDATE': []
+            , 'ENDDATE': []
+        };
+        var options = {};
+        options.Columns = listColumns;
+        $('#dynamic-table-thead').table_Sortable(options);
+    </script>
+}

@@ -1,0 +1,280 @@
+﻿@model PageInfo<Mst_Agent>
+@{
+    Layout = "~/Views/Shared/_LayoutQuantri.cshtml";
+    var title = "DANH MỤC ĐẠI LÝ";
+    ViewBag.Title = title;
+    var startCount = 0;
+    var strStartCount = ViewBag.StartCount as string;
+    if (!CUtils.IsNullOrEmpty(strStartCount))
+    {
+        startCount = Convert.ToInt32(strStartCount);
+    }
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="panel-group" id="steps">
+                <div class="panel panel-info">
+                    <div class="title">
+                        <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                    </div>
+                </div>
+                <div class="panel panel-info">
+                    <div class="panel-heading row no-margin">
+
+                        <div class="col-xs-12">
+                            <aside class="col-xs-12 no-padding layout-tk">
+                                <a class="btn font-color mybtn-Button dropdown-toggle" data-toggle="dropdown" aria-expanded="false" style="float: right;font-size: 13px;margin-top: 20px;position: relative;">...</a>
+                                <ul class="dropdown-menu" role="menu" style="">
+                                    <li>
+                                        @RenderItemFormat("BTN_QL_DAI_LY_NHAP_EXCEL", "<a class=\"mybtn-Button-1\" onclick=\"ShowPopupImportExcel()\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/import.svg") + "'>Nhập Excel</a>", "", "")
+                                    </li>
+                                    <li>
+                                        @RenderItemFormat("BTN_QL_DAI_LY_XUAT_EXCEL", "<a class=\"mybtn-Button-1\" onclick=\"Export()\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/export.svg") + "'>Xuất Excel</a>", "", "")
+                                    </li>
+                                    <li>
+                                        @RenderItemFormat("BTN_QL_DAI_LY_XUAT_EXCEL_TEM", "<a class=\"mybtn-Button-1\" onclick=\"ExportTemplate()\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/export.svg") + "'>Xuất Excel template</a>", "", "")
+                                    </li>
+                                </ul>
+                                @RenderItemFormat("BTN_QL_DAI_LY_TAO", "<a class=\"btn font-color mybtn-Button\" href=\"" + Url.Action("Create", "Mst_Agent") + "\" style=\"float: right;font-size: 13px; margin-top: 20px;margin-right: 10px; \"><img class=\"img-button in-acti\" src='" + Url.Content("~/Images/Hoadon/Tao.svg") + "'><img class=\"img-button acti\" src='" + Url.Content("~/Images/Hoadon/Tao.svg") + "'>Tạo</a>", "", "")
+
+                            </aside>
+                        </div>
+                    </div>
+                    <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                        @Html.AntiForgeryToken()
+                        <aside class="col-xs-12">
+                            <div class="scrollable-horizontal padding-left-0 padding-right-0 div-scrollable" style="padding-top: 0!important;">
+                                <div style="width: 100%; float: left;">
+                                    <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center cell-50">@MvcHtmlString.Create("STT")</th>
+
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Mã đại lý")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Tên đại lý")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Tỉnh/Thành phố")
+                                                </th>
+                                                <th class="text-center cell-200">
+                                                    @MvcHtmlString.Create("Quận/Huyện")
+                                                </th>
+                                                <th class="text-center cell-150">
+                                                    @MvcHtmlString.Create("Địa chỉ")
+                                                </th>
+                                                <th class="text-center cell-75">
+                                                    @MvcHtmlString.Create("Trạng thái")
+                                                </th>
+                                                <th class="cell-100">&nbsp;</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="table-tbodyID">
+
+                                            @if (Model != null && Model.DataList != null && Model.DataList.Count > 0)
+                                            {
+                                                var idx = 0;
+                                                foreach (var item in Model.DataList)
+                                                {
+                                                    var iindex = startCount + (idx + 1);
+                                                    var agentcode = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.AgentCode))
+                                                    {
+                                                        agentcode = CUtils.StrValueOrNull(item.AgentCode);
+                                                    }
+                                                    var agentname = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.AgentName))
+                                                    {
+                                                        agentname = CUtils.StrValueOrNull(item.AgentName);
+                                                    }
+                                                    var flagActive = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.FlagActive))
+                                                    {
+                                                        flagActive = CUtils.StrValueOrNull(item.FlagActive);
+                                                    }
+                                                    <tr idx="@idx" class="data-item trdata">
+                                                        <td class="text-center cell-50" style="background: #D3EDE4;">
+                                                            @MvcHtmlString.Create(iindex.ToString())
+                                                        </td>
+
+                                                        <td class="text-center cell-100">
+                                                            @MvcHtmlString.Create(agentcode)
+                                                        </td>
+                                                        <td class="text-center cell-100">
+                                                            @MvcHtmlString.Create(agentname)
+                                                        </td>
+                                                        <td class="text-center cell-100">
+                                                            @MvcHtmlString.Create(CUtils.StrValueOrNull(item.mp_ProvinceName))
+                                                        </td>
+                                                        <td class="text-center cell-100">
+                                                            @MvcHtmlString.Create(CUtils.StrValueOrNull(item.md_DistrictName))
+                                                        </td>
+                                                        <td class="text-center cell-150">
+                                                            @MvcHtmlString.Create(item.AgentAddress.ToString())
+                                                        </td>
+                                                        <td class="center cell-75">
+
+                                                            @if (flagActive.Equals("1"))
+                                                            {
+                                                                <span class="label label-sm label-success">Active</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="label label-sm label-danger">Inactive</span>
+                                                            }
+                                                        </td>
+                                                        <td class="text-center cell-100">
+                                                            <div class="action-buttons padding-top-2">
+                                                                @{
+                                                                    var urlDetail = Url.Action("Detail", "Mst_Agent", new { agentcode = item.AgentCode });
+                                                                    var urlUpdate = Url.Action("Update", "Mst_Agent", new { agentcode = item.AgentCode });
+
+                                                                }
+                                                                @RenderItemFormat("BTN_QL_DAI_LY_CHI_TIET", "<a class=\"icon-detail\" href=\'" + urlDetail + "\' title=\"Chi tiết\"><img class=\"img-icon\" src='" + Url.Content("~/Images/Xem.svg") + "'></a>", "", "")
+                                                                @RenderItemFormat("BTN_QL_DAI_LY_SUA", "<a class=\"icon-edit\" href=\'" + urlUpdate + "\' title=\"Sửa\"><img class=\"img-icon\" src='" + Url.Content("~/Images/Sua.svg") + "'></a>", "", "")
+                                                                @RenderItemFormat("BTN_QL_DAI_LY_XOA", "<a href=\"javascript:;\" class=\"icon-delete\" title=\"Xóa\" onclick=\"Delete('" + item.AgentCode.ToString() + "','" + item.AgentName.ToString() + "')\"><img class=\"img-icon\" src='" + Url.Content("~/Images/Xoa.svg") + "'></a>", "", "")
+
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    idx++;
+                                                }
+                                            }
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                                @*<div class="scrollable" style="width: 100%; float: left;">
+                                    <table id="dynamic-table-tbody" class="table table-striped table-bordered table-hover table-tbody">
+                                        
+                                    </table>
+                                </div>*@
+                            </div>
+                        </aside>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+@*Import Excel*@
+<div class="modal fade" id="ImportExcelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Mst_Agent.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "Mst_Agent")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+        });
+
+        @* Set focus *@
+        $(document).ready(function () {
+            $('#AgentCode').focus();
+        });
+
+        @* Scroll *@
+        //$(document).ready(function () {
+        //    $('.scrollable-horizontal').each(function () {
+        //        var $this = $(this);
+        //        $(this).ace_scroll(
+        //            {
+        //                horizontal: true,
+        //                //styleClass: 'scroll-top',//show the scrollbars on top(default is bottom)
+        //                size: $this.attr('data-size') || 6500,
+        //                mouseWheelLock: true
+        //            }
+        //        ).css({ 'padding-top': 0 });
+        //    });
+        //});
+        $('.scrollable').each(function () {
+            var $this = $(this);
+            $(this).ace_scroll({
+                //size: 500,
+                size: $this.attr('data-size') || 1000,
+                mouseWheelLock: true
+                //styleClass: 'scroll-left scroll-margin scroll-thin scroll-dark scroll-light no-track scroll-visible'
+            });
+        });
+
+        @* keypress *@
+        $(document).on('keypress', function (e) {
+            if (e.which == 13) {
+                Search();
+            }
+        });
+
+        var objMst_Agent = new Mst_Agent();
+        function Delete(agentcode, agentname) {
+            var objMst_Agent_Delete = {
+                AgentCode: agentcode,
+                AgentName: agentname,
+            };
+
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Delete", "Mst_Agent")';
+
+            objMst_Agent.Image_Message = "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO";
+            objMst_Agent.Confirm_Message = "Đồng ý xóa Country '" + agentcode + "' - '" + agentname + "' ?";
+            objMst_Agent.ajaxSettings = ajaxSettings;
+            objMst_Agent.deleteData(objMst_Agent_Delete);
+        }
+
+        var objCommonExcel = new CommonExcel();
+        var objVariablesInit = {
+            Id_FormMain: '',
+            Id_FormImportExcel: 'manageFormImportExcel',
+            Id_Modal: 'ImportExcelModal',
+            Id_FileInput: 'file',
+        };
+
+        var ajaxSettings_Excel = {};
+        ajaxSettings_Excel.Type = 'post';
+        ajaxSettings_Excel.DataType = 'json';
+
+        function ShowPopupImportExcel() {
+            ajaxSettings_Excel.Url = '@Url.Action("ShowPopupImportExcel", "Admin")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.variablesInit(objVariablesInit);
+            objCommonExcel.showPopupImportExcel();
+        }
+
+        function ImportFileExcel() {
+            ajaxSettings_Excel.Url = '@Url.Action("Import", "Mst_Agent")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.variablesInit(objVariablesInit);
+            objCommonExcel.importFileExcel();
+        }
+
+        function ExportTemplate() {
+            ajaxSettings_Excel.Url = '@Url.Action("ExportTemplate", "Mst_Agent")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.exportExcel();
+        }
+
+        function Export() {
+            ajaxSettings_Excel.Url = '@Url.Action("Export", "Mst_Agent")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.exportExcel();
+        }
+
+    </script>
+}

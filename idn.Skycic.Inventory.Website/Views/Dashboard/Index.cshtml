@@ -1,0 +1,107 @@
+﻿@{ 
+    ViewBag.Title = "Dashboard";
+}
+<style>
+    .content {
+        background-image: url(/Images/bg-qrbox.jpg);
+        background-size: cover;
+        background-repeat: no-repeat;
+        height: calc(100vh - 50px);
+    }
+
+    .breadcrumb {
+        display: none;
+    }
+</style>
+@*<a class="btn btn-nc-button" title="Thêm bệnh" tabindex="0" onclick="ShowPopupAdd()"><i class="fa fa-plus"></i> Mở popup</a>
+
+<!--Model Add-->
+<div class="modal fade" id="ShowPopupAdd" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Thêm</b></h2>
+                <a href="javascript:;" onclick="ClosePopupAdd()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupAdd" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group margin-bottom-5">
+                        <label for="ProdCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên sản phẩm <span style=\"color: red\">*</span>")</label>
+                        <div class="col-xs-12 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <input type="text" id="ProdCode" name="ProdCode" class="col-xs-11 text-right ProdCode" value="" autocomplete="off" required />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group margin-bottom-5">
+                        <label for="ParentCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Nhóm cha <span style=\"color: red\">*</span>")</label>
+                        <div class="col-xs-12 col-sm-8">
+                            <select id="ParentCode" style="width: 150px;">
+                                <option value="">--Lựa chọn--</option>
+                                <option value="computer" prodcode="computer" rootprd="computer" baseprd="computer" level="0">Máy tính</option>
+                                <option value="asus" prodcode="asus" rootprd="computer" baseprd="asus" level="1">-Asus</option>
+                                <option value="asustufgaming" prodcode="asustufgaming" rootprd="computer" baseprd="asus" level="2">--Asus TUF Gaming</option>
+                                <option value="asusrogzephyrus" prodcode="asusrogzephyrus" rootprd="computer" baseprd="asus" level="2">--ASUS ROG Zephyrus</option>
+                                <option value="dell" prodcode="dell" rootprd="computer" baseprd="dell" level="1">-Dell</option>
+                            </select>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="Add()" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Thêm</a>
+            </div>
+        </div>
+    </div>
+</div>
+<br />
+<br />
+
+<div class="row form-group margin-bottom-9">
+    <div class="row col-9">
+        <div class="col-5 col-sm-5" style="padding-right:0;">
+            <div class="col-12" style="padding: 0;">
+                <div class="input-group" id="dtdatestart">
+                    <input type="text" id="EffDateStart" name="EffDateStart" class="col-8 cl-date EffDateStart hasDatepicker" data-date-format="yyyy-mm-dd" value="" autocomplete="off">
+                    <span class="input-group-addon">
+                        <i class="far fa-calendar-alt"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        //datepicker plugin
+        $('#EffDateStart').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            dateFormat: 'yy-mm-dd'
+        })
+            ////show datepicker when clicking on the icon
+            .next().on('click', function () {
+                $(this).prev().focus();
+            });
+    });
+</script>
+
+
+<!---->
+
+<script>
+    function ShowPopupAdd() {
+        $('#ShowPopupAdd').modal({
+            backdrop: false,
+            keyboard: true,
+        });
+        $('#ParentCode').select2();
+        $('#ShowPopupAdd').modal('show');
+    }
+
+    function ClosePopupAdd() {
+        $('#ShowPopupAdd').modal('hide');
+    }
+</script>*@

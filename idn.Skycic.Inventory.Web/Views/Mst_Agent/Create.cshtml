@@ -1,0 +1,171 @@
+﻿@model Mst_Agent
+@{
+    var title = "TẠO MỚI DANH MỤC ĐẠI LÝ";
+    Layout = "~/Views/Shared/_LayoutQuantri.cshtml";
+    var titleMng = "Danh mục đại lý";
+    ViewBag.Title = title;
+    var listMst_Province = ViewBag.ListMst_Province as List<Mst_Province>;
+}
+<script type="text/javascript">
+    var parents = new Array();
+    parents.push("@Url.Action("Index", "Mst_Agent")");
+    parents.push("");
+    var parentsText = new Array();
+    parentsText.push("@MvcHtmlString.Create("titleMng")");
+    parentsText.push("@MvcHtmlString.Create("title")");
+    setAdminCurrentTag(parents, parentsText);
+</script>
+
+<div class="container">
+    <div class="col-xs-12 no-padding">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group no-padding" id="steps">
+            <div class="panel panel-info no-padding">
+                <div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>
+                <div class="panel-body no-padding" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="row no-margin box-shadow-tk">
+                        @using (Html.BeginForm("Create", "Mst_Agent", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                        <div class="col-sm-12 no-padding">
+                            <div class="col-xs-12 col-sm-6">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="AgentCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã đại lý <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="AgentCode" name="AgentCode" class="col-xs-11 AgentCode" onkeyup="locdau(this);" value="" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="AgentName" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên đại lý <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="AgentName" name="AgentName" class="col-xs-11 AgentName" value="" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="AgentAddress" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Địa chỉ đại lý")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="AgentAddress" name="AgentAddress" class="col-xs-11 AgentAddress" value="" autocomplete="off" />
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6">
+
+                                <div class="form-group margin-bottom-5">
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tỉnh/Thành <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <select id="ProvinceCode" name="ProvinceCode" class="col-xs-11" onchange="LoadDistrict(this)">
+                                                <option></option>
+                                                @{
+                                                    if (listMst_Province != null && listMst_Province.Count > 0)
+                                                    {
+                                                        foreach (var it in listMst_Province)
+                                                        {
+                                                            <option value="@MvcHtmlString.Create(it.ProvinceCode.ToString().Trim())" desc="@MvcHtmlString.Create(it.ProvinceName.ToString().Trim())">@MvcHtmlString.Create(it.ProvinceName.ToString().Trim())</option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Quận/Huyện <span style=\"color: red \">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <select id="DistrictCode" name="DistrictCode" class="col-xs-11"></select>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>                          
+                        </div>
+                        }
+                    </aside>
+                    <div class="col-xs-12 text-center">
+                        <div class="clearfix">
+                            <div class="row no-margin text-center" style=" float: right;">
+                                @RenderItemFormat("BTN_TAO_DAI_LY_LUU", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px; margin-left: 10px; padding-left: 15px!important; padding-right: 15px!important; \" onclick=\"SaveData();\"><i class=\"ace-icon fa fa-floppy-o bigger-110\"></i>Lưu</a>", "", "")
+
+                                @*<a href="javascript:void();" class="btn font-color mybtn-Button" style="margin-left: 10px; padding-left: 15px!important; padding-right: 15px!important; " onclick="SaveData();"><i class="ace-icon fa fa-floppy-o bigger-110"></i>Lưu</a>*@
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Mst_Agent.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "Mst_Agent")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+        });
+        var _getForm = document.getElementById("manageForm");
+        _getForm.addEventListener('reset', function () {
+            document.getElementById("").focus()
+        });
+        function LoadDistrict(thiz) {
+        var provincecode = $(thiz).val();
+        if (!IsNullOrEmpty(provincecode))
+        {
+            var url = '@Url.Action("LoadMst_DistrictInSolution", "AdminBase")';
+            var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+            $.ajax({
+                url: url,
+                data: {
+                    __RequestVerificationToken: token
+                    , provincecode: provincecode
+                },
+                type: 'post',
+                dataType: 'json',
+                traditional: true,
+                success: function (data) {
+                    if (data.Success) {
+                        $("#DistrictCode").html(data.Html);
+                    } else {
+                        if (!IsNullOrEmpty(data.Detail))
+                        {
+                            _showErrorMsg123('Lỗi!', data.Detail);
+                        }
+                        else {
+                            _showErrorMsg123('Lỗi!', data.Title[0]);
+                        }
+                    }
+                }
+            });
+        }
+        else {
+            $("#DistrictCode").html('');
+        }
+    }
+        function SaveData() {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Create", "Mst_Agent")';
+            var objMst_Agent = new Mst_Agent();
+            objMst_Agent.ActionType = 'create';
+            objMst_Agent.ajaxSettings = ajaxSettings;
+            objMst_Agent.saveData();
+        }
+    </script>
+}

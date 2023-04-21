@@ -1,0 +1,408 @@
+﻿@model RT_InvF_InvAudit
+@{
+    var Lst_Mst_Inventory = ViewBag.Lst_Mst_Inventory as List<Mst_Inventory>;
+    var Lst_Mst_InventoryType = ViewBag.Lst_Mst_InventoryType as List<Mst_InventoryType>;
+    var Lst_Mst_InventoryLevelType = ViewBag.Lst_Mst_InventoryLevelType as List<Mst_InventoryLevelType>;
+    var IFInvAudNo = ViewBag.IFInvAudNo == null ? "" : ViewBag.IFInvAudNo.ToString();
+
+    var lst_Mst_InvOutType = new List<Mst_InvOutType>();
+    if (ViewBag.Lst_Mst_InvOutType != null)
+    {
+        lst_Mst_InvOutType = ViewBag.Lst_Mst_InvOutType as List<Mst_InvOutType>;
+    }
+
+    var lstCustomer = new List<Mst_Customer>();
+    if (ViewBag.Lst_MstCustomer != null)
+    {
+        lstCustomer = ViewBag.Lst_MstCustomer as List<Mst_Customer>;
+    }
+
+    var lst_Mst_ProductUI = new List<Mst_ProductUI>();
+    if (ViewBag.Lst_Mst_ProductUI != null)
+    {
+        lst_Mst_ProductUI = ViewBag.Lst_Mst_ProductUI;
+    }
+
+    var InvF_InvAudit = new InvF_InvAudit();
+    if (Model != null && Model.Lst_InvF_InvAudit != null && Model.Lst_InvF_InvAudit.Count != 0)
+    {
+        InvF_InvAudit = Model.Lst_InvF_InvAudit[0];
+    }
+    var lst_InvF_InvAuditDtl = new List<InvF_InvAuditDtl>();
+    if (Model.Lst_InvF_InvAuditDtl != null)
+    {
+        lst_InvF_InvAuditDtl = Model.Lst_InvF_InvAuditDtl;
+    }
+    var lstMstProductGroup = ViewBag.ListMstProductGroup as List<Mst_ProductGroup>;
+    if (lstMstProductGroup == null)
+    {
+        lstMstProductGroup = new List<Mst_ProductGroup>();
+    }
+    var viewonly = "";
+    var disabled = "";
+    if (!CUtils.IsNullOrEmpty(InvF_InvAudit.IF_InvAuditStatus) && InvF_InvAudit.IF_InvAuditStatus.Equals("FINISH"))
+    {
+        viewonly = "1";
+        disabled = "disabled";
+    }
+}
+@{
+    ViewBag.Title = "Thực hiện phiếu kiểm kê";
+}
+<style>
+    .text-red {
+        color: red;
+    }
+</style>
+
+<div class="mt-3">
+    <div class="col-12">
+        @using (Html.BeginForm("ActionInvF_InvAudit", "InvFInvAudit", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+            <input type="hidden" id="ViewOnly" name="ViewOnly" value="@viewonly" />
+            <input type="hidden" id="ActionView" name="ActionView" value="action" />
+            <div class="col-12 row">
+                <div class="col-12 row">
+                    <aside class="col-md-4">
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="IFInvAudNo">
+                                @("Số phiếu kiểm kê".HtmlItemString("ifinvaudno_invfinvaudit"))
+                            </label>
+                            <div class="col-md-8">
+                                <input type="text" class="col-md-12 text-bold" name="IFInvAudNo" id="IFInvAudNo" readonly="readonly" value="@(InvF_InvAudit.IF_InvAudNo == null ? "" : InvF_InvAudit.IF_InvAudNo)" />
+                            </div>
+                        </div>
+
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="IFInvAudNo">
+                                @("Ngày tạo".HtmlItemString("createdtime_invfinvaudit"))
+                            </label>
+                            <div class="col-md-8">
+                                <input type="text" class="col-md-12 text-bold" readonly="readonly" value="@(InvF_InvAudit.CreateDTimeUTC == null ? "" : Convert.ToDateTime(InvF_InvAudit.CreateDTimeUTC).ToString("yyyy-MM-dd"))" />
+                            </div>
+                        </div>
+                    </aside>
+                    <aside class="col-md-4">
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="InvCodeOut">
+                                @("Kho kiểm kê".HtmlItemString("invcode_invfinvaudit"))
+                                <span style="color: red "> *</span>
+                            </label>
+                            <div class="col-md-8">
+                                <span class="block input-icon input-icon-right">
+                                    <select disabled id="InvCodeAudit" name="InvCodeAudit" class="col-md-12 mstinventory">
+                                        <optgroup label="">
+                                            <option value="">--Chọn kho kiểm kê--</option>
+                                            @if (Lst_Mst_Inventory != null && Lst_Mst_Inventory.Count > 0)
+                                            {
+                                                foreach (var item in Lst_Mst_Inventory)
+                                                {
+                                                    var invCode = CUtils.StrValue(item.InvCode);
+                                                    var invName = CUtils.StrValue(item.InvName);
+                                                    <option @(InvF_InvAudit.InvCodeAudit.Equals(item.InvCode) ? "selected" : "") invBUPattern="@(item.InvBUPattern == null ? "" : item.InvBUPattern)" value="@MvcHtmlString.Create(invCode)">@MvcHtmlString.Create(invName)</option>
+                                                }
+                                            }
+                                        </optgroup>
+                                    </select>
+                                </span>
+                            </div>
+                        </div>
+                    </aside>
+                    <aside class="col-md-4">
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-3" for="Remark">
+                                @("Ghi chú".HtmlItemString("remark_invfinvaudit"))
+                            </label>
+                            <div class="col-md-12">
+                                <textarea class="col-md-6" name="Remark" @disabled id="Remark" rows="2">@(InvF_InvAudit.Remark == null ? "" : InvF_InvAudit.Remark.ToString())</textarea>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+                
+                <div class="col-12 row">
+                    <div class="col-12 col-sm-3">
+                        @if (Model.Lst_InvF_InvAudit[0].IF_InvAuditStatus.ToString() != "FINISH")
+                        {
+                            @RenderItemFormat("", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnSave\" onclick=\"SaveAction('" + Url.Action("ActionIF_InvAudNo", "InvFInvAudit") + "', '0');\"><i class=\"fas fa-check\" aria-hidden=\"true\"></i> Đã kiểm</a>", "", "");
+                        }
+                    </div>
+                    <div class="col-12 col-sm-8">
+                        @{
+                            if (Model.Lst_InvF_InvAudit[0].IF_InvAuditStatus.ToString() != "FINISH")
+                            {
+                                <div class="col-10">
+                                    <div class="form-group margin-bottom-9">
+                                        <div class="col-8">
+                                            <div class="col-12 form-group no-padding">
+                                                <input class="col-12" type="text" name="ProductCodeSearchAction" id="ProductCodeSearchAction" value="" autocomplete="off" placeholder="Quét mã vạch, mã hh, tên hh,serial, số xác thực, hoặc nhập để tìm kiếm" />
+                                                <input class="col-12 idn-hidden" type="text" name="ProductScanAction" id="ProductScanAction" value="" autocomplete="off" placeholder="Quét mã vạch, mã hh, tên hh,serial, số xác thực, hoặc nhập và nhấn enter để tìm kiếm" />
+                                                <div class="product-list">
+                                                    <ul class="no-padding no-margin"></ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <a href="javascript:void(0);" class="btn btn-nc-button" style="margin-left: 10px" id="btnScanProduct" onclick="ScanProductAction();">@("Quét".HtmlItemString("productscan_inventoryout"))</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            }
+                        }
+
+                        @*<a href="javascript:void(0);" class="btn btn-nc-button" style="margin-left: 10px" id="btnScanProduct" onclick="EndScanProduct();">@("Dừng quét".HtmlItemString("endproductscan_inventoryout"))</a>*@
+                        @*<a href="javascript:void(0);" class="btn btn-nc-button" id="btnMore" onclick="MoreExcel()">...</a>*@
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@Html.Partial("LstProductDaKiem", lst_InvF_InvAuditDtl, new ViewDataDictionary() {
+    { "dakiem", true },
+    { "IF_InvAuditStatus", InvF_InvAudit.IF_InvAuditStatus },
+    { "viewonly", viewonly }
+})
+@Html.Partial("_TemplateHtml", new ViewDataDictionary() {
+    { "lst_InvF_InvAuditDtl", Model.Lst_InvF_InvAuditDtl },
+    { "lstInvF_InvAuditInstLot", Model.Lst_InvF_InvAuditInstLot },
+    { "lstInvF_InvAuditInstSerial", Model.Lst_InvF_InvAuditInstSerial },
+    { "ListMstProductGroup", lstMstProductGroup },
+    { "viewonly",viewonly }
+})
+@Html.Partial("_CommonJs", new ViewDataDictionary() {
+    { "viewonly", viewonly }
+})
+<script src="~/Scripts/mine/InvF_Audit.js"></script>
+@section Scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            //$('.select2-selection').select2();
+            //$('#FlagIn_Out').select2({
+            //    minimumResultsForSearch: -1
+            //});
+            $("select#InvCodeAudit").select2();
+            $("select#ProductCode").select2();
+        });
+    </script>
+
+    <script>
+        function AddProductToListKiemKe(thiz, urlSearch, colortext) {
+            debugger;
+            var productcode = $(thiz).val();
+            if (productcode === "Search") {
+                $.ajax({
+                    url: urlSearch,
+                    data: {
+                        productkey: "",
+                        showview: "1"
+                    },
+                    type: 'post',
+                    dataType: 'json',
+                    traditional: true,
+                    success: function (data) {
+                        if (data.Success) {
+                            $('#ShowPopupProduct').modal({
+                                backdrop: false,
+                                keyboard: true
+                            });
+                            $("#ShowPopupProduct").html(data.Html);
+                            var display = $("#ShowPopupProduct").css('display');
+                            if (display === "none") {
+                                $("#ShowPopupProduct").show();
+                            }
+                        } else {
+                            showErrorDialog(data.Detail);
+                        }
+                    }
+                });
+            }
+            else {
+                if (colortext !== undefined && colortext !== "") {
+                    AddProductKiemKe($('#rowtemplateProductAddDaKiem'), $('#table-tbodyID'), urlSearch, colortext);
+                }
+                else {
+                    AddProductKiemKe($('#rowtemplateProduct'), $('#table-tbodyID'), urlSearch, colortext);
+                }
+            }
+        }
+
+        // Ghi đè hàm
+        function AddProductKiemKe(rowTempIdName, tbodyIdName, urlGetTonKho, colortext) {
+            debugger;
+            if (colortext == undefined) {
+                colortext = "black";
+            }
+            var ProductCode = $('#ProductCode').val();
+            if (ProductCode == "" || ProductCode == null) return;
+            var optSelect = $('#ProductCode').find('option:selected');
+            var ProductCodeBase = $(optSelect).attr("ProductCodeBase");
+            var ProductCodeRoot = $(optSelect).attr("ProductCodeRoot");
+            var ProductCodeUser = $(optSelect).attr("ProductCodeUser");
+            var ProductName = $(optSelect).attr("ProductName");
+            var UnitCodeSP = $(optSelect).attr("UnitCode");
+            var UnitCode = "";
+            var SellPrice = $(optSelect).attr("SellPrice");
+
+            // Số lượng từ đơn hàng
+            var strqtyOrder = $(optSelect).attr('qtyOrder');
+            var qtyOrder = 0;
+            if ($.isNumeric(strqtyOrder)) {
+                qtyOrder = parseFloat(strqtyOrder);
+            }
+            //
+            var SellOrder = 0;//$(optSelect).attr("SellOrder");
+            var ProductType = "";
+
+            var SellProduct = 0.0;
+            var checkOrder = $('#FlagXuatTuDH').prop('checked');
+            if (checkOrder == true) {
+                SellProduct = SellOrder;
+            }
+            else {
+                SellProduct = SellPrice;
+            }
+            var IF_InvAudNo = $('#IFInvAudNo').val();
+            //var QtyTotalOK = $(optSelect).attr("QtyTotalOK");
+            var DiscountPrice = $(optSelect).attr("DiscountPrice");
+            var InvCode = $(optSelect).attr("InvCode");
+            var FlagCombo = $(optSelect).attr("FlagCombo");
+            var FlagSerial = $(optSelect).attr("FlagSerial");
+            var FlagLo = $(optSelect).attr("FlagLo");
+            var ValAmount = 0;
+            //var Qty = "1"; // Tạm fix
+
+            var flagCombo = "0";
+            var showTonKho = "";
+            var FlagAudit = "0";
+
+            if (FlagSerial == "1") {
+                //ProductType = "<a href=\"javascript:;\" title=\"Chi tiết Serial\" onclick=\"ShowSerial('" + ProductCode + "', '" + ProductCodeBase + "', '" + ProductCodeUser + "', '" + ProductName + "')\">(Serial)</a>";
+                ProductType = "<a href=\"javascript:;\" titFirstle=\"Chi tiết Serial\" onclick=\"ShowSerial('" + ProductCode + "', '" + ProductCodeBase + "', '" + ProductCodeUser + "', '" + ProductName + "', '" + IF_InvAudNo + "')\">(Serial)</a>";
+                flagCombo = "0";
+            }
+            else if (FlagLo == "1") {
+                //ProductType = "<a href=\"javascript:;\" title=\"Chi tiết Lô\" onclick=\"ShowLo('" + ProductCode + "', '" + ProductCodeBase + "', '" + ProductCodeUser + "', '" + ProductName + "')\">(Lô)</a>";
+                ProductType = "<a href=\"javascript:;\" titFirstle=\"Chi tiết Lô\" onclick=\"ShowLoKK('" + IF_InvAudNo + "', '" + ProductCode + "', '" + ProductCodeBase + "', '" + FlagAudit + "', '" + ProductCodeUser + "', '" + ProductName + "')\">(Lô)</a>";
+                flagCombo = "0";
+            }
+            else if (FlagCombo == "1") {
+                ProductType = "<a href=\"javascript:;\" titFirstle=\"Chi tiết Combo\" onclick=\"ShowCombo('" + ProductCode + "', '" + ProductCodeUser + "', '" + ProductName + "')>(Combo)</a>";
+                //ProductType = "<a href=\"javascript:;\" title=\"Chi tiết Combo\" onclick=\"ShowCombo('" + ProductCode + "', '" + ProductCodeBase + "', '" + ProductCodeUser + "', '" + ProductName + "')\">(Combo)</a>";
+                flagCombo = "1";
+
+                // Nếu loại là combo thì tồn = 0;
+                QtyTotalOK = 0;
+                InvCode = "";
+            }
+            else {
+                //showTonKho = "";
+                var urlTonKho = '@Url.Action("GetTonKho", "InvFInvAudit")';
+                 showTonKho = "<a href=\"javascript:;\" title=\"Chọn vị trí\" onclick=\"ShowTonKhoKK(this, '"+ProductCode+"','"+urlTonKho+"', '"+ProductCodeUser+"', '"+ProductName+"', '"+FlagAudit+"')\"><i class=\"fa fa-caret-down\"></i></a>";
+            }
+
+            // Lấy tồn kho
+            // urlGetTonKho = "ModalCommon/GetBalanceByProduct";
+
+            var valmstInventory = "";
+            if ($('select.mstinventory').length > 0) {
+                var selectKho = $('select.mstinventory').eq(0);
+                var optionSelect = $(selectKho).find('option:selected');
+                if (optionSelect.val() == "") {
+                    alert("Kho chưa được chọn");
+                    $('select.mstinventory').focus();
+                    return;
+                }
+                else {
+                    valmstInventory = optionSelect.attr("invBUPattern");
+                }
+            }
+
+            // Lấy giá trị quy đổi
+            var valconvert = '1';
+
+            var selectProduct = $('#ProductCode').find('option:selected');
+            if (selectProduct != undefined) {
+                var strvalconvert = selectProduct.attr('valconvert');
+                valconvert = parseFloat(strvalconvert);
+            }
+
+            //var trDtl = $("tbody#table-tbodyID tr.trdata[productCode='" + ProductCode + "']");
+            //if (trDtl.length > 0) {
+            //    var idxDtl = trDtl.attr('idx');
+            //    var selectDonvi = trDtl.find('select[name="Lst_InvF_InventoryOutDtl[' + idxDtl + '].UnitCode"]').find('option:selected');
+            //    if (selectDonvi != undefined) {
+            //        var strvalconvert = selectDonvi.attr('valconvert');
+            //        valconvert = parseFloat(strvalconvert);
+            //    }
+            //}
+            //
+            debugger;
+            $.ajax({
+                url: urlGetTonKho,
+                data: {
+                    productCode: ProductCode,
+                    InvBUPattern: valmstInventory,
+                    productCodeBase: ProductCodeBase,
+                    valconvert: valconvert
+                },
+                type: 'post',
+                dataType: 'json',
+                traditional: true,
+                success: function (data) {
+                    if (data.Success) {
+                        debugger;
+                        var qtyTotalOk = data.qtytotalok;
+                        var invCodeMax = data.invCodeMax;
+                        var Qty = data.qtyMax; // Qty = tồn kho lớn nhất tại 1 vị trí
+                        ValAmount = parseFloat(Qty) * (parseFloat(SellProduct) - parseFloat(DiscountPrice));
+                        AddProductCommon(rowTempIdName, tbodyIdName, ProductCode, ProductName, UnitCode, UnitCodeSP, SellProduct, qtyTotalOk, DiscountPrice, invCodeMax, Qty, ValAmount, ProductType, flagCombo, FlagLo, FlagSerial, ProductCodeBase, ProductCodeRoot, colortext, showTonKho, ProductCodeUser, qtyOrder);
+                        //AddProductCommon(rowTempIdName, tbodyIdName, ProductCode, ProductName, UnitCode, UnitCodeSP, SellProduct, qtyTotalOk, DiscountPrice, InvCode, Qty, ValAmount, ProductType, flagCombo, FlagLo, FlagSerial, ProductCodeBase, ProductCodeRoot);
+                    } else {
+                        showErrorDialog(data.Detail);
+                    }
+                }
+            });
+            //
+        }
+    </script>
+    <script>
+        function SaveAction(urlSave, savetype) {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = urlSave;
+            var objInvF_InvAudit = new InvF_InvAudit();
+            objInvF_InvAudit.ajaxSettings = ajaxSettings;
+            objInvF_InvAudit.saveAction(savetype);
+        }
+    </script>
+}
+
+@* Cache thông tin sản phẩm (được chọn từ popup) trường hợp không quản lý LOT- Serial *@
+
+<script type="text/template" id="tmpl_cache_products">
+    <tr class="data-item trdata" idx="==idx==" productcode="==ProductCode==" productcodebase="==ProductCodeBase==" rd="==rd==">
+        <td>
+            <input type="hidden" class="==productcodeCss==" value="==ProductCode==" />
+            <input type="hidden" class="==productcodebaseCss==" value="==ProductCodeBase==" />
+            <input type="hidden" class="==qtytotalokCss==" value="==QtyTotalOK==" />
+            <input type="hidden" class="==invcodeCss==" value="==InvCode==" />
+            <input type="hidden" class="==qtyactualCss==" value="==QtyActual==" />
+            <input type="hidden" class="==invcodeactualCss==" value="==InvCodeActual==" />
+            <input type="hidden" class="==flagrowCss==" value="==FlagRow==" /> @*1: row được thêm mới ở popup, 0: row load từ DB*@
+        </td>
+    </tr>
+</script>
+
+<table class="display-none">
+    <tbody id="tbodyCacheProducts"></tbody>
+</table>
+
+
+
+

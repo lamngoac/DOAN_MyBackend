@@ -1,0 +1,123 @@
+﻿@model List<Prd_PrdIDCustomField>
+@{
+    Layout = "~/Views/Shared/_LayoutQuantri.cshtml";
+    var title = "DANH SÁCH FIELD";
+    var titleMng = "Danh sách Field";
+    ViewBag.Title = title;
+}
+<script type="text/javascript">
+    var parents = new Array();
+    parents.push("@Url.Action("Index", "OS_PrdCenter_PrdPrdIDCustomField")");
+    //parents.push("");
+    var parentsText = new Array();
+    parentsText.push("@MvcHtmlString.Create(titleMng)");
+    //parentsText.push("@MvcHtmlString.Create(title)");
+    setAdminCurrentTag(parents, parentsText);
+</script>
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="col-xs-12 row no-margin box-shadow-tk">
+                        @using (Html.BeginForm("Edit", "OS_PrdCenter_PrdPrdIDCustomField", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="col-sm-8">
+                                @if (Model != null && Model.Count > 0)
+                                {
+                                    var i = 0;
+                                    foreach (var item in Model)
+                                    {
+                                        var checkActive = "";
+                                        var flagActive = "0";
+                                        if (item != null && item.FlagActive.Equals("1"))
+                                        {
+                                            flagActive = item.FlagActive.ToString().Trim();
+                                        }
+                                        checkActive = flagActive.Equals("1") ? "checked" : "";
+                                        var prdCustomFieldCode = "";
+                                        var prdCustomFieldName = "";
+                                        if (!CUtils.IsNullOrEmpty(item.PrdCustomFieldCode))
+                                        {
+                                            prdCustomFieldCode = item.PrdCustomFieldCode.ToString().Trim();
+                                        }
+                                        if (!CUtils.IsNullOrEmpty(item.PrdCustomFieldName))
+                                        {
+                                            prdCustomFieldName = item.PrdCustomFieldName.ToString().Trim();
+                                        }
+                                        <div class="form-group margin-bottom-5 divcusfield" idx="@i">
+                                            <label for="" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create(prdCustomFieldCode)</label>
+                                            <div class="col-xs-12 col-sm-8">
+                                                <div class="col-xs-2">
+                                                    <span class="block input-icon input-icon-right padding-top-5">
+                                                        <label>
+                                                            <input id="FlagActive_@i" name="ListPrd_PrdIDCustomField[@i].FlagActive" class="ace ace-switch ace-switch-4" onclick="SetValueCheckBox(this)" type="checkbox" value="@MvcHtmlString.Create(flagActive)" @checkActive />
+                                                            <span class="lbl"></span>
+                                                        </label>
+                                                    </span>
+                                                </div>
+                                                <span class="block input-icon input-icon-right">
+                                                    <input type="hidden" name="ListPrd_PrdIDCustomField[@i].PrdCustomFieldCode" id="PrdCustomFieldCode_@i" value="@MvcHtmlString.Create(prdCustomFieldCode)" />
+                                                    <input type="text" id="PrdCustomFieldName_@i" name="ListPrd_PrdIDCustomField[@i].PrdCustomFieldName" class="col-xs-9" value="@MvcHtmlString.Create(prdCustomFieldName)" autocomplete="off" />
+                                                </span>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+
+
+                        }
+                    </aside>
+                    <div class="col-xs-12 no-padding">
+                        <div class="clearfix">
+                            <div class="row no-margin" style="float: right">
+                                @RenderItemFormat("BTN_SUA_OS_PRDCENTER_PRD_PRDIDCUSTOMFIELD_CAP_NHAT", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px; \" onclick=\"SaveData();\">Lưu</a>", "", "")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/OS_PrdCenter_PrdPrdIDCustomField.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "OS_PrdCenter_PrdPrdIDCustomField")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+        });
+        @* keypress *@
+        $(document).on('keypress', function (e) {
+            if (e.which == 13) {
+                Search();
+            }
+        });
+        function SetValueCheckBox(thiz) {
+            var objOS_PrdCenter_PrdPrdIDCustomField = new OS_PrdCenter_PrdPrdIDCustomField();
+            objOS_PrdCenter_PrdPrdIDCustomField.setValueCheckBox(thiz);
+        }
+        function SaveData() {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Edit", "OS_PrdCenter_PrdPrdIDCustomField")';
+            var objOS_PrdCenter_PrdPrdIDCustomField = new OS_PrdCenter_PrdPrdIDCustomField();
+            objOS_PrdCenter_PrdPrdIDCustomField.ActionType = 'edit';
+            objOS_PrdCenter_PrdPrdIDCustomField.ajaxSettings = ajaxSettings;
+            objOS_PrdCenter_PrdPrdIDCustomField.saveData();
+        }
+    </script>
+}

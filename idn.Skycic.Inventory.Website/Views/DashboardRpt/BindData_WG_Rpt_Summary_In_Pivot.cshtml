@@ -1,0 +1,24 @@
+﻿@model List<Rpt_Summary_In_Out_Pivot>
+
+@if (Model != null)
+{
+    var idx = 0;
+    foreach (var item in Model)
+    {
+        <tr class="data-item trdata" idx="@idx">
+            <td class="text-center cell-100">
+                @(item.ProductCodeUser ?? "")
+            </td>
+            @*<td fieldId="mp_ProductName" fieldName="Tên sản phẩm" fieldActive="0" class="text-center cell-150">
+                @(item.ProductName ?? "")
+            </td>*@
+            <td fieldId="mp_UnitCode" fieldName="Đơn vị" fieldActive="0" class="text-center cell-50">
+                @(item.UnitCode ?? "")
+            </td>
+            <td fieldName="Số lượng" fieldActive="0" class="text-right cell-50">
+                @(item.Qty ?? "")
+            </td>
+        </tr>
+        idx++;
+    }
+}

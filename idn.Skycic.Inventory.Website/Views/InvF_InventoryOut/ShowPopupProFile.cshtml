@@ -1,0 +1,295 @@
+﻿@model RT_InvF_InventoryOut
+@{
+    ViewBag.Title = "ShowPopupProFile";
+
+    var objInvF_InventoryOut = new InvF_InventoryOut();
+    var listAttachFile = new List<InvF_InventoryOutAttachFile>();
+    var IF_InvOutNo = "";
+    var remark = "";
+    var ProfileStatus = "";
+
+    var userState = ViewBag.UserState as UserState;
+    var urlFile = CUtils.StrValue(userState.AddressAPIs) + "api/File/";
+
+
+    if (Model != null)
+    {
+        if (Model.Lst_InvF_InventoryOut != null && Model.Lst_InvF_InventoryOut.Count > 0)
+        {
+            objInvF_InventoryOut = Model.Lst_InvF_InventoryOut[0];
+            IF_InvOutNo = CUtils.StrValue(objInvF_InventoryOut.IF_InvOutNo);
+            remark = CUtils.StrValue(objInvF_InventoryOut.Remark);
+            ProfileStatus = CUtils.StrValue(objInvF_InventoryOut.ProfileStatus);
+        }
+        if (Model.Lst_InvF_InventoryOutAttachFile != null && Model.Lst_InvF_InventoryOutAttachFile.Count > 0)
+        {
+            listAttachFile.AddRange(Model.Lst_InvF_InventoryOutAttachFile);
+        }
+    }
+}
+<div class="modal-dialog" role="document" style="max-width:700px;width:100%">
+    <div class="modal-content">
+        <div class="modal-header" style="background:#ddd !important;color:#373737;">
+            <h5 class="modal-title" id="exampleModalLabel" style="font-weight:unset;">Cập nhật hồ sơ</h5>
+            <a href="javascript:;" onclick="closePopupEditFile()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body">
+            <aside class="row no-margin">
+                @using (Html.BeginForm(null, null, FormMethod.Get, new { id = "manageForm_Search_Popup", @class = "form-horizontal" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true)
+                    <input hidden id="init" name="init" value="search" />
+                    <div class="layout-search col-12 no-padding">
+                        <div class="row no-margin">
+                            <div class="row col-sm-12" style="flex: 0 0 97.5%">
+                                <div class="col-sm-10">
+                                    <input type="hidden" class="IF_InvOutNoPopup" id="IF_InvOutNoPopup" value="@MvcHtmlString.Create(IF_InvOutNo)" />
+
+                                    <div class="form-group margin-bottom-9">
+                                        <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">TT hồ sơ</label>
+                                        <div class="col-12 col-sm-8">
+                                            <select id="profileStatusPopup" name="profileStatusPopup" class="col-12 select2 profileStatusPopup">
+                                                <optgroup>
+                                                    <option value="">&nbsp;</option>
+
+                                                    <option value="0" @(ProfileStatus.Equals("0") ? "selected" : "")>Chưa nhận</option>
+                                                    <option value="1" @(ProfileStatus.Equals("1") ? "selected" : "")>Đã nhận đủ</option>
+
+                                                </optgroup>
+
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-9">
+                                        <label class="control-label col-md-4" for="Remark">
+                                            @("File đính kèm".HtmlItemString("remark_inventoryout"))
+                                        </label>
+                                        <div class="col-md-8">
+                                            @*<span class="block input-icon input-icon-right">
+                                                    <a href="javascript:void(0);" id="btn_add_file_popup" class="btn btn-nc-button">
+                                                        <i class="fas fa-file-upload"></i>
+                                                        Thêm file đính kèm
+                                                    </a>
+                                                    <br />
+                                                </span>*@
+                                            <div class="col-12 row no-margin muti-title" style="margin-bottom: 7px!important;">
+                                                Danh sách tệp tin
+                                            </div>
+                                            <div style="margin: 10px 0;">
+
+                                            </div>
+                                            <table class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody" style="margin-bottom:8px">
+                                                <tbody id="tbody-Order_FileUploadPopup" class="tbody-Order_FileUploadPopup">
+                                                    @{
+                                                        // flagFileUpload:
+                                                        // 1: là file upload
+                                                        // 0: không là file được upload
+                                                    }
+                                                </tbody>
+                                            </table>
+                                            <span class="block input-icon input-icon-right">
+                                                <a href="javascript:void(0);" id="btn_add_file_popup" class="btn btn-nc-button">
+                                                    <i class="fas fa-file-upload"></i>
+                                                    Thêm file đính kèm
+                                                </a>
+                                                <br />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-9">
+                                        <label class="control-label col-md-4" for="Remark">
+                                            @("Nội dung xuất".HtmlItemString("remark_inventoryout"))
+                                        </label>
+                                        <div class="col-md-8">
+                                            <textarea class="col-md-12" name="RemarkPopup" id="RemarkPopup" rows="4">@MvcHtmlString.Create(remark) </textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </aside>
+        </div>
+        <div class="modal-footer" style="display:flex; align-items:center; justify-content: center">
+            <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="SaveFileApprove()" style="float: right;font-size: 13px;">Cập nhật</a>
+        </div>
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+    var listInvF_InventoryOutAttachFile = [];
+
+        @if (listAttachFile != null && listAttachFile.Count > 0)
+        {
+            foreach(var item in listAttachFile)
+            {
+                var fileId = "";
+                var fileName = CUtils.StrValue(item.AttachFileName);
+                var filePath = CUtils.StrValue(item.AttachFilePath);
+                var url = "";
+                if (!CUtils.IsNullOrEmpty(filePath))
+                {
+                    filePath = filePath.Replace("\\", "/");
+                    url = urlFile + filePath;
+                }
+                var fileSize = "0";
+                //var FlagFileUpload = CUtils.StrValue(item.FlagActive);
+                var FlagFileUpload = "1";
+                var des = CUtils.StrValue(item.AttachFileDesc);
+
+                <text>
+        var objInvF_InventoryOutAttachFile = {
+            FlagFileUpload: '@MvcHtmlString.Create(FlagFileUpload)',
+            fileId: '@MvcHtmlString.Create(fileId)',
+            fileName: '@MvcHtmlString.Create(fileName)',
+            filePath: '@MvcHtmlString.Create(filePath)',
+            url: '@MvcHtmlString.Create(url)',
+            fileSize: '@MvcHtmlString.Create(fileSize)',
+            Description: '@MvcHtmlString.Create(des)'
+        };
+        listInvF_InventoryOutAttachFile.push(objInvF_InventoryOutAttachFile);
+                </text>
+            }
+        }
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        debugger
+        if (listInvF_InventoryOutAttachFile !== null && listInvF_InventoryOutAttachFile !== undefined && listInvF_InventoryOutAttachFile.length > 0) {
+            for (var i = 0; i < listInvF_InventoryOutAttachFile.length; i++) {
+                debugger
+                var data = listInvF_InventoryOutAttachFile[i];
+                renderDocItemPopup(data);
+            }
+            commonUtils.updateTableTrNotShowIdx($('#tbody-Order_FileUploadPopup tr.trdata'), true);
+        }
+    });
+</script>
+
+
+<script type="text/javascript">
+    function SaveFileApprove() {
+        debugger
+
+        var IF_InvOutNoPopup = $('#IF_InvOutNoPopup').val();
+        var ProfileStatus = $('#profileStatusPopup').val();
+        var Remark = $('#RemarkPopup').val();
+
+
+        var objInvF_InventoryOut = {};
+        objInvF_InventoryOut.IF_InvOutNo = IF_InvOutNoPopup;
+        objInvF_InventoryOut.ProfileStatus = ProfileStatus;
+        objInvF_InventoryOut.Remark = Remark;
+
+
+        var Lst_InvF_InventoryOutAttachFileUI = [];
+        var rows12 = $('tbody#tbody-Order_FileUploadPopup tr.trdata').length;
+        if (rows12 > 0) {
+            $('tbody#tbody-Order_FileUploadPopup tr.trdata').each(function () {
+                debugger
+                var $tr = $(this);
+                var flagFileUpload = $tr.attr('flagfileupload');
+                var idx = $tr.attr('idx');
+                var filePath = commonUtils.returnValue($tr.find('input.filePath').val());
+                var fileId = commonUtils.returnValue($tr.find('input.fileId').val());
+                var fileName = commonUtils.returnValue($tr.find('input.fileName').val());
+                var description = commonUtils.returnValue($tr.find('input.descript').val());
+                if (flagFileUpload == '1') {
+                    var objOrd_OrderSRFilesUploadUI = {
+                        Idx: idx,
+                        IF_InvOutNo: IF_InvOutNoPopup,
+                        FlagIsFilePath: flagFileUpload,
+                        AttachFilePath: filePath,
+                        AttachFileName: fileName,
+                        AttachFileDesc: description
+                    };
+                    Lst_InvF_InventoryOutAttachFileUI.push(objOrd_OrderSRFilesUploadUI);
+                }
+                else {
+                    var objOrd_OrderSRFilesUploadUI = {
+                        Idx: idx,
+                        IF_InvOutNo: IF_InvOutNoPopup,
+                        FlagIsFilePath: flagFileUpload,
+                        AttachFileSpec: fileId,
+                        AttachFileName: fileName,
+                        AttachFileDesc: description
+                    };
+                    Lst_InvF_InventoryOutAttachFileUI.push(objOrd_OrderSRFilesUploadUI);
+                }
+
+            });
+
+        }
+
+        var tem = {};
+        tem.InvF_InventoryOut = objInvF_InventoryOut;
+        tem.Lst_InvF_InventoryOutAttachFile = Lst_InvF_InventoryOutAttachFileUI;
+        var modelCur = commonUtils.returnJSONValue(tem);
+        var data = {
+            model: modelCur,
+        };
+
+        $.ajax({
+            type: 'post',
+            data: data,
+                        url: '@Url.Action("UpdProfile", "InvF_InventoryOut")',
+                        dataType: 'json',
+                        beforeSend: function () {
+                        }
+                    }).done(function (objResult) {
+                        debugger;
+                        if (objResult.Success) {
+                            if (!commonUtils.isNullOrEmpty(objResult.Messages)) {
+                                var listToastr = [];
+                                objToastr = { ToastrType: 'success', ToastrMessage: objResult.Messages };
+                                listToastr.push(objToastr);
+                                commonUtils.showToastr(listToastr);
+                            }
+                            if (!commonUtils.isNullOrEmpty(objResult.RedirectUrl)) {
+                                commonUtils.window_location_href(objResult.RedirectUrl);
+                            }
+                        }
+                        else {
+                            if (!commonUtils.isNullOrEmpty(objResult.Detail)) {
+                                _showErrorMsg123('Lỗi!', objResult.Detail);
+                            }
+                        }
+                       
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                    }).always(function () {
+                    });
+    }
+</script>
+
+
+<script>
+     $(document).ready(function () {
+        debugger
+            window.globalUploadFileUrl = '@Url.Action("UploadFile", "File")';
+       
+        $('#btn_add_file_popup').click(function () {
+            debugger
+                commonUtils.uploadFile({
+                    //neu xet window.globalUploadFileUrl thi ko can cai nay
+                    //url:'@Url.Action("UploadFile", "File")',
+                    fileTypes: '.doc, .docx, .xls, .xlsx, .ppt, .pptx, .pdf, .jpg, .png',
+                    fileSizeWarning: 1048576,
+                    success: function (data) {
+                        if (data !== undefined && data !== null) {
+                            data.FlagFileUpload = '0'; @*1: là file upload; 0: không là file được upload*@
+                            data.filePath = data.url;
+                            data.Description = '';
+                        }
+                        renderDocItemPopup(data);
+                        commonUtils.updateTableTrNotShowIdx($('#tbody-Order_FileUploadPopup tr.trdata'), true);
+                    }
+                });
+        });
+
+    });
+</script>

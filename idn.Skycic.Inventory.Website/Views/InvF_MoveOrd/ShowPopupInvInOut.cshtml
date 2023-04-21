@@ -1,0 +1,225 @@
+﻿@model List<Inv_InventoryBalance>
+@{
+    var List_Mst_InventoryIn = ViewBag.List_Mst_InventoryIn as List<Mst_Inventory>;
+    var ProductCode = ViewBag.ProductCode;
+    var ProductName = ViewBag.ProductName;
+    var UnitCode = ViewBag.UnitCode;
+}
+<!-- Model -->
+<div class="modal-dialog" style="width: 600px; max-width: 600px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel"><b>Chọn vị trí xuất/nhập</b></h2>
+            <a href="javascript:;" onclick="ClosePopupInvInOut()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body" style="">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupInvInOut" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="col-12 no-padding layout-bot-top-16">
+                    <div class="scrollable-horizontal padding-left-0 padding-right-0" style="padding-top: 0!important;">
+                        <div style="width: 100%; float: left;">
+                            <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                                <thead>
+                                    <tr class="trthead">
+                                        <th class="text-center cell-75">@("Vị trí".HtmlItemString("inventory"))</th>
+                                        <th class="text-center cell-50">@("Số lượng tồn".HtmlItemString("inventory"))</th>
+                                        <th class="text-center cell-75">@("Số lượng điều chuyển".HtmlItemString("inventory"))</th>
+                                        <th class="text-center cell-100">@("Vị trí nhập".HtmlItemString("inventory"))</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                            <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                                <tbody id="PopupLst_InvF_MoveOrdProduct" product-productcode="@ProductCode" product-unitcode="@UnitCode">
+                                    @{
+                                        if (Model != null && Model.Count > 0)
+                                        {
+                                            foreach (var invBalance in Model)
+                                            {
+                                                <tr class="data-item trdata" InvCodeOut="@invBalance.InvCode">
+                                                    <input type="hidden" name="Qty" value="@invBalance.QtyTotalOK" />
+                                                    <input type="hidden" name="InvCodeOut" value="@invBalance.InvCode" />
+                                                    <td class="text-center cell-75" name="InvCodeOut">@invBalance.InvCode</td>
+                                                    <td class="text-center cell-50 qtytotalok">@invBalance.QtyTotalOK</td>
+                                                    <td class="text-center cell-75">
+                                                        <input type="text" name="DtlQtyMove" class="col-12 text-right DtlQtyMove" value="" autocomplete="off">
+                                                    </td>
+                                                    <td class="text-center cell-100">
+                                                        <div class="col-xs-12 col-sm-12 no-padding-left">
+                                                            <span class="block input-icon input-icon-right">
+                                                                <select class="select2-invinout" name="InventoryBalance">
+                                                                    <option value="">--Chọn--</option>
+                                                                    @{
+                                                                        if (List_Mst_InventoryIn != null && List_Mst_InventoryIn.Count > 0)
+                                                                        {
+                                                                            foreach (var inv in List_Mst_InventoryIn)
+                                                                            {
+                                                                                if (!CUtils.IsNullOrEmpty(inv.InvCode) && !inv.InvCode.Equals(invBalance.InvCode))
+                                                                                {
+                                                                                    <option value="@inv.InvCode">@inv.InvCode</option>
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                </select>
+                                                            </span>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="modal-footer">
+            <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="SaveInvBalanceProduct()" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Chọn</a>
+        </div>
+    </div>
+</div>
+
+<!-- Init js -->
+<script>
+    $(document).ready(function () {
+
+        $('.select2-invinout').select2();
+        var listInventoryIn = JSON.parse('@Html.Raw(Json.Encode(List_Mst_InventoryIn))');
+        //
+        debugger;
+        var productCode = '@ProductCode';
+        if (lst_InvF_MoveOrdDtl != undefined && lst_InvF_MoveOrdDtl.length > 0) {
+            let productListDtlCur = lst_InvF_MoveOrdDtl
+                .filter(function (el) { return el.ProductCode == productCode });
+            if (productListDtlCur != undefined && productListDtlCur[0].LstMoveOrd_Dtl.length > 0) {
+                for (const dtl of productListDtlCur[0].LstMoveOrd_Dtl) {
+                    UpdateTemplate(dtl);
+                }
+            }
+
+            var tableName = 'InvF_MoveOrd';
+            var qtyformat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'Qty');
+
+            $('input.DtlQtyMove').number(true, qtyformat);
+        }
+
+    });
+
+    function UpdateTemplate({
+        InvCodeOut = '',
+        Qty = '0',
+        InvCodeIn = '',
+    }) {
+        debugger
+        let curRow = $('#PopupLst_InvF_MoveOrdProduct tr.trdata[InvCodeOut="' + InvCodeOut + '"]');
+        $(curRow).find('input.DtlQtyMove').val(Qty);
+        let select = $(curRow).find('select[name="InventoryBalance"]')[0];
+        var selected = $(select).find('option[value="' + InvCodeIn + '"]')[0];
+        $(selected).attr('selected', true)
+        $(select).trigger('change');
+
+        var tableName = 'InvF_MoveOrd';
+        var qtyformat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'Qty');
+
+        $(curRow).find($('input.DtlQtyMove')).number(true, qtyformat);
+    }
+</script>
+
+<!-- Save and Show on UI -->
+<script>
+    function SaveInvBalanceProduct() {
+        //debugger;
+        // Check if exist rows in Lot table
+        var listBalanceChoosen = $('#PopupLst_InvF_MoveOrdProduct').find('tr.trdata');
+        var productCodeCur = $('#PopupLst_InvF_MoveOrdProduct').attr('product-productcode');
+        var unitCodeCur = $('#PopupLst_InvF_MoveOrdProduct').attr('product-unitcode');
+        if (listBalanceChoosen == undefined || listBalanceChoosen.length == 0) {
+            ClosePopupInvInOut();
+            return false;
+        }
+        // Reset
+        for (let listDtl of lst_InvF_MoveOrdDtl) {
+            if (listDtl['ProductCode'] == productCodeCur) {
+                listDtl.LstMoveOrd_Dtl = [];
+            }
+        }
+        // Show on UI
+        let QtySum = 0;
+        let InvCodeIn = [];
+        let InvCodeOut = [];
+
+        let ListMoveOrd_Dtl = [];
+        for (let item of listBalanceChoosen) {
+            // SL xuất
+            let listToastr = [];
+            let qtyMove = $(item).find('input[name="DtlQtyMove"]').val();
+            let qtyTotalOK = $(item).find('input[name="Qty"][type=hidden]').val();
+
+            if (!commonUtils.isNullOrEmpty(qtyMove) && Number(qtyMove) > Number(qtyTotalOK)) {
+               let objToastr = {
+                    ToastrType: 'error',
+                    ToastrMessage: 'SL điều chuyển phải nhỏ hơn tồn kho hiện tại!'
+                };
+                listToastr.push(objToastr);
+                commonUtils.showToastr(listToastr);
+                $(item).find('input[name="DtlQtyMove"]').focus();
+                return false;
+            }
+            if (!commonUtils.isNullOrEmpty(qtyMove) && Number(qtyMove) < 0) {
+                let objToastr = {
+                    ToastrType: 'error',
+                    ToastrMessage: 'SL điều chuyển phải >0!'
+                };
+                listToastr.push(objToastr);
+                commonUtils.showToastr(listToastr);
+                $(item).find('input[name="DtlQtyMove"]').focus();
+                return false;
+            }
+
+            let invCodeInCur = $(item).find('select[name="InventoryBalance"]').val();
+            let invCodeOutCur = $(item).find('input[type=hidden][name="InvCodeOut"]').val();
+            if (qtyMove == 0 || qtyMove.length == 0 || invCodeInCur.length == 0) continue;
+
+            QtySum += Number(qtyMove);
+            if (!InvCodeIn.includes(invCodeInCur)) {
+                InvCodeIn.push(invCodeInCur);
+            }
+            InvCodeOut.push(invCodeOutCur);
+
+            let obj_InvF_MoveOrdDtl = new InvF_MoveOrdDtl();
+            obj_InvF_MoveOrdDtl.InvCodeOut = invCodeOutCur;
+            obj_InvF_MoveOrdDtl.InvCodeIn = invCodeInCur;
+            obj_InvF_MoveOrdDtl.Qty = qtyMove;
+            obj_InvF_MoveOrdDtl.ProductCode = productCodeCur;
+            obj_InvF_MoveOrdDtl.UnitCode = unitCodeCur;
+            ListMoveOrd_Dtl.push(obj_InvF_MoveOrdDtl);
+        }
+        debugger;
+        //
+        for (let listDtl of lst_InvF_MoveOrdDtl) {
+            if (listDtl['ProductCode'] == productCodeCur) {
+                listDtl.LstMoveOrd_Dtl = [...listDtl.LstMoveOrd_Dtl, ...ListMoveOrd_Dtl];
+            }
+        }
+        // Add to main UI
+        var productCodeCur = $('#PopupLst_InvF_MoveOrdProduct').attr('product-productcode');
+        var itemOnProductTable = $('#Lst_InvF_MoveOrdProduct').find('tr.trdata[ProductCode="' + productCodeCur + '"]');
+        // SL điều chuyển
+        $(itemOnProductTable).find('input[name="Qty"]').val(QtySum).attr('readonly', true);
+        // Vị trí xuất
+        let inputInvOut = '';
+        inputInvOut = InvCodeOut.join(',');
+        $(itemOnProductTable).find('td[name="ListInvCodeOut"] input[name="InvCodeOut"]').val(inputInvOut);
+        // Vị trí nhập
+        let inputInvIn = '';
+        inputInvIn = InvCodeIn.join(',');
+        $(itemOnProductTable).find('td[name="ListInvCodeIn"] input[name="InvCodeIn"]').val(inputInvIn);
+        // Close
+        ClosePopupInvInOut();
+    }
+</script>

@@ -1,0 +1,673 @@
+﻿@model PageInfo<Mst_NNT>
+@{
+    //Layout = "~/Views/Shared/_LayoutQuantri.cshtml";
+    var title = "QUẢN LÝ CHI NHÁNH";
+    ViewBag.Title = title;
+    var startCount = 0;
+    var strStartCount = ViewBag.StartCount as string;
+    var recordCount = CUtils.StrValue(ViewBag.RecordCount);
+    if (!CUtils.IsNullOrEmpty(strStartCount))
+    {
+        startCount = Convert.ToInt32(strStartCount);
+    }
+    var init = CUtils.StrValue(ViewBag.init);
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+    var pageCount = CUtils.StrValue(ViewBag.PageCount);
+    var totalPage = "0";
+    if (Model != null)
+    {
+        totalPage = CUtils.StrValue(Model.PageCount);
+    }
+
+    var showtext = "";
+    if (Model.ItemCount > 0)
+    {
+        var recordstart = (Model.PageIndex) * Model.PageSize + 1;
+        var recordend = (Model.PageIndex + 1) * Model.PageSize;
+        if (recordend > Model.ItemCount)
+        {
+            recordend = Model.ItemCount;
+        }
+        showtext = recordstart + "-" + recordend + " trong số " + Model.ItemCount;
+    }
+    var userState = ViewBag.UserState as UserState;
+    var viewid = string.Format("{0}_{1}_{2}_{3}", CUtils.StrValue(userState.SysUser.UserCode), CUtils.StrValue(ViewBag.SolutionCodeSignature), CUtils.StrValue(userState.Mst_NNT.OrgID), "Mst_NNT_Mng");
+}
+<script>
+    setAdminCurrentUrl('@Url.Action("Index", "Mst_Organization")');
+</script>
+
+<div class="">
+    <div class="row no-margin">
+        <aside class="col-12 no-padding">
+            @using (Html.BeginForm(null, null, FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="layout-bot-top-16">
+                    <div class="row">
+                        <div class="col-6">
+                            @RenderItemFormat("BTN_QL_CHI_NHANH_TAO", "<a class=\"btn btn-nc-button\" href=\'" + @Url.Action("Create", "Mst_Organization") + "\' style=\"font-size: 13px;\" title=\"Tạo mới\"><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i> Tạo</a>", "", "")
+                            @RenderItemFormat("BTN_QL_CHI_NHANH_XUAT_EXCEL", "<a class=\"btn btn-nc-button\" onclick=\"Export()\" href=\"javascript:void(0);\" style=\"\"><i class=\"fas fa-download\" aria-hidden=\"true\" style=\"\"></i> Export Excel</a>", "", "")
+                            @*<a class="btn font-color mybtn-Button" data-toggle="dropdown" aria-expanded="false" style="font-size: 13px; position: relative;"><i class="fas fa-ellipsis-h"></i></a>*@
+                            @*<ul class="dropdown-menu" role="menu" style="">
+                                    <li style="padding: 10px 5px">
+                                        @RenderItemFormat("BTN_QL_CHI_NHANH_NHAP_EXCEL", "<a class=\"row no-margin col-12 no-padding\" onclick=\"ShowPopupImportExcel()\" href=\"javascript:void(0);\" style=\"line-height: 13px; color: #000000\"><i class=\"fas fa-upload\" aria-hidden=\"true\" style=\"margin-right: 7px\"></i> Nhập Excel</a>", "", "")
+                                    </li>
+                                    <li style="padding: 10px 5px">
+                                        @RenderItemFormat("BTN_QL_CHI_NHANH_XUAT_EXCEL_TEM", "<a class=\"row no-margin col-12 no-padding\" onclick=\"ExportTemplate()\" href=\"javascript:void(0);\" style=\"line-height: 13px; color: #000000\"><i class=\"fas fa-download\" aria-hidden=\"true\" style=\"margin-right: 7px\"></i> Xuất Template</a>", "", "")
+                                    </li>
+                                    <li style="padding: 10px 5px">
+
+                                    </li>
+                                </ul>*@
+
+                            @*<span class="search-bar">
+                                    <input type="text" id="dynamic-table-thead-search" class="quicksearch dynamic-table-thead-search" name="search">
+                                    <input type="text" class="quicksearch1 dynamic-table-thead-search1" name="search" style="z-index: -1000; height: 0; padding: 0; margin: 0; border: 0">
+                                </span>*@
+
+
+
+                            <span class="search-bar">
+                                <input type="text" id="dynamic-table-thead-search" class="quicksearch dynamic-table-thead-search" name="search">
+                                <input type="text" class="quicksearch1 dynamic-table-thead-search1" name="search" style="z-index: -1000; height: 0; padding: 0; margin: 0; border: 0;display: none;">
+                            </span>
+                        </div>
+                        <div class="col-6">
+                            @if (CheckAccess("BTN_QL_CHI_NHANH_TK"))
+                            {
+                                @Html.Partial("Pagination", null, new ViewDataDictionary() { { "PageCur", MvcHtmlString.Create(pageCur) }, { "RecordCount", MvcHtmlString.Create(Model.PageSize.ToString()) }, { "ShowText", showtext }, { "groupname", Request["groupname"] } })
+                            }
+                            <input type="hidden" value="@MvcHtmlString.Create(pageCur)" name="page" id="page" />
+                            <input type="hidden" id="totalpage" value="@Model.PageCount" />
+                        </div>
+                    </div>
+
+                </div>
+            }
+        </aside>
+        <div class="col-12 panel-body no-padding" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+            <aside class="col-12 layout-table no-padding">
+                @Html.AntiForgeryToken()
+                <div class="scrollable-horizontal padding-left-0 padding-right-0" style="padding-top: 0!important;">
+                    <div style="width: 100%; float: left;">
+                        <table id="dynamic-table-thead" idn-datatable-id="dynamic-table-thead-tbody" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                            <thead>
+                                <tr class="trthead" filterroot="" bfilter="0">
+                                    <th fieldId="CONTROL" fieldName="CONTROL" fieldActive="0" class="cell-100">&nbsp;</th>
+                                    <th fieldId="STT" fieldName="STT" fieldActive="0" class="cell-50">@MvcHtmlString.Create("STT")</th>
+                                    <th fieldId="ORGID" fieldName="Mã chi nhánh" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="cell-120">
+                                        @("Mã chi nhánh".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="NNTFULLNAME" fieldName="Tên chi nhánh" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="cell-200">
+                                        @("Tên chi nhánh".HtmlItemString("product"))
+                                    </th>
+                                    @*<th fieldId="" fieldName="Tên viết tắt" fieldActive="0" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="cell-120">
+                                            @("Tên viết tắt".HtmlItemString("product"))
+                                        </th>*@
+                                    <th fieldId="DLCODE" fieldName="Mã đại lý" fieldActive="0" class="cell-100">
+                                        @("Mã đại lý".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="AREACODE" fieldName="Vùng thị trường" fieldActive="0" class="cell-200">
+                                        @("Vùng thị trường".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="MST" fieldName="MST" fieldActive="0" class="cell-120">
+                                        @("MST".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="PRESENTBY" fieldName="Người đại diện" fieldActive="0" class="cell-120">
+                                        @("Người đại diện".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="NNTPOSITION" fieldName="Chức vụ" fieldActive="0" class="cell-100">
+                                        @("Chức vụ".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="PRESENTIDNO" fieldName="Số giấy tờ" fieldActive="0" class="cell-120">
+                                        @("Số giấy tờ".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="PRESENTIDTYPE" fieldName="Loại giấy tờ" fieldActive="0" class="cell-120">
+                                        @("Loại giấy tờ".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="NNTADDRESS" fieldName="Địa chỉ" fieldActive="0" class="cell-250">
+                                        @("Địa chỉ".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="MD_DISTRICTNAME" fieldName="Quận/Huyện" fieldActive="0" class="cell-120">
+                                        @("Quận/Huyện".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="MP_PROVINCENAME" fieldName="Tỉnh/Thành" fieldActive="0" class="cell-120">
+                                        @("Tỉnh/Thành".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="WEBSITE" fieldName="Website" fieldActive="0" class="cell-120">
+                                        @("Website".HtmlItemString("product"))
+                                    </th>
+                                    @*<th fieldId="CONTACTEMAIL" fieldName="Email" fieldActive="0" class="cell-120">
+                                            @("Email".HtmlItemString("product"))
+                                        </th>*@
+                                    <th fieldId="NNTPHONE" fieldName="Điện thoại cố định" fieldActive="0" class="cell-100">
+                                        @("Điện thoại cố định".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="NNTMOBILE" fieldName="Điện thoại di động" fieldActive="0" class="cell-100">
+                                        @("Điện thoại di động".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="NNTFAX" fieldName="Fax" fieldActive="0" class="cell-100">
+                                        @("Fax".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="CONTACTNAME" fieldName="Người liên hệ" fieldActive="0" class="cell-120">
+                                        @("Người liên hệ".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="CONTACTEMAIL" fieldName="Email liên hệ" fieldActive="0" class="cell-120">
+                                        @("Email liên hệ".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="CONTACTPHONE" fieldName="ĐT liên hệ" fieldActive="0" class="cell-100">
+                                        @("ĐT liên hệ".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="ACCNO" fieldName="Số tài khoản" fieldActive="0" class="cell-120">
+                                        @("Số tài khoản".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="ACCHOLDER" fieldName="Chủ tài khoản" fieldActive="0" class="cell-120">
+                                        @("Chủ tài khoản".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="BANKNAME" fieldName="Ngân hàng" fieldActive="0" class="cell-150">
+                                        @("Ngân hàng".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="CANUMBER" fieldName="Chứng thư số" fieldActive="0" class="cell-120">
+                                        @("Chứng thư số".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="CAORG" fieldName="chi nhánh cấp CTS" fieldActive="0" class="cell-120">
+                                        @("chi nhánh cấp CTS".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="CAEFFDTIMEUTCSTART" fieldName="Thời gian bắt đầu hiệu lực" fieldActive="0" class="cell-100">
+                                        @("Thời gian bắt đầu hiệu lực".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="CAEFFDTIMEUTCEND" fieldName="Thời gian hết hiệu lực" fieldActive="0" class="cell-100">
+                                        @("Thời gian hết hiệu lực".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="FLAGACTIVE" fieldName="Trạng thái" fieldActive="0" class="cell-75">
+                                        @("Trạng thái".HtmlItemString("product"))
+                                    </th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                        <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                            <tbody id="table-tbodyID">
+                                @if (Model != null && Model.DataList != null && Model.DataList.Count > 0)
+                                {
+                                    var idx = 0;
+                                    foreach (var item in Model.DataList)
+                                    {
+                                        var iindex = startCount + (idx + 1);
+
+                                        <tr idx="@idx" class="data-item trdata">
+                                            <td fieldId="CONTROL" fieldActive="0" class="text-center cell-100">
+                                                <div class="action-buttons padding-top-2">
+                                                    @{
+                                                        var urlDetail = Url.Action("Detail", "Mst_Organization", new { mst = item.MST });
+                                                        var urlUpdate = Url.Action("Update", "Mst_Organization", new { mst = item.MST });
+
+                                                    }
+
+                                                    @RenderItemFormat("BTN_QL_CHI_NHANH_CHI_TIET", "<a class=\"icon-detail\" href=\'" + urlDetail + "\' title=\"Chi tiết\"><i class=\"fas fa-eye\"></i></a>", "", "")
+                                                    @RenderItemFormat("BTN_QL_CHI_NHANH_SUA", "<a class=\"icon-edit\" href=\'" + urlUpdate + "\' title=\"Sửa\"><i class=\"fas fa-pencil-alt\"></i></a>", "", "")
+                                                    @RenderItemFormat("BTN_QL_CHI_NHANH_XOA", "<a href=\"javascript:;\" class=\"icon-delete\" title=\"Xóa\" onclick=\"Delete('" + item.OrgID + "','" + item.MST + "')\"><i class=\"fas fa-trash-alt\"></i></a>", "", "")
+
+                                                </div>
+                                            </td>
+                                            <td fieldId="STT" fieldActive="0" class="text-center cell-50">
+                                                @MvcHtmlString.Create(iindex.ToString())
+                                            </td>
+                                            <td fieldId="ORGID" fieldActive="0" class="cell-120">
+                                                @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.MST) ? "" : item.OrgID.ToString())
+                                            </td>
+                                            <td fieldId="NNTFULLNAME" fieldActive="0" class="cell-200">
+                                                @MvcHtmlString.Create(item.NNTFullName.ToString())
+                                            </td>
+                                            @*<td fieldId="" fieldActive="0" class="cell-120">
+                                                    @MvcHtmlString.Create("")
+                                                </td>*@
+                                            <td fieldId="DLCODE" fieldActive="0" class="cell-100">
+                                                @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.DLCode) ? "" : item.DLCode.ToString())
+                                            </td>
+                                            <td fieldId="AREACODE" fieldActive="0" class="cell-200">
+                                                @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.ma_AreaName) ? "" : item.ma_AreaName.ToString())
+                                            </td>
+                                            <td fieldId="MST" fieldActive="0" class="cell-120">
+                                                @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.MST) ? "" : item.MST.ToString())
+                                            </td>
+                                            <td fieldId="PRESENTBY" fieldActive="0" class="cell-120">
+                                                @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.PresentBy) ? "" : item.PresentBy.ToString())
+                                            </td>
+                                            <td fieldId="NNTPOSITION" fieldActive="0" class="cell-100">
+                                                @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.NNTPosition) ? "" : item.NNTPosition.ToString())
+                                            </td>
+                                            <td fieldId="PRESENTIDNO" fieldActive="0" class="cell-120">
+                                                @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.PresentIDNo) ? "" : item.PresentIDNo.ToString())
+                                            </td>
+                                            <td fieldId="PRESENTIDTYPE" fieldActive="0" class="cell-120">
+                                                @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.PresentIDType) ? "" : item.PresentIDType.ToString())
+                                            </td>
+                                            <td fieldId="NNTADDRESS" fieldActive="0" class="cell-250">
+                                                @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.NNTAddress) ? "" : item.NNTAddress.ToString())
+                                            </td>
+                                            <td fieldId="MD_DISTRICTNAME" fieldActive="0" class="cell-120">
+                                                @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.md_DistrictCode) ? "" : item.md_DistrictName.ToString())
+                                            </td>
+                                            <td fieldId="MP_PROVINCENAME" fieldActive="0" class="cell-120">
+                                                @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.mp_ProvinceCode) ? "" : item.mp_ProvinceName.ToString())
+                                            </td>
+                                            <td fieldId="WEBSITE" fieldActive="0" class="cell-120">
+                                                @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.Website) ? "" : item.Website.ToString())
+                                            </td>
+                                            @*<td fieldId="CONTACTEMAIL" fieldActive="0" class="cell-120">
+                                                    @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.ContactEmail) ? "" : item.ContactEmail.ToString())
+                                                </td>*@
+                                            <td fieldId="NNTPHONE" fieldActive="0" class="cell-100">
+                                                @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.NNTPhone) ? "" : item.NNTPhone.ToString())
+                                            </td>
+                                            <td fieldId="NNTMOBILE" fieldActive="0" class="cell-100">
+                                                @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.NNTMobile) ? "" : item.NNTMobile.ToString())
+                                            </td>
+                                            <td fieldId="NNTFAX" fieldActive="0" class="cell-100">
+                                                @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.NNTFax) ? "" : item.NNTFax.ToString())
+                                            </td>
+                                            <td fieldId="CONTACTNAME" fieldActive="0" class="cell-120">
+                                                @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.ContactName) ? "" : item.ContactName.ToString())
+                                            </td>
+                                            <td fieldId="CONTACTEMAIL" fieldActive="0" class="cell-120">
+                                                @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.ContactEmail) ? "" : item.ContactEmail.ToString())
+                                            </td>
+                                            <td fieldId="CONTACTPHONE" fieldActive="0" class="cell-100">
+                                                @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.ContactPhone) ? "" : item.ContactPhone.ToString())
+                                            </td>
+                                            <td fieldId="ACCNO" fieldActive="0" class="cell-120">
+                                                @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.AccNo) ? "" : item.AccNo.ToString())
+                                            </td>
+                                            <td fieldId="ACCHOLDER" fieldActive="0" class="cell-120">
+                                                @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.AccHolder) ? "" : item.AccHolder.ToString())
+                                            </td>
+                                            <td fieldId="BANKNAME" fieldActive="0" class="cell-150">
+                                                @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.BankName) ? "" : item.BankName.ToString())
+                                            </td>
+                                            <td fieldId="CANUMBER" fieldActive="0" class="cell-120">
+                                                @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.CANumber) ? "" : item.CANumber.ToString())
+                                            </td>
+                                            <td fieldId="CAORG" fieldActive="0" class="cell-120">
+                                                @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.CAOrg) ? "" : item.CAOrg.ToString())
+                                            </td>
+                                            <td fieldId="CAEFFDTIMEUTCSTART" fieldActive="0" class="cell-100">
+                                                @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.CAEffDTimeUTCStart) ? "" : item.CAEffDTimeUTCStart.ToString())
+                                            </td>
+                                            <td fieldId="CAEFFDTIMEUTCEND" fieldActive="0" class="cell-100">
+                                                @MvcHtmlString.Create(CUtils.IsNullOrEmpty(item.CAEffDTimeUTCEnd) ? "" : item.CAEffDTimeUTCEnd.ToString())
+                                            </td>
+                                            <td fieldId="FLAGACTIVE" fieldActive="0" class="text-center cell-75">
+                                                @if (item.FlagActive.Equals("1"))
+                                                {
+                                                    <div class="status approve">Active</div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="status cancel">Inactive</div>
+                                                }
+                                            </td>
+                                        </tr>
+                                        idx++;
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ShowPopup" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+
+</div>
+
+@*Import Excel*@
+<div class="modal fade" id="ImportExcelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="exampleModalLabel">Nhập dữ liệu từ file Excel</h3>
+                <a href="javascript:;" onclick="CloseModalImportExcel()" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </a>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "manageFormImportExcel" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-group margin-bottom-9">
+                        <input type="file" name="file" id="file" />
+                    </div>
+                }
+
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn mybtn-Button" onclick="Import()" id="btnSaveImport" style="padding-left: 10px!important; padding-right: 10px!important; font-size: 16px; font-weight: 500;">Nhập</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Mst_Organization.js")"></script>
+    <script>
+        setAdminCurrentUrl('@Url.Action("Index", "Mst_Organization")');
+
+        $(document).on('keypress', function (e) {
+            if (e.which == 13) {
+                SearchData();
+            }
+        });
+        function SearchData()
+        {
+            $('#manageForm').attr('action', '@Url.Action("Index", "Mst_Organization")').submit();
+        }
+
+        function Delete(orgid, mst) {
+        var objMst_Organization_Delete = {
+            OrgID: orgid,
+            MST: mst,
+            };
+            debugger
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Delete", "Mst_Organization")';
+
+            var objMst_Organization = new Mst_Organization();
+            objMst_Organization.Image_Message = "<i class=\"fas fa-info-circle\"></i> THÔNG BÁO";
+            objMst_Organization.Confirm_Message = "Đồng ý xóa chi nhánh '" + orgid + "' ?";
+            objMst_Organization.ajaxSettings = ajaxSettings;
+            objMst_Organization.deleteData(objMst_Organization_Delete);
+        }
+
+        function ClosePopup() {
+            $('#ShowPopup').html('');
+            $('#ShowPopup').modal({
+                backdrop: true,
+                keyboard: false,
+                show: false
+            });
+            $('#ShowPopup').removeClass('show');
+            $('#ShowPopup').css('display', 'none');
+        }
+
+        var objCommonExcel = new CommonExcel();
+        var objVariablesInit = {
+            Id_FormMain: '',
+            Id_FormImportExcel: 'manageFormImportExcel',
+            Id_Modal: 'ImportExcelModal',
+            Id_FileInput: 'file',
+        };
+
+        var ajaxSettings_Excel = {};
+        ajaxSettings_Excel.Type = 'post';
+        ajaxSettings_Excel.DataType = 'json';
+
+        function ShowPopupImportExcel() {
+            $('#ImportExcelModal').modal('show');
+        }
+        function Import(title) {
+            var file = $("#file").val();
+            var listCheck = $('input[name="importChoose"]');
+            var flagImport = '';
+            listCheck.each(function () {
+                if ($(this).is(':checked')) {
+                    flagImport = $(this).val();
+                }
+            });
+            if (file.length === 0) {
+                alert("Nhập file cần Import");
+                $("#file").val('');
+                return false;
+            } else {
+                var checkFile = false;
+                var _index = file.lastIndexOf('.');
+                if (_index !== undefined && _index !== null && _index > 0) {
+                    var fileType = file.substring(_index + 1, file.length).toLowerCase();
+                    if (fileType === 'xls' || fileType.toLowerCase() === 'xlsx') {
+                        checkFile = true;
+                    }
+                }
+                if (checkFile) {
+                    ImportFileExcel();
+                } else {
+                    alert("File Excel Import không hợp lệ!");
+                }
+            }
+        }
+        function CloseModalImportExcel() {
+            $('#ImportExcelModal').modal('hide');
+            $('#ImportExcelModal').on('hidden.bs.modal', function () {
+                $(this).find('#manageFormImportExcel').trigger('reset');
+            });
+        }
+
+        function ImportFileExcel() {
+        ajaxSettings_Excel.Url = '@Url.Action("Import", "Mst_Organization")';
+
+        objCommonExcel.ajaxSettingsInit();
+        objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+        objCommonExcel.variablesInit(objVariablesInit);
+        var ListData = [];
+
+        objCommonExcel.importFileExcel(ListData);
+        }
+
+     @*function GetDetailData(groupcode)
+     {
+        var ajaxSettings = {};
+        ajaxSettings.Type = 'post';
+        ajaxSettings.DataType = 'json';
+        ajaxSettings.Url = '@Url.Action("GetDetailData", "Mst_Organization")';
+
+        var objSys_Group = new Sys_Group();
+        objSys_Group.ajaxSettings = ajaxSettings;
+         objSys_Group.getDetailData(groupcode);
+    }*@
+        function ExportTemplate()
+    {
+        ajaxSettings_Excel.Url = '@Url.Action("ExportTemplate", "Mst_Organization")';
+
+        objCommonExcel.ajaxSettingsInit();
+        objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+        objCommonExcel.exportExcel();
+    }
+
+    function Export()
+    {
+        ajaxSettings_Excel.Url = '@Url.Action("Export", "Mst_Organization")';
+        var token = $('input[name=__RequestVerificationToken]').val();
+        var url = '@Url.Action("Export", "Mst_Organization")';
+        //var groupcode = commonUtils.returnValueText('#GroupCode');
+        //var listParams = [
+        //    { "Key": 'groupcode', "Value": groupcode }
+        //];
+        objCommonExcel.ajaxSettingsInit();
+        objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+        objCommonExcel.exportExcel();
+    }
+    </script>
+    <!-- #region table sort -->
+    <script>
+        var initDefault = function () {
+            $('#dynamic-table-thead').idnTable({
+                searchTextbox: '#dynamic-table-thead-search', columnToggleButton: '#togglecolumn',
+                cookieId: '#viewid',
+            });
+        };
+        var initCustom = function () {
+            var tb = $('#dynamic-table-thead').idnTable();
+
+            $('#dynamic-table-thead-search').keyup(function () {
+                var kw = $(this).val();
+                tb.search(kw);
+            });
+
+            //tb.showColumns(['STT'], false);
+            //tb.reload();
+            var colList = tb.getAllColumns();
+            $('#togglecolumn').html('');
+
+            for (var i = 0; i < colList.length; ++i) {
+
+                var col = colList[i];
+                var fieldid = col.id;
+                var title = col.name;
+
+                if (title !== undefined && title !== null && title.toString().trim().length > 0) {
+                    title = title.toString().trim();
+                } else {
+                    title = '';
+                }
+
+                var fieldactive = col.show;
+
+                //B2: Sinh popup tùy chỉnh các cột trong bảng #dynamic-table-thead
+                var $input = $('<input>');
+                $input.attr('type', 'checkbox');
+                $input.attr('name', fieldid);
+
+                if (fieldactive === true) { //Nếu trạng thái bằng 0 cho hiện cột và checked ô input tương ứng
+                    $input.attr('checked', 'checked');
+
+                }
+
+                var $spaninput = $('<span>');
+                $spaninput.append($input);
+                $spaninput.css('margin-right', '10px');
+
+                var $spantext = $('<span>');
+                $spantext.text(title);
+
+                var $li = $('<li>');
+                $li.css('line-height', '19px');
+                $li.css('margin-bottom', '18px');
+                $li.append($spaninput);
+                $li.append($spantext);
+
+                $('#togglecolumn').append($li);
+
+                $input.click(function () {
+                    if ($(this).is(':checked')) {
+                        tb.showColumns([$(this).attr('name')], false);
+                    }
+                    else {
+                        tb.hideColumns([$(this).attr('name')], false);
+                    }
+                });
+            }
+        };
+        $(document).ready(function () {
+            initDefault();
+            //initCustom();
+        });
+        $(document).ready(function () {
+            (function ($) {
+                var body = $('body');
+                body.on('keyup', '#dynamic-table-thead-search', function () {
+                    var datafilter = $(this).val();
+                    if (datafilter !== undefined && datafilter !== null && datafilter.toString().trim()) {
+                        datafilter = datafilter.toUpperCase().trim();
+                    }
+                    var rex = new RegExp($(this).val(), 'i');
+                    $('#table-tbodyID tr').hide();
+                    $('#table-tbodyID tr').filter(function () {
+                        //debugger
+                        var dataOfRow = $(this).text();
+                        if (dataOfRow !== undefined && dataOfRow !== null && dataOfRow.toString().trim().length > 0) {
+                            dataOfRow = dataOfRow.toUpperCase().trim();
+                        }
+                        if (dataOfRow.toUpperCase().indexOf(datafilter) > -1) {
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }
+                    }).show();
+                });
+
+            }(jQuery));
+
+        });
+        $(document).ready(function () {
+            //debugger;
+            var viewId = commonUtils.returnValueText('#viewid');
+            if (!commonUtils.isNullOrEmpty(viewId)) {
+                var cookie = commonUtils.getCookie(viewId);
+                if (commonUtils.isNullOrEmpty(cookie)) {
+                    var cookieValue = 'CONTROL|STT|ORGID|NNTFULLNAME|DLCODE|AREACODE|MST|PRESENTBY|NNTPOSITION|PRESENTIDNO|PRESENTIDTYPE|NNTADDRESS|MD_DISTRICTNAME|MP_PROVINCENAME|WEBSITE|CONTACTEMAIL|NNTPHONE|NNTMOBILE|NNTFAX|CONTACTNAME|CONTACTPHONE|ACCNO|ACCHOLDER|BANKNAME|CANUMBER|CAORG|CAEFFDTIMEUTCSTART|CAEFFDTIMEUTCEND';
+                    commonUtils.setCookie(viewId, cookieValue, 10);
+                }
+            }
+            initDefault();
+
+            //initCustom();
+
+        });
+    </script>
+    <!-- #endregion -->
+    <!-- #region cookies -->
+    <script>
+        document.addEventListener('DOMContentLoaded',
+            function () {
+                //debugger;
+                readCookies("Mst_NNT");
+                var checkboxs = document.querySelectorAll('#togglecolumn.ulshowdata input[type="checkbox"]');
+                for (let checkbox of checkboxs) {
+                    checkbox.addEventListener('change', setCookie)
+                }
+            });
+
+        function saveSelectedToCookie() {
+            //debugger;
+            setCookie("Mst_NNT",
+                {
+                    path: '/',
+                    expires: 10
+                });
+        }
+
+        function setCookie(name, options = {}) {
+            //debugger;
+            var checkboxs = document.querySelectorAll('#togglecolumn.ulshowdata input[type="checkbox"]');
+            var value = new Object();
+            for (const ckb of checkboxs) {
+                value[ckb.name] = ckb.checked === true ? "0" : "1";
+            }
+            let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(JSON.stringify(value));
+
+            if (options.expires instanceof Date) {
+                options.expires = options.expires.toUTCString();
+            }
+
+            for (let optionKey in options) {
+                updatedCookie += "; " + optionKey;
+                let optionValue = options[optionKey];
+                if (optionValue !== true) {
+                    updatedCookie += "=" + optionValue;
+                }
+            }
+            document.cookie = updatedCookie;
+        }
+
+        function readCookies(name) {
+            //debugger;
+            var result = document.cookie.match(new RegExp(name + '=([^;]+)'));
+            result && (result = JSON.parse(decodeURIComponent(result[1])));
+            if (result != null && result != undefined) {
+                for (const key in result) {
+                    $('#dynamic-table-thead').find('th[fieldid="' + key + '"]').attr('fieldactive', result[key]);
+                }
+            }
+        }
+    </script>
+    <!-- #endregion -->
+}
+

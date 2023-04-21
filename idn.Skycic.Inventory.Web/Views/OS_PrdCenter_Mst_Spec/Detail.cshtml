@@ -1,0 +1,764 @@
+﻿@using System.Reflection
+@model Mst_Spec
+@{
+    Layout = "~/Views/Shared/_LayoutQuantri.cshtml";
+    var title = "CHI TIẾT SPEC";
+    var titleMng = "Danh mục Spec";
+    ViewBag.Title = title;
+    var listOS_PrdCenter_Mst_SpecType1 = ViewBag.ListOS_PrdCenter_Mst_SpecType1 as List<Mst_SpecType1>;
+    if (listOS_PrdCenter_Mst_SpecType1 == null || listOS_PrdCenter_Mst_SpecType1.Count == 0)
+    {
+        listOS_PrdCenter_Mst_SpecType1 = new List<Mst_SpecType1>();
+    }
+    var listOS_PrdCenter_Mst_Unit = ViewBag.ListOS_PrdCenter_Mst_Unit as List<Mst_Unit>;
+    if (listOS_PrdCenter_Mst_Unit == null || listOS_PrdCenter_Mst_Unit.Count == 0)
+    {
+        listOS_PrdCenter_Mst_Unit = new List<Mst_Unit>();
+    }
+    var list_OS_PrdCenter_Mst_SpecCustomField = ViewBag.List_OS_PrdCenter_Mst_SpecCustomField as List<Mst_SpecCustomField>;
+    if (list_OS_PrdCenter_Mst_SpecCustomField == null || list_OS_PrdCenter_Mst_SpecCustomField.Count == 0)
+    {
+        list_OS_PrdCenter_Mst_SpecCustomField = new List<Mst_SpecCustomField>();
+    }
+    var listMst_SpecFiles = ViewBag.ListMst_SpecFiles as List<Mst_SpecImage_File>;
+    if (listMst_SpecFiles == null || listMst_SpecFiles.Count == 0)
+    {
+        listMst_SpecFiles = new List<Mst_SpecImage_File>();
+    }
+    var listMst_SpecImage = ViewBag.ListMst_SpecImage as List<Mst_SpecImage_File>;
+    if (listMst_SpecImage == null || listMst_SpecImage.Count == 0)
+    {
+        listMst_SpecImage = new List<Mst_SpecImage_File>();
+    }
+
+    var IdFirst = "";
+    var PrimaryImagePathFirst = "";
+    var flagPrimaryImageFirst = "0";
+    if (listMst_SpecImage != null && listMst_SpecImage.Count > 0 && listMst_SpecImage.FirstOrDefault(x => x.FlagPrimaryImage == "1") != null)
+    {
+        if (listMst_SpecImage.FirstOrDefault(x => x.FlagPrimaryImage == "1").Id != null)
+        {
+            IdFirst = listMst_SpecImage.FirstOrDefault(x => x.FlagPrimaryImage == "1").Id;
+        }
+        if (listMst_SpecImage.FirstOrDefault(x => x.FlagPrimaryImage == "1").Src != null)
+        {
+            PrimaryImagePathFirst = listMst_SpecImage.FirstOrDefault(x => x.FlagPrimaryImage == "1").Src;
+        }
+        if (listMst_SpecImage.FirstOrDefault(x => x.FlagPrimaryImage == "1").FlagPrimaryImage != null && listMst_SpecImage.FirstOrDefault(x => x.FlagPrimaryImage == "1").FlagPrimaryImage == "1")
+        {
+            flagPrimaryImageFirst = "1";
+        }
+    }
+    else
+    {
+        PrimaryImagePathFirst = Url.Content("~/Images/DK_TVAN.png");
+    }
+
+    var PrimaryImagePath = "";
+
+    var idxImg = "";
+    var flagPrimaryImage = "0";
+
+    const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
+    var objectProperties = typeof(Mst_Spec).GetProperties(flags);
+
+    var isparent = ViewBag.IsParent;
+
+    var waOrgID = ViewBag.WaOrgID as string;
+    if (CUtils.IsNullOrEmpty(waOrgID))
+    {
+        waOrgID = "";
+    }
+    var orgID = "";
+    if (Model != null && !CUtils.IsNullOrEmpty(Model.OrgID))
+    {
+        orgID = CUtils.StrValueOrNull(Model.OrgID);
+    }
+}
+<style>
+    .scroll-track {
+        width: 8px;
+    }
+</style>
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="col-xs-12 no-padding">
+                        @using (Html.BeginForm("Detail", "OS_PrdCenter_Mst_Spec", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                        <div class="col-xs-12 col-sm-5 no-padding">
+                            <div class="form-group margin-bottom-5">
+                                <label for="OrgID" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã tổ chức")</label>
+                                <div class="col-xs-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <input type="text" id="OrgID" name="OrgID" class="col-xs-11 disabled-fix" onkeyup="locdau(this);" value="@Model.OrgID" autocomplete="off" required />
+                                    </span>
+                                    <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-5">
+                                <label for="SpecCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã Spec")</label>
+                                <div class="col-xs-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <input type="text" id="SpecCode" name="SpecCode" class="col-xs-11 disabled-fix SpecCode" onkeyup="locdau(this);" value="@if (Model != null && Model.SpecCode != null){@MvcHtmlString.Create(Model.SpecCode.ToString())} else { @("")}" autocomplete="off" required />
+                                    </span>
+                                    <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                </div>
+
+                            </div>
+                            @if (isparent && !waOrgID.Equals(orgID))
+                            {
+                                <div class="form-group margin-bottom-5">
+                                    <label for="NetworkSpecCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã Model Chung")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="NetworkSpecCode" name="NetworkSpecCode" class="col-xs-11 disabled-fix NetworkSpecCode" onkeyup="locdau(this);" value="@if (Model != null && Model.NetworkSpecCode != null){@MvcHtmlString.Create(Model.NetworkSpecCode.ToString())} else { @("")}" autocomplete="off" readonly />
+                                        </span>
+                                    </div>
+
+                                </div>
+                            }
+                            else
+                            {
+                                <input type="hidden" id="NetworkSpecCode" name="NetworkSpecCode" class="col-xs-11 NetworkSpecCode" value="@if (Model != null && Model.NetworkSpecCode != null){@MvcHtmlString.Create(Model.NetworkSpecCode.ToString())} else { @("")}" />
+                            }
+                            <div class="form-group margin-bottom-5">
+                                <label for="SpecName" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên Spec")</label>
+                                <div class="col-xs-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <input type="text" id="SpecName" name="SpecName" class="col-xs-11 disabled-fix SpecName" value="@if (Model != null && Model.SpecName != null){@MvcHtmlString.Create(Model.SpecName.ToString())} else { @("")}" autocomplete="off" required />
+                                    </span>
+                                    <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                </div>
+
+                            </div>
+                            @*<div class="form-group margin-bottom-5">
+                                <label for="ModelCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã Model")</label>
+                                <div class="col-xs-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        @{
+                                            var modelCode = "";
+                                            if (Model != null && !CUtils.IsNullOrEmpty(Model.ModelCode))
+                                            {
+                                                modelCode = CUtils.StrValueOrNull(Model.ModelCode);
+                                            }
+                                        }
+                                        <select id="ModelCode" name="ModelCode" class="col-xs-11 disabled-fix" required>
+                                            <option></option>
+                                            @{
+                                                if (listOS_PrdCenter_Mst_Model != null && listOS_PrdCenter_Mst_Model.Count > 0)
+                                                {
+                                                    foreach (var it in listOS_PrdCenter_Mst_Model)
+                                                    {
+                                                        <option value="@MvcHtmlString.Create(it.ModelCode.ToString().Trim())" desc="@MvcHtmlString.Create(it.ModelName.ToString().Trim())" @(modelCode.Equals(it.ModelCode.ToString().Trim()) ? "selected" : "")>@MvcHtmlString.Create(it.ModelCode.ToString().Trim())</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </span>
+                                    <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                </div>
+
+                            </div>*@
+                            <div class="form-group margin-bottom-5">
+                                <label for="SpecType1" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Loại sản phẩm")</label>
+                                <div class="col-xs-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        @{
+                                            var specType1 = "";
+                                            if (Model != null && !CUtils.IsNullOrEmpty(Model.SpecType1))
+                                            {
+                                                specType1 = CUtils.StrValueOrNull(Model.SpecType1);
+                                            }
+                                        }
+                                        <select id="SpecType1" name="SpecType1" class="col-xs-11 disabled-fix" required>
+                                            <option></option>
+                                            @{
+                                                if (listOS_PrdCenter_Mst_SpecType1 != null && listOS_PrdCenter_Mst_SpecType1.Count > 0)
+                                                {
+                                                    foreach (var it in listOS_PrdCenter_Mst_SpecType1)
+                                                    {
+                                                        <option value="@MvcHtmlString.Create(it.SpecType1.ToString().Trim())" desc="@MvcHtmlString.Create(it.SpecType1Name.ToString().Trim())" @(specType1.Equals(it.SpecType1.ToString().Trim()) ? "selected" : "")>@MvcHtmlString.Create(it.SpecType1.ToString().Trim())</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </span>
+                                    <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                </div>
+
+                            </div>
+                            @*<div class="form-group margin-bottom-5">
+                                <label for="SpecType2" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Nhóm sản phẩm")</label>
+                                <div class="col-xs-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        @{
+                                            var specType2 = "";
+                                            if (Model != null && !CUtils.IsNullOrEmpty(Model.SpecType2))
+                                            {
+                                                specType2 = CUtils.StrValueOrNull(Model.SpecType2);
+                                            }
+                                        }
+                                        <select id="SpecType2" name="SpecType2" class="col-xs-11 disabled-fix" required>
+                                            <option></option>
+                                            @{
+                                                if (listOS_PrdCenter_Mst_SpecType2 != null && listOS_PrdCenter_Mst_SpecType2.Count > 0)
+                                                {
+                                                    foreach (var it in listOS_PrdCenter_Mst_SpecType2)
+                                                    {
+                                                        <option value="@MvcHtmlString.Create(it.SpecType2.ToString().Trim())" desc="@MvcHtmlString.Create(it.SpecType2Name.ToString().Trim())" @(specType2.Equals(it.SpecType2.ToString().Trim()) ? "selected" : "")>@MvcHtmlString.Create(it.SpecType2.ToString().Trim())</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </span>
+                                    <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                </div>
+
+                            </div>*@
+                            <div class="form-group margin-bottom-5">
+                                <label for="Color" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên màu")</label>
+                                <div class="col-xs-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <input type="text" id="Color" name="Color" class="col-xs-11 disabled-fix Color" value="@if (Model != null && Model.Color != null){@MvcHtmlString.Create(Model.Color.ToString())} else { @("")}" autocomplete="off" required />
+                                    </span>
+                                </div>
+
+                            </div>
+                            <div class="form-group margin-bottom-5">
+                                <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">Cờ quản lý Serial</label>
+                                <div class="col-xs-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right disabled-checkbox-fix padding-top-5">
+                                        @{
+                                            var checkFlagHasSerial = "";
+                                            if (Model != null && Model.FlagHasSerial.Equals("1"))
+                                            {
+                                                checkFlagHasSerial = "checked";
+                                            }
+                                            else
+                                            {
+                                                checkFlagHasSerial = "";
+                                            }
+                                        }
+                                        <label>
+                                            <input name="FlagHasSerial" id="FlagHasSerial" class="ace ace-switch ace-switch-4 FlagHasSerial" type="checkbox" value="1" @checkFlagHasSerial />
+                                            <span class="lbl"></span>
+                                            <input name="FlagHasSerial" type="hidden" value="0" />
+                                        </label>
+                                    </span>
+                                </div>
+                            </div>
+                            @*<div class="form-group margin-bottom-5">
+                                <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">Cờ quản lý LOT</label>
+                                <div class="col-xs-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right disabled-checkbox-fix padding-top-5">
+                                        @{
+                                            var checkFlagHasLOT = "";
+                                            if (Model != null && Model.FlagHasLOT.Equals("1"))
+                                            {
+                                                checkFlagHasLOT = "checked";
+                                            }
+                                            else
+                                            {
+                                                checkFlagHasLOT = "";
+                                            }
+                                        }
+                                        <label>
+                                            <input name="FlagHasLOT" id="FlagHasLOT" class="ace ace-switch ace-switch-4 FlagHasLOT" type="checkbox" value="1" @checkFlagHasLOT />
+                                            <span class="lbl"></span>
+                                            <input name="FlagHasLOT" type="hidden" value="0" />
+                                        </label>
+                                    </span>
+                                </div>
+                            </div>*@
+                            <div class="form-group margin-bottom-5">
+                                <label for="DefaultUnitCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Đơn vị thường dùng")</label>
+                                <div class="col-xs-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        @{
+                                            var defaultUnitCode = "";
+                                            if (Model != null && !CUtils.IsNullOrEmpty(Model.DefaultUnitCode))
+                                            {
+                                                defaultUnitCode = CUtils.StrValueOrNull(Model.DefaultUnitCode);
+                                            }
+                                        }
+                                        <select id="DefaultUnitCode" name="DefaultUnitCode" class="col-xs-11 disabled-fix" required>
+                                            <option></option>
+                                            @{
+                                                if (listOS_PrdCenter_Mst_Unit != null && listOS_PrdCenter_Mst_Unit.Count > 0)
+                                                {
+                                                    foreach (var it in listOS_PrdCenter_Mst_Unit)
+                                                    {
+                                                        <option value="@MvcHtmlString.Create(it.UnitCode.ToString().Trim())" desc="@MvcHtmlString.Create(it.UnitName.ToString().Trim())" @(defaultUnitCode.Equals(it.UnitCode.ToString().Trim()) ? "selected" : "")>@MvcHtmlString.Create(it.UnitCode.ToString().Trim())</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </span>
+                                    <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                </div>
+
+                            </div>
+                            @*<div class="form-group margin-bottom-5">
+                                <label for="StandardUnitCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Đơn vị chuẩn")</label>
+                                <div class="col-xs-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        @{
+                                            var standardUnitCode = "";
+                                            if (Model != null && !CUtils.IsNullOrEmpty(Model.StandardUnitCode))
+                                            {
+                                                standardUnitCode = CUtils.StrValueOrNull(Model.StandardUnitCode);
+                                            }
+                                        }
+                                        <select id="StandardUnitCode" name="StandardUnitCode" class="col-xs-11 disabled-fix" required>
+                                            <option></option>
+                                            @{
+                                                if (listOS_PrdCenter_Mst_Unit != null && listOS_PrdCenter_Mst_Unit.Count > 0)
+                                                {
+                                                    foreach (var it in listOS_PrdCenter_Mst_Unit)
+                                                    {
+                                                        <option value="@MvcHtmlString.Create(it.UnitCode.ToString().Trim())" desc="@MvcHtmlString.Create(it.UnitName.ToString().Trim())" @(standardUnitCode.Equals(it.UnitCode.ToString().Trim()) ? "selected" : "")>@MvcHtmlString.Create(it.UnitCode.ToString().Trim())</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </span>
+                                    <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                </div>
+
+                            </div>*@
+
+                            @if (list_OS_PrdCenter_Mst_SpecCustomField != null && list_OS_PrdCenter_Mst_SpecCustomField.Count > 0)
+                            {
+                                var lstName = new List<int>();
+                                foreach (var it in list_OS_PrdCenter_Mst_SpecCustomField)
+                                {
+                                    var CustomFieldCode = it.SpecCustomFieldCode.ToString().Replace("CUSTOMFIELD", "");
+                                    lstName.Add(Convert.ToInt32(CustomFieldCode));
+                                }
+                                lstName.Sort();
+                                foreach (var it in lstName)
+                                {
+                                    var customFieldCode = "CUSTOMFIELD" + it;
+                                    var itProperties = objectProperties.Where(x => x.Name.ToString().ToUpper() == customFieldCode).FirstOrDefault();
+
+                                    var itSpecCustomField = list_OS_PrdCenter_Mst_SpecCustomField.Where(x => x.SpecCustomFieldCode.ToString() == customFieldCode).FirstOrDefault();
+                                    if (itProperties != null)
+                                    {
+                                        var valueCur = itProperties.GetValue(Model);
+                                        if (!CUtils.IsNullOrEmpty(valueCur))
+                                        {
+                                            valueCur = valueCur.ToString().Trim();
+                                        }
+                                        else
+                                        {
+                                            valueCur = "";
+                                        }
+                                        var specCustomFieldName = itSpecCustomField == null ? "" : itSpecCustomField.SpecCustomFieldName.ToString().Trim();
+                                        <div class="form-group margin-bottom-5">
+                                            <label for="@MvcHtmlString.Create(customFieldCode)" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create(specCustomFieldName)</label>
+                                            <div class="col-xs-12 col-sm-8">
+                                                <span class="block input-icon input-icon-right">
+                                                    <input type="text" id="@MvcHtmlString.Create(customFieldCode)" name="@MvcHtmlString.Create(customFieldCode)" class="col-xs-11 disabled-fix" value="@MvcHtmlString.Create(valueCur.ToString().Trim())" autocomplete="off" />
+                                                </span>
+                                            </div>
+
+                                        </div>
+                                    }
+                                }
+                                @*foreach (var item in list_OS_PrdCenter_Mst_SpecCustomField)
+            {
+                var specCustomFieldCode = item.SpecCustomFieldCode.ToString().Trim();
+                var specCustomFieldName = item.SpecCustomFieldName.ToString().Trim();
+                foreach (var properties in objectProperties)
+                {
+                    if (properties.Name.ToString().ToUpper().Trim().Equals(specCustomFieldCode))
+                    {
+                        var valueCur = properties.GetValue(Model);
+                        if (!CUtils.IsNullOrEmpty(valueCur))
+                        {
+                            valueCur = valueCur.ToString().Trim();
+                        }
+                        else
+                        {
+                            valueCur = "";
+                        }
+                        <div class="form-group margin-bottom-5">
+                            <label for="@MvcHtmlString.Create(specCustomFieldCode)" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create(specCustomFieldName)</label>
+                            <div class="col-xs-12 col-sm-8">
+                                <span class="block input-icon input-icon-right">
+                                    <input type="text" id="@MvcHtmlString.Create(specCustomFieldCode)" name="@MvcHtmlString.Create(specCustomFieldCode)" class="col-xs-11 disabled-fix @MvcHtmlString.Create(specCustomFieldCode)" value="@MvcHtmlString.Create(valueCur.ToString().Trim())" autocomplete="off" />
+                                </span>
+                            </div>
+                        </div>
+                        break;
+                    }
+                }
+
+            }*@
+
+                            }
+
+                        </div>
+                            <div class="col-xs-12 col-sm-7 padding-left-right-0">
+                                <div style="min-height: 400px; width: 100%; float: left;">
+                                    <div class="tabbable tabs-below padding-left-0 padding-right-0">
+                                        <div class="tab-content" style="margin-left: 0px; margin-right: 0px;">
+
+
+                                            <div id="media" class="tab-pane col-xs-12 active" style="padding-left: 0px; padding-right: 0px;">
+
+                                                <div style="float: left; width: 100%;">
+                                                    <div class="col-xs-12" style="padding-left: 0; padding-right: 0; float: left;">
+
+                                                        <span class="block input-icon input-icon-right disabled-checkbox-fix" style="float: right; top: 35px; right: -20px;" title="Thiết lập ảnh mặc định">
+                                                            <label>
+                                                                <input name="FlagPrimaryImage" id="FlagPrimaryImage" class="ace ace-switch ace-switch-4" type="checkbox" onchange="SetPrimaryImage(this)" />
+                                                                <span class="lbl"></span>
+                                                            </label>
+                                                        </span>
+                                                        <div style="margin-left: auto; margin-right: auto; width: 400px; height: 330px; border: 1px solid #e1e1e1; padding: 3px;">
+                                                            <img idximg="" flagprimaryimage="" id="imgView" class="img-responsive" style="width: 394px; height: 324px;" src="@Url.Content("~/Images/DK_TVAN.png")" />
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-xs-12" style="float: left; padding: 5px; background: azure">
+                                                        <div class="scrollable-horizontal" data-size="10024">
+                                                            <div id="listImagesThumb" class="" style="padding-bottom: 5px; z-index: 200;">
+                                                                @if (listMst_SpecImage != null && listMst_SpecImage.Count > 0)
+                                                                {
+                                                                    var i = 0;
+
+                                                                    foreach (var item in listMst_SpecImage)
+                                                                    {
+                                                                        var divCss = "div-thumb";
+                                                                        var specImagePath = "";
+                                                                        if (item.Id == IdFirst)
+                                                                        {
+                                                                            divCss = "div-thumb-active";
+                                                                        }
+                                                                        if (!CUtils.IsNullOrEmpty(item.Src))
+                                                                        {
+                                                                            specImagePath = CUtils.StrValueOrNull(item.Src);
+                                                                        }
+                                                                        if (item.FlagPrimaryImage.Equals("1"))
+                                                                        {
+                                                                            idxImg = i.ToString().Trim();
+                                                                            flagPrimaryImage = "1";
+                                                                            PrimaryImagePath = specImagePath;
+                                                                        }
+                                                                        if (item.FlagPrimaryImage.Equals("0"))
+                                                                        {
+                                                                            flagPrimaryImage = "0";
+                                                                        }
+                                                                        <div idx="@i" class="text-center divthumb @MvcHtmlString.Create(divCss)" onclick="SelectedImages(this)">
+                                                                            <img idximg="@i" class="img-thumb" src="@MvcHtmlString.Create(specImagePath)" flagprimaryimage="@MvcHtmlString.Create(flagPrimaryImage)">
+                                                                        </div>
+                                                                        i++;
+                                                                    }
+                                                                    if (!flagPrimaryImage.Equals("1"))
+                                                                    {
+                                                                        idxImg = "0";
+                                                                        if (!CUtils.IsNullOrEmpty(listMst_SpecImage[0].Src))
+                                                                        {
+                                                                            var specImagePath = CUtils.StrValueOrNull(listMst_SpecImage[0].Src);
+                                                                            PrimaryImagePath = specImagePath;
+                                                                        }
+                                                                    }
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+                                        <ul class="nav nav-tabs" id="myTab" style="position: unset;">
+
+                                            <li class="active">
+                                                <a data-toggle="tab" href="#media" aria-expanded="true">Media</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                </div>
+                                <div style="">
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="SpecDesc" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mô tả")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                @{
+                                                    var specDesc = "";
+                                                    if (Model != null && !CUtils.IsNullOrEmpty(Model.SpecDesc))
+                                                    {
+                                                        specDesc = CUtils.StrValueOrNull(Model.SpecDesc);
+                                                    }
+                                                }
+                                                <textarea cols="50" rows="3" id="SpecDesc" name="SpecDesc" maxlength="400" readonly="readonly" class="col-xs-11 SpecDesc">@MvcHtmlString.Create(specDesc)</textarea>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group margin-bottom-5">
+                                        @{
+                                            var checkActive = "";
+                                            if (Model != null && Model.FlagActive.Equals("1"))
+                                            {
+                                                checkActive = "checked";
+                                            }
+                                            else
+                                            {
+                                                checkActive = "";
+                                            }
+                                        }
+                                        <label for="" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500">Trạng thái</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right disabled-checkbox-fix padding-top-5">
+                                                <label>
+                                                    <input name="FlagActive" id="FlagActive" class="ace ace-switch ace-switch-4 FlagActive" type="checkbox" value="1" @checkActive />
+                                                    <span class="lbl"></span>
+                                                    <input name="FlagActive" type="hidden" value="0" />
+                                                </label>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500">Tệp tin đính kèm</label>
+                                        <div class="col-xs-12 col-sm-7">
+
+                                            <div style="width: 100%; float: left; padding-top: 15px;">
+                                                <table class="padding-left-right-25">
+                                                    <tbody id="tbody-FileUpload">
+                                                        @if (listMst_SpecFiles != null && listMst_SpecFiles.Count > 0)
+                                                        {
+                                                            var i = 0;
+                                                            foreach (var item in listMst_SpecFiles)
+                                                            {
+                                                                var specFilePath = "";
+                                                                if (!CUtils.IsNullOrEmpty(item.Src))
+                                                                {
+                                                                    specFilePath = CUtils.StrValueOrNull(item.Src);
+                                                                }
+                                                                var specFilePathLocal = "";
+                                                                if (!CUtils.IsNullOrEmpty(item.SrcLocal))
+                                                                {
+                                                                    specFilePathLocal = CUtils.StrValueOrNull(item.SrcLocal);
+                                                                }
+                                                                <tr class="data-item trdata" idx="@i" specfilename="@MvcHtmlString.Create(item.Name)" status="@MvcHtmlString.Create(item.Status)">
+                                                                    <input type="hidden" name="ListFiles[@i].SpecFileName" value="@MvcHtmlString.Create(item.Name)">
+                                                                    <input type="hidden" name="ListFiles[@i].SpecFilePath" value="@MvcHtmlString.Create(specFilePath)">
+                                                                    <input type="hidden" name="ListFiles[@i].SpecFilePathLocal" value="@MvcHtmlString.Create(specFilePathLocal)">
+                                                                    <input type="hidden" name="ListFiles[@i].SpecFileType" value="">
+                                                                    <input type="hidden" name="ListFiles[@i].SpecFileDesc" value="">
+                                                                    <td>
+                                                                        <a download="@MvcHtmlString.Create(item.Name)" href="@MvcHtmlString.Create(item.Src)" target="_blank">@MvcHtmlString.Create(item.Name)</a>
+                                                                    </td>
+
+                                                                </tr>
+                                                                i++;
+                                                            }
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        }
+                    </aside>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+<table style="display: none;">
+    <tbody id="rowtemplateFileUpload">
+        <tr class="data-item trdata" idx="==idx==" specfilename="==specfilename==" status="==status==">
+            <input type="hidden" name="ListFiles[==idx==].SpecFileName" value="==specfilename==">
+            <input type="hidden" name="ListFiles[==idx==].SpecFilePath" value="==specfilepath==">
+            <input type="hidden" name="ListFiles[==idx==].SpecFileType" value="==specfiletype==">
+            <input type="hidden" name="ListFiles[==idx==].SpecFileDesc" value="==specfiledesc==">
+            <td>
+                <a download='==specfilename==' href="==specfilepath==" target="_blank">==specfilename==</a>
+            </td>
+            <td>
+                <span style="padding-left: 10px">
+                    <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteFile(this)"><img class="img-icon" src="/Images/Xoa.svg"></a>
+                </span>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<script type="text/javascript">
+    processAjaxForm($('#manageForm'), function (response) {
+        processAjaxFormResult(response);
+
+    });
+</script>
+
+@*Active Menu*@
+<script type="text/javascript">
+    setAdminCurrentUrl('@Url.Action("Index", "OS_PrdCenter_Mst_Spec")');
+</script>
+
+@*Set focus*@
+<script type="text/javascript">
+    //ListImages = JSON.parse('@Html.Raw(Json.Encode(listMst_SpecImage))');
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#BrandCode').focus();
+        $('#imgView').attr('src', '@MvcHtmlString.Create(PrimaryImagePathFirst)');
+        $('#imgView').attr('idximg', '@MvcHtmlString.Create(idxImg)');
+        $('#imgView').attr('flagprimaryimage', '@MvcHtmlString.Create(flagPrimaryImage)');
+
+        if ('@MvcHtmlString.Create(flagPrimaryImageFirst)' === '1') {
+            $('#FlagPrimaryImage').prop('checked', true);
+        }
+
+
+    });
+</script>
+
+
+@*scroll*@
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('.scrollable-horizontal').each(function () {
+            var $this = $(this);
+            $(this).ace_scroll(
+                {
+                    horizontal: true,
+                    size: $this.attr('data-size') || 6500,
+                    mouseWheelLock: true
+                }
+            ).css({ 'padding-top': 0 });
+        });
+    });
+
+    function SelectedImages(thiz) {
+        debugger;
+        var divCur = $(thiz);
+        $(".divthumb").each(function () {
+            var divthumbCur = $(this);
+            idx = $(divthumbCur).attr('idx');
+            if ($(divthumbCur).hasClass('div-thumb-active')) {
+                $(divthumbCur).removeClass('div-thumb-active');
+            }
+            if (!$(divthumbCur).hasClass('div-thumb')) {
+                $(divthumbCur).addClass('div-thumb');
+            }
+        });
+        if (!$(divCur).hasClass('div-thumb-active')) {
+            $(divCur).addClass('div-thumb-active');
+        }
+
+        if ($(divCur).hasClass('div-thumb')) {
+            $(divCur).removeClass('div-thumb');
+        }
+        var imgCur = $(divCur).children('img');
+        var src = imgCur.attr('src');
+        var idximg = imgCur.attr('idximg');
+        var flagprimaryimage = imgCur.attr('flagprimaryimage');
+        $('#imgView').attr('src', src);
+        $('#imgView').attr('idximg', idximg);
+        $('#imgView').attr('flagprimaryimage', flagprimaryimage);
+        if (flagprimaryimage === '1') {
+            $('#FlagPrimaryImage').prop('checked', true);
+        } else {
+            $('#FlagPrimaryImage').prop('checked', false);
+        }
+    }
+
+    function SetPrimaryImage(thiz) {
+        debugger
+        var checkBox = $(thiz);
+        if (checkBox !== null && checkBox !== undefined) {
+            if (checkBox.is(':checked')) {
+                checkBox.prop('checked', true);
+                checkBox.val('1');
+                var imgCur = $(thiz).parent().parent().parent().find('img');
+                var idx = $(imgCur).attr('idximg');
+                $(imgCur).attr('flagprimaryimage', '1');
+
+                $("#listImagesThumb div.divthumb").each(function () {
+                    debugger;
+                    var _imgCur = $(this).find('img');
+                    if (_imgCur !== undefined && _imgCur !== null && _imgCur.length > 0) {
+                        var idxCur = $(this).attr('idx');
+                        if (idxCur.toString().trim() === idx.toString().trim()) {
+                            $(_imgCur).attr('flagprimaryimage', '1');
+                        }
+                        //else {
+                        //    $(_imgCur).attr('flagprimaryimage', '0');
+                        //}
+                    }
+                });
+                if (ListImages !== undefined && ListImages !== null && ListImages.length > 0) {
+
+                    for (var i = 0; i < ListImages.length; i++) {
+                        debugger;
+                        var objImages = ListImages[i];
+                        if (objImages.Id.toString().trim() === idx.toString().trim()) {
+                            objImages.FlagPrimaryImage = '1';
+                        }
+                        //else {
+                        //    objImages.FlagPrimaryImage = '0';
+                        //}
+                    }
+                }
+            } else {
+                checkBox.prop('checked', false);
+                checkBox.val('0');
+                var imgCur = $(thiz).parent().parent().parent().find('img');
+                var idx = $(imgCur).attr('idximg');
+                $(imgCur).attr('flagprimaryimage', '0');
+                $("#listImagesThumb div.divthumb").each(function () {
+                    var _imgCur = $(this).find('img');
+                    if (_imgCur !== undefined && _imgCur !== null && _imgCur.length > 0) {
+                        $(_imgCur).attr('flagprimaryimage', '0');
+                    }
+                    //else {
+                    //    $(_imgCur).attr('flagprimaryimage', '0');
+                    //}
+                });
+                if (ListImages !== undefined && ListImages !== null && ListImages.length > 0) {
+
+                    for (var i = 0; i < ListImages.length; i++) {
+                        var objImages = ListImages[i];
+                        if (objImages.Id.toString().trim() === idx.toString().trim()) {
+                            objImages.FlagPrimaryImage = '0';
+                        }
+                        //else {
+                        //    objImages.FlagPrimaryImage = '1';
+                        //}
+                    }
+                }
+            }
+        }
+    }
+</script>
+
+
+
+
+

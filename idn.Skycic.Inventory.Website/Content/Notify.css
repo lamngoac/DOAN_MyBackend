@@ -1,0 +1,396 @@
+﻿#form-notify a.globe-event {
+    color: #fff;
+}
+
+    #form-notify a.globe-event::after {
+        display: none;
+    }
+
+#form-notify #globeventcount {
+    display: block;
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    background: #f00;
+    font-size: 10px;
+    line-height: 13px;
+    padding: 0 3px 0 3px;
+    margin: 0;
+    border-radius: 2px;
+}
+#form-notify ul li {
+    list-style: none;
+}
+
+.setting-box {
+    background-color: #ECF0F5;
+    padding: 0;
+    margin: 0;
+}
+
+.title-setting {
+    font-weight: bold;
+    padding: 0 7.5px;
+}
+
+.detail-setting-box {
+    background-color: #fff;
+}
+
+.type-notifi, .notifi-box {
+    border-bottom: 1px solid #DEDEDE;
+}
+
+.type-title {
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.title-type-box {
+    font-weight: bold;
+    margin-bottom: 0 !important;
+}
+
+.detail-type-box {
+    font-style: italic;
+    color: #9A9A9A;
+}
+
+.content-title, .time-notifi {
+    color: #888;
+}
+
+.detail-setting-box .lbl-flag .lbl {
+    margin: 0 4px;
+    position: relative;
+    display: inline-block;
+    margin: 0;
+    line-height: 20px;
+    height: 20px;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.detail-setting-box .lbl-flag input[type=checkbox].icon-flag + .lbl::before {
+    text-indent: -24px;
+    content: "";
+    font-size: 12px;
+    line-height: 21px;
+    height: 20px;
+    overflow: hidden;
+    border-radius: 12px;
+    background-color: #9e9e9e;
+    border: 1px solid #9e9e9e;
+    color: #FFF;
+    width: 35px;
+    text-shadow: 0 0 0 #FFF;
+    display: inline-block;
+    position: relative;
+    box-shadow: none;
+    -webkit-transition: all .25s ease;
+    -o-transition: all .25s ease;
+    transition: all .25s ease;
+    top: 2px;
+}
+
+.detail-setting-box .lbl-flag .lbl::after {
+    font-family: 'Open Sans';
+    content: '';
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0;
+    color: #AAA;
+    text-shadow: none;
+    background-color: #FFF;
+    border-radius: 100%;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    position: absolute;
+    top: -2px;
+    left: -3px;
+    -webkit-box-shadow: 0 1px 1px 1px rgba(0,0,0,.3);
+    /* box-shadow: 0 1px 1px 1px rgba(0,0,0,.3); */
+    -webkit-transition: left .25s ease;
+    -o-transition: left .25s ease;
+    transition: left .25s ease;
+}
+
+.detail-setting-box .lbl-flag .lbl::after {
+    content: '';
+    font-size: 11px;
+    position: absolute;
+    top: 4px;
+    left: 2px;
+    letter-spacing: 0;
+    width: 15px;
+    height: 15px;
+    line-height: 10px;
+    text-shadow: none !important;
+    color: #939393;
+    background-color: #FFF;
+    -webkit-transition: all .25s ease;
+    -o-transition: all .25s ease;
+    transition: all .25s ease;
+}
+
+.detail-setting-box .lbl-flag input[type=checkbox].icon-flag:checked + .lbl::before {
+    background-color: #057d5a;
+    border-color: #057d5a;
+    text-indent: 7px;
+}
+
+.detail-setting-box .lbl-flag input[type=checkbox].icon-flag:checked + .lbl::after {
+    left: 17px;
+    background-color: #FFF;
+    color: #848484;
+}
+
+.detail-setting-box input[type=checkbox].icon-flag {
+    z-index: -100 !important;
+    width: 1px !important;
+    height: 1px !important;
+    clip: rect(1px,1px,1px,1px);
+    position: absolute;
+}
+
+.detail-setting-box .lbl-flag .lbl {
+    margin: 0 4px;
+    min-height: 24px;
+    position: relative;
+    display: inline-block;
+    margin: 0;
+    line-height: 20px;
+    height: 20px;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.detail-setting-box .lbl-flag input[type=checkbox].icon-flag + .lbl::before {
+    text-indent: -24px;
+    content: "";
+    font-size: 12px;
+    line-height: 20px;
+    height: 20px;
+    overflow: hidden;
+    border-radius: 12px;
+    background-color: #9e9e9e;
+    border: 1px solid #9e9e9e;
+    color: #FFF;
+    width: 35px;
+    text-shadow: 0 0 0 #FFF;
+    display: inline-block;
+    position: relative;
+    box-shadow: none;
+    -webkit-transition: all .25s ease;
+    -o-transition: all .25s ease;
+    transition: all .25s ease;
+    top: 2px;
+}
+
+.detail-setting-box .type-notifi:last-child {
+    border: none !important;
+}
+
+.no-border {
+    border: none !important;
+}
+
+.layout-bot-top-10 {
+    padding: 10px 0 !important;
+}
+
+.avatar-no {
+    width: 50px;
+    height: 50px;
+    margin: auto;
+}
+
+    .avatar-no img {
+        width: 100%;
+        height: 100%;
+        /*object-fit: cover;*/
+        border-radius: 100%;
+        width: 40px;
+        height: 40px;
+    }
+
+.detail-setting-box {
+    padding-bottom: 10px;
+}
+
+/*.button-alert-notifi {
+    background-image: url(/images/read-unread.png);
+    background-repeat: no-repeat;
+    background-size: auto;
+    cursor: pointer;
+    height: 14px;
+    background-position: 0;
+    width: 30px;
+    min-width: 30px;
+}
+
+.notifi-box:hover .button-alert-notifi {
+    background-position: -15px -4px;
+}*/
+
+.notifi-box:hover .button-alert-notifi {
+    display: block !important;
+}
+
+.notification-list li .nt-actions button, .notification-list-index li .nt-actions button {
+    margin-right: 5px;
+    padding: 0 5px 0 5px;
+    line-height: 18px;
+    font-size: 12px;
+    color: #fff;
+    background: #EF6D3F;
+    border: none;
+    border-radius: 2px;
+}
+
+    .notification-list li .nt-actions button.reject, .notification-list-index li .nt-actions button.reject {
+        background: #fff;
+        border: solid 1px #EF6D3F;
+        color: #EF6D3F;
+    }
+
+.button-alert-notifi-unread {
+    background-image: url(/images/ic_unread.svg);
+    background-repeat: no-repeat;
+    background-size: auto;
+    cursor: pointer;
+    height: 14px;
+    background-position: 0;
+    width: 14px;
+}
+
+.button-alert-notifi-read {
+    background-image: url(/images/ic_read.svg);
+    background-repeat: no-repeat;
+    background-size: auto;
+    cursor: pointer;
+    height: 14px;
+    background-position: 0;
+    width: 14px;
+}
+
+.notifi-box.unread {
+    background-color: #eaf9f2;
+}
+
+ul.notification-list li.notifi-box {
+    padding: 5px 10px !important;
+}
+
+.unread .content-title, .unread .time-notifi {
+    font-weight: bold;
+    color: #333 !important;
+}
+
+.menu #form-notify {
+    margin: 0 !important;
+}
+
+#Notifi .modal-header {
+    background: #098850;
+    color: #fff;
+}
+
+#Notifi .checkmark {
+    position: absolute;
+    top: 3px;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background: url(../Images/unchk_30x30.svg) top no-repeat;
+    /*border: 1px solid #ddd;*/
+    /*cursor: pointer;*/
+}
+
+#CKFlagRead {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 20px;
+    width: 20px;
+    left: 20px;
+    top: 5px;
+}
+
+#Notifi .close {
+    font-size: 30px;
+    color: #fff;
+    opacity: 1;
+}
+
+#Notifi label.checkbox {
+    position: relative;
+    padding-left: 30px;
+    display: inline-block;
+    margin: 0;
+}
+
+#CKFlagRead:checked ~ .checkmark {
+    background: url(../Images/chk_30x30.svg) top no-repeat;
+}
+
+.img-button-search-notify {
+    height: 15px;
+    margin: 0px;
+}
+
+.read-button{
+    margin: auto;
+}
+#form-notify a.showpopupnotifi {
+    padding: 5px 10px !important;
+}
+
+#notification-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+#notification-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Handle */
+#notification-list::-webkit-scrollbar-thumb {
+    background: #d9d9d9;
+    display: none
+}
+
+/* Handle on hover */
+#notification-list:hover::-webkit-scrollbar-thumb {
+    background: #c2c2c2;
+    display: block;
+}
+
+#notification-list::-webkit-scrollbar {
+    height: 15px;
+}
+
+/* Track */
+#notification-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Handle */
+#notification-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    display: none
+}
+
+/* Handle on hover */
+#notification-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    display: block;
+}
+.detail-notifi {
+    word-break: break-word;
+}
+.content{
+    padding-left: 0;
+}

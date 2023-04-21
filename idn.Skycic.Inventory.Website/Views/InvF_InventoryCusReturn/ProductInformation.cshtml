@@ -1,0 +1,1297 @@
+﻿@model RT_InvF_InventoryCusReturn
+@{
+    /**/
+
+    var startCount = 0;
+    var fromdate = ViewBag.FromDate as string;
+    var apprfromdate = ViewBag.ApprFromDate as string;
+    var strStartCount = ViewBag.StartCount as string;
+    if (!CUtils.IsNullOrEmpty(strStartCount))
+    {
+        startCount = Convert.ToInt32(strStartCount);
+    }
+    var list_Mst_ProductGroup = ViewBag.List_Mst_ProductGroup as List<Mst_ProductGroup>;
+    if (list_Mst_ProductGroup == null || list_Mst_ProductGroup.Count == 0)
+    {
+        list_Mst_ProductGroup = new List<Mst_ProductGroup>();
+    }
+
+    var init = CUtils.StrValue(ViewBag.init);
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+    var pageCount = CUtils.StrValue(ViewBag.PageCount);
+
+    var Lst_InvF_InventoryCusReturnCoverUI = ViewBag.Lst_InvF_InventoryCusReturnCoverUI as List<InvF_InventoryCusReturnCoverUI>;
+}
+
+<style>
+    .readonly {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        pointer-events: none;
+    }
+</style>
+
+<div class="panel-body row no-margin no-padding" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+    <div class="col-12 padding-left-0 padding-right-0 div-scrollable" style="padding-top: 0!important;">
+        <div style="width: 100%; float: left;">
+            <div class="margin-bottom-9" style="width: 60%; margin-top: 9px">
+                <form autocomplete="off">
+                    <div class="autocomplete row col-10">
+                        <label class="control-label" style="margin-right: 20px;">
+                            @("Hàng hóa".HtmlItemString("invf_inventoryin"))
+                        </label>
+                        <input class="col-8" id="myInput" type="text" name="myInput" onkeyup="Autocompletesearch()" placeholder="@("Quét mã vạch hoặc nhập mã, tên để tìm kiếm".HtmlItemString("invf_inventoryin"))">
+                        <input class="col-8" style="display: none" id="quetmavach" type="text" name="quetmavach" placeholder="@("Quét mã vạch".HtmlItemString("invf_inventoryin"))">
+                        <div id="divPrdOrder" style="display: none" class="col-8">
+                            <span class="block input-icon input-icon-right">
+                                <select id="ordProductCode" name="ordProductCode" showpopup-control-searchdata="#ShowPopupProductInOrderSearch" class="col-12" onchange="AddProductToList(this);"></select>
+                            </span>
+                        </div>
+
+                        <a class="btn btn-nc-button" style="margin-left: 10px" onclick="ShowPopupSearchRefNo()" href="javascript:void(0);" style=""><img class="img-button-search" src="@Url.Content("~/Images/search.svg")"></a>
+                        <a href="javascript:void(0);" class="btn btn-nc-button" id="btnScan" onclick="StartScan()" title="Quét"><i class="fa fa-qrcode" aria-hidden="true"></i></a>
+                        <a class="btn font-color mybtn-Button" data-toggle="dropdown" aria-expanded="false" style="font-size: 13px; position: relative;"><i class="fas fa-ellipsis-h"></i></a>
+                        <ul class="dropdown-menu dropdown-action" role="menu" style="">
+                            <li style="padding: 6px 5px">
+                                <span class="row no-margin col-12 no-padding" href="javascript:void(0);" style="line-height: 13px; color: #000000">Nhập excel</span>
+                            </li>
+                            <li style="padding: 6px 5px 6px 15px!important">
+                                <a class="row no-margin col-12 no-padding" onclick="ImportProducts()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-upload" style="margin-right: 7px" aria-hidden="true"></i> Nhập hàng hóa</a>
+                            </li>
+                            <li style="padding: 6px 5px 6px 15px!important">
+                                <a class="row no-margin col-12 no-padding" onclick="ImportLot()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-upload" style="margin-right: 7px" aria-hidden="true"></i> Nhập lô</a>
+                            </li>
+                            <li style="padding: 6px 5px 6px 15px!important">
+                                <a class="row no-margin col-12 no-padding" onclick="ImportSerial()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-upload" style="margin-right: 7px" aria-hidden="true"></i> Nhập serial</a>
+                            </li>
+                            @*<li style="padding: 6px 5px 6px 15px!important">
+                <a class="row no-margin col-12 no-padding" onclick="ImportQR()" href="javascript:void(0);" style="line-height: 13px; color: #000000">
+                    <i class="fas fa-upload" style="margin-right: 7px" aria-hidden="true"></i> Nhập thông tin xác thực
+                </a>
+            </li>*@
+
+                            <li style="padding: 6px 5px">
+                                <span class="row no-margin col-12 no-padding" href="javascript:void(0);" style="line-height: 13px; color: #000000">Xuất file excel template</span>
+                            </li>
+                            <li style="padding: 6px 5px 6px 15px!important">
+                                <a class="row no-margin col-12 no-padding" onclick="ExportTemplateProduct()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" style="margin-right: 7px" aria-hidden="true"></i> Xuất hàng hóa</a>
+                            </li>
+                            <li style="padding: 6px 5px 6px 15px!important">
+                                <a class="row no-margin col-12 no-padding" onclick="ExportTemplateLot()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" style="margin-right: 7px" aria-hidden="true"></i> Xuất lô</a>
+                            </li>
+                            <li style="padding: 6px 5px 6px 15px!important">
+                                <a class="row no-margin col-12 no-padding" onclick="ExportTemplateSerial()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" style="margin-right: 7px" aria-hidden="true"></i> Xuất serial</a>
+                            </li>
+                            @*<li style="padding: 6px 5px 6px 15px!important">
+                <a class="row no-margin col-12 no-padding" onclick="ExportTemplateQR()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" style="margin-right: 7px" aria-hidden="true"></i> Xuất thông tin xác thực</a>
+            </li>*@
+                        </ul>
+                    </div>
+                </form>
+            </div>
+            <table id="dynamic-table-thead" class="table table-striped table-bordered table-hover table-cus table-bottom-0 no-margin">
+                <thead>
+                    <tr class="trthead">
+                        <th class="cell-50">
+                            @MvcHtmlString.Create("")
+                        </th>
+                        <th fieldid="PRODUCTCODE" sorttype="T" class="cell-100">
+                            @("Mã hàng hóa".HtmlItemString("invf_inventoryin"))
+                        </th>
+                        <th fieldid="PRODUCTNAME" sorttype="T" class="cell-200">
+                            @("Tên hàng hóa (TV)".HtmlItemString("invf_inventoryin"))
+                        </th>
+                        <th fieldid="UNITCODE" sorttype="D" class="cell-75">
+                            @("Đơn vị".HtmlItemString("invf_inventoryin"))
+                        </th>
+                        <th fieldid="QTY" sorttype="D" class="cell-75">
+                            @("Số lượng".HtmlItemString("invf_inventoryin"))
+                        </th>
+                        <th fieldid="INVCODEINACTUAL" sorttype="D" class="cell-150">
+                            @("Vị trí nhập".HtmlItemString("invf_inventoryin"))
+                        </th>
+                        <th fieldid="UPIN" sorttype="T" class="cell-100">
+                            @("Giá nhập".HtmlItemString("invf_inventoryin"))
+                        </th>
+                        <th fieldid="UPINDESC" sorttype="T" class="cell-100">
+                            @("Giảm giá".HtmlItemString("invf_inventoryin"))
+                        </th>
+                        <th fieldid="VALINAFTERDESC" sorttype="T" class="cell-100">
+                            @("Thành tiền".HtmlItemString("invf_inventoryin"))
+                        </th>
+                        <th fieldid="REMARK" sorttype="T" class="cell-100">
+                            @("Ghi chú".HtmlItemString("invf_inventoryin"))
+                        </th>
+                    </tr>
+                </thead>
+            </table>
+            <div id="" class="scrollable" style="width: 100%; float: left">
+                <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody">
+                    <tbody id="table-tbodyID" class="GetPrd">
+                        @Html.Partial("LoadProduct", Lst_InvF_InventoryCusReturnCoverUI)
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<table hidden>
+    <tbody id="rowtemplateProduct">
+
+        <tr id="unit_==ProductCode==" idx="==idx==" flagvisible="==flagvisible==" data-prdcode="==ProductCode==" class="data-item trdata getbom ==ProductCode==" style="==trdisplay==">
+            <td class="text-center cell-50">
+                <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleleRowPrd('==ProductCode==')"><i class="fas fa-trash-alt"></i></a>
+            </td>
+            <td fieldid="PRODUCTCODE" sorttype="T" class="cell-100 ">
+                ==ProductCodeUser== &nbsp; ==ProductType==
+            </td>
+
+            <td fieldid="PRODUCTNAME" sorttype="T" class="cell-200 "> ==ProductName== </td>
+
+            <td fieldid="UNITCODE" sorttype="T" class="text-center cell-75" id="unitCode_==ProductCode==">
+                <select @*class="listproductbase"*@ name="Lst_InvF_InventoryCusReturnDtl[==idx==].UnitCode" style="width:75px;" id="Unitchange-==ProductCode==" onchange="ChangUnit('==ProductCode==')">
+                    <optgroup label="">
+                        ==UnitCode==
+                    </optgroup>
+                </select>
+            </td>
+
+            <td fieldid="QTY" sorttype="T" class="text-center cell-75 ">
+                <input arr="qty" style="width:75px;" type="text" class="text-right number ==ReadOnly==" name="Lst_InvF_InventoryCusReturnDtl[==idx==].Qty" id="qty_==ProductCode==" value="==Qty==" onkeyup="inputQty(this)" />
+            </td>
+
+            <td fieldid="INVCODEINACTUAL" sorttype="T" class="text-center cell-150">
+                <input arr="invcodeinactual" readonly="readonly" type="text" class="text-left col-md-11" name="Lst_InvF_InventoryCusReturnDtl[==idx==].InvCodeInActual" id="invCodeInActual_==ProductCode==" value="==InvCodeSuggest==" />
+                ==ShowPopupInvCodeInActual==
+            </td>
+
+            <td fieldid="UPIN" sorttype="T" class="text-center cell-100 ">
+                <input arr="upin" style="width:100px;" type="text" class="text-right number" name="Lst_InvF_InventoryCusReturnDtl[==idx==].UPCusReturn" id="uPIn_==ProductCode==" value="==UPCusReturn==" onkeyup="inputUPCusReturn(this)" />
+            </td>
+
+            <td fieldid="UPINDESC" sorttype="T" class="text-center cell-100 ">
+                <input arr="upindesc" style="width:100px;" type="text" class="text-right number" name="Lst_InvF_InventoryCusReturnDtl[==idx==].UPCusReturnDesc" id="uPInDesc_==ProductCode==" value="0" onkeyup="inputUPCusReturnDesc(this)" />
+            </td>
+
+            <td fieldid="VALINAFTERDESC" sorttype="T" class="text-center cell-100 ">
+                <input arr="valinafterdesc" style="width:100px;" readonly="readonly" type="text" class="text-right number" name="Lst_InvF_InventoryCusReturnDtl[==idx==].ValCusReturnAfterDesc" id="valInAfterDesc_==ProductCode==" value="" />
+            </td>
+
+            <td fieldid="REMARK" sorttype="T" class="text-center cell-100 ">
+                <input arr="remark" style="width:100px;" type="text" class="text-right" name="Lst_InvF_InventoryCusReturnDtl[==idx==].Remark" id="remark_==ProductCode==" value="" />
+            </td>
+
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnDtl[==idx==].ProductCode" value="==ProductCode==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnDtl[==idx==].ProductCodeUser" value="==ProductCodeUser==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnDtl[==idx==].ProductName" value="==ProductName==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnDtl[==idx==].FlagLot" value="==FlagLot==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnDtl[==idx==].FlagSerial" value="==FlagSerial==" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnDtl[==idx==].FlagCombo" value="==FlagCombo==" />
+        </tr>
+    </tbody>
+</table>
+
+@**Modal Search Product*@
+<div class="modal fade" id="ShowPopupProductSearch" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 1000px; max-width: 1000px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Tìm kiếm hàng hoá</b></h2>
+                <a href="javascript:;" onclick="ClosePopupProductSearch()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupAdd" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="layout-search">
+                        <div class="form-group margin-bottom-5 padding-bottom-10">
+                            <div class="col-xs-12 col-sm-4 no-padding-left">
+                                <span class="block input-icon input-icon-left">
+                                    <input type="text" id="ProductName" name="ProductName" class="col-12 text-left ProductName" value="" autocomplete="off" required placeholder="Nhập mã hoặc tên hàng hoá" />
+                                </span>
+                            </div>
+                            <a class="btn btn-nc-button" onclick="SearchProduct()" href="javascript:void(0);" style=""><img class="img-button-search" src="@Url.Content("~/Images/search.svg")"></a>
+                        </div>
+                    </div>
+                    <div class="col-12 no-padding" id="List_Product_Data">
+
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="AddItems()" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Chọn</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@**Modal Search Product In Order*@
+<div class="modal fade" id="ShowPopupProductInOrderSearch" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 1000px; max-width: 1000px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Tìm kiếm hàng hoá</b></h2>
+                <a href="javascript:;" onclick="ClosePopupProductInOrderSearch()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupAddPrdInOrder" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="layout-search">
+                        <div class="row no-margin">
+                            <div class="col-sm-11 row no-margin">
+                                <div class="col-sm-5 no-padding">
+                                    @*<div class="row form-group margin-bottom-9">
+                                        <label for="sCustomerCode" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Mã khách hàng".HtmlItemString("invf_inventorycusreturn"))</label>
+                                        <div class="col-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="sCustomerCode" name="sCustomerCode" class="col-12 sCustomerCode" value="" />
+                                            </span>
+                                        </div>
+                                    </div>*@
+                                    <div class="row form-group margin-bottom-9">
+                                        <label for="sRefNo" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Số RefNo".HtmlItemString("invf_inventorycusreturn"))</label>
+                                        <div class="col-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="sRefNo" name="sRefNo" class="col-12 sRefNo" value="" readonly="readonly"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-5 no-padding">
+                                    @*<div class="row form-group margin-bottom-9">
+                                        <label for="sProductCode" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Mã hàng hóa".HtmlItemString("invf_inventorycusreturn"))</label>
+                                        <div class="col-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="sProductCode" name="sProductCode" class="col-12 sProductCode" value="" />
+                                            </span>
+                                        </div>
+                                    </div>*@
+                                    <div class="row form-group margin-bottom-9">
+                                        <label for="sProductName" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Hàng hóa".HtmlItemString("invf_inventorycusreturn"))</label>
+                                        <div class="col-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="sProductName" name="sProductName" class="col-12 sProductName" value="" />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <span class="block input-icon input-icon-right">
+                                    <a class="btn btn-nc-button" onclick="SearchProductInOrder()" href="javascript:void(0);" style=""><img class="img-button-search" src="@Url.Content("~/Images/search.svg")"></a>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row margin-bottom-9">
+                            <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="AddItemsPrdInOrder()" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Chọn</a>
+                        </div>
+                    </div>
+
+                    <div class="col-12 no-padding" id="List_Product_Data_InOrder">
+
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+@*Import Excel*@
+<div class="modal fade" id="ImportExcelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="exampleModalLabel">Nhập excel</h3>
+                <a href="javascript:;" onclick="CloseModalImportExcel()" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </a>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "manageFormImportExcel" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="key" name="key" value="" />
+                    <div class="form-group margin-bottom-9">
+                        <input type="file" name="file" id="file" />
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn mybtn-Button" onclick="Import()" id="btnSaveImport" style="padding-left: 10px!important; padding-right: 10px!important; font-size: 16px; font-weight: 500;">Nhập</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('select#ordProductCode').select2().on('select2:close', function () { commonUtils.showPopup(this); });
+</script>
+
+<script>
+    var objCommonExcel = new CommonExcel();
+        var objVariablesInit = {
+            Id_FormMain: '',
+            Id_FormImportExcel: 'manageFormImportExcel',
+            Id_Modal: 'ImportExcelModal',
+            Id_FileInput: 'file',
+        };
+
+        var ajaxSettings_Excel = {};
+        ajaxSettings_Excel.Type = 'post';
+        ajaxSettings_Excel.DataType = 'json';
+
+    function ImportProducts() {
+        $('#key').val("PRODUCT");
+        $('#file').val('');
+        ShowPopupImportExcel();
+    }
+    function ImportLot() {
+        $('#key').val("LOT");
+        $('#file').val('');
+        ShowPopupImportExcel();
+    }
+    function ImportSerial() {
+        $('#key').val("SERIAL");
+        $('#file').val('');
+        ShowPopupImportExcel();
+    }
+    function ImportQR() {
+        $('#key').val("QR");
+        $('#file').val('');
+        ShowPopupImportExcel();
+    }
+
+        function ShowPopupImportExcel() {
+            $('#ImportExcelModal').modal('show')
+        }
+
+        function CloseModalImportExcel() {
+            $('#ImportExcelModal').modal('hide')
+            $('#ImportExcelModal').on('hidden.bs.modal', function () {
+                $(this).find('#manageFormImportExcel').trigger('reset');
+            });
+        }
+
+        function Import() {
+            var file = $("#file").val();
+
+            if (file.length === 0) {
+                alert("Nhập file cần Import");
+                $("#file").val('');
+                return false;
+            } else {
+                var checkFile = false;
+                var _index = file.lastIndexOf('.');
+                if (_index !== undefined && _index !== null && _index > 0) {
+                    var fileType = file.substring(_index + 1, file.length).toLowerCase();
+                    if (fileType === 'xls' || fileType.toLowerCase() === 'xlsx') {
+                        checkFile = true;
+                    }
+                }
+                if (checkFile) {
+                    debugger;
+                    var key = $("#key").val();
+                    if (key.toString().toUpperCase().trim() == "PRODUCT") {
+                        ImportFileExcelProduct();
+                    }
+                    else if (key.toString().toUpperCase().trim() == "LOT") {
+                        ImportFileExcelLot();
+                    }
+                    else if (key.toString().toUpperCase().trim() == "SERIAL") {
+                        ImportFileExcelSerial();
+                    }
+                    else if (key.toString().toUpperCase().trim() == "QR") {
+                        ImportFileExcelQR();
+                    }
+                } else {
+                    alert("File Excel Import không hợp lệ!");
+                }
+            }
+        }
+
+    function ImportFileExcelProduct() {
+        var formData = new window.FormData($('#manageFormImportExcel')[0]);
+        formData.append('tax_file', $('input[type=file]')[0].files[0]);
+
+        var invBUPattern = "";
+        var invcodein = $('#InvCodeIn').val();
+
+        if (invcodein === "") {
+            alert("Kho nhập chưa được chọn");
+            $('#InvCodeIn').focus();
+            return;
+        }
+        var optSelect = $('#InvCodeIn').find('option:selected');
+        invBUPattern = $(optSelect).attr("InvBUPattern");
+        formData.append('invBUPattern', invBUPattern);
+
+        if (formData != undefined && formData != null) {
+            $('#ImportExcelModal').modal("hide");
+            //Loading();
+            var url = '@(Url.Action("ImportProduct", "InvF_InventoryCusReturn"))';
+            $.ajax({
+                url: url,
+                data: formData,
+                type: 'post',
+                beforeSend: function () { },
+                success: function (result) {
+                    //Endloading();
+                    var getData = result;
+                    if (getData.Success == false || getData.Success == 'false') {
+                        if (getData.Detail != null) {
+                            showErrorDialog("Lỗi!", getData.Detail);
+                        } else {
+                            alert(getData.Messages[0]);
+                        }
+                    } else {
+                        $('#table-tbodyID.GetPrd').html('');
+                        $('#table-detailLot').html('');
+                        $('#table-detailSerial').html('');
+                        $('#table-tbodyID.GetPrd').html(getData.Html);
+                        TongTienHang();
+                        $('.number').number(true, 2);
+
+                        //Add bảng VT nhập
+                        $('#table-detailInvCodeInActual').html('');
+                        var rows = $('tbody#table-tbodyID tr').length;
+                        if (rows > 0) {
+                            $("#table-tbodyID tr").each(function () {
+                                var idx = $(this).attr('idx');
+                                var productCode = $(this).find('input[type="hidden"][name="Lst_InvF_InventoryCusReturnDtl[' + idx + '].ProductCode"]').val();
+                                var invCodeInActual = $(this).find('input[type="text"][name="Lst_InvF_InventoryCusReturnDtl[' + idx + '].InvCodeInActual"]').val();
+                                var qty = $(this).find('input[type="text"][name="Lst_InvF_InventoryCusReturnDtl[' + idx + '].Qty"]').val();
+
+                                let strHtmlVtNhap;
+                                strHtmlVtNhap = getHtmlFromTemplate($('#rowtemplateInvCodeInActual'), {
+                                    ProductCode: productCode,
+                                    ProductCodeRoot: productCode,
+                                    Qty: qty,
+                                    InvCodeInActual: invCodeInActual,
+                                    idx: 999999
+                                });
+
+                                $('#table-detailInvCodeInActual').append(strHtmlVtNhap);
+                                updateTableTrIdx($('#table-detailInvCodeInActual tr'), false);
+                                TongTienHang();
+                            });
+                        }
+                    }
+                },
+                error: function () {
+                    //Endloading();
+                },
+                cache: false,
+                contentType: false,
+                //dataType: "json",
+                processData: false
+            });
+        }
+    }
+
+    function ImportFileExcelLot() {
+        var formData = new window.FormData($('#manageFormImportExcel')[0]);
+        formData.append('tax_file', $('input[type=file]')[0].files[0]);
+
+        var invBUPattern = "";
+        var invcodein = $('#InvCodeIn').val();
+
+        if (invcodein === "") {
+            alert("Kho nhập chưa được chọn");
+            $('#InvCodeIn').focus();
+            return;
+        }
+        var optSelect = $('#InvCodeIn').find('option:selected');
+        invBUPattern = $(optSelect).attr("InvBUPattern");
+        formData.append('invBUPattern', invBUPattern);
+
+        if (formData != null && formData != undefined) {
+            var rows = $("tbody#table-tbodyID tr.trdata").length;
+            if (rows > 0) {
+                var listPrd = [];
+                $("tbody#table-tbodyID tr.trdata").each(function () {
+                    var tr = $(this);
+                    var idx = tr.attr('idx');
+                    var product = {};
+                    var productCode = tr.attr('data-prdcode');
+                    var productCodeUser = tr.find('input[type="hidden"][name="Lst_InvF_InventoryCusReturnDtl[' + idx + '].ProductCodeUser"]').val();
+                    var flagLot = tr.find('input[type="hidden"][name="Lst_InvF_InventoryCusReturnDtl[' + idx + '].FlagLot"]').val();
+                    product.ProductCode = productCode;
+                    product.ProductCodeUser = productCodeUser;
+                    product.mp_FlagLot = flagLot;
+                    listPrd.push(product);
+                });
+                $('#ImportExcelModal').modal("hide");
+                //Loading();
+                var url = '@(Url.Action("ImportLot", "InvF_InventoryCusReturn"))';
+                formData.append('listProduct', JSON.stringify(listPrd));
+                $.ajax({
+                    url: url,
+                    type: 'post',
+                    beforeSend: function () { },
+                    success: function (result) {
+                        //debugger;
+                        //Endloading();
+                        var getData = result;
+                        if (getData.Success == false || getData.Success == 'false') {
+                            if (getData.Detail != null) {
+                                showErrorDialog("Lỗi!", getData.Detail);
+                            } else {
+                                alert(getData.Messages[0]);
+                            }
+                        } else {
+                            $('#table-detailLot').html('');
+                            $('#table-detailLot').html(getData.Html);
+                            updateTableTrIdx($('#table-detailLot tr'), true);
+
+                            //Update Số lượng, Vị trí lên DS hàng hóa
+                            $("tbody#table-tbodyID tr.trdata").each(function () {
+                                var trProduct = $(this);
+                                var idx = trProduct.attr('idx');
+                                var prdCode = trProduct.attr('data-prdcode');
+                                var flagLot = trProduct.find('input[type="hidden"][name="Lst_InvF_InventoryCusReturnDtl[' + idx + '].FlagLot"]').val();
+                                if (flagLot !== '1') {
+                                    return;
+                                }
+
+                                var sumqty = 0.0;
+                                var lstVitri = "";
+                                $('#table-detailLot').find('tr[productcode="' + prdCode + '"]').each(function () {
+                                    var tr = $(this);
+                                    var idx = $(tr).attr('idx');
+                                    var strqty = tr.find('input[type="hidden"][name="Lst_InvF_InventoryCusReturnInstLot[' + idx + '].Qty"]').val();
+
+                                    var qty = parseFloat(strqty);
+                                    sumqty += qty;
+
+                                    var invCodeInActual = tr.find('input[type="hidden"][name="Lst_InvF_InventoryCusReturnInstLot[' + idx + '].InvCodeInActual"]').val();
+                                    if (invCodeInActual != null) {
+                                        if (lstVitri == "") {
+                                            lstVitri += invCodeInActual;
+                                        }
+                                        else if (!lstVitri.includes(invCodeInActual)) {
+                                            lstVitri += ", " + invCodeInActual;
+                                        }
+                                    }
+                                });
+
+                                trProduct.find('input[name="Lst_InvF_InventoryCusReturnDtl[' + idx + '].Qty"]').val(sumqty);
+                                trProduct.find('input[name="Lst_InvF_InventoryCusReturnDtl[' + idx + '].InvCodeInActual"]').val(lstVitri);
+                            });
+
+                            TongTienHang();
+                        }
+                    },
+                    error: function () {
+                        //Endloading();
+                    },
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    //dataType: "json",
+                    processData: false
+                });
+            }
+            else {
+                alert('@MvcHtmlString.Create("Lưới danh mục hàng hóa trống!")');
+                return false;
+            }
+        }
+    }
+
+    function ImportFileExcelSerial() {
+        var formData = new window.FormData($('#manageFormImportExcel')[0]);
+        formData.append('tax_file', $('input[type=file]')[0].files[0]);
+
+        var invBUPattern = "";
+        var invcodein = $('#InvCodeIn').val();
+
+        if (invcodein === "") {
+            alert("Kho nhập chưa được chọn");
+            $('#InvCodeIn').focus();
+            return;
+        }
+        var optSelect = $('#InvCodeIn').find('option:selected');
+        invBUPattern = $(optSelect).attr("InvBUPattern");
+        formData.append('invBUPattern', invBUPattern);
+
+        if (formData != null && formData != undefined) {
+            var rows = $("tbody#table-tbodyID tr.trdata").length;
+            if (rows > 0) {
+                var listPrd = [];
+                $("tbody#table-tbodyID tr.trdata").each(function () {
+                    var tr = $(this);
+                    var idx = tr.attr('idx');
+                    var product = {};
+                    var productCode = tr.attr('data-prdcode');
+                    var productCodeUser = tr.find('input[type="hidden"][name="Lst_InvF_InventoryCusReturnDtl[' + idx + '].ProductCodeUser"]').val();
+                    var flagSerial = tr.find('input[type="hidden"][name="Lst_InvF_InventoryCusReturnDtl[' + idx + '].FlagSerial"]').val();
+                    product.ProductCode = productCode;
+                    product.ProductCodeUser = productCodeUser;
+                    product.mp_FlagSerial = flagSerial;
+                    listPrd.push(product);
+                });
+                $('#ImportExcelModal').modal("hide");
+                //Loading();
+                var url = '@(Url.Action("ImportSerial", "InvF_InventoryCusReturn"))';
+                formData.append('listProduct', JSON.stringify(listPrd));
+                $.ajax({
+                    url: url,
+                    type: 'post',
+                    beforeSend: function () { },
+                    success: function (result) {
+                        //Endloading();
+                        var getData = result;
+                        if (getData.Success == false || getData.Success == 'false') {
+                            if (getData.Detail != null) {
+                                showErrorDialog("Lỗi!", getData.Detail);
+                            } else {
+                                alert(getData.Messages[0]);
+                            }
+                        } else {
+                            $('#table-detailSerial').html('');
+                            $('#table-detailSerial').html(getData.Html);
+                            updateTableTrIdx($('#table-detailSerial tr'), true);
+
+                            //Update Số lượng, Vị trí lên DS hàng hóa
+                            $("tbody#table-tbodyID tr.trdata").each(function () {
+                                var trProduct = $(this);
+                                var idx = trProduct.attr('idx');
+                                var prdCode = trProduct.attr('data-prdcode');
+                                var flagSerial = trProduct.find('input[type="hidden"][name="Lst_InvF_InventoryCusReturnDtl[' + idx + '].FlagSerial"]').val();
+                                if (flagSerial !== '1') {
+                                    return;
+                                }
+
+                                var lstVitri = "";
+                                var sumqty = $('#table-detailSerial').find('tr[productcode="' + prdCode + '"]').length;
+                                $('#table-detailSerial').find('tr[productcode="' + prdCode + '"]').each(function () {
+                                    var tr = $(this);
+                                    var idx = $(tr).attr('idx');
+
+                                    var invCodeInActual = tr.find('input[type="hidden"][name="Lst_InvF_InventoryCusReturnInstSerial[' + idx + '].InvCodeInActual"]').val();
+                                    if (invCodeInActual != null) {
+                                        if (lstVitri == "") {
+                                            lstVitri += invCodeInActual;
+                                        }
+                                        else if (!lstVitri.includes(invCodeInActual)) {
+                                            lstVitri += ", " + invCodeInActual;
+                                        }
+                                    }
+                                });
+
+                                trProduct.find('input[name="Lst_InvF_InventoryCusReturnDtl[' + idx + '].Qty"]').val(sumqty);
+                                trProduct.find('input[name="Lst_InvF_InventoryCusReturnDtl[' + idx + '].InvCodeInActual"]').val(lstVitri);
+                            });
+
+                            TongTienHang();
+                        }
+                    },
+                    error: function () {
+                        //Endloading();
+                    },
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    //dataType: "json",
+                    processData: false
+                });
+            }
+            else {
+                alert('@MvcHtmlString.Create("Lưới danh mục hàng hóa trống!")');
+                return false;
+            }
+        }
+    }
+
+    function ImportFileExcelQR() {
+        var formData = new window.FormData($('#manageFormImportExcel')[0]);
+        formData.append('tax_file', $('input[type=file]')[0].files[0]);
+
+        if (formData != undefined && formData != null) {
+            var rows = $("tbody#table-tbodyID tr.trdata").length;
+            if (rows > 0) {
+                var listPrd = [];
+                $("tbody#table-tbodyID tr.trdata").each(function () {
+                    var tr = $(this);
+                    var idx = tr.attr('idx');
+                    var product = {};
+                    var productCode = tr.attr('data-prdcode');
+                    var productCodeUser = tr.find('input[type="hidden"][name="Lst_InvF_InventoryCusReturnDtl[' + idx + '].ProductCodeUser"]').val();
+                    var productName = tr.find('input[type="hidden"][name="Lst_InvF_InventoryCusReturnDtl[' + idx + '].ProductName"]').val();
+                    product.ProductCode = productCode;
+                    product.ProductCodeUser = productCodeUser;
+                    product.ProductName = productName;
+                    listPrd.push(product);
+                });
+                $('#ImportExcelModal').modal("hide");
+                //Loading();
+                var url = '@(Url.Action("ImportQR", "InvF_InventoryCusReturn"))';
+                formData.append('listProduct', JSON.stringify(listPrd));
+                $.ajax({
+                    url: url,
+                    data: formData,
+                    type: 'post',
+                    beforeSend: function () { },
+                    success: function (result) {
+                        //Endloading();
+                        var getData = result;
+                        if (getData.Success == false || getData.Success == 'false') {
+                            if (getData.Detail != null) {
+                                showErrorDialog("Lỗi!", getData.Detail);
+                            } else {
+                                alert(getData.Messages[0]);
+                            }
+                        } else {
+                            $('#table-tbodyIDXacThuc').html('');
+                            $('#table-tbodyIDXacThuc').html(getData.Html);
+                            updateTableTrIdxColumn2($('#table-tbodyIDXacThuc tr'), true);
+                        }
+                    },
+                    error: function () {
+                        //Endloading();
+                    },
+                    cache: false,
+                    contentType: false,
+                    //dataType: "json",
+                    processData: false
+                });
+            }
+            else {
+                alert('@MvcHtmlString.Create("Lưới danh mục hàng hóa trống!")');
+                return false;
+            }
+        }
+    }
+
+    function ExportTemplateProduct() {
+
+        ajaxSettings_Excel.Url = '@Url.Action("ExportTemplateProduct", "InvF_InventoryCusReturn")';
+
+        objCommonExcel.ajaxSettingsInit();
+        objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+        objCommonExcel.exportExcel();
+    }
+    function ExportTemplateLot() {
+
+            ajaxSettings_Excel.Url = '@Url.Action("ExportTemplateLot", "InvF_InventoryCusReturn")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.exportExcel();
+    }
+    function ExportTemplateSerial() {
+
+            ajaxSettings_Excel.Url = '@Url.Action("ExportTemplateSerial", "InvF_InventoryCusReturn")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.exportExcel();
+    }
+    function ExportTemplateQR() {
+
+            ajaxSettings_Excel.Url = '@Url.Action("ExportTemplateQR", "InvF_InventoryCusReturn")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.exportExcel();
+        }
+</script>
+
+<!-- Search product -->
+<script type="text/javascript">
+        function ClosePopupProductSearch() {
+            $('#ShowPopupProductSearch').modal('hide');
+            $('#ShowPopupProductSearch').on('hidden.bs.modal', function () {
+                $('#ShowPopupProductSearch form')[0].reset();
+            });
+        }
+
+    function SearchProduct() {
+        let invcodein = $('#InvCodeIn').val();
+        if (invcodein === undefined || invcodein === '') {
+            alert("Kho nhập chưa được chọn");
+            //$('#InvCodeIn').focus();
+            return;
+        }
+
+            var productCode = commonUtils.returnValueText('#ShowPopupProductSearch #ProductName')
+            var token = $('#ShowPopupProductSearch #manageForm input[name=__RequestVerificationToken]').val();
+            var url = '@Url.Action("SearchMstProduct", "InvF_InventoryCusReturn")';
+            $.ajax({
+            type: "post",
+            data: {
+                __RequestVerificationToken: token,
+                productcode: productCode,
+                invcode: invcodein
+            },
+            url: url,
+            dataType: 'json',
+                beforeSend: function () { }
+            }).done(function (result) {
+                if (result.Success) {
+                    $('#List_Product_Data').html('');
+                    $('#List_Product_Data').html(result.Html);
+                    //Disabled_previous_Next();
+                    $('.numberic').number(true, 2);
+                } else {
+                    if (!commonUtils.isNullOrEmpty(result.Detail)) {
+                        showErrorDialog(result.Detail);
+                    }
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+
+            }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+                //alert("complete");
+            });
+    }
+
+    function AddItems() {
+        var checkedRows = $('#ShowPopupProductSearch #dynamic-table-thead-tbody input[type="checkbox"]:checked');
+        if (checkedRows.length == 0) {
+            alert("Không có hàng hoá được chọn!");
+            return false;
+        }
+        for (let item of checkedRows) {
+            debugger;
+            let trRow = $(item).parent().parent();
+            let idx = $(trRow).attr('idx');
+            let flagShow = $(trRow).is(":hidden") ? '0' : '1';
+            let productCode = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].ProductCode"]').val();
+            let productCodeUser = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].ProductCodeUser"]').val();
+            let productCodeBase = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].ProductCodeBase"]').val();
+            let productName = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].ProductName"]').val();
+            let unitCode = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].UnitCode"]').val();
+            let uPBuy = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].UPBuy"]').val();
+            let flagLot = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].mp_FlagLot"]').val();
+            let flagSerial = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].mp_FlagSerial"]').val();
+            let flagCombo = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].FlagCombo"]').val();
+            let invCodeSuggest = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].InvCodeSuggest"]').val();
+
+            var trdisplay = flagShow === '0' ? "display: none" : "";
+            var flagvisible = flagShow === '1' ? "1" : "0";
+            var readonly = 'readonly';
+            var ProductType = '';
+            if (flagLot == "1") {
+                ProductType = "<a href=\"javascript:;\" title=\"Chi tiết Lô\" onclick=\"ShowLo('" + productCode + "','" + productCodeBase + "')\">(Lô)</a>";
+            }
+            else if (flagSerial == "1") {
+                ProductType = "<a href=\"javascript:;\" title=\"Chi tiết Serial\" onclick=\"ShowSerial('" + productCode + "','" + productCodeBase + "')\">(Serial)</a>";
+            }
+            else if (flagCombo == "1") {
+                readonly = '';
+                ProductType = "<a href=\"javascript:;\" title=\"Chi tiết Combo\" onclick=\"ShowCombo('" + productCode + "')\">(Combo)</a>";
+            }
+            else {
+                readonly = '';
+            }
+            debugger;
+            var UnitCode = document.getElementById('optgroup-' + productCode).innerHTML;
+
+            var ShowPopupInvCodeInActual = '';
+            if (flagSerial != "1" && flagLot != "1" && flagCombo != "1") {
+                ShowPopupInvCodeInActual = "<a href=\"javascript:;\" title=\"Chọn vị trí nhập\" onclick=\"ShowVTNhap('" + productCode + "','" + productCodeUser + "','" + productName + "','" + productCodeBase + "')\"><i class=\"fa fa-caret-down\"></i></a>";
+            }
+
+            //
+            var strHtml = getHtmlFromTemplate($('#rowtemplateProduct'), {
+                ProductCode: productCode,
+                ProductName: productName,
+                ProductCodeUser: productCodeUser,
+                ProductType: ProductType,
+                UnitCode: UnitCode,
+                ShowPopupInvCodeInActual: ShowPopupInvCodeInActual,
+                UPCusReturn: uPBuy,
+                Qty: '1',
+                trdisplay: trdisplay,
+                flagvisible: flagvisible,
+                FlagLot: flagLot,
+                FlagSerial: flagSerial,
+                FlagCombo: flagCombo,
+                ReadOnly: readonly,
+                InvCodeSuggest: invCodeSuggest,
+                idx: 999999
+            });
+
+            var oldItem = $('.GetPrd').find('tr[data-prdcode="' + productCode + '"]');
+            if (oldItem != undefined && oldItem.length > 0) {
+                let flagVisibleCur = oldItem.attr('flagvisible');
+                if (flagVisibleCur === '1' && flagvisible === '1') {
+                    commonUtils.showAlert('Mã hàng hóa ' + productCodeUser + ' đã tồn tại trên lưới dữ liệu!');
+                    return;
+                }
+                else if (flagVisibleCur === '0' && flagvisible === '1') {
+                    oldItem.remove();
+                    $('.GetPrd').append(strHtml);
+
+                    //Xóa VT cũ cùng ProductCode
+                    var trOldInvs = $('#table-detailInvCodeInActual').find('tr[productcode="' + productCode + '"]');
+                    $(trOldInvs).each(function () {
+                        $(this).remove();
+                    });
+                    updateTableTrIdx($('#table-detailInvCodeInActual tr'), false);
+                }
+                else if (flagVisibleCur === '1' && flagvisible === '0') {
+                    continue;
+                }
+            } else {
+                $('.GetPrd').append(strHtml);
+            }
+            updateTableTrIdx($('#table-tbodyID tr.trdata'), false);
+            jQuery(function ($) {
+                if ($('.number').length) {
+                    $('.number').number(true, 2);
+                }
+            });
+
+            //Add row bảng vị trí nhập
+            let strHtmlVtNhap;
+            strHtmlVtNhap = getHtmlFromTemplate($('#rowtemplateInvCodeInActual'), {
+                ProductCode: productCode,
+                ProductCodeRoot: productCode,
+                Qty: '1',
+                InvCodeInActual: invCodeSuggest,
+                idx: 999999
+            });
+            $('#table-detailInvCodeInActual').append(strHtmlVtNhap);
+            updateTableTrIdx($('#table-detailInvCodeInActual tr'), false);
+        }
+        $('#myInput').val('');
+        TongTienHang();
+        EnableRefNo();
+        ClosePopupProductSearch();
+    }
+</script>
+
+<!-- Search product in order-->
+<script type="text/javascript">
+        function ClosePopupProductInOrderSearch() {
+            $('#ShowPopupProductInOrderSearch').modal('hide');
+            $('#ShowPopupProductInOrderSearch').on('hidden.bs.modal', function () {
+                $('#ShowPopupProductInOrderSearch form')[0].reset();
+            });
+        }
+
+        function SearchProductInOrder() {
+            var customerCode = commonUtils.returnValueText('#ShowPopupProductInOrderSearch #sCustomerCode');
+            var refNo = commonUtils.returnValueText('#ShowPopupProductInOrderSearch #sRefNo');
+            var productCode = commonUtils.returnValueText('#ShowPopupProductInOrderSearch #sProductCode');
+            var productName = commonUtils.returnValueText('#ShowPopupProductInOrderSearch #sProductName');
+            var refType = $('#RefType').val();
+
+            if (refNo === undefined || refNo.length === 0) {
+                alert('Vui lòng nhập số RefNo!');
+                $('#ShowPopupProductInOrderSearch #sRefNo').focus();
+                return;
+            }
+
+            let invcodein = $('#InvCodeIn').val();
+            if (invcodein === undefined || invcodein === '') {
+                alert("Kho nhập chưa được chọn");
+                //$('#InvCodeIn').focus();
+                return;
+            }
+
+            var token = $('#ShowPopupProductInOrderSearch #manageForm input[name=__RequestVerificationToken]').val();
+            var url = '@Url.Action("SearchProductInOrder", "InvF_InventoryCusReturn")';
+            $.ajax({
+            type: "post",
+            data: {
+                __RequestVerificationToken: token,
+                customercode: customerCode,
+                refno: refNo,
+                reftype: refType,
+                productcode: productCode,
+                productname: productName,
+                invcode: invcodein
+            },
+            url: url,
+            dataType: 'json',
+                beforeSend: function () { }
+            }).done(function (result) {
+                if (result.Success) {
+                    $('#List_Product_Data_InOrder').html('');
+                    $('#List_Product_Data_InOrder').html(result.Html);
+                    //Disabled_previous_Next();
+                    $('.numberic').number(true, 2);
+                } else {
+                    if (!commonUtils.isNullOrEmpty(result.Detail)) {
+                        showErrorDialog(result.Detail);
+                    }
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+
+            }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+                //alert("complete");
+            });
+    }
+
+    function AddItemsPrdInOrder() {
+        var checkedRows = $('#ShowPopupProductInOrderSearch #dynamic-table-thead-tbody input[type="checkbox"]:checked');
+        if (checkedRows.length == 0) {
+            alert("Không có hàng hoá được chọn!");
+            return false;
+        }
+        for (let item of checkedRows) {
+            debugger;
+            let trRow = $(item).parent().parent();
+            let idx = $(trRow).attr('idx');
+            let flagShow = $(trRow).is(":hidden") ? '0' : '1';
+            let productCode = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].ProductCode"]').val();
+            let productCodeUser = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].ProductCodeUser"]').val();
+            let productCodeBase = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].ProductCodeBase"]').val();
+            let productName = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].ProductName"]').val();
+            let unitCode = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].UnitCode"]').val();
+            let uPBuy = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].UPBuy"]').val();
+            let flagLot = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].mp_FlagLot"]').val();
+            let flagSerial = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].mp_FlagSerial"]').val();
+            let flagCombo = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].FlagCombo"]').val();
+            let qty = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].QtyOrder"]').val();
+            let invCodeSuggest = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].InvCodeSuggest"]').val();
+
+            var trdisplay = flagShow === '0' ? "display: none" : "";
+            var flagvisible = flagShow === '1' ? "1" : "0";
+            var readonly = 'readonly';
+            var ProductType = '';
+            if (flagLot == "1") {
+                ProductType = "<a href=\"javascript:;\" title=\"Chi tiết Lô\" onclick=\"ShowLo('" + productCode + "','" + productCodeBase + "')\">(Lô)</a>";
+            }
+            else if (flagSerial == "1") {
+                ProductType = "<a href=\"javascript:;\" title=\"Chi tiết Serial\" onclick=\"ShowSerial('" + productCode + "','" + productCodeBase + "')\">(Serial)</a>";
+            }
+            else if (flagCombo == "1") {
+                readonly = '';
+                ProductType = "<a href=\"javascript:;\" title=\"Chi tiết Combo\" onclick=\"ShowCombo('" + productCode + "')\">(Combo)</a>";
+            }
+            else {
+                readonly = '';
+            }
+            debugger;
+            var UnitCode = "<option value=\"" + unitCode + "\" prdcode = \"" + productCode + "\" selected >" + unitCode + "</option>";
+
+            var ShowPopupInvCodeInActual = '';
+            if (flagSerial != "1" && flagLot != "1" && flagCombo != "1") {
+                ShowPopupInvCodeInActual = "<a href=\"javascript:;\" title=\"Chọn vị trí nhập\" onclick=\"ShowVTNhap('" + productCode + "','" + productCodeUser + "','" + productName + "','" + productCodeBase + "')\"><i class=\"fa fa-caret-down\"></i></a>";
+            }
+
+            //
+            var strHtml = getHtmlFromTemplate($('#rowtemplateProduct'), {
+                ProductCode: productCode,
+                ProductName: productName,
+                ProductCodeUser: productCodeUser,
+                ProductType: ProductType,
+                UnitCode: UnitCode,
+                ShowPopupInvCodeInActual: ShowPopupInvCodeInActual,
+                UPCusReturn: uPBuy,
+                Qty: qty,
+                trdisplay: trdisplay,
+                flagvisible: flagvisible,
+                FlagLot: flagLot,
+                FlagSerial: flagSerial,
+                FlagCombo: flagCombo,
+                ReadOnly: readonly,
+                InvCodeSuggest: invCodeSuggest,
+                idx: 999999
+            });
+
+            var oldItem = $('.GetPrd').find('tr[data-prdcode="' + productCode + '"]');
+            if (oldItem != undefined && oldItem.length > 0) {
+                let flagVisibleCur = oldItem.attr('flagvisible');
+                if (flagVisibleCur === '1' && flagvisible === '1') {
+                    commonUtils.showAlert('Mã hàng hóa ' + productCodeUser + ' đã tồn tại trên lưới dữ liệu!');
+                    return;
+                }
+                else if (flagVisibleCur === '0' && flagvisible === '1') {
+                    oldItem.remove();
+                    $('.GetPrd').append(strHtml);
+
+                    //Xóa VT cũ cùng ProductCode
+                    var trOldInvs = $('#table-detailInvCodeInActual').find('tr[productcode="' + productCode + '"]');
+                    $(trOldInvs).each(function () {
+                        $(this).remove();
+                    });
+                    updateTableTrIdx($('#table-detailInvCodeInActual tr'), false);
+                }
+                else if (flagVisibleCur === '1' && flagvisible === '0') {
+                    continue;
+                }
+            } else {
+                $('.GetPrd').append(strHtml);
+            }
+            updateTableTrIdx($('#table-tbodyID tr.trdata'), false);
+            jQuery(function ($) {
+                if ($('.number').length) {
+                    $('.number').number(true, 2);
+                }
+            });
+
+            //Add row bảng vị trí nhập
+            let strHtmlVtNhap;
+            strHtmlVtNhap = getHtmlFromTemplate($('#rowtemplateInvCodeInActual'), {
+                ProductCode: productCode,
+                ProductCodeRoot: productCode,
+                Qty: qty,
+                InvCodeInActual: invCodeSuggest,
+                idx: 999999
+            });
+            $('#table-detailInvCodeInActual').append(strHtmlVtNhap);
+            updateTableTrIdx($('#table-detailInvCodeInActual tr'), false);
+
+            TongTienHang();
+            EnableRefNo();
+            ClosePopupProductInOrderSearch();
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    function AddProductToList(thiz) {
+        let productCode = $(thiz).val();
+        if (productCode === 'SEARCHDATA' || productCode === '') {
+            return;
+        }
+
+        let optSelect = $(thiz).find('option:selected');        
+        
+        let productCodeUser = $(optSelect).attr("ProductCodeUser");
+        let productCodeBase = $(optSelect).attr("ProductCodeBase");
+        let productName = $(optSelect).attr("ProductName");
+        let unitCode = $(optSelect).attr("UnitCode");
+        let uPBuy = $(optSelect).attr("UPBuy");
+        let flagLot = $(optSelect).attr("FlagLot");
+        let flagSerial = $(optSelect).attr("FlagSerial");
+        let flagCombo = $(optSelect).attr("FlagCombo");
+        let qty = $(optSelect).attr("Qty");
+        let invCodeSuggest = $(optSelect).attr("InvCodeSuggest");
+
+        let trdisplay = "";
+        let flagvisible = "1";
+        let readonly = 'readonly';
+        let ProductType = '';
+        if (flagLot == "1") {
+            ProductType = "<a href=\"javascript:;\" title=\"Chi tiết Lô\" onclick=\"ShowLo('" + productCode + "','" + productCodeBase + "')\">(Lô)</a>";
+        }
+        else if (flagSerial == "1") {
+            ProductType = "<a href=\"javascript:;\" title=\"Chi tiết Serial\" onclick=\"ShowSerial('" + productCode + "','" + productCodeBase + "')\">(Serial)</a>";
+        }
+        else if (flagCombo == "1") {
+            readonly = '';
+            ProductType = "<a href=\"javascript:;\" title=\"Chi tiết Combo\" onclick=\"ShowCombo('" + productCode + "')\">(Combo)</a>";
+        }
+        else {
+            readonly = '';
+        }
+        
+        var UnitCode = "<option value=\"" + unitCode + "\" prdcode = \"" + productCode + "\" selected >" + unitCode + "</option>";
+
+        var ShowPopupInvCodeInActual = '';
+        if (flagSerial != "1" && flagLot != "1" && flagCombo != "1") {
+            ShowPopupInvCodeInActual = "<a href=\"javascript:;\" title=\"Chọn vị trí nhập\" onclick=\"ShowVTNhap('" + productCode + "','" + productCodeUser + "','" + productName + "','" + productCodeBase + "')\"><i class=\"fa fa-caret-down\"></i></a>";
+        }
+
+        //
+        var strHtml = getHtmlFromTemplate($('#rowtemplateProduct'), {
+            ProductCode: productCode,
+            ProductName: productName,
+            ProductCodeUser: productCodeUser,
+            ProductType: ProductType,
+            UnitCode: UnitCode,
+            ShowPopupInvCodeInActual: ShowPopupInvCodeInActual,
+            UPCusReturn: uPBuy,
+            Qty: qty,
+            trdisplay: trdisplay,
+            flagvisible: flagvisible,
+            FlagLot: flagLot,
+            FlagSerial: flagSerial,
+            FlagCombo: flagCombo,
+            ReadOnly: readonly,
+            InvCodeSuggest: invCodeSuggest,
+            idx: 999999
+        });
+
+        var oldItem = $('.GetPrd').find('tr[data-prdcode="' + productCode + '"]');
+        if (oldItem != undefined && oldItem.length > 0) {
+            let flagVisibleCur = oldItem.attr('flagvisible');
+            if (flagVisibleCur === '1' && flagvisible === '1') {
+                commonUtils.showAlert('Mã hàng hóa ' + productCodeUser + ' đã tồn tại trên lưới dữ liệu!');
+                return;
+            }
+            else if (flagVisibleCur === '0' && flagvisible === '1') {
+                oldItem.remove();
+                $('.GetPrd').append(strHtml);
+
+                //Xóa VT cũ cùng ProductCode
+                var trOldInvs = $('#table-detailInvCodeInActual').find('tr[productcode="' + productCode + '"]');
+                $(trOldInvs).each(function () {
+                    $(this).remove();
+                });
+                updateTableTrIdx($('#table-detailInvCodeInActual tr'), false);
+            }
+            else if (flagVisibleCur === '1' && flagvisible === '0') {
+                //continue;
+            }
+        } else {
+            $('.GetPrd').append(strHtml);
+        }
+        updateTableTrIdx($('#table-tbodyID tr.trdata'), false);
+        jQuery(function ($) {
+            if ($('.number').length) {
+                $('.number').number(true, 2);
+            }
+        });
+
+        //Add row bảng vị trí nhập
+        let strHtmlVtNhap;
+        strHtmlVtNhap = getHtmlFromTemplate($('#rowtemplateInvCodeInActual'), {
+            ProductCode: productCode,
+            ProductCodeRoot: productCode,
+            Qty: qty,
+            InvCodeInActual: invCodeSuggest,
+            idx: 999999
+        });
+
+        $('#table-detailInvCodeInActual').append(strHtmlVtNhap);
+        updateTableTrIdx($('#table-detailInvCodeInActual tr'), false);
+
+        TongTienHang();
+        EnableRefNo();
+    }
+</script>
+
+<script>
+    
+    function StartScan() {
+        if (FlagScan === '0') {
+            var listToastr = [];
+            objToastr = { ToastrType: 'success', ToastrMessage: '@MvcHtmlString.Create("Bắt đầu chuyển sang chế độ quét".HtmlItemString("invf_inventorycusreturn"))' };
+            listToastr.push(objToastr);
+            commonUtils.showToastr(listToastr);            
+            FlagScan = '1';
+            //Ẩn hiện ô quét
+            $('#quetmavach').show();
+            $('#divPrdOrder').hide();
+            $('#myInput').val('');
+            $('#myInput').hide();
+            $('#quetmavach').focus();
+        }
+        else {
+            var listToastr = [];
+            objToastr = { ToastrType: 'success', ToastrMessage: '@MvcHtmlString.Create("Đã tắt chế độ quét".HtmlItemString("invf_inventorycusreturn"))' };
+            listToastr.push(objToastr);
+            commonUtils.showToastr(listToastr);
+            FlagScan = '0';
+            //Ẩn hiện ô quét
+            $('#quetmavach').val('');
+            $('#quetmavach').hide();
+            let elementFlagTraTuDH = document.getElementById('FlagTraTuDH');
+            ChangeTraTuDH(elementFlagTraTuDH);
+        }
+}
+</script>

@@ -1,0 +1,337 @@
+﻿@model Sys_User
+@{
+    Layout = "~/Views/Shared/CoreLayoutQuanTri.cshtml";
+    var title = "TẠO NGƯỜI DÙNG";
+    var titleMng = "Quản lý người dùng";
+    ViewBag.Title = title;
+    var ListMst_Department = ViewBag.ListMst_Department as List<Mst_Department>;
+    var listMst_NNT = ViewBag.ListMst_NNTCur as List<Mst_NNT>;
+    if (listMst_NNT == null || listMst_NNT.Count == 0)
+    {
+        listMst_NNT = new List<Mst_NNT>();
+    }
+    var isParent = ViewBag.IsParent;
+
+    var urlPdf = @"https://services.qinvoice.vn/idocNet.Real.HDDT.V22.3253935000.WA/api/File/UploadedFiles/PdfFiles/3253935000/VUTHITHUTHAO730@OUTLOOK.COM/2019-11-27/000DK3BR00GSQ020191127_165923.pdf";
+    //urlPdf = @"https://qinvoice.vn/TempFiles/20191122_084016.pdf";
+    var urlPdfNew = @"https://services.qinvoice.vn/idocNet.Real.HDDT.V22.3344306000.WA/api/File/UploadedFiles/PdfFiles/3344306000/HOADT@IDOCNET.COM/2019-11-28/0005K3BS00H0W820191128_094050.pdf";
+}
+<script type="text/javascript">
+    var parents = new Array();
+    parents.push("@Url.Action("Index", "Sys_User")");
+    parents.push("");
+    var parentsText = new Array();
+    parentsText.push("@MvcHtmlString.Create(titleMng)");
+    parentsText.push("@MvcHtmlString.Create(title)");
+    setAdminCurrentTag(parents, parentsText);
+</script>
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                @*<div class="title">
+                        <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                    </div>*@
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="row no-margin box-shadow-tk">
+                        @using (Html.BeginForm("Create", "Sys_User", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="col-xs-4 no-padding">
+                                <div class="form-group margin-bottom-9">
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã người dùng <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="UserCode" name="UserCode" class="col-xs-12  UserCode" value="@if (Model != null && Model.UserCode != null){@MvcHtmlString.Create(Model.UserCode.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group margin-bottom-9">
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên người dùng <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="UserName" name="UserName" class="col-xs-12 UserName" value="@if (Model != null && Model.UserName != null){@MvcHtmlString.Create(Model.UserName.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-9">
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Điện thoại")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" maxlength="11" id="PhoneNo" name="PhoneNo" class="col-xs-12 PhoneNo" onKeyPress="return isNumberKey(event)" value="@if (Model != null && Model.PhoneNo != null){@MvcHtmlString.Create(Model.PhoneNo.ToString())} else { @("")}" autocomplete="off" />
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-4 no-padding">
+                                <div class="form-group margin-bottom-9">
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Trực thuộc đơn vị <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            @*<input type="text" id="MST" name="MST" class="col-xs-11 MST" value="@if (Model != null && Model.MST != null){@MvcHtmlString.Create(Model.MST.ToString())} else { @("")}" autocomplete="off" required />*@
+                                            <select id="MST" name="MST" class="col-xs-12" required="">
+                                                <option></option>
+                                                @{
+                                                    if (listMst_NNT != null && listMst_NNT.Count > 0)
+                                                    {
+                                                        foreach (var it in listMst_NNT)
+                                                        {
+                                                            <option value="@MvcHtmlString.Create(it.MST.ToString().Trim())">@MvcHtmlString.Create(it.MST.ToString().Trim())</option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group margin-bottom-9">
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Bộ phận/phòng ban <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <select id="DepartmentCode" name="DepartmentCode" class="col-xs-12">
+                                                <option></option>
+                                                @{
+                                                    if (ListMst_Department != null)
+                                                    {
+                                                        foreach (var it in ListMst_Department)
+                                                        {
+                                                            <option value="@it.DepartmentCode">@it.DepartmentCode - @it.DepartmentName</option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                            @*<input type="text" id="DepartmentCode" name="DepartmentCode" class="col-xs-11 DepartmentCode"  value="@if (Model != null && Model.DepartmentCode != null){@MvcHtmlString.Create(Model.DepartmentCode.ToString())} else { @("")}" autocomplete="off" required />*@
+                                        </span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-9">
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">Cờ Quản trị đơn vị</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right padding-top-5">
+                                            <label>
+                                                <input name="FlagNNTAdmin" id="FlagNNTAdmin" class="ace ace-switch ace-switch-4 FlagNNTAdmin" type="checkbox" value="1" />
+                                                <span class="lbl"></span>
+                                                <input name="FlagNNTAdmin" type="hidden" value="0" />
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-4 no-padding">
+                                <div class="form-group margin-bottom-9">
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mật khẩu <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="password" id="UserPassword" name="UserPassword" class="col-xs-12 UserPassword" value="@if (Model != null && Model.UserPassword != null){@MvcHtmlString.Create(Model.UserPassword.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group margin-bottom-9">
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Nhập lại mật khẩu <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="password" id="ConfirmPassword" name="ConfirmPassword" class="col-xs-12 ConfirmPassword" value="@if (Model != null && Model.UserPassword != null){@MvcHtmlString.Create(Model.UserPassword.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                    </div>
+                                </div>
+                                @if (isParent)
+                                {
+                                    <div class="form-group margin-bottom-9">
+                                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">Cờ Quản trị HT</label>
+                                        <div class="col-xs-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right padding-top-5">
+                                                <label>
+                                                    <input name="FlagSysAdmin" id="FlagSysAdmin" class="ace ace-switch ace-switch-4 FlagSysAdmin" type="checkbox" value="1" />
+                                                    <span class="lbl"></span>
+                                                    <input name="FlagSysAdmin" type="hidden" value="0" />
+                                                </label>
+                                            </span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </aside>
+                    <div class="col-xs-12">
+                        <div class="clearfix">
+                            <div class="row no-margin" style="float: right">
+                                @*<a href="javascript:void(0);" class="btn font-color mybtn-Button" style="margin-left: 10px; padding-left: 15px!important; padding-right: 15px!important; " onclick="SaveData();"><i class="ace-icon fa fa-floppy-o bigger-110"></i>Lưu</a>*@
+                                @RenderItemFormat("BTN_TAO_MOI_NGUOI_DUNG_LUU", "<a href=\"javascript: void(0); \" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px; padding-left: 15px!important; padding-right: 15px!important;\" onclick=\"SaveData();\">Lưu</a>", "", "")
+
+                                @*<a class="btn font-color mybtn-Button" href="javascript:;" onclick="openIframe();" style="float: right;font-size: 13px; margin-top: 20px;margin-right: 10px; "><img class="img-button in-acti" src="/Images/Hoadon/Tao.svg"><img class="img-button acti" src="/Images/Hoadon/Tao.svg">iFrame</a>*@
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Sys_User.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "Sys_User")');
+
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+
+        });
+    @* Set focus *@
+    var _getForm = document.getElementById("manageForm");
+    _getForm.addEventListener('reset', function () {
+        document.getElementById("UserCode").focus();
+    });
+        @* Set focus *@
+        $(document).ready(function () {
+            $('#UserCode').focus();
+        });
+        function SaveData() {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Create", "Sys_User")';
+            var objSys_User = new Sys_User();
+            objSys_User.ActionType = 'create';
+            objSys_User.ajaxSettings = ajaxSettings;
+            objSys_User.saveData();
+        }
+    </script>
+}
+
+
+
+<div class="col-xs-12 col-md-12 col-lg-12" style="text-align: center; display: none;" id="divView">
+    <object id="objPDF" data="@MvcHtmlString.Create(urlPdf)" type="application/pdf" style="width: 800px; height: 620px;"> </object>
+</div>
+<style>
+    html[dir='ltr'] #toolbarContainer {
+        display: none;
+    }
+</style>
+
+<script type="text/javascript">
+    function openIframe() {
+        $('.modal-content').html('');
+        $('#ModelKyDienTuSendMail').modal({
+            backdrop: false,
+            keyboard: true
+        });
+        $('#ModelKyDienTuSendMail').modal('show');
+
+        var link = "http://test.qinvoice.vn:12071/invoice-sse?invoicecode=0005K3BQ01OQ2A&networkid";
+        //var link = "http://localhost:1283//invoice-sse?invoicecode=0005K3BQ01OQ2A&networkid="
+
+        var iframe = document.createElement('iframe');
+        iframe.id = "randomid";
+        iframe.name = "randomid";
+        iframe.width = "100%";
+        iframe.height = "530px";
+        document.getElementById("ad54").appendChild(iframe);
+        //iframe.style.display = 'none';
+        iframe.setAttribute("src", '@MvcHtmlString.Create(urlPdfNew)');
+        iframe.onload = function () {
+            //setTimeout(function() {
+            //    iframe.focus();
+            //    iframe.contentWindow.print();
+            //}, 1);
+        };
+        //iframe.src = link;
+
+        //var iframe = document.createElement('iframe');
+        //iframe.frameBorder=0;
+        //iframe.width="640px";
+        //iframe.height="530px";
+        //iframe.id="randomid";
+        //iframe.setAttribute("src", link);
+        //document.getElementById("ad54").appendChild(iframe);
+        ////iframe.focus();
+        ////iframe.contentWindow.print();
+        ////iframe.style.display = 'none';
+        //iframe.onload = function() {
+        //    setTimeout(function () {
+        //        debugger;
+        //        iframe.focus();
+        //        iframe.contentWindow.print();
+        //    }, 0);
+        //};
+
+        //iframe.setAttribute("src", link);
+        //iframe.src = link;
+        //var ifrm = document.createElement("iframe");
+        //ifrm.setAttribute("src", "http://test.qinvoice.vn:12071/3296932000/Invoice_Invoice/Search?invoiceCode=0005K3BQ01OQ2A");
+        //ifrm.style.width = "640px";
+        //ifrm.style.height = "530px";
+        ////$('#ModelKyDienTuSendMail').appendChild(ifrm);
+        //document.body.appendChild(ifrm);
+    }
+    function CloseModalKyDienTuSendMail() {
+        $('#ModelKyDienTuSendMail').modal('hide');
+        $('#tbodyKyDienTuSendMail').html('');
+    }
+    function ESignSendMail() {
+
+    }
+</script>
+
+<div class="modal fade" id="ModelKyDienTuSendMail" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 75%">
+        @using (Html.BeginForm(null, null, FormMethod.Get, new { id = "manageFormPopupKyDienTuSendMail", @class = "form-horizontal" }))
+        {
+            @Html.AntiForgeryToken()
+            <div class="modal-header">
+                <div class="col-xs-10" style="font-size: 15px; font-weight: 600;"><img src="/Images/logo-white.svg" style="width: 94px;"> | GIẢI PHÁP HÓA ĐƠN ĐIỆN TỬ Q-INVOICE</div>
+                <a href="javascript:void();" onclick="CloseModalKyDienTuSendMail()" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </a>
+            </div>
+            <div class="modal-content" id="ad54">
+                @*<div class="modal-header">
+                        <div class="col-xs-6" style="font-size: 15px; font-weight: 600;">Ký điện tử</div>
+                        <a href="javascript:;" onclick="CloseModalKyDienTuSendMail()" class="close" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </a>
+                    </div>
+                    <div class="modal-body" style="padding: 30px 30px;">
+                        <div class="scrollable-horizontal-esignsendmail padding-left-0 padding-right-0 div-scrollable" data-size="1600" style="padding-top: 0 !important;">
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="javascript:void(0);" class="btn mybtn-Button" onclick="ESignSendMail();" id="btnSaveKyDienTu" style="padding-left: 10px !important; padding-right: 10px !important; font-size: 16px; font-weight: 500;">Ký điện tử</a>
+                    </div>*@
+            </div>
+        }
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    function AutoPrinf() {
+        var link = "http://test.qinvoice.vn:12071/3296932000/Invoice_Invoice/Search?invoiceCode=0005K3BQ01OQ2A"
+        //var link = "http://localhost:1283/3296932000/Invoice_Invoice/Search?invoiceCode=0005K3BQ01OQ2A"
+
+        var iframe = document.createElement('iframe');
+        document.getElementById("ad54").appendChild(iframe);
+        iframe.style.display = 'none';
+        //iframe.setAttribute("src", link);
+        iframe.onload = function () {
+            setTimeout(function () {
+                iframe.focus();
+                iframe.contentWindow.print();
+            }, 1);
+        };
+        iframe.src = link;
+    }
+</script>
+
+
+

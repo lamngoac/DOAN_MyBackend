@@ -1,0 +1,207 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{2BBAAB4A-FC12-4547-992A-355BF693D6F6}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>idn.Skycic.Inventory.ClientService</RootNamespace>
+    <AssemblyName>idn.Skycic.Inventory.ClientService</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\05.Refs\Libs\System.DLL\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Services\Customer_DynamicFieldService.cs" />
+    <Compile Include="Services\InvFInventoryReturnSupService.cs" />
+    <Compile Include="Services\InvFTempPrintService.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\DMS\DMS_ReportService.cs" />
+    <Compile Include="Services\Inbrand\OS_MstSv_InBrandServices.cs" />
+    <Compile Include="Services\Inbrand\Report_InbrandService.cs" />
+    <Compile Include="Services\InvF_InvAuditService.cs" />
+    <Compile Include="Services\InvF_InventoryCusReturnService.cs" />
+    <Compile Include="Services\InvF_InventoryInService.cs" />
+    <Compile Include="Services\InvF_InventoryOutService.cs" />
+    <Compile Include="Services\InvF_MoveOrdService.cs" />
+    <Compile Include="Services\InvInventoryBalanceSerialService.cs" />
+    <Compile Include="Services\Inv_InventoryBalanceLotService.cs" />
+    <Compile Include="Services\LQDMS\Mst_PrintOrderService.cs" />
+    <Compile Include="Services\Map_UserInNotifyTypeService.cs" />
+    <Compile Include="Services\MstInvOutTypeService.cs" />
+    <Compile Include="Services\MstTempPrintTypeService.cs" />
+    <Compile Include="Services\Mst_AreaService.cs" />
+    <Compile Include="Services\Mst_AttributeService.cs" />
+    <Compile Include="Services\Mst_BrandService.cs" />
+    <Compile Include="Services\Mst_ColumnConfigGroupService.cs" />
+    <Compile Include="Services\Mst_ColumnConfigService.cs" />
+    <Compile Include="Services\Mst_CustomerGroupService.cs" />
+    <Compile Include="Services\Mst_CustomerService.cs" />
+    <Compile Include="Services\Mst_CustomerSourceService.cs" />
+    <Compile Include="Services\Mst_CustomerTypeService.cs" />
+    <Compile Include="Services\Mst_InvOutTypeService.cs" />
+    <Compile Include="Services\InvF_InventoryInFGInstSerialService.cs" />
+    <Compile Include="Services\InvF_InventoryInFGService.cs" />
+    <Compile Include="Services\InvF_InventoryOutFGInstSerialService.cs" />
+    <Compile Include="Services\InvF_InventoryOutFGService.cs" />
+    <Compile Include="Services\Invoice_CustomFieldService.cs" />
+    <Compile Include="Services\Inv_GenTimesBoxService.cs" />
+    <Compile Include="Services\Inv_GenTimesCartonService.cs" />
+    <Compile Include="Services\Inv_GenTimesService.cs" />
+    <Compile Include="Services\Inv_InventoryBalanceSerialService.cs" />
+    <Compile Include="Services\Inv_InventoryBalanceService.cs" />
+    <Compile Include="Services\Inv_InventoryBoxService.cs" />
+    <Compile Include="Services\Inv_InventoryCartonService.cs" />
+    <Compile Include="Services\Inv_InventorySecretService.cs" />
+    <Compile Include="Services\Mst_GovTaxIDService.cs" />
+    <Compile Include="Services\Mst_InventoryOutTypeService.cs" />
+    <Compile Include="Services\Mst_InvInTypeService.cs" />
+    <Compile Include="Services\ClientServiceBase.cs" />
+    <Compile Include="Services\CommonService.cs" />
+    <Compile Include="Services\EmailService.cs" />
+    <Compile Include="Services\FileService.cs" />
+    <Compile Include="Services\InvoiceInvoiceInputService.cs" />
+    <Compile Include="Services\InvoiceInvoiceService.cs" />
+    <Compile Include="Services\Invoice_licenseService.cs" />
+    <Compile Include="Services\Map_DealerDiscountService.cs" />
+    <Compile Include="Services\MasterServerService.cs" />
+    <Compile Include="Services\MstGovIDTypeService.cs" />
+    <Compile Include="Services\MstSv_Mst_NetworkService.cs" />
+    <Compile Include="Services\Mst_AgentService.cs" />
+    <Compile Include="Services\Mst_BizFieldService.cs" />
+    <Compile Include="Services\Mst_BizSizeService.cs" />
+    <Compile Include="Services\Mst_BizTypeService.cs" />
+    <Compile Include="Services\Mst_CountryService.cs" />
+    <Compile Include="Services\Mst_DealerService.cs" />
+    <Compile Include="Services\Mst_DepartmentService.cs" />
+    <Compile Include="Services\Mst_DistrictService.cs" />
+    <Compile Include="Services\Mst_GovIDTypeService.cs" />
+    <Compile Include="Services\Mst_InventoryLevelTypeService.cs" />
+    <Compile Include="Services\Mst_InventoryService.cs" />
+    <Compile Include="Services\Mst_InventoryTypeService.cs" />
+    <Compile Include="Services\Mst_InvoiceTypeService.cs" />
+    <Compile Include="Services\Mst_MoveOrdTypeService.cs" />
+    <Compile Include="Services\Mst_NNTService.cs" />
+    <Compile Include="Services\Mst_NNTTypeService.cs" />
+    <Compile Include="Services\Mst_OrgService.cs" />
+    <Compile Include="Services\Mst_PartMaterialTypeService.cs" />
+    <Compile Include="Services\Mst_PartService.cs" />
+    <Compile Include="Services\Mst_PartTypeService.cs" />
+    <Compile Include="Services\Mst_PartUnitService.cs" />
+    <Compile Include="Services\Mst_PaymentMethodsService.cs" />
+    <Compile Include="Services\Mst_ProductGroupService.cs" />
+    <Compile Include="Services\Mst_ProductService.cs" />
+    <Compile Include="Services\Mst_ProductTypeService.cs" />
+    <Compile Include="Services\Mst_ProvinceService.cs" />
+    <Compile Include="Services\Mst_Sys_ConfigService.cs" />
+    <Compile Include="Services\Mst_TempPrintGroupService.cs" />
+    <Compile Include="Services\Mst_UserMapInventoryService.cs" />
+    <Compile Include="Services\Mst_VATRateService.cs" />
+    <Compile Include="Services\Mst_WardService.cs" />
+    <Compile Include="Services\OS_InosService.cs" />
+    <Compile Include="Services\OS_Inos_OrgService.cs" />
+    <Compile Include="Services\OS_Invoice_InvoiceTempService.cs" />
+    <Compile Include="Services\OS_MstSvTVAN_MstSv_Sys_UserService.cs" />
+    <Compile Include="Services\OS_Ord_OrderPDService.cs" />
+    <Compile Include="Services\OS_PrdCenter_FileService.cs" />
+    <Compile Include="Services\OS_PrdCenter_Mst_BrandService.cs" />
+    <Compile Include="Services\OS_PrdCenter_Mst_CurrencyExService.cs" />
+    <Compile Include="Services\OS_PrdCenter_Mst_ModelService.cs" />
+    <Compile Include="Services\OS_PrdCenter_Mst_SpecCustomFieldService.cs" />
+    <Compile Include="Services\OS_PrdCenter_Mst_SpecPriceService.cs" />
+    <Compile Include="Services\OS_PrdCenter_Mst_SpecService.cs" />
+    <Compile Include="Services\OS_PrdCenter_Mst_SpecType1Service.cs" />
+    <Compile Include="Services\OS_PrdCenter_Mst_SpecType2Service.cs" />
+    <Compile Include="Services\OS_PrdCenter_Mst_SpecUnitService.cs" />
+    <Compile Include="Services\OS_PrdCenter_Mst_UnitService.cs" />
+    <Compile Include="Services\OS_PrdCenter_Mst_VATRateService.cs" />
+    <Compile Include="Services\OS_PrdCenter_PrdPrdIDCustomFieldService.cs" />
+    <Compile Include="Services\OS_PrdCenter_PrdProductIDService.cs" />
+    <Compile Include="Services\PayGateService.cs" />
+    <Compile Include="Services\Prd_DynamicFieldService.cs" />
+    <Compile Include="Services\ProductCustomFieldService.cs" />
+    <Compile Include="Services\Rpt_Inventory_In_Out_InvService.cs" />
+    <Compile Include="Services\Rpt_InvF_WarehouseCardService.cs" />
+    <Compile Include="Services\Rpt_Inv_InventoryBalanceService.cs" />
+    <Compile Include="Services\ReportsService.cs" />
+    <Compile Include="Services\RptSv_Invoice_CustomFieldService.cs" />
+    <Compile Include="Services\RptSv_Rpt_InvoiceSummary_01Service.cs" />
+    <Compile Include="Services\RptSv_Sys_AccessService.cs" />
+    <Compile Include="Services\RptSv_Sys_GroupService.cs" />
+    <Compile Include="Services\RptSv_Sys_ObjectService.cs" />
+    <Compile Include="Services\RptSv_Sys_SolutionService.cs" />
+    <Compile Include="Services\RptSv_Sys_UserInGroupService.cs" />
+    <Compile Include="Services\RptSv_Sys_UserService.cs" />
+    <Compile Include="Services\Rpt_InvoiceForDashboardService.cs" />
+    <Compile Include="Services\Rpt_InvoiceInvoice_ResultUsedService.cs" />
+    <Compile Include="Services\Rpt_Inv_InventoryBalance_ExtendService.cs" />
+    <Compile Include="Services\SeqService.cs" />
+    <Compile Include="Services\Seq_CommonService.cs" />
+    <Compile Include="Services\Seq_FormNoService.cs" />
+    <Compile Include="Services\Seq_InvoiceCodeService.cs" />
+    <Compile Include="Services\Sys_AccessService.cs" />
+    <Compile Include="Services\Sys_GroupService.cs" />
+    <Compile Include="Services\Sys_ModulesService.cs" />
+    <Compile Include="Services\Sys_ObjectInModulesService.cs" />
+    <Compile Include="Services\Sys_ObjectService.cs" />
+    <Compile Include="Services\Sys_SolutionService.cs" />
+    <Compile Include="Services\Sys_UserInGroupService.cs" />
+    <Compile Include="Services\Sys_UserService.cs" />
+    <Compile Include="Services\Temp_PrintTempService.cs" />
+    <Compile Include="Services\Veloca\Ser_ROService.cs" />
+    <Compile Include="Services\View_ColumnInGroupService.cs" />
+    <Compile Include="Services\View_ColumnViewService.cs" />
+    <Compile Include="Services\View_GroupViewService.cs" />
+    <Compile Include="Services\Mst_Product_GetService.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\idn.Skycic.Inventory.Common\idn.Skycic.Inventory.Common.csproj">
+      <Project>{f95f377c-72c1-4bb7-b07c-cb7b090a15d1}</Project>
+      <Name>idn.Skycic.Inventory.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\idn.Skycic.Inventory.Constants\idn.Skycic.Inventory.Constants.csproj">
+      <Project>{050fc41b-8a80-4d6e-9d6e-0126cf0a0ad5}</Project>
+      <Name>idn.Skycic.Inventory.Constants</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\idn.Skycic.Inventory.Utils\idn.Skycic.Inventory.Utils.csproj">
+      <Project>{44d1e3cb-3335-458d-b014-a72c482342e4}</Project>
+      <Name>idn.Skycic.Inventory.Utils</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

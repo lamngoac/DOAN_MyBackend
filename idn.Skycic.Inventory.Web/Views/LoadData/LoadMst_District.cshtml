@@ -1,0 +1,13 @@
+﻿@model List<Mst_District>
+@{
+    Layout = null;
+}
+
+<option value=""></option>
+@if (Model != null && Model.Count > 0)
+{
+    foreach (var item in Model)
+    {
+        <option value="@MvcHtmlString.Create(item.DistrictCode.ToString().Trim())" desc="@MvcHtmlString.Create(item.DistrictName.ToString().Trim())">@MvcHtmlString.Create(item.DistrictName.ToString().Trim())</option>
+    }
+}

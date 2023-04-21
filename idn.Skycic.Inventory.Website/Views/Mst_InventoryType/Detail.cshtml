@@ -1,0 +1,75 @@
+﻿@model Mst_InventoryType
+@{
+    ViewBag.Title = "Create";
+    Layout = null;
+}
+
+<div class="modal-dialog" style="width: 600px; max-width: 600px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel"><b>Chi tiết Kho</b></h2>
+            <a href="javascript:;" onclick="ClosePopupDetail()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body" style="">
+            <div class="col-12">
+                <!-- PAGE CONTENT BEGINS -->
+                <div class="row no-margin">
+                    <div class="col-12">
+                        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="col-12 layout-bot-top-16">
+                                <div class="col-12">
+                                    <div class="form-group margin-bottom-9">
+                                        <label class="control-label col-3 no-padding-right" for="InvType">@("Mã loại kho".HtmlItemString("inventory"))</label>
+                                        <div class="col-9 col-sm-9">
+                                            <div class="clearfix">
+                                                <input type="text" name="InvType" id="InvType" class="col-11" value="@Model.InvType" readonly/>
+                                                <label class="span-input" style="color: red; padding-left: 10px;">*</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group margin-bottom-9">
+                                        <label class="control-label col-3 no-padding-right" for="InvTypeName">@("Tên loại kho".HtmlItemString("inventory"))</label>
+                                        <div class="col-9 col-sm-9">
+                                            <div class="clearfix">
+                                                <input type="text" name="InvTypeName" id="InvTypeName" class="col-11" value="@Model.InvTypeName" required readonly/>
+                                                <label class="span-input" style="color: red; padding-left: 10px;">*</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group margin-bottom-9">
+                                        <label class="control-label col-3 no-padding-right" for="FlagActive">@("Trạng thái".HtmlItemString("inventory"))</label>
+                                        @{
+                                            var ckb = "";
+                                            if (!CUtils.IsNullOrEmpty(Model.FlagActive))
+                                            {
+                                                if (Model.FlagActive.Equals("1"))
+                                                {
+                                                    ckb = "checked";
+                                                }
+                                            }
+                                        }
+                                        <div class="col-9">
+                                            <span class="block input-icon input-icon-right padding-top-5 disabled-fix">
+                                                <label class="lbl-flag">
+                                                    <input name="FlagActive" id="FlagActive" class="icon-flag" type="checkbox" value="1" @ckb>
+                                                    <span class="lbl"></span>
+                                                    <input name="FlagActive" type="hidden" value="0">
+                                                </label>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

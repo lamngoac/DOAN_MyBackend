@@ -1,0 +1,13 @@
+﻿@model List<Mst_GovTaxID>
+@{
+    Layout = null;
+}
+
+<option value=""></option>
+@if (Model != null && Model.Count > 0)
+{
+    foreach (var item in Model)
+    {
+        <option value="@MvcHtmlString.Create(item.GovTaxID.ToString().Trim())" desc="@MvcHtmlString.Create(item.GovTaxName.ToString().Trim())">@MvcHtmlString.Create(item.GovTaxName.ToString().Trim())</option>
+    }
+}

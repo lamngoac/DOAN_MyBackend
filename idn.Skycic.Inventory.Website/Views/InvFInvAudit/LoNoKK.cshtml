@@ -1,0 +1,371 @@
+﻿@*@model List<InvF_InventoryOutInstLot>*@
+@{
+    var lstInv_InventoryBalanceLot = new List<Inv_InventoryBalanceLot>();
+    if (ViewBag.lstInv_InventoryBalanceLot != null)
+    {
+        lstInv_InventoryBalanceLot = ViewBag.lstInv_InventoryBalanceLot as List<Inv_InventoryBalanceLot>;
+    }
+    //var lstInvF_InventoryOutInstLot = new List<InvF_InventoryOutInstLot>();
+    //if (ViewBag.lst_InvF_InventoryOutInstLot != null)
+    //{
+    //    lstInvF_InventoryOutInstLot = ViewBag.lst_InvF_InventoryOutInstLot as List<InvF_InventoryOutInstLot>;
+    //}
+    var ProductCodeUser = ViewBag.ProductCodeUser == null ? "" : ViewBag.ProductCodeUser;
+    var ProductName = ViewBag.ProductName == null ? "" : ViewBag.ProductName;
+    var valconvert = ViewBag.valconvert == null ? 1 : Convert.ToDouble(ViewBag.valconvert);
+}
+<div class="modal-dialog" style="width: 900px; max-width: 900px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel"><b>POPUP danh sách Lô</b></h2>
+            <a href="javascript:;" onclick="ClosePopupLo()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body" style="">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupLo" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group margin-bottom-9">
+                    <div class="col-10 col-sm-8">
+                        <span class="block input-icon input-icon-right">
+                            <label>Mã hàng hóa: @ProductCodeUser - @ProductName</label>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-xs-12 idn-hidden">
+                    <input hidden id="mdLo_ProductCode" value="@(ViewBag.ProductCode == null ? "" : ViewBag.ProductCode)" />
+                    <div class="form-group margin-bottom-5">
+                        <label for="ParentCode" class="col-xs-3 col-sm-2 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tìm số lô <span style=\"color: red\">*</span>")</label>
+                        <div class="col-xs-3 col-sm-4">
+                            <select id="Lo" style="width: 150px;" multiple>
+                                @{
+                                    foreach (var it in lstInv_InventoryBalanceLot)
+                                    {
+                                        //var ProductionDate = it.ProductionDate == null || (it.ProductionDate != null && it.ProductionDate.ToString() == "") ? "" : Convert.ToDateTime(it.ProductionDate).ToString("yyyy-MM-dd");
+                                        //var ExpiredDate = (it.ExpiredDate == null || (it.ExpiredDate != null && it.ExpiredDate.ToString() == "")) ? "" : Convert.ToDateTime(it.ExpiredDate).ToString("yyyy-MM-dd");
+                                        <option ProductionDate="@((it.ProductionDate == null || (it.ProductionDate != null && it.ProductionDate.ToString() == "")) ? "" : Convert.ToDateTime(it.ProductionDate).ToString("yyyy-MM-dd"))" ProductLotNo="@it.ProductLotNo" ExpiredDate="@((it.ExpiredDate == null || (it.ExpiredDate != null && it.ExpiredDate.ToString() == "")) ? "" : Convert.ToDateTime(it.ExpiredDate).ToString("yyyy-MM-dd"))" QtyTotalOK="@it.QtyTotalOK" InvCode="@it.InvCode" value="@it.ProductLotNo">@it.ProductLotNo - @it.QtyTotalOK</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+                <div style="width: 100%; float: left;">
+                    <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                        <thead>
+                            <tr class="trthead">
+                                @*<th class="text-center cell-50">
+                                </th>*@
+                                <th fieldId="INVCODE" sorttype="T" fieldName="Mã kho" fieldActive="0" class="text-left cell-150">
+                                    @("Số lô".HtmlItemString("ProductLotNo"))
+                                </th>
+                                <th fieldId="INVNAME" sorttype="T" fieldName="Tên kho" fieldActive="0" class="text-left cell-150">
+                                    @("Ngày sản xuất".HtmlItemString("inventory"))
+                                </th>
+                                <th fieldId="INVCODEPARENT" sorttype="T" fieldName="Mã kho cha" fieldActive="0" class="text-left cell-150">
+                                    @("Ngày hết hạn".HtmlItemString("inventory"))
+                                </th>
+                                <th fieldId="INVADDRESS" sorttype="T" fieldName="Địa chỉ" fieldActive="0" class="text-left cell-100">
+                                    @("Số lượng tồn".HtmlItemString("inventory"))
+                                </th>
+                                <th fieldId="INVTYPE" sorttype="T" fieldName="Tên loại kho" fieldActive="0" class="text-left cell-150">
+                                    @("Vị trí".HtmlItemString("InvCodeOutActual"))
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                    <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                        <tbody id="table-tbodyIDLo">
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            @*<a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="SelectLo()" style="float: right;font-size: 13px;"> Chọn</a>
+            <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="SaveLo()" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Lưu</a>*@
+        </div>
+    </div>
+</div>
+
+<script type="text/template" id="rowtemplateLo">
+    <tr class="data-item trdata" rd="==rd==" ProductLotNo="==ProductLotNo==" InvCode="==InvCode==">
+        <input type="hidden" class="==productlotnoCss==" value="==ProductLotNo==" />
+        <input type="hidden" class="==productiondateCss==" value="==ProductionDate==" />
+        <input type="hidden" class="==exprieddateCss==" value="==ExpiredDate==" />
+        <input type="hidden" class="==qtytotalokCss==" value="==QtyTotalOK==" />
+        <input type="hidden" class="==invcodeCss==" value="==InvCode==" />
+        <input type="hidden" class="==flagexistCss==" value="0" />
+        @*<td class="text-center cell-50 action-buttons">
+            <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteLo(this, '==ProductLotNo==');"><i class="fas fa-trash-alt"></i></a>
+        </td>*@
+        <td class="text-left cell-150">
+            ==ProductLotNo==
+        </td>
+        <td class="text-left cell-150">
+            ==ProductionDate==
+        </td>
+        <td class="text-left cell-150">
+            ==ExpiredDate==
+        </td>
+        <td class="text-right cell-100">
+            <input class="col-md-12 text-right ==qtytotalokCss==" disabled value="==QtyTotalOK=="/>
+        </td>
+        <td class="text-left cell-150">
+            ==InvCode==
+        </td>
+    </tr>
+</script>
+
+<script>
+    $(function () {
+        $('#Lo').select2({
+            closeOnSelect: false
+        });
+    })
+
+    function ChangeQtyOut(thiz) {
+        let listToastr = [];
+        
+        var strqty = $(thiz).val();
+        if (strqty == "") {
+           var objToastr = {
+                ToastrType: 'error',
+                ToastrMessage: 'Số lượng không đúng định dạng số!'
+            };
+            listToastr.push(objToastr);
+            $(thiz).focus();
+        }
+        var tr = $(thiz).parents('tr');
+        var rd = $(tr).attr("rd");
+        var strqtytotalOK = tr.find('input.qtytotalok-'+rd).val();
+        var qtytotalOK = parseFloat(strqtytotalOK);
+        var qty = parseFloat(strqty);
+        if (qty > qtytotalOK) {
+            $(thiz).focus();
+           var objToastr = {
+                ToastrType: 'error',
+                ToastrMessage: 'Số lượng không được lớn hơn số lượng tồn kho!'
+            };
+            listToastr.push(objToastr);
+        }
+
+        if (listToastr.length > 0) {
+            commonUtils.showToastr(listToastr);
+            return false;
+        }
+    }
+
+    function SelectLo() {
+        debugger;
+        let listToastr = [];
+        var length = $('#Lo').find("option:selected").length;
+        if (length == 0) {
+            var objToastr = {
+                ToastrType: 'error',
+                ToastrMessage: 'Không có lô nào được chọn!'
+            };
+            listToastr.push(objToastr);
+        }
+        if (listToastr.length > 0) {
+            commonUtils.showToastr(listToastr);
+            return false;
+        }
+        var lstLo = [];
+
+        for (var i = 0; i < length; i++) {
+            var Lo = new Object();
+            var optselect = $('#Lo').find("option:selected").eq(i);
+            Lo.ProductLotNo = optselect.attr("ProductLotNo");
+            Lo.ProductionDate = optselect.attr("ProductionDate");
+            Lo.ExpiredDate = optselect.attr("ExpiredDate");
+            Lo.QtyTotalOK = optselect.attr("QtyTotalOK");
+            Lo.InvCode = optselect.attr("InvCode");
+            lstLo.push(Lo);
+        }
+        var qtyLo = lstLo.length;
+        for (var i = 0; i < qtyLo; i++) {
+            var item = lstLo[i];
+            var strHtml = commonUtils.getHtmlFromTemplate($('#rowtemplateLo'), {
+                ProductLotNo: item.ProductLotNo,
+                ProductionDate: item.ProductionDate,
+                ExpiredDate: item.ExpiredDate,
+                QtyTotalOK: item.QtyTotalOK,
+                InvCode: item.InvCode,
+                idx: 999999
+            });
+
+            var trProductOld = $('#table-tbodyIDLo').find("tr.trdata[ProductLotNo='" + item.ProductLotNo + "'][InvCode='" + item.InvCode + "']");
+            if (trProductOld.length > 0) {
+                trProductOld.replaceWith(strHtml);
+            }
+            else {
+                $('#table-tbodyIDLo').append(strHtml);
+            }
+
+            updateTableTrIdx($('#table-tbodyIDLo tr'), false);
+        }
+    }
+
+    function DeleteLo(thiz, malo) {
+        var tr = $(thiz).parents('tr');
+        if (tr != undefined) {
+            tr.remove();
+            updateTableTrIdx($('#table-tbodyIDLo tr'), false);
+        }
+    }
+
+    function SaveLo() {
+        debugger;
+        let listToastr = [];
+        var length = $('#table-tbodyIDLo').length;
+        var productcode = $('#mdLo_ProductCode').val();
+        var check = true;
+        if (length > 0) {
+            var lenItem = $('#table-detailLot').find('tr [productcode="' + productcode + '"]').length;
+            var sumqty = 0.0;
+            var sumqtytotalok = 0.0;
+            var arrayInvCode = [];
+            var lstVitri = "";
+            $("#table-tbodyIDLo tr.trdata").each(function () {
+                var tr = $(this);
+                var rd = $(tr).attr('rd');                
+                var strqty = tr.find('input.qtytotalok-'+rd).val(); // KK Sl = sl tồn
+                if (strqty == "") {
+                    var objToastr = {
+                        ToastrType: 'error',
+                        ToastrMessage: 'Số lượng xuất không được trống!'
+                    };
+                    listToastr.push(objToastr);
+                    tr.find('input.qty-'+rd).focus();
+                    check = false;
+                    return;
+                }
+                var qty = parseFloat(strqty);
+                sumqty += qty;
+
+                var strHtml;
+
+                var ProductLotNo = tr.find('input.productlotno-'+rd).val();
+                var ProductionDate = tr.find('input.productiondate-'+rd).val();
+                var ExpiredDate = tr.find('input.expriceddate-'+rd).val();
+                
+                var QtyTotalOK = tr.find('input.qtytotalok-'+rd).val();
+                var qtyok = parseFloat(QtyTotalOK);
+                sumqtytotalok += qtyok;
+                var InvCodeOutActual = tr.find('input.invcode-'+rd).val();
+                if (InvCodeOutActual != null) {
+                    if (arrayInvCode.includes(InvCodeOutActual) == false) {
+                        arrayInvCode.push(InvCodeOutActual);
+                        if (lstVitri == "") {
+                            lstVitri += InvCodeOutActual;
+                        }
+                        else {
+                            lstVitri += ", " + InvCodeOutActual;
+                        }
+                    }
+
+                }
+                strHtml = commonUtils.getHtmlFromTemplate($('#rowtemplateLoDetail'), {
+                    ProductCode: productcode,
+                    ProductLotNo: ProductLotNo,
+                    ProductionDate: ProductionDate,
+                    ExpiredDate: ExpiredDate,
+                    QtyTotalOK: QtyTotalOK,
+                    QtyActual: QtyTotalOK,
+                    InvCodeOutActual: InvCodeOutActual,
+                    idx: 999999
+                });
+
+                // Cập nhật lại số lượng theo sl lô
+                debugger;
+                var trProduct = $('#table-tbodyID').find('tr[productcode="' + productcode + '"]');                
+                var rd = trProduct.attr('rd');
+
+                //Kiểm kê
+                var lengthKiemKe = trProduct.find('input.qtytotalok-' + rd).length;
+                if (lengthKiemKe != 0 && lengthKiemKe != undefined) {
+                    trProduct.find('input.qtytotalok-' + rd).val(sumqtytotalok);
+                    trProduct.find('input.invcode-' + rd).val(lstVitri);
+                    trProduct.find('input.invcodeinit-' + rd).val(lstVitri);
+                }
+                //
+
+                TongSoLuongTon();
+                //
+
+                if (lenItem == 0) {
+                    $('#table-detailLot').append(strHtml);
+                }
+                else {
+                    var trLo_Old = $('#table-detailLot').find('tr[productcode="' + productcode + '"]').eq(0);
+                    if (trLo_Old != undefined) {
+                        trLo_Old.replaceWith(strHtml);
+                    }
+                    else {
+                        $('#table-detailLot').append(strHtml);
+                    }
+
+                }
+                updateTableTrIdx($('#table-detailLot tr'), false);
+                ClosePopupLo();
+            });
+        }
+        if (check == false) return;
+    }
+</script>
+
+
+<script>
+    var Lst_Data = [];
+    @if(lstInv_InventoryBalanceLot != null && lstInv_InventoryBalanceLot.Count > 0)
+    {
+        foreach (var item in lstInv_InventoryBalanceLot)
+        {
+            var productlotno = CUtils.StrValue(item.ProductLotNo);
+            var productiondate = "";
+            if (!CUtils.IsNullOrEmpty(item.ProductionDate))
+            {
+                productiondate = Convert.ToDateTime(item.ProductionDate).ToString("yyyy-MM-dd");
+            }
+            var invcode = CUtils.StrValue(item.InvCode);
+            var expriceddate = "";
+            if (!CUtils.IsNullOrEmpty(item.ExpiredDate))
+            {
+                expriceddate = Convert.ToDateTime(item.ExpiredDate).ToString("yyyy-MM-dd");
+            }
+            double qtytotalok = 0;
+            if(!CUtils.IsNullOrEmpty(item.QtyTotalOK))
+            {
+                qtytotalok= Convert.ToDouble(item.QtyTotalOK) / valconvert;
+            }
+            <text>
+            var objInvBalanceLot = {
+            ProductLotNo: '@productlotno',
+                    ProductionDate: '@productiondate',
+                    InvCode: '@invcode',
+                    ExpiredDate: '@expriceddate',
+                    QtyTotalOK: '@qtytotalok',
+                    FlagExist: '0',
+                }
+            Lst_Data.push(objInvBalanceLot);
+            </text>
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        debugger;
+        @*Add danh sách serial vào Popup*@
+        if (Lst_Data !== undefined && Lst_Data !== null && Lst_Data.length > 0) {
+            for (var i = 0; i < Lst_Data.length; i++) {
+                renderInvBalanceLotPopup(Lst_Data[i]);
+            }
+        }
+    });
+</script>

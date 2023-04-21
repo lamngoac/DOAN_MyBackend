@@ -1,0 +1,65 @@
+﻿@model List<Inv_InventoryBalanceSerial>
+@{
+    var ProductCode = ViewBag.ProductCode;
+    var ProductCodeUser = ViewBag.ProductCodeUser;
+    var ProductName = ViewBag.ProductName;
+}
+<!--Model Add-->
+<div class="modal-dialog" style="width: 600px; max-width: 600px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel"><b>Danh sách serial tồn kho</b></h2>
+            <a href="javascript:;" onclick="ClosePopupSerial()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body" style="">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupLot" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="col-12 no-padding">
+                    <h2 class="modal-title">@ProductCodeUser - @ProductName</h2>
+                </div>
+                <div class="col-12 no-padding layout-bot-top-16">
+                    <div class="scrollable-horizontal padding-left-0 padding-right-0" style="padding-top: 0!important;">
+                        <div style="width: 100%; float: left;">
+                            <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                                <thead>
+                                    <tr class="trthead">
+                                        <th class="text-center cell-50">@("STT".HtmlItemString("inventory"))</th>
+                                        <th class="text-center cell-150">@("Số serial".HtmlItemString("inventory"))</th>
+                                        <th class="text-center cell-150">@("Vị trí tồn".HtmlItemString("inventory"))</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                            <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                                <tbody id="Lst_InvF_MoveOrdInstLot">
+                                    @{
+                                        if (Model != null && Model.Count > 0)
+                                        {
+                                            var stt = 1;
+                                            foreach (var item in Model)
+                                            {
+                                                <tr class="trdata">
+                                                    <td class="text-center cell-50">@stt</td>
+                                                    <td class="text-center cell-150">@item.SerialNo</td>
+                                                    <td class="text-center cell-150">@item.InvCode</td>
+                                                </tr>
+                                                stt++;
+                                            }
+
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        @*<div class="modal-footer">
+                <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="SaveInvBalanceLot()" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Hoàn tất</a>
+            </div>*@
+    </div>
+</div>
+

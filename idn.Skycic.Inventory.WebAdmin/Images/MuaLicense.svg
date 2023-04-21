@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 22.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 389.9 372.5" style="enable-background:new 0 0 389.9 372.5;" xml:space="preserve">
+<style type="text/css">
+	.st0{clip-path:url(#SVGID_2_);}
+	.st1{fill:#109BF8;}
+	.st2{fill:#0C6993;}
+	.st3{clip-path:url(#SVGID_4_);}
+	.st4{fill:#FFFFFF;}
+</style>
+<g>
+	<g>
+		<g>
+			<g id="Group_137_2_" transform="translate(-4708.926 1178.461)">
+				<g id="Group_136_2_" transform="translate(4708.926 -1178.461)">
+					<defs>
+						<rect id="SVGID_1_" x="-100.3" y="-115.5" width="591.8" height="598.6"/>
+					</defs>
+					<clipPath id="SVGID_2_">
+						<use xlink:href="#SVGID_1_"  style="overflow:visible;"/>
+					</clipPath>
+					<g id="Group_135_2_" transform="translate(0 0)" class="st0">
+						<path id="Path_313_2_" class="st1" d="M255.5,12.4h-169c-15.3,0.1-27.7,12.5-27.8,27.8v294c0.1,15.3,12.5,27.8,27.8,27.8
+							h223.4c15.3-0.1,27.8-12.5,27.8-27.8V93.2L255.5,12.4z M118.9,87.8H215c6.6-0.2,12.1,5,12.3,11.6c-0.2,6.6-5.7,11.8-12.3,11.6
+							h-96.1c-6.6,0.2-12.1-5-12.4-11.6C106.8,92.8,112.3,87.6,118.9,87.8 M276.4,161.3H118.9c-6.6,0.2-12.1-5-12.4-11.6
+							c0.2-6.6,5.7-11.8,12.4-11.6h157.5c6.6-0.2,12.1,5,12.4,11.6C288.6,156.3,283,161.5,276.4,161.3 M276.4,199.3H118.9
+							c-6.6,0.2-12.1-5-12.4-11.6c0.2-6.6,5.7-11.8,12.4-11.6h157.5c6.6-0.2,12.1,5,12.4,11.6C288.6,194.4,283,199.5,276.4,199.3"/>
+						<path id="Path_314_2_" class="st2" d="M256.4,11.2v80.9h82.2L256.4,11.2z"/>
+						<g id="Group_134_2_">
+							<g id="Group_132_2_" transform="translate(21.255 12.347)">
+								<g id="Group_131_2_" transform="translate(0 0)">
+									<defs>
+										<rect id="SVGID_3_" x="235.8" y="79.8" width="80.9" height="105.7"/>
+									</defs>
+									<clipPath id="SVGID_4_">
+										<use xlink:href="#SVGID_3_"  style="overflow:visible;"/>
+									</clipPath>
+									<g id="Group_130_2_" class="st3">
+										<path id="Path_315_2_" class="st1" d="M316.7,79.8h-80.9l80.9,105.7V79.8z"/>
+									</g>
+								</g>
+							</g>
+							<g id="Group_133_2_" transform="translate(20.193 19.494)">
+								<path id="Path_316_2_" class="st4" d="M280,210.2l-0.7-13.9l-13-5l-8.8-10.8L244,184l-13.4-3.6l-8.8,10.8l-13,5l-0.7,13.9
+									l-7.6,11.8l7.6,11.8l0.7,13.9l13,5l8.8,10.9L244,260l13.4,3.6l8.8-10.9l13-5l0.7-13.9l7.6-11.8L280,210.2z M244,250
+									c-15.5,0-28.1-12.6-28.1-28.1c0-15.5,12.6-28.1,28.1-28.1c15.5,0,28.1,12.6,28.1,28.1c0,0,0,0,0,0
+									C272.1,237.4,259.5,250,244,250C244,250,244,250,244,250"/>
+								<path id="Path_317_2_" class="st4" d="M223.2,319.7l-7.6-18.4l-17.9,8.8l24.2-64l25.4,9.6L223.2,319.7z"/>
+								<path id="Path_318_2_" class="st4" d="M264.9,319.7l7.6-18.4l17.9,8.8l-24.2-64l-25.4,9.6L264.9,319.7z"/>
+								<path id="Path_319_2_" class="st4" d="M261.1,221.9c0,9.5-7.7,17.2-17.2,17.2c-9.5,0-17.2-7.7-17.2-17.2s7.7-17.2,17.2-17.2
+									l0,0C253.5,204.7,261.1,212.4,261.1,221.9"/>
+							</g>
+						</g>
+					</g>
+				</g>
+			</g>
+		</g>
+	</g>
+</g>
+</svg>

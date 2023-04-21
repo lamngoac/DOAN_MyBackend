@@ -1,0 +1,188 @@
+﻿@model RT_Map_UserInNotifyType
+@{
+    var init = CUtils.StrValue(ViewBag.init);
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+    var recordCount = CUtils.StrValue(ViewBag.RecordCount);
+    var userState = ViewBag.UserState as UserState;
+    var listMst_NNT = ViewBag.ListMst_NNT as List<Mst_NNT>;
+    var viewid = string.Format("{0}_{1}_{2}_{3}", CUtils.StrValue(userState.SysUser.UserCode), CUtils.StrValue(ViewBag.SolutionCodeSignature), CUtils.StrValue(userState.Mst_NNT.OrgID), "Map_UserInNotifyType_Mng");
+}
+
+@section StyleSheet
+{
+    <style>
+    </style>
+}
+
+<div class="row no-margin">
+    <input type="hidden" id="viewid" name="viewid" value="@MvcHtmlString.Create(viewid)" />
+    <div class="col-sm-12 no-padding">
+        <aside class="col-12 no-padding">
+            <div class="layout-bot-top-16" style="padding-bottom: 0px!important">
+                <div class="row">
+                    <div class="col-12">
+                        @RenderItemFormat("BTN_MNG_MAP_USERINNOTIFYTYPE_SAVEDATA", "<a id=\"btn_submit_save\" class=\"btn btn-nc-button\" href=\"javascript:; \" title=\"" + "Lưu".HtmlItemString("contract_contract") + "\" style=\"margin-left: 11px;\"><i class=\"fa fa-save\" aria-hidden=\"true\"></i>" + "Lưu".HtmlItemString("contract_contract") + "</a>", "", "")
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+    <div class="col-sm-12 no-padding">
+        <aside class="row no-margin">
+            @using (Html.BeginForm("Index", "Map_UserInNotifyType", FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <input type="hidden" id="viewid" name="viewid" value="@MvcHtmlString.Create(viewid)" />
+                <input hidden id="init" name="init" value="search" />
+                <div class="col-sm-12 layout-search layout-bot-top-16">
+                    <div class="row no-margin">
+                        <div class="col-sm-11 row no-margin no-padding">
+                            <div class="col-sm-4 no-padding">
+                                <div class="form-group margin-bottom-9">
+                                    <label for="" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Đơn vị".HtmlItemString("map_userinnotifytype"))</label>
+                                    <div class="col-12 col-sm-9">
+                                        <span class="block input-icon input-icon-right">
+                                            <select id="mst" class="form-control select2">
+                                                <optgroup>
+                                                    <option value="">&nbsp;</option>
+                                                    @if (listMst_NNT != null && listMst_NNT.Count > 0)
+                                                    {
+                                                        var mst = CUtils.StrValue(ViewBag.MST);
+                                                        foreach (var item in listMst_NNT)
+                                                        {
+                                                            if (!item.MST.Equals("ALL"))
+                                                            {
+                                                                <option value="@item.MST" @(item.MST.Equals(mst) ? "selected" : "")> @MvcHtmlString.Create(CUtils.StrValue(item.NNTFullName))</option>
+                                                            }
+                                                        }
+                                                    }
+                                                </optgroup>
+
+                                            </select>
+                                        </span>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-sm-4 no-padding">
+                                <div class="form-group margin-bottom-9">
+                                    <label for="" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Email/Họ tên".HtmlItemString("map_userinnotifytype"))</label>
+                                    <div class="col-12 col-sm-9">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="email" name="email" class="col-12 " value="@MvcHtmlString.Create(CUtils.StrValue(ViewBag.Email))" autocomplete="off" />
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 no-padding">
+                                <span class="block input-icon input-icon-right">
+                                    @RenderItemFormat("BTN_MNG_MAP_USERINNOTIFYTYPE_SEARCH", "<a href=\"javascript: void(0); \" class=\"btn btn-nc-button\" onclick=\"SearchData();\"><img class=\"img-button-search\" src=\"" + Url.Content("~/Images/search.svg") + "\"></a>", "", "")
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            }
+
+        </aside>
+        <div id="BindDataMap_UserInNotifyType" class="conten-table">
+            @Html.Partial("BindDataMap_UserInNotifyType", Model, new ViewDataDictionary() { { "init", MvcHtmlString.Create(init) }, { "PageCur", MvcHtmlString.Create(pageCur) }, { "RecordCount", MvcHtmlString.Create(recordCount) }, { "UserState", userState } })
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Map_UserInNotifyType.js")"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('select.select2').select2({
+
+            });
+        });
+    </script>
+    <script type="text/javascript">
+        function FlagNotify_Change_CheckAll(thiz) {
+            if (thiz !== undefined && thiz !== null) {
+                var notifytype = $(thiz).attr('notifytype');
+                var title = 'Không';
+                var flagNotify = '0';
+                if ($(thiz).prop('checked')) {
+                    title = 'Có';
+                    flagNotify = '1';
+                }
+                var $lblParent = $(thiz).parent();
+                if ($lblParent !== undefined && $lblParent !== null) {
+                    var $spanTitle = $lblParent.find('span.lbl-title');
+                    if ($spanTitle !== undefined && $spanTitle !== null) {
+                        $spanTitle.text(title);
+                    }
+                }
+                if (!commonUtils.isNullOrEmpty(notifytype)) {
+                    var rows = $('tbody#table-tbodyID tr.trdata').length;
+                    if (rows > 0) {
+                        $('tbody#table-tbodyID tr.trdata').each(function () {
+                            var $td = $(this).find('td[fieldid="' + notifytype + '"]');
+                            if ($td !== undefined && $td !== null) {
+                                var $inputCheckBox = $td.find('input.' + notifytype);
+                                if ($inputCheckBox !== undefined && $inputCheckBox !== null) {
+                                    if (flagNotify === '1') {
+                                        $($inputCheckBox).prop('checked', true);
+                                    }
+                                    else {
+                                        $($inputCheckBox).prop('checked', false);
+                                    }
+                                }
+                                var $spanTitleChild = $td.find('span.lbl-title');
+                                if ($spanTitleChild !== undefined && $spanTitleChild !== null) {
+                                    $spanTitleChild.text(title);
+                                }
+                            }
+                        });
+                    }
+                }
+
+            }
+        }
+        function FlagNotify_Change(thiz) {
+            if (thiz !== undefined && thiz !== null) {
+                var title = 'Không'
+                if ($(thiz).prop('checked')) {
+                    title = 'Có';
+                }
+                var $lblParent = $(thiz).parent();
+                if ($lblParent !== undefined && $lblParent !== null) {
+                    var $spanTitle = $lblParent.find('span.lbl-title');
+                    if ($spanTitle !== undefined && $spanTitle !== null) {
+                        $spanTitle.text(title);
+                    }
+                }
+            }
+        }
+    </script>
+    <script type="text/javascript">
+        $('#btn_submit_save').click(function () {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("SaveData", "Map_UserInNotifyType")';
+            var objMap_UserInNotifyType = new Map_UserInNotifyType();
+            objMap_UserInNotifyType.ActionType = 'savedata';
+            objMap_UserInNotifyType.ajaxSettings = ajaxSettings;
+            objMap_UserInNotifyType.saveData();
+        });
+
+        function SearchData() {
+            var objMap_UserInNotifyType = new Map_UserInNotifyType();
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("DoSearch", "Map_UserInNotifyType")';
+
+            objMap_UserInNotifyType.ajaxSettings = ajaxSettings;
+            objMap_UserInNotifyType.doSearch();
+        }
+
+    </script>
+}

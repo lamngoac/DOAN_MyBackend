@@ -1,0 +1,122 @@
+﻿@model Mst_PartType
+@{
+    Layout = "~/Views/Shared/CoreLayoutQuanTri.cshtml";
+    var title = "TẠO MỚI LOẠI SẢN PHẨM";
+    var titleMng = "Danh mục loại sản phẩm";
+    ViewBag.Title = title;
+}
+@{
+
+}
+<script type="text/javascript">
+    var parents = new Array();
+    parents.push("@Url.Action("Index", "Mst_PartType")");
+    parents.push("");
+    var parentsText = new Array();
+    parentsText.push("@MvcHtmlString.Create("titleMng")");
+    parentsText.push("@MvcHtmlString.Create("title")");
+    setAdminCurrentTag(parents, parentsText);
+</script>
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                @*<div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>*@
+                <div class="panel-body no-padding" id="panel-body">
+                    <aside class="col-xs-12 no-padding">
+                        @using (Html.BeginForm("Create", "Mst_PaymentType", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                        <div class="col-xs-12 layout-search layout-bot-top-16">
+                            <div class="col-xs-4 no-padding">
+                                <div class="form-group margin-bottom-9">
+                                    <label for="PartType" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã loại sản phẩm <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="PartType" name="PartType" class="col-xs-12 PartType" onkeyup="locdau(this);" value="" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-4 no-padding">
+                                <div class="form-group margin-bottom-9">
+                                    <label for="PartTypeName" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên loại sản phẩm <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="PartTypeName" name="PartTypeName" class="col-xs-12 Code PartTypeName" value="" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                        }
+                    </aside>
+                    <div class="col-xs-12 layout-search layout-bot-top-16">
+                        @RenderItemFormat("BTN_TAO_LOAI_SP_LUU", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"\" onclick=\"SaveData();\">Lưu</a>", "", "")
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE CONTENT ENDS -->
+</div><!-- /.col -->
+</div><!-- /.row -->
+
+<script type="text/javascript">
+    processAjaxForm($('#manageForm'), function (response) {
+        processAjaxFormResult(response);
+
+    });
+</script>
+
+@*Active Menu*@
+<script type="text/javascript">
+    setAdminCurrentUrl('@Url.Action("Index", "Mst_PartType")');
+</script>
+@*Set focus*@
+<script type="text/javascript">
+    var _getForm = document.getElementById("manageForm");
+    _getForm.addEventListener('reset', function () {
+        document.getElementById("").focus()
+    })
+</script>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Mst_PartType.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "Mst_PartType")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+        });
+        @* Set focus *@
+        var _getForm = document.getElementById("manageForm");
+        _getForm.addEventListener('reset', function () {
+            document.getElementById("PartType").focus()
+        })
+        function SaveData() {
+            debugger;
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Create", "Mst_PartType")';
+            var objMst_PartType = new Mst_PartType();
+            objMst_PartType.ActionType = 'create';
+            objMst_PartType.ajaxSettings = ajaxSettings;
+            objMst_PartType.saveData();
+        }
+    </script>
+}
+
+
+
+

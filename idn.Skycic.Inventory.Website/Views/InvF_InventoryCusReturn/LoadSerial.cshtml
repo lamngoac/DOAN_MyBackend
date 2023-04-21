@@ -1,0 +1,17 @@
+﻿@model List<InvF_InventoryCusReturnInstSerial>
+
+@if (Model != null && Model.Count > 0)
+{
+    var idx = 0;
+    foreach (var item in Model)
+    {
+        <tr class="data-item trdata" idx="@idx" productcode="@item.ProductCode">
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnInstSerial[@idx].ProductCode" value="@item.ProductCode" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnInstSerial[@idx].ProductCodeRoot" value="@item.ProductCodeRoot" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnInstSerial[@idx].SerialNo" value="@item.SerialNo" />
+            <input type="hidden" name="Lst_InvF_InventoryCusReturnInstSerial[@idx].InvCodeInActual" value="@item.InvCodeInActual" />
+        </tr>
+        idx++;
+    }
+}
+

@@ -1,0 +1,42 @@
+﻿@{
+    ViewBag.Title = "VnPayReturn";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div style="text-align: center; padding-top: 100px; font-weight: 600; font-size: 14px;">@MvcHtmlString.Create(ViewBag.msg)</div>
+<p style="text-align: center">
+    <a value="Về trang chủ" id="btnClose" class="btn btn-default" href="~/login">Về trang chủ</a>
+</p>
+<div class="modal fade" id="ShowPopupGenNetwork" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        //setTimeout(GetOrderStatus, 20000);
+        ShowPopupGenNetwork();
+    });
+
+    function ShowPopupGenNetwork() {
+        // Show popup gen network
+        var urlShowPopupGenNetwork = '@Url.Action("ShowPopupGenNetwork", "Register")';
+        $.ajax({
+            url: urlShowPopupGenNetwork,
+            data: {},
+            type: 'post',
+            dataType: 'json',
+            traditional: true,
+            success: function (data) {
+                if (data.Success) {
+                    $('#ShowPopupGenNetwork').modal({
+                        backdrop: false,
+                        keyboard: true
+                    });
+                    $("#ShowPopupGenNetwork").html(data.Html);
+                } else {
+                    _showErrorMsg123("Lỗi!", data.Detail);
+                    window.location.href = '@MvcHtmlString.Create(Url.Action("Login", "Account"))';
+                }
+
+            }
+        });
+    }
+
+
+</script>

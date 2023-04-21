@@ -1,0 +1,19 @@
+﻿
+
+<div class="col-xs-2 no-padding" style="float: right">
+    <label for="RecordCount" class="no-padding-right no-padding-left  font-weight-500 " style="float:left">@MvcHtmlString.Create("Số kết quả trên trang")</label>
+    <div class="col-xs-12 col-sm-4 no-padding-right">
+        <span class="block input-icon input-icon-right">
+            <select id="RecordCount" name="RecordCount" onchange="Search()" class="col-xs-12 RecordCount no-padding">
+                @{
+                    var recordCount = Request["recordCount"] == null ? "" : Request["recordCount"].ToString();
+                }
+                <option value="10" @(recordCount == "10" ? "selected" : "")>10</option>
+                <option value="50" @(recordCount == "50" ? "selected" : "")>50</option>
+                <option value="100" @(recordCount == "100" ? "selected" : "")>100</option>
+            </select>
+        </span>
+    </div>
+</div>
+
+

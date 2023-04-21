@@ -1,0 +1,210 @@
+﻿@model List<InvF_InventoryOutDtl>
+@{
+    var productCode = ViewBag.ProductCode;
+    var ProductCodeUser = ViewBag.ProductCodeUser == null ? "" : ViewBag.ProductCodeUser;
+    var ProductName = ViewBag.ProductName == null ? "" : ViewBag.ProductName;
+}
+<div class="modal-dialog" style="width: 1000px; max-width: 1000px">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel"><b>Hàng hóa thành phần combo</b></h2>
+            <a href="javascript:;" onclick="ClosePopupCombo()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body" style="">
+            <div class="form-group margin-bottom-9">
+                <div class="col-10 col-sm-8">
+                    <span class="block input-icon input-icon-right">
+                        <label>Mã hàng hóa: @ProductCodeUser - @ProductName</label>
+                    </span>
+                </div>
+            </div>
+            <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+                <div style="width: 100%; float: left;">
+                    <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                        <thead>
+                            <tr class="trthead">
+                                <th class="text-center cell-50">
+                                </th>
+                                <th fieldId="ProductCode" sorttype="T" fieldName="Mã hàng hóa" fieldActive="0" class="text-left cell-150">
+                                    @("Mã hàng hóa".HtmlItemString("productcode"))
+                                </th>
+                                <th fieldId="ProductName" sorttype="T" fieldName="Tên hàng hóa (TV)" fieldActive="0" class="text-left cell-150">
+                                    @("Tên hàng hóa (TV)".HtmlItemString("productname"))
+                                </th>
+                                <th fieldId="UnitCode" sorttype="T" fieldName="Đơn vị tính" fieldActive="0" class="text-left cell-100">
+                                    @("Đơn vị tính".HtmlItemString("unitcode"))
+                                </th>
+                                <th fieldId="INVADDRESS" sorttype="T" fieldName="Tồn kho" fieldActive="0" class="text-left cell-100">
+                                    @("Tồn kho".HtmlItemString("inventory"))
+                                </th>
+                                <th fieldId="INVLEVELTYPE" sorttype="T" fieldName="Số lượng" fieldActive="0" class="text-left cell-100">
+                                    @("Số lượng".HtmlItemString("inventory"))
+                                </th>
+                                <th fieldId="INVTYPE" sorttype="T" fieldName="Vị trí xuất" fieldActive="0" class="text-left cell-150">
+                                    @("Vị trí xuất".HtmlItemString("inventory"))
+                                </th>
+                                <th fieldId="INVTYPE" sorttype="T" fieldName="Đơn giá" fieldActive="0" class="text-left cell-100">
+                                    @("Đơn giá".HtmlItemString("inventory"))
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                    <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                        <tbody id="table-tbodyIDCombo">
+                            @{
+                                var stt = 0;
+                                foreach (var it in Model)
+                                {
+                                    <tr class="trdata" idx="@stt" productcode="@productCode">
+                                        <input type="hidden" name="Lst_InvF_InventoryOutComboDtl[@stt].ProductCodeRoot" value="@productCode" />
+                                        <input type="hidden" name="Lst_InvF_InventoryOutComboDtl[@stt].ProductCode" value="@(it.ProductCode)" />
+                                        <input type="hidden" name="Lst_InvF_InventoryOutComboDtl[@stt].UnitCode" value="@(it.UnitCode == null ? "" : it.UnitCode)" />
+                                        <input type="hidden" name="Lst_InvF_InventoryOutComboDtl[@stt].Remark" value="" />
+                                        <td class="text-center cell-50">@stt</td>
+                                        <td fieldId="ProductCode" sorttype="T" fieldName="Mã hàng hóa" fieldActive="0" class="text-left cell-150">
+                                            @(it.mp_ProductCodeUser)
+
+                                        </td>
+                                        <td fieldId="ProductName" sorttype="T" fieldName="Tên hàng hóa (TV)" fieldActive="0" class="text-left cell-150">
+                                            @(it.mp_ProductName == null ? "" : it.mp_ProductName)
+                                        </td>
+                                        <td fieldId="UnitCode" sorttype="T" fieldName="Đơn vị tính" fieldActive="0" class="text-left cell-100">
+                                            @(it.UnitCode == null ? "" : it.UnitCode)
+                                        </td>
+                                        <td fieldId="QtyTotalOKMax" sorttype="T" fieldName="Tồn kho" fieldActive="0" class="text-left QtyTotalOKMax cell-100">
+                                            @(it.QtyInv == null ? "0" : it.QtyInv)
+                                        </td>
+                                        <td fieldId="Qty" sorttype="T" fieldName="Số lượng" fieldActive="0" class="text-left cell-100">
+                                            <input disabled class="col-md-12 QtyPopup" name="Lst_InvF_InventoryOutComboDtl[@stt].Qty" value="@(it.Qty == null ? "0" : it.Qty)" />
+                                        </td>
+                                        <td fieldId="InvCodeMax" sorttype="T" fieldName="Vị trí xuất" fieldActive="0" class="text-left cell-150">                                           
+                                            <select disabled class="col-md-12" name="Lst_InvF_InventoryOutComboDtl[@stt].InvCodeOutActual" Onchange="ChangeInvOutCombo(this)">
+                                                <option  value="@it.InvCodeOutActual" >@it.InvCodeOutActual</option>                                               
+                                            </select>
+                                        </td>
+                                        <td fieldId="INVTYPE" sorttype="T" fieldName="Đơn giá" fieldActive="0" class="text-left cell-100 UPOut">
+                                            @(it.UPOut == null ? "0" : it.UPOut)
+                                        </td>
+                                    </tr>
+                                    stt++;
+                                }
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            @*<a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="SelectCombo()" style="float: right;font-size: 13px;">Chọn</a>*@
+            <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="ClosePopupCombo()" style="float: right;font-size: 13px;">Đóng</a>
+        </div>
+    </div>
+</div>
+
+<script>
+
+
+        $(document).ready(function () {
+        
+    format_Number();
+    });
+
+    function ChangeInvOutCombo(thiz) {
+        var optSelect = $(thiz).find('option:selected');
+    }
+
+    function SaveCombo() {
+        debugger;
+        var arrCheckInvCode = [];
+        if ($('tbody#table-tbodyIDCombo').length > 0) {
+            var sumqty = 0.0;
+            var lstVitri = "";
+            var productcode = "";
+            $("tbody#table-tbodyIDCombo tr.trdata").each(function () {
+                debugger;
+                var tr = $(this);
+                var idx = tr.attr('idx');
+                var selectInvCode = tr.find('select[name="Lst_InvF_InventoryOutComboDtl[' + idx + '].InvCodeOutActual"]');
+
+                var strProductCodeRoot = tr.find('input[name="Lst_InvF_InventoryOutComboDtl[' + idx + '].ProductCodeRoot"]').val();
+                var strProductCode = tr.find('input[name="Lst_InvF_InventoryOutComboDtl[' + idx + '].ProductCode"]').val();
+                var strUnitCode = tr.find('input[name="Lst_InvF_InventoryOutComboDtl[' + idx + '].UnitCode"]').val();
+                var strRemark = tr.find('input[name="Lst_InvF_InventoryOutComboDtl[' + idx + '].Remark"]').val();
+                var strQty = tr.find('input[name="Lst_InvF_InventoryOutComboDtl[' + idx + '].Qty"]').val();
+                var strInvCodeOutActual = $(selectInvCode).val();
+
+                if (productcode == "" || productcode == undefined) {
+                    productcode = strProductCodeRoot;
+                }
+
+                var qty = 0;
+                if ($.isNumeric(strQty)) {
+                    qty = parseFloat(strQty);
+                    sumqty += qty;
+                }
+                if (strInvCodeOutActual != null) {
+                    if (arrCheckInvCode.includes(strInvCodeOutActual) == false) {
+                        arrCheckInvCode.push(strInvCodeOutActual);
+                        if (lstVitri == "") {
+                            lstVitri += strInvCodeOutActual;
+                        }
+                        else {
+                            lstVitri += ", " + strInvCodeOutActual;
+                        }
+                    }
+                }
+
+                strHtml = getHtmlFromTemplate($('#rowtemplateComboDetail'), {
+                    ProductCodeRoot: strProductCodeRoot,
+                    ProductCode: strProductCode,
+                    UnitCode: strUnitCode,
+                    Remark: strRemark,
+                    InvCodeOutActual: strInvCodeOutActual,
+                    Qty: strQty,
+                    idx: 999999
+                });
+                var lenItem = $('#table-detailCombo tr.trdata').length;
+                if (lenItem == 0) {
+                    $('#table-detailCombo').append(strHtml);
+                }
+                else {
+                    var trLo_Old = $('#table-detailCombo').find('tr[productcode="' + strProductCode + '"]').eq(0);
+                    if (trLo_Old.length != 0) {
+                        trLo_Old.replaceWith(strHtml);
+                    }
+                    else {
+                        $('#table-detailCombo').append(strHtml);
+                    }
+                }
+            });
+            // Cập nhật lại số lượng theo sl lô
+            debugger;
+            var trProduct = $('#table-tbodyID').find('tr[productcode="' + productcode + '"]');
+            var ProductId = trProduct.attr('idx');
+            //trProduct.find('input[name="Lst_InvF_InventoryOutDtl[' + ProductId + '].Qty"]').val(sumqty);
+            trProduct.find('input[name="Lst_InvF_InventoryOutDtl[' + ProductId + '].InvCodeOutActual"]').val(lstVitri);
+            TongTien();
+            //
+            updateTableTrIdx($('#table-detailCombo tr'), false);
+            ClosePopupCombo();
+        }
+    }
+</script>
+
+
+<script type="text/javascript">
+    function format_Number(){
+        var tableName = 'InvF_InventoryOut';
+       var qtyFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'Qty');
+
+        var UPOutFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'UPOut');
+        $('.QtyTotalOKMax').number(true, qtyFormat);
+        $('.QtyPopup').number(true, qtyFormat);
+        $('.UPOut').number(true, UPOutFormat);
+        
+    }
+</script>
+

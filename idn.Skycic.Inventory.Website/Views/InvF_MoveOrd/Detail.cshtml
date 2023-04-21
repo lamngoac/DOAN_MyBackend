@@ -1,0 +1,451 @@
+﻿
+@model InvF_MoveOrd
+@{
+    ViewBag.Title = "Chi tiết điều chuyển kho";
+    var List_Mst_InventoryInOut = ViewBag.List_Mst_InventoryInOut as List<Mst_Inventory>;
+    var List_Mst_InventoryPosition = ViewBag.List_Mst_InventoryPosition as List<Mst_Inventory>;
+    var List_Mst_Product = ViewBag.List_Mst_Product as List<Mst_Product>;
+
+    var Lst_InvF_MoveOrdDtlUI = ViewBag.Lst_InvF_MoveOrdDtlUI as List<InvF_MoveOrdDtlUI>;
+    var Lst_InvF_MoveOrdInstLot = ViewBag.Lst_InvF_MoveOrdInstLot as List<InvF_MoveOrdInstLot>;
+    var Lst_InvF_MoveOrdInstSerial = ViewBag.Lst_InvF_MoveOrdInstSerial as List<InvF_MoveOrdInstSerial>;
+    var Lst_Mst_ProductUI = ViewBag.Lst_Mst_ProductUI as List<Mst_Product>;
+}
+<style>
+    .padding-bottom-10 {
+        padding-bottom: 10px;
+    }
+
+    .no-padding-left {
+        padding-left: 0;
+    }
+
+    .hidden {
+        display: none;
+    }
+</style>
+<div class="col-12 layout-bot-top-10">
+    <div class="col-6">
+        @if (CUtils.StrValue(Model.IF_MOStatus).Equals("PENDING"))
+        {
+            var href = Url.Action("Update", "InvF_MoveOrd", new { IF_MONo = CUtils.StrValue(Model.IF_MONo) });
+            @RenderItemFormat("BTN_SUA_DIEUCHUYEN_LUU", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnEdit\" onclick=\"Edit('" + href + "')\"><i class=\"fa fa-edit\" aria-hidden=\"true\"></i>Sửa</a>", "", "")
+            @RenderItemFormat("BTN_QL_DIEUCHUYEN_DUYET", " <a class=\"btn btn-nc-button\" onclick=\"Approve()\" href=\"javascript:;\"><i class=\"fa fa-check-circle\" aria-hidden=\"true\"></i> Duyệt</a>")
+            @RenderItemFormat("BTN_QL_DIEUCHUYEN_HUY", " <a class=\"btn btn-nc-button\" onclick=\"Cancel()\" href=\"javascript:;\"><i class=\"fas fa-ban\" aria-hidden=\"true\"></i> Huỷ</a>")
+        }
+    </div>
+</div>
+<div class="col-12">
+    @using (Html.BeginForm("Create", "Mst_Inventory", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+
+        <div class="col-12 layout-bot-top-16 row">
+            <div class="col-4 row form-group margin-bottom-9">
+                <label for="IF_MONo" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Số phiếu điều chuyển".HtmlItemString("inventory")) <span style="color: red;">*</span></label>
+                <div class="col-8">
+                    <input type="text" name="IF_MONo" id="IF_MONo" class="col-12" value="@Model.IF_MONo" readonly>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="row form-group margin-bottom-9">
+                    <label for="InvCodeOut" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Kho xuất".HtmlItemString("inventory")) <span style="color: red;">*</span></label>
+                    <div class="col-12 col-sm-8 disabled-fix">
+                        <span class="block input-icon input-icon-right">
+                            <select class="select2-selection" name="InvCodeOut" id="InvCodeOut" disabled>
+                                <option value="">--Chọn kho xuất--</option>
+                                @{
+                                    if (List_Mst_InventoryInOut != null && List_Mst_InventoryInOut.Count > 0)
+                                    {
+                                        foreach (var invInOut in List_Mst_InventoryInOut)
+                                        {
+                                            <option value="@invInOut.InvCode" bupattern="@invInOut.InvBUPattern" @(Model.InvCodeOut.Equals(invInOut.InvCode) ? "selected" : "")>
+                                                @invInOut.InvCode : @invInOut.InvName
+                                            </option>
+                                        }
+                                    }
+                                }
+                            </select>
+                        </span>
+                    </div>
+                </div>
+                <div class="row form-group margin-bottom-9">
+                    <label for="InvCodeIn" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Kho nhập".HtmlItemString("inventory")) <span style="color: red;">*</span></label>
+                    <div class="col-12 col-sm-8 disabled-fix">
+                        <span class="block input-icon input-icon-right">
+                            <select class="select2-selection" name="InvCodeIn" id="InvCodeIn" disabled>
+                                <option value="">--Chọn kho nhập--</option>
+                                @{
+                                    if (List_Mst_InventoryInOut != null && List_Mst_InventoryInOut.Count > 0)
+                                    {
+                                        foreach (var inv in List_Mst_InventoryInOut)
+                                        {
+                                            <option value="@inv.InvCode" bupattern="@inv.InvBUPattern" @(Model.InvCodeIn.Equals(inv.InvCode) ? "selected" : "")>@inv.InvCode: @inv.InvName</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4 form-group margin-bottom-9">
+                <label for="Remark" class="col-sm-3 control-label no-padding-right font-weight-500 ">@("Nội dung xuất".HtmlItemString("inventory"))</label>
+                <div class="col-8">
+                    <textarea type="text" name="Remark" id="Remark" class="col-12" value="@Model.Remark" readonly>@Model.Remark</textarea>
+                </div>
+            </div>
+            <div class="row col-12">
+                <p class="font-weight-bold">Danh mục hàng hóa</p>
+            </div>
+            <div class="col-12 row no-margin">
+                <div class="col-6">
+                    <div class="form-group margin-bottom-9">
+                        @*<label for="" class="col-4 control-label no-padding-right font-weight-500 font-weight-bold text-left">@("Hàng hoá".HtmlItemString("product"))<span style="color: red "> *</span></label>*@
+                        @*<div class="col-8 disabled-fix">
+                                <select id="ProductCode" name="ProductCode" class="ProductCode" showpopup-control-searchdata="#ShowPopupProductSearch" disabled>
+                                    <optgroup label="">
+                                        @if (List_Mst_Product != null && List_Mst_Product.Count > 0)
+                                        {
+                                            foreach (var item in List_Mst_Product.Take(5))
+                                            {
+                                                var productCodeCur = CUtils.StrValue(item.ProductCode);
+                                                var productNameCur = CUtils.StrValue(item.ProductName);
+                                                <option value="@MvcHtmlString.Create(productCodeCur)">@MvcHtmlString.Create(productNameCur)</option>
+                                            }
+                                        }
+                                    </optgroup>
+                                    <option value="SEARCHDATA">@("Tìm kiếm thêm".HtmlItemString("inventory"))</option>
+                                    @*<option value="ADDDATA">@("Thêm mới".HtmlItemString("inventory"))</option>
+                                </select>
+                            </div>*@
+                    </div>
+                </div>
+                <div class="col-6 text-right" style="margin-top: 9px;">
+                    <span style="font-weight: bold">Tổng: </span><span id="spanTotalPrd" style="font-weight: bold">0</span>
+                </div>
+            </div>
+            <div class="col-12 layout-bot-top-16">
+                <div class="scrollable-horizontal padding-left-0 padding-right-0" style="padding-top: 0!important;">
+                    <div style="width: 100%; float: left;">
+                        <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                            <thead>
+                                <tr class="trthead">
+                                    <th class="text-center cell-120">@("Mã hàng hoá".HtmlItemString("inventory"))</th>
+                                    <th class="text-center cell-100">@("Tên hàng hoá".HtmlItemString("inventory"))</th>
+                                    <th class="text-center cell-50">@("Đơn vị".HtmlItemString("inventory"))</th>
+                                    <th class="text-center cell-50">@("Tồn kho".HtmlItemString("inventory"))</th>
+                                    <th class="text-center cell-75">@("Số lượng điều chuyển".HtmlItemString("inventory"))</th>
+                                    <th class="text-center cell-75">@("Vị trí xuất".HtmlItemString("inventory"))</th>
+                                    <th class="text-center cell-75">@("Vị trí nhập".HtmlItemString("inventory"))</th>
+                                    <th class="text-center cell-110">@("Ghi chú".HtmlItemString("inventory"))</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                        <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                            <tbody id="Lst_InvF_MoveOrdProduct"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts{
+    <script src="~/Content/assets/js/bootbox.js"></script>
+    <script src="@Url.Content("~/Scripts/mine/InvF_MoveOrd.js")"></script>
+
+    <!-- Render row product -->
+    <script type="text/template" id="tmplRenderRowProduct">
+        <tr class="data-item trdata" rd="==rd==" productcode="==ProductCode==" productname="==mp_ProductName==" unitcode="==UnitCode==" flaglot="==mp_FlagLot==" flagserial="==mp_FlagSerial==">
+            <td class="text-left cell-120 td-prdcodeuser productcodeuser-==rd==">
+                <span class="productname-==rd==">==mp_ProductCodeUser==</span>
+                <input type="hidden" class="productcode-==rd==" value="==ProductCode==" />
+                <input type="hidden" class="productcodeuser-==rd==" value="==mp_ProductCodeUser==" />
+                <input type="hidden" class="productcodebase-==rd==" value="==mp_ProductCodeBase==" />
+                <input type="hidden" class="productname-==rd==" value="==mp_ProductName==" />
+                <input type="hidden" class="flaglot-==rd==" value="==mp_FlagLot==" />
+                <input type="hidden" class="flagserial-==rd==" value="==mp_FlagSerial==" />
+                <input type="hidden" class="qtytotalok-==rd==" value="==QtyTotalOK==" />
+                <span class="serial-lot-text">
+
+                </span>
+            </td>
+            <td class="text-center cell-100 productname-==rd==">==mp_ProductName==</td>
+            <td class="text-center cell-50 ">
+                <select class="select2 select2-selection col-12 no-border selectunitcode-==rd==" disabled initdata="==ProductCode==" ischange="0">
+                    <optgroup></optgroup>
+                </select>
+            </td>
+            <td class="text-center cell-50">
+                <input type="text" class="col-12 no-border text-right qtytotalok-==rd==" initdata="==QtyTotalOK==" value="==QtyTotalOK==" readonly />
+            </td>
+            <td class="text-center cell-75">
+                <input type="text" name="Qty" class="col-12 text-right qty-==rd==" value="==qtySum==" readonly />
+            </td>
+            <td class="text-center cell-75 listInvCodeOut-==rd==" name="ListInvCodeOut"></td>
+            <td class="text-center cell-75 listInvCodeIn-==rd==" name="ListInvCodeIn"></td>
+            <td class="text-center cell-110">
+                <textarea type="text" name="Remark" class="col-12 remark-==rd==" value="" readonly>
+                </textarea>
+            </td>
+        </tr>
+    </script>
+
+    <script>
+    var Lst_Data = [];
+    @{
+        if(Lst_InvF_MoveOrdDtlUI != null && Lst_InvF_MoveOrdDtlUI.Count > 0)
+        {
+            var Lst_InvF_MoveOrdDtlDistinctUI = Lst_InvF_MoveOrdDtlUI.GroupBy(dtl => dtl.ProductCode).Select(item => item.First()).ToList();
+            foreach (var item in Lst_InvF_MoveOrdDtlDistinctUI)
+            {
+                var qtySum = Lst_InvF_MoveOrdDtlUI.Where(dtl => dtl.ProductCode.Equals(item.ProductCode)).Sum(i => Convert.ToDouble(i.Qty));
+                <text>
+                    var listProductBase = JSON.parse('@Html.Raw(Json.Encode(item.Lst_Mst_ProductBase))');
+                    var objProduct = {
+                        ProductCode: '@item.ProductCode',
+                        mp_ProductName: '@item.mp_ProductName',
+                        mp_ProductCodeUser: '@item.mp_ProductCodeUser',
+                        mp_ProductCodeBase: '@item.mp_ProductCodeBase',
+                        UnitCode: '@item.UnitCode',
+                        mp_FlagLot: '@item.mp_FlagLot',
+                        mp_FlagSerial: '@item.mp_FlagSerial',
+                        QtyTotalOK: '@item.QtyTotalOK',
+                        qtySum: '@qtySum',
+                        listProductBase: listProductBase,
+                    }
+                    Lst_Data.push(objProduct);
+                </text>
+            }
+        }
+    }
+    </script>
+
+    <script type="text/javascript">
+
+        var flagIsCreate = 0;
+    $(document).ready(function () {
+        debugger;
+        @*Add danh sách serial vào Popup*@
+        if (Lst_Data !== undefined && Lst_Data !== null && Lst_Data.length > 0) {
+            for (var i = 0; i < Lst_Data.length; i++) {
+                renderRenderRowProductDetail(Lst_Data[i]);
+            }
+        }
+        lst_InvF_MoveOrdDtlDb = @Html.Raw(JsonConvert.SerializeObject(Lst_InvF_MoveOrdDtlUI));
+            lst_InvF_MoveOrdInstLotDb = @Html.Raw(JsonConvert.SerializeObject(Lst_InvF_MoveOrdInstLot));
+            lst_InvF_MoveOrdInstSerialDb = @Html.Raw(JsonConvert.SerializeObject(Lst_InvF_MoveOrdInstSerial));
+            //
+            const rowMainUI = $('#Lst_InvF_MoveOrdProduct tr.trdata');
+            if (lst_InvF_MoveOrdDtlDb != undefined && lst_InvF_MoveOrdDtlDb.length > 0) {
+                // Distinct productcode
+                let lstProductCode = [...new Set(lst_InvF_MoveOrdDtlDb.map(dtl => dtl.ProductCode))];
+                // Group object by ProductCode
+                for (let prdCode of lstProductCode) {
+                    let objDtl = new Object();
+                    objDtl.ProductCode = prdCode;
+                    objDtl.LstMoveOrd_Dtl = [];
+
+                    listMoveOrd_Dtl = lst_InvF_MoveOrdDtlDb.filter(function (el) { return el.ProductCode == prdCode }); // []
+                    if (listMoveOrd_Dtl.length > 0) {
+                        objDtl.LstMoveOrd_Dtl = [...objDtl.LstMoveOrd_Dtl, ...listMoveOrd_Dtl];
+                    }
+                    lst_InvF_MoveOrdDtl.push(objDtl);
+                }
+                // Remark UI
+                for (let item of rowMainUI) {
+                    let productCode = $(item).attr('ProductCode');
+                    let curRowInfo = lst_InvF_MoveOrdDtlDb.filter(function (el) { return el.ProductCode == productCode });
+                    if (curRowInfo != undefined && curRowInfo.length > 0) {
+                        $(item).find('textarea[name="Remark"]').val(curRowInfo[0].Remark);
+                    }
+                }
+            }
+            //
+            if (lst_InvF_MoveOrdInstLotDb != undefined && lst_InvF_MoveOrdInstLotDb.length > 0) {
+                let lstProductCode = [...new Set(lst_InvF_MoveOrdInstLotDb.map(lot => lot.ProductCode))];
+                for (let prdCode of lstProductCode) {
+                    let objLot = new Object();
+                    objLot.ProductCode = prdCode;
+                    objLot.LstMoveOrd_Lot = [];
+
+                    listMoveOrd_Lot = lst_InvF_MoveOrdInstLotDb
+                        .filter(function (el) { return el.ProductCode == prdCode }); // []
+
+                    if (listMoveOrd_Lot.length > 0) {
+                        objLot.LstMoveOrd_Lot = [...objLot.LstMoveOrd_Lot, ...listMoveOrd_Lot];
+                    }
+                    lst_InvF_MoveOrdInstLot.push(objLot);
+                }
+            }
+            //
+            if (lst_InvF_MoveOrdInstSerialDb != undefined && lst_InvF_MoveOrdInstSerialDb.length > 0) {
+                for (let serial of lst_InvF_MoveOrdInstSerialDb) {
+                    let objSerial = new Object();
+                    objSerial.ProductCode = serial.ProductCode;
+                    objSerial.LstMoveOrd_Serial = [];
+
+                    listMoveOrd_Serial = lst_InvF_MoveOrdInstSerialDb.filter(function (el) {
+                        return el.ProductCode == serial.ProductCode && el.SerialNo == serial.SerialNo
+                    });
+                    if (listMoveOrd_Serial.length > 0) {
+                        objSerial.LstMoveOrd_Serial = [...objSerial.LstMoveOrd_Serial, ...listMoveOrd_Serial];
+                    }
+                    lst_InvF_MoveOrdInstSerial.push(objSerial)
+                }
+            }
+            //
+            if (lst_InvF_MoveOrdDtl != undefined && lst_InvF_MoveOrdDtl.length > 0) {
+                for (let item of rowMainUI) {
+                    var flagLot = $(item).attr('FlagLot');
+                    var flagSerial = $(item).attr('FlagSerial');
+                    // Get current info array
+                    let rowCurMoveOrdDtl = lst_InvF_MoveOrdDtl.filter(function (el) { return el.ProductCode == $(item).attr('ProductCode') });
+                    // Kho nhập kho xuất trên UI
+                    if (rowCurMoveOrdDtl.length > 0 && rowCurMoveOrdDtl[0].LstMoveOrd_Dtl.length > 0) {
+                        // List distinc Kho nhập và Kho xuất theo row
+                        let lstInvCodeIn = [];
+                        let lstInvCodeOut = [];
+                        for (let inv of rowCurMoveOrdDtl[0].LstMoveOrd_Dtl) {
+                            if (!lstInvCodeIn.includes(inv.InvCodeIn)) {
+                                lstInvCodeIn.push(inv.InvCodeIn);
+                            }
+                            if (!lstInvCodeOut.includes(inv.InvCodeOut)) {
+                                lstInvCodeOut.push(inv.InvCodeOut);
+                            }
+                        }
+                        // Show on UI
+                        let inputInvIn = '';
+                        let inputInvOut = '';
+                        // Hiển thị nút chọn cho sp không QL lot hay serial
+                        let strLstInvCodeIn = lstInvCodeIn.join(',');
+                        inputInvIn += `<input readonly="readonly" class="col-md-11" name="InvCodeIn" value="${strLstInvCodeIn}">`;
+
+                        let strLstInvCodeOut = lstInvCodeOut.join(',');
+                        inputInvOut += `<input readonly="readonly" class="col-md-11" name="InvCodeIn" value="${strLstInvCodeOut}">`;
+
+                        if (flagLot !== '1' && flagSerial !== '1') {
+                            inputInvIn += `<a href="javascript:;" title="Chọn vị trí nhập/xuất" onclick="ShowPopupInvInOut(this,'viewdetail')"><i class="fa fa-caret-down" style="line-height:24px"></i></a>`;
+                            inputInvOut += `<a href="javascript:;" title="Chọn vị trí nhập/xuất" onclick="ShowPopupInvInOut(this,'viewdetail')"><i class="fa fa-caret-down" style="line-height:24px"></i></a>`;
+                        }
+                        $(item).find('td[name="ListInvCodeIn"]').html(inputInvIn);
+                        $(item).find('td[name="ListInvCodeOut"]').html(inputInvOut);
+                    }
+                }
+        }
+        debugger
+            //format số
+        $(rowMainUI).each(function () {
+            debugger
+                //format số
+                var tr = $(this);
+                var rd = $(tr).attr('rd');
+                var qtytotalokCss = "qtytotalok-" + rd;
+                var qtyCss = "qty-" + rd;
+
+                var tableName = 'InvF_MoveOrd';
+            var qtyokformat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'Qty');
+                var qtyformat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'Qty');
+
+                $('.' + qtytotalokCss).number(true, qtyokformat);
+                $('.' + qtyCss).number(true, qtyformat);
+
+            });
+    });
+    </script>
+    <!-- End Render row product -->
+    <script type="text/javascript">
+        function Edit(url) {
+            commonUtils.window_location_href(url);
+        }
+    </script>
+    <script>
+        $(document).ready(function () {
+            var rowPrd = $("#Lst_InvF_MoveOrdProduct tr.trdata").length;
+            $("#spanTotalPrd").text(rowPrd);
+        });
+    </script>
+    <!-- document ready -->
+    <!-- select2 js -->
+    <script>
+        $(document).ready(function () {
+            $('.select2-selection, select#ProductCode').select2();
+            $('select#ProductCode').select2().on('select2:close', function () { commonUtils.showPopup(this); });
+
+
+            var tableName = 'InvF_MoveOrd';
+            var totalValOutAfterDescFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'Qty');
+            $('#spanTotalPrd').number(true, totalValOutAfterDescFormat);
+        });
+    </script>
+
+    <!-- Approve -->
+    <script>
+        function Approve() {
+            var objInvF_MoveOrd = new InvF_MoveOrd();
+            var iF_MONo = $('#IF_MONo').val();
+            var remark = $('#Remark').val();
+            if (commonUtils.isNullOrEmpty(iF_MONo)) {
+                alert("Số phiếu điều chuyển trống!");
+                return false;
+            }
+
+            var listInvF_MoveOrd = [];
+
+            var objInvF_MoveOrdCur = {};
+            objInvF_MoveOrdCur.IF_MONo = iF_MONo;
+            objInvF_MoveOrdCur.Remark = remark;
+            listInvF_MoveOrd.push(objInvF_MoveOrdCur);
+
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Approve", "InvF_MoveOrd")';
+
+            objInvF_MoveOrd.Image_Message = "<i class=\"fas fa-info-circle\"></i> THÔNG BÁO";
+            objInvF_MoveOrd.Confirm_Message = "Đồng ý duyệt phiếu điều chuyển này?";
+            objInvF_MoveOrd.ajaxSettings = ajaxSettings;
+            objInvF_MoveOrd.approved(listInvF_MoveOrd);
+        }
+    </script>
+    <!-- Huỷ -->
+    <script>
+        //var objInvF_InventoryReturnSup = new InvFInventoryReturnSup();
+        function Cancel() {
+            var objInvF_MoveOrd = new InvF_MoveOrd();
+            var iF_MONo = $('#IF_MONo').val();
+            var remark = $('#Remark').val();
+            if (commonUtils.isNullOrEmpty(iF_MONo)) {
+                alert("Số phiếu điều chuyển trống!");
+                return false;
+            }
+
+            var listInvF_MoveOrd = [];
+
+            var objInvF_MoveOrdCur = {};
+            objInvF_MoveOrdCur.IF_MONo = iF_MONo;
+            objInvF_MoveOrdCur.Remark = remark;
+            listInvF_MoveOrd.push(objInvF_MoveOrdCur);
+
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Cancel", "InvF_MoveOrd")';
+
+            objInvF_MoveOrd.Image_Message = "<i class=\"fas fa-info-circle\"></i> THÔNG BÁO";
+            objInvF_MoveOrd.Confirm_Message = "Đồng ý hủy phiếu điều chuyển này?";
+            objInvF_MoveOrd.ajaxSettings = ajaxSettings;
+            objInvF_MoveOrd.canceled(listInvF_MoveOrd);
+        }
+    </script>
+
+}
+
+@Html.Partial("_ModalShow")
+@Html.Partial("_CommonJs")
+@Html.Partial("Template")

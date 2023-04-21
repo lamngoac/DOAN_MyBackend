@@ -1,0 +1,85 @@
+﻿@model Mst_InvInType
+@{
+    ViewBag.Title = "Sửa loại nhập kho";
+    Layout = null;
+}
+
+<div class="modal-dialog" style="width: 600px; max-width: 600px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel"><b>Cập nhật loại nhập kho</b></h2>
+            <a href="javascript:;" onclick="ClosePopupUpdate()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body" style="">
+            <div class="col-12">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true)
+                    <div class="col-12 layout-bot-top-16">
+                        <div class="col-12">
+                            <div class="form-group margin-bottom-9">
+                                <label class="control-label col-4 col-sm-4 no-padding-right" for="InvInType">@("Mã loại nhập kho".HtmlItemString("inventory"))</label>
+                                <div class="col-8 col-sm-8">
+                                    <div class="clearfix">
+                                        <input type="text" name="InvInType" id="InvInType" class="col-11" value="@Model.InvInType" readonly />
+                                        <label class="span-input" style="color: red; padding-left: 10px;">*</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group margin-bottom-9">
+                                <label class="control-label col-4 no-padding-right" for="InvInTypeName">@("Tên loại nhập kho".HtmlItemString("inventory"))</label>
+                                <div class="col-8 col-sm-8">
+                                    <div class="clearfix">
+                                        <input type="text" name="InvInTypeName" id="InvInTypeName" class="col-11" value="@Model.InvInTypeName" required />
+                                        <label class="span-input" style="color: red; padding-left: 10px;">*</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group margin-bottom-9">
+                                <label class="control-label col-4 no-padding-right" for="FlagActive">@("Trạng thái".HtmlItemString("inventory"))</label>
+                                <div class="col-8">
+                                    @{
+                                        var check = Model.FlagActive.Equals("1") ? "checked" : "";
+                                    }
+                                    <span class="block input-icon input-icon-right padding-top-5">
+                                        <label class="lbl-flag no-margin">
+                                            <input name="FlagActive" id="FlagActive" class="icon-flag" type="checkbox" value="1" @check>
+                                            <span class="lbl"></span>
+                                            <input name="FlagActive" type="hidden" value="0">
+                                        </label>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9 d-none">
+                                <label class="control-label col-4 no-padding-right" for="FlagStatistic">@("Flag Statistic".HtmlItemString("inventory"))</label>
+                                <div class="col-8">
+                                    @{
+                                        var checkStatistic = Model.FlagStatistic.Equals("1") ? "checked" : "";
+                                    }
+                                    <span class="block input-icon input-icon-right padding-top-5">
+                                        <label class="lbl-flag no-margin">
+                                            <input name="FlagStatistic" id="FlagStatistic" class="icon-flag" type="checkbox" value="1" @check>
+                                            <span class="lbl"></span>
+                                            <input name="FlagStatistic" type="hidden" value="0">
+                                        </label>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-12 text-center">
+                                @RenderItemFormat("BTN_LOAI_NHAP_KHO_SUA", "<a href=\"javascript: void(0); \" class=\"btn btn-nc-button\" onclick=\"SaveDataUpdate();\"  style=\"float: right;\"><i class=\"fas fa-save\" aria-hidden=\"true\"></i> Lưu</a>", "", "")
+                                @*<a class="btn btn-nc-button" href="javascript:void(0);" onclick="SaveDataUpdate()"><i class="fas fa-save"></i> Lưu</a>*@
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Mst_InvInType.js")"></script>
+}

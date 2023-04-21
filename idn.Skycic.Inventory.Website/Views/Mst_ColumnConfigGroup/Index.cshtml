@@ -1,0 +1,272 @@
+﻿@model PageInfo<Mst_ColumnConfigGroup>
+
+
+@{
+    ViewBag.Title = "Quản lý nhóm cấu hình";
+    var init = CUtils.StrValue(ViewBag.init);
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+    var recordCount = CUtils.StrValue(ViewBag.RecordCount);
+
+    var userType = "";
+    var userState = ViewBag.UserState as UserState;
+    if (userState != null)
+    {
+        userType = CUtils.StrValue(userState.UserType);
+    }
+    var viewid = string.Format("{0}_{1}_{2}_{3}", CUtils.StrValue(userState.SysUser.UserCode), CUtils.StrValue(ViewBag.SolutionCodeSignature), CUtils.StrValue(userState.Mst_NNT.OrgID), "Mst_ColumnConfigGroup_Mng");
+}
+
+
+
+<div>
+    <div class="row no-margin">
+        <div class="col-sm-12">
+            <aside class="row no-margin">
+                <input type="hidden" id="viewid" name="viewid" value="@MvcHtmlString.Create(viewid)" />
+                @using (Html.BeginForm("Index", "Mst_ColumnConfigGroup", FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true)
+                    <input hidden id="init" name="init" value="search" />
+                }
+            </aside>
+            <div id="BindDataMst_ColumnConfigGroup" class="conten-table">
+                @Html.Partial("BindDataMst_ColumnConfigGroup", Model, new ViewDataDictionary() { { "init", MvcHtmlString.Create(init) }, { "PageCur", MvcHtmlString.Create(pageCur) }, { "RecordCount", MvcHtmlString.Create(recordCount) } })
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script src="@Url.Content("~/Scripts/mine/Mst_ColumnConfigGroup.js")"></script>
+    <script type="text/javascript">
+        setAdminCurrentUrl('@Url.Action("Index", "Mst_ColumnConfigGroup")');
+
+
+    </script>
+
+
+    <script type="text/javascript">
+        function SearchData() {
+            var recordcount = commonUtils.returnValueText('#recordcount'); //Số bản ghi trên 1 trang
+            var page = commonUtils.returnValueText('#page'); //Trang hiện tại
+
+
+            var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+            var url = '@Url.Action("DoSearch", "Mst_ColumnConfigGroup")';
+
+            $.ajax({
+                type: "post",
+                data: {
+                    __RequestVerificationToken: token,
+                    page: page,
+                    recordcount: recordcount,
+                },
+                url: url,
+                dataType: 'json',
+                beforeSend: function () {
+
+                }
+            }).done(function (result) {
+                if (result.Success) {
+                    $('#BindDataMst_ColumnConfigGroup').html('');
+                    $('#BindDataMst_ColumnConfigGroup').html(result.Html);
+                    readCookies("Mst_ColumnConfigGroup");
+                } else {
+                    if (!commonUtils.isNullOrEmpty(result.Detail)) {
+                        showErrorDialog(result.Detail);
+                    }
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+
+            }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+                //alert("complete");
+            });
+
+        }
+    </script>
+
+
+    <!-- #region table sort -->
+    <script>
+        var initDefault = function () {
+            $('#dynamic-table-thead').idnTable({
+                searchTextbox: '#dynamic-table-thead-search', columnToggleButton: '#togglecolumn',
+                cookieId: '#viewid',
+            });
+        };
+        var initCustom = function () {
+            var tb = $('#dynamic-table-thead').idnTable();
+
+            $('#dynamic-table-thead-search').keyup(function () {
+                var kw = $(this).val();
+                tb.search(kw);
+            });
+
+            //tb.showColumns(['STT'], false);
+            //tb.reload();
+            var colList = tb.getAllColumns();
+            $('#togglecolumn').html('');
+
+            for (var i = 0; i < colList.length; ++i) {
+
+                var col = colList[i];
+                var fieldid = col.id;
+                var title = col.name;
+
+                if (title !== undefined && title !== null && title.toString().trim().length > 0) {
+                    title = title.toString().trim();
+                } else {
+                    title = '';
+                }
+
+                var fieldactive = col.show;
+
+                //B2: Sinh popup tùy chỉnh các cột trong bảng #dynamic-table-thead
+                var $input = $('<input>');
+                $input.attr('type', 'checkbox');
+                $input.attr('name', fieldid);
+
+                if (fieldactive === true) { //Nếu trạng thái bằng 0 cho hiện cột và checked ô input tương ứng
+                    $input.attr('checked', 'checked');
+
+                }
+
+                var $spaninput = $('<span>');
+                $spaninput.append($input);
+                $spaninput.css('margin-right', '10px');
+
+                var $spantext = $('<span>');
+                $spantext.text(title);
+
+                var $li = $('<li>');
+                $li.css('line-height', '19px');
+                $li.css('margin-bottom', '18px');
+                $li.append($spaninput);
+                $li.append($spantext);
+
+                $('#togglecolumn').append($li);
+
+                $input.click(function () {
+                    if ($(this).is(':checked')) {
+                        tb.showColumns([$(this).attr('name')], false);
+                    }
+                    else {
+                        tb.hideColumns([$(this).attr('name')], false);
+                    }
+                });
+            }
+        };
+        $(document).ready(function () {
+            initDefault();
+            //initCustom();
+        });
+        $(document).ready(function () {
+            (function ($) {
+                var body = $('body');
+                body.on('keyup', '#dynamic-table-thead-search', function () {
+                    var datafilter = $(this).val();
+                    if (datafilter !== undefined && datafilter !== null && datafilter.toString().trim()) {
+                        datafilter = datafilter.toUpperCase().trim();
+                    }
+                    var rex = new RegExp($(this).val(), 'i');
+                    $('#table-tbodyID tr').hide();
+                    $('#table-tbodyID tr').filter(function () {
+                        //debugger
+                        var dataOfRow = $(this).text();
+                        if (dataOfRow !== undefined && dataOfRow !== null && dataOfRow.toString().trim().length > 0) {
+                            dataOfRow = dataOfRow.toUpperCase().trim();
+                        }
+                        if (dataOfRow.toUpperCase().indexOf(datafilter) > -1) {
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }
+                    }).show();
+                });
+
+            }(jQuery));
+
+        });
+        $(document).ready(function () {
+            //debugger;
+            var viewId = commonUtils.returnValueText('#viewid');
+            if (!commonUtils.isNullOrEmpty(viewId)) {
+                var cookie = commonUtils.getCookie(viewId);
+                if (commonUtils.isNullOrEmpty(cookie)) {
+                    var cookieValue = 'CONTROL|COLUMNCONFIGGRPCODE|COLUMNGRPNAME|COLUMNGRPFORMAT|COLUMNGRPDESC|FLAGACTIVE';
+                    commonUtils.setCookie(viewId, cookieValue, 10);
+                }
+            }
+            initDefault();
+
+            //initCustom();
+
+        });
+    </script>
+    <!-- #endregion -->
+    <!-- #region cookies -->
+    <script>
+        document.addEventListener('DOMContentLoaded',
+            function () {
+                //debugger;
+                readCookies("Mst_ColumnConfigGroup");
+                var checkboxs = document.querySelectorAll('#togglecolumn.ulshowdata input[type="checkbox"]');
+                for (let checkbox of checkboxs) {
+                    checkbox.addEventListener('change', setCookie)
+                }
+            });
+
+        function saveSelectedToCookie() {
+            //debugger;
+            setCookie("Mst_ColumnConfigGroup",
+                {
+                    path: '/',
+                    expires: 10
+                });
+        }
+
+        function setCookie(name, options = {}) {
+            //debugger;
+            var checkboxs = document.querySelectorAll('#togglecolumn.ulshowdata input[type="checkbox"]');
+            var value = new Object();
+            for (const ckb of checkboxs) {
+                value[ckb.name] = ckb.checked === true ? "0" : "1";
+            }
+            let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(JSON.stringify(value));
+
+            if (options.expires instanceof Date) {
+                options.expires = options.expires.toUTCString();
+            }
+            //debugger;
+            for (let optionKey in options) {
+                updatedCookie += "; " + optionKey;
+                let optionValue = options[optionKey];
+                if (optionValue !== true) {
+                    updatedCookie += "=" + optionValue;
+                }
+            }
+            document.cookie = updatedCookie;
+        }
+
+        function readCookies(name) {
+            //debugger;
+            var result = document.cookie.match(new RegExp(name + '=([^;]+)'));
+            if (result != null && result != undefined && result.length > 0) {
+                var y = result[1];
+                var x = JSON.parse(decodeURIComponent(result[1]));
+                result && (result = JSON.parse(decodeURIComponent(result[1])));
+            }
+
+            if (result != null && result != undefined) {
+                for (const key in result) {
+                    $('#dynamic-table-thead').find('th[fieldid="' + key + '"]').attr('fieldactive', result[key]);
+                }
+            }
+        }
+    </script>
+    <!-- #endregion -->
+
+}

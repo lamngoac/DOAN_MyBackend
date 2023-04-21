@@ -1,0 +1,304 @@
+﻿@model Mst_Customer
+@{
+
+    var listMst_GovIDType = ViewBag.ListMst_GovIDType as List<Mst_GovIDType>;
+    var listCustomer_DynamicField = ViewBag.ListCustomer_DynamicField as List<Customer_DynamicField>;
+    var objMst_Customer = new Mst_Customer();
+    if (Model != null)
+    {
+        objMst_Customer = Model;
+    }
+    var customDataDict = new Dictionary<string, object>();
+    if (Model != null)
+    {
+        customDataDict = Model.CustomDataDict;
+    }
+    var view = CUtils.StrValue(ViewBag.View);
+    var disabled = "";
+    var displayNone = "";
+    if (!view.Equals("create"))
+    {
+        disabled = "disabled-fix";
+        displayNone = "display-none";
+    }
+}
+
+@*Thông tin bổ sung*@
+<div id="cusct_additionalinfo" class="row no-margin" style="padding-top: 20px;">
+    <div class="no-margin col-4 no-padding d-none" id="thongtintochuc">
+        <div class="row no-margin form-group margin-bottom-9">
+            <label for="" class="col-4 control-label no-padding-right font-weight-500">@("Người đại diện".HtmlItemString("customer"))</label>
+            <div class="col-8">
+                <input type="text" name="RepresentName" id="RepresentName" class="col-12 RepresentName @disabled" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Customer.RepresentName))">
+            </div>
+        </div>
+        <div class="row no-margin form-group margin-bottom-9">
+            <label for="" class="col-4 control-label no-padding-right font-weight-500">@("Chức vụ".HtmlItemString("customer"))</label>
+            <div class="col-8">
+                <input type="text" name="RepresentPosition" id="RepresentPosition" class="col-12 RepresentPosition @disabled" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Customer.RepresentPosition))">
+            </div>
+        </div>
+        <div class="row no-margin form-group margin-bottom-9">
+            <label for="" class="col-4 control-label no-padding-right font-weight-500">@("Số giấy tờ".HtmlItemString("customer"))</label>
+            <div class="col-8">
+                <input type="text" name="GovIDCardNo" id="GovIDCardNo" class="col-12 GovIDCardNo @disabled" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Customer.GovIDCardNo))">
+            </div>
+        </div>
+        <div class="row no-margin form-group margin-bottom-9">
+            <label for="" class="col-4 control-label no-padding-right font-weight-500 ">@("Loại giấy tờ".HtmlItemString("customer"))</label>
+            <div id="div-GovIDType" class="col-8 @disabled">
+                <select id="GovIDType" name="GovIDType" class="GovIDType">
+                    @Html.Partial("~/Views/LoadData/LoadMst_GovIDType.cshtml", listMst_GovIDType, new ViewDataDictionary() { { "GovIDType", CUtils.StrValue(objMst_Customer.GovIDType) } })
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="no-margin col-4 no-padding">
+        <div class="row no-margin form-group margin-bottom-9">
+            <label for="" class="col-4 control-label no-padding-right font-weight-500">@("Số tài khoản".HtmlItemString("customer"))</label>
+            <div class="col-8">
+                <input type="text" name="BankAccountNo" id="BankAccountNo" class="col-12 BankAccountNo @disabled" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Customer.BankAccountNo))">
+            </div>
+        </div>
+        <div class="row no-margin form-group margin-bottom-9">
+            <label for="" class="col-4 control-label no-padding-right font-weight-500">@("Tên ngân hàng".HtmlItemString("customer"))</label>
+            <div class="col-8">
+                <input type="text" name="BankName" id="BankName" class="col-12 BankName @disabled" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Customer.BankName))">
+            </div>
+        </div>
+        <div class="row no-margin form-group margin-bottom-9">
+            <label for="" class="col-4 control-label no-padding-right font-weight-500">@("Người liên hệ".HtmlItemString("customer"))</label>
+            <div class="col-8">
+                <input type="text" name="ContactName" id="ContactName" class="col-12 ContactName @disabled" onblur="Blur_Element(this);" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Customer.ContactName))">
+            </div>
+        </div>
+        <div class="row no-margin form-group margin-bottom-9">
+            <label for="" class="col-4 control-label no-padding-right font-weight-500">@("ĐT liên hệ".HtmlItemString("customer"))</label>
+            <div class="col-8">
+                <input type="text" name="ContactPhone" id="ContactPhone" class="col-12 ContactPhone @disabled" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Customer.ContactPhone))">
+            </div>
+        </div>
+    </div>
+    <div class="no-margin col-4 no-padding">
+        <div class="row no-margin form-group margin-bottom-9">
+            <label for="" class="col-4 control-label no-padding-right font-weight-500">@("Email liên hệ".HtmlItemString("customer"))</label>
+            <div class="col-8">
+                <input type="text" name="ContactEmail" id="ContactEmail" class="col-12 ContactEmail @disabled" onblur="Blur_Element(this);" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Customer.ContactEmail))">
+            </div>
+        </div>
+        <div class="row no-margin form-group margin-bottom-9">
+            <label for="" class="col-4 control-label no-padding-right font-weight-500">@("Fax".HtmlItemString("customer"))</label>
+            <div class="col-8">
+                <input type="text" name="Fax" id="Fax" class="col-12 Fax @disabled" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Customer.Fax))">
+            </div>
+        </div>
+        <div class="row no-margin form-group margin-bottom-9">
+            <label for="" class="col-4 control-label no-padding-right font-weight-500">@("Ngày sinh/Ngày thành lập".HtmlItemString("customer"))</label>
+            <div class="col-8">
+                <input type="text" name="CustomerDateOfBirth" id="CustomerDateOfBirth" class="col-12 CustomerDateOfBirth @disabled" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Customer.CustomerDateOfBirth))">
+            </div>
+        </div>
+        <div class="row no-margin form-group margin-bottom-9">
+            <label for="" class="col-4 control-label no-padding-right font-weight-500">@("Facebook".HtmlItemString("customer"))</label>
+            <div class="col-8">
+                <input type="text" name="Facebook" id="Facebook" class="col-12 Facebook @disabled" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Customer.Facebook))">
+            </div>
+        </div>
+    </div>
+</div>
+<div id="cusct_additionalinvoiceinfo" class="row no-margin">
+    <div class="col-12 title-toggle" onclick="Toggle(this)">
+        <span>@("Thông tin xuất hóa đơn".HtmlItemString("customer"))</span>
+        <img class="showdetail" style="width: 20px" src="/Images/Hide.svg" value="1">
+    </div>
+    <div class="col-12 detail-toggle" style="padding-top: 15px; ">
+        <div class="no-margin col-4 no-padding" style="float: left;">
+            <div class="row no-margin form-group margin-bottom-9">
+                <label for="" class="col-4 control-label no-padding-right font-weight-500">@("Người mua hàng".HtmlItemString("customer"))</label>
+                <div class="col-8">
+                    <input type="text" name="InvoiceCustomerName" id="InvoiceCustomerName" class="col-12 InvoiceCustomerName @disabled" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Customer.InvoiceCustomerName))">
+                </div>
+            </div>
+            <div class="row no-margin form-group margin-bottom-9">
+                <label for="" class="col-4 control-label no-padding-right font-weight-500">@("Tên tổ chức".HtmlItemString("customer"))</label>
+                <div class="col-8">
+                    <input type="text" name="InvoiceOrgName" id="InvoiceOrgName" class="col-12 InvoiceOrgName @disabled" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Customer.InvoiceOrgName))">
+                </div>
+            </div>
+        </div>
+        <div class="no-margin col-4 no-padding" style="float: left;">
+            <div class="row no-margin form-group margin-bottom-9">
+                <label for="" class="col-4 control-label no-padding-right font-weight-500">@("MST".HtmlItemString("customer"))</label>
+                <div class="col-8">
+                    <input type="text" name="MST" id="MST" class="col-12 MST @disabled" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Customer.MST))">
+                </div>
+            </div>
+            <div class="row no-margin form-group margin-bottom-9">
+                <label for="" class="col-4 control-label no-padding-right font-weight-500">@("Địa chỉ".HtmlItemString("customer"))</label>
+                <div class="col-8">
+                    <input type="text" name="InvoiceCustomerAddress" id="InvoiceCustomerAddress" class="col-12 InvoiceCustomerAddress @disabled" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Customer.InvoiceCustomerAddress))">
+                </div>
+            </div>
+        </div>
+        <div class="no-margin col-4 no-padding" style="float: left;">
+            <div class="row no-margin form-group margin-bottom-9">
+                <label for="" class="col-4 control-label no-padding-right font-weight-500">@("Email nhận HĐ".HtmlItemString("customer"))</label>
+                <div class="col-8">
+                    <input type="text" name="InvoiceEmailSend" id="InvoiceEmailSend" class="col-12 InvoiceEmailSend @disabled" value="@MvcHtmlString.Create(CUtils.StrValue(objMst_Customer.InvoiceEmailSend))">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="cusct_additional-info" class="row no-margin">
+    <div class="col-12 title-toggle" onclick="Toggle(this)">
+        <span>@("Thông tin bổ sung".HtmlItemString("customer"))</span>
+        <img class="showdetail" style="width: 20px" src="/Images/Hide.svg" value="1">
+    </div>
+    <div class="col-12 detail-toggle">
+        @*@if (view.Equals("create"))
+        {*@
+            <div id="div-Customer_DynamicField" class="row no-margin @displayNone" style="padding: 15px 0">
+                <table id="table-informationupdate" class="table-product col-7">
+                    <tbody id="tbody-information">
+                        @if (customDataDict != null && customDataDict.Count > 0)
+                        {
+                            var idx = 0;
+                            foreach (var it in customDataDict)
+                            {
+                                <tr class="trdata" idx="@idx">
+                                    <td class="cell-50 td-event-delete">
+                                        <a href="javascript:;" onclick="DeleteRow_Information(this)" title="Xóa">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </td>
+                                    <td class="td-select">
+                                        <div class="form-group no-margin div-select-information">
+                                            <!--Note: Đang fix cứng datatype: 1, controltype: 1-->
+                                            <select class="col-10 select-information" select-value="@it.Key" select-datatype="1" select-controltype="1">
+                                                <option opt="null">--Lựa chọn--</option>
+                                                @if (listCustomer_DynamicField != null && listCustomer_DynamicField.Count > 0)
+                                                {
+                                                    var codecur = it.Key;
+                                                    if (listCustomer_DynamicField[0].ParamTypes != null && listCustomer_DynamicField[0].ParamTypes.Count > 0)
+                                                    {
+                                                        foreach (var item in listCustomer_DynamicField[0].ParamTypes)
+                                                        {
+                                                            <option opt="null" value="@item.Code" @(codecur.Equals(item.Code.ToString().Trim()) ? "selected" : "")>@item.Title</option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                            <a class="btn btn-nc-button btn-add-or-edit" onclick="ShowPopup_Edit_Information(this)" title="Sửa thông tin">
+                                                <i class="fas fa-pencil-alt"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <td class="td-input-text">
+                                        <div class="form-group no-margin div-input-text">
+                                            @{
+                                                var _value = CUtils.StrValue(it.Value);
+                                                _value = _value.Replace(";", ",");
+
+                                            }
+                                            <input type="text" class="col-12 value-information" placeholder="Enter an input and press Enter" value="@MvcHtmlString.Create(_value)" data-role="tagsinput">
+                                        </div>
+                                    </td>
+                                </tr>
+                                idx++;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        @*}*@
+        @if (!view.Equals("create"))
+        {
+            <div id="div-Customer_DynamicField_View" class="row no-margin" style="padding: 15px 0">
+                <table id="table-information" class="table-product col-7">
+                    <tbody id="tbody-information">
+                        @if (customDataDict != null && customDataDict.Count > 0)
+                        {
+                            var idx = 0;
+                            foreach (var it in customDataDict)
+                            {
+                                <tr class="trdata" idx="@idx">
+                                    <td class="td-select">
+                                        <div class="form-group no-margin div-select-information @disabled">
+                                            <!--Note: Đang fix cứng datatype: 1, controltype: 1-->
+                                            <select class="col-10 select-information" select-value="@it.Key" select-datatype="1" select-controltype="1">
+                                                <option opt="null">--Lựa chọn--</option>
+                                                @if (listCustomer_DynamicField != null && listCustomer_DynamicField.Count > 0)
+                                                {
+                                                    var codecur = it.Key;
+                                                    if (listCustomer_DynamicField[0].ParamTypes != null && listCustomer_DynamicField[0].ParamTypes.Count > 0)
+                                                    {
+                                                        foreach (var item in listCustomer_DynamicField[0].ParamTypes)
+                                                        {
+                                                            <option opt="null" value="@item.Code" @(codecur.Equals(item.Code.ToString().Trim()) ? "selected" : "")>@item.Title</option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+
+                                        </div>
+                                    </td>
+                                    <td class="td-input-text">
+                                        <div class="form-group no-margin div-input-text @disabled">
+                                            @{
+                                                var _value = CUtils.StrValue(it.Value);
+                                                _value = _value.Replace(";", ",");
+
+                                            }
+                                            <input type="text" class="col-12 value-information" placeholder="Enter an input and press Enter" value="@MvcHtmlString.Create(_value)" data-role="tagsinput">
+                                        </div>
+                                    </td>
+                                </tr>
+                                idx++;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        <a id="AddRow_Information" href="javascript: void(0); " class="btn font-color mybtn-Button-2 @displayNone" style="padding-left: 15px!important; padding-right: 15px!important;" onclick="AddRow_Information()">@("More information".HtmlItemString("customer"))</a>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $("#CustomerDateOfBirth").datepicker({
+            autoclose: true,
+            format: 'yyyy-mm-dd',
+            todayHighlight: true
+        });
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,175 @@
+﻿@model RT_Map_UserInNotifyType
+@using idn.Skycic.Inventory.Website.State
+@{
+    var userState = ViewBag.UserState as UserState;
+    var userType = "";
+    if (userState != null)
+    {
+        userType = CUtils.StrValue(userState.UserType);
+    }
+    var listMst_ManageNotify = new List<Mst_ManageNotify>();
+    var listMst_NotifyType = new List<Mst_NotifyType>();
+    var listMap_UserInNotifyType = new List<Map_UserInNotifyType>();
+    if (Model != null)
+    {
+        if (Model.Lst_Mst_ManageNotify != null && Model.Lst_Mst_ManageNotify.Count > 0)
+        {
+            listMst_ManageNotify.AddRange(Model.Lst_Mst_ManageNotify);
+        }
+        if (Model.Lst_Mst_NotifyType != null && Model.Lst_Mst_NotifyType.Count > 0)
+        {
+            listMst_NotifyType.AddRange(Model.Lst_Mst_NotifyType);
+        }
+        if (Model.Lst_Map_UserInNotifyType != null && Model.Lst_Map_UserInNotifyType.Count > 0)
+        {
+            listMap_UserInNotifyType.AddRange(Model.Lst_Map_UserInNotifyType);
+        }
+    }
+}
+<style>
+    .lbl-flag input[type=checkbox].icon-flag + .lbl::before {
+        text-indent: -20px;
+        content: "";
+        /*content: "Có\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0Không";*/
+        width: 40px;
+        height: 20px;
+        line-height: 20px;
+    }
+
+    .lbl-flag input[type=checkbox].icon-flag + .lbl::after {
+        content: "";
+        width: 12px;
+        height: 12px;
+        line-height: 10px;
+        top: 4px;
+    }
+
+    .lbl-flag input[type=checkbox].icon-flag:checked + .lbl::after {
+        left: 22px;
+        background-color: #FFF;
+        color: #848484;
+    }
+</style>
+<div class="col-xs-12 layout-bot-top-16" style="">
+    <div class="row">
+        <div class="col-6"></div>
+        <div class="col-6"></div>
+    </div>
+</div>
+
+<div class="panel-body no-padding" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+    <aside class="col-xs-12 layout-table no-padding">
+        <div class="padding-left-0 padding-right-0" style="padding-top: 0!important;">
+            @{
+                var stt = "STT".HtmlItemString("contract_temcontract");
+                var tContracNameColumn = "Email".HtmlItemString("contract_temcontract");
+                var contracNameColumn = "Họ tên".HtmlItemString("contract_temcontract");
+                var contractTypeColumn = "Loại hợp đồng".HtmlItemString("contract_temcontract");
+                var flagActiveColumn = "Trạng thái".HtmlItemString("contract_temcontract");
+                var remarkColumn = "Ghi chú".HtmlItemString("contract_temcontract");
+            }
+
+            <div style="width: 100%; float: left;">
+                <table id="dynamic-table-thead" idn-datatable-id="dynamic-table-thead-tbody" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                    <thead>
+                        <tr class="trheadfirst">
+                            <th fieldid="STT" class="text-left cell-30"></th>
+                            <th fieldid="CONTRACTNO" class="text-left cell-200"></th>
+                            <th fieldid="CONTRACNAME" class="text-right cell-200">Áp dụng tất cả</th>
+                            @if (listMst_NotifyType != null && listMst_NotifyType.Count > 0)
+                            {
+                                foreach (var item in listMst_NotifyType)
+                                {
+                                    <th fieldid="@MvcHtmlString.Create(CUtils.StrValue(item.NotifyType))" fieldname="@MvcHtmlString.Create(CUtils.StrValue(item.NotifyDesc))" class="cell-100">
+                                        <span class="block input-icon input-icon-right padding-top-5">
+                                            <label class="lbl-flag" style="margin-bottom: 0px!important;">
+                                                <input class="icon-flag" type="checkbox" value="1" notifytype="@MvcHtmlString.Create(CUtils.StrValue(item.NotifyType))" onchange="FlagNotify_Change_CheckAll(this)" />
+                                                <span class="lbl"></span>
+                                                <span class="lbl-title" style="position: absolute; width: 50px; padding-left: 3px;">@MvcHtmlString.Create("Không")</span>
+                                            </label>
+                                        </span>
+                                    </th>
+                                }
+                            }
+                        </tr>
+                        <tr class="trthead" filterroot="" bfilter="0">
+                            <th fieldid="STT" fieldname="@MvcHtmlString.Create(stt)" idn-data-type="N" idn-data-sort="1" idn-data-filter="0" class="text-left cell-30">@MvcHtmlString.Create(stt)</th>
+                            <th fieldid="TCONTRACNAME" fieldname="@MvcHtmlString.Create(tContracNameColumn)" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-200">
+                                @MvcHtmlString.Create(tContracNameColumn)
+                            </th>
+                            <th fieldid="CONTRACNAME" fieldname="@MvcHtmlString.Create(contracNameColumn)" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" class="text-left cell-200">
+                                @MvcHtmlString.Create(contracNameColumn)
+                            </th>
+                            @if (listMst_NotifyType != null && listMst_NotifyType.Count > 0)
+                            {
+                                foreach (var item in listMst_NotifyType)
+                                {
+                                    <th fieldid="@MvcHtmlString.Create(CUtils.StrValue(item.NotifyType))" fieldname="@MvcHtmlString.Create(CUtils.StrValue(item.NotifyDesc))" class="cell-100" onchange="FlagNotify_Change_CheckAll(this)">
+                                        @MvcHtmlString.Create(CUtils.StrValue(item.NotifyDesc))
+                                    </th>
+                                }
+                            }
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                <table id="dynamic-table-thead-tbody" class="table table-tbody table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                    <tbody id="table-tbodyID">
+                        @if (listMst_ManageNotify != null && listMst_ManageNotify.Count > 0)
+                        {
+                            var i = 0;
+                            foreach (var item in listMst_ManageNotify)
+                            {
+                                var userCodeCur = CUtils.StrValue(item.UserCode);
+                                <tr idx="@i" class="data-item trdata">
+                                    <input type="hidden" class="UserCode" value="@MvcHtmlString.Create(CUtils.StrValue(item.UserCode))" />
+                                    <input type="hidden" class="UserName" value="@MvcHtmlString.Create(CUtils.StrValue(item.UserName))" />
+                                    <td fieldid="STT" fieldname="@MvcHtmlString.Create(stt)" class="text-right cell-30">@MvcHtmlString.Create((i + 1).ToString())</td>
+                                    <td fieldid="TCONTRACNAME" fieldname="@MvcHtmlString.Create(tContracNameColumn)" class="text-left cell-200">
+                                        @MvcHtmlString.Create(CUtils.StrValue(item.UserCode))
+                                    </td>
+                                    <td fieldid="CONTRACNAME" fieldname="@MvcHtmlString.Create(contracNameColumn)" class="text-left cell-200">
+                                        @MvcHtmlString.Create(CUtils.StrValue(item.UserName))
+                                    </td>
+                                    @if (listMst_NotifyType != null && listMst_NotifyType.Count > 0)
+                                    {
+                                        foreach (var it in listMst_NotifyType)
+                                        {
+                                            var notifyTypeCur = CUtils.StrValue(it.NotifyType);
+                                            var flagNotify = "0";
+                                            var title = "Không";
+                                            var objMap_UserInNotifyType = listMap_UserInNotifyType.Where(_it => CUtils.StrValue(_it.NotifyType).Equals(notifyTypeCur) && CUtils.StrValue(_it.UserCode).Equals(userCodeCur)).FirstOrDefault();
+                                            if (objMap_UserInNotifyType != null)
+                                            {
+                                                flagNotify = CUtils.StrValue(objMap_UserInNotifyType.FlagNotify);
+                                            }
+                                            var checkFlagNotify = "";
+                                            if (flagNotify.Equals("1"))
+                                            {
+                                                checkFlagNotify = "checked";
+                                                title = "Có";
+                                            }
+                                            <td fieldid="@MvcHtmlString.Create(CUtils.StrValue(it.NotifyType))" fieldname="@MvcHtmlString.Create(CUtils.StrValue(it.NotifyDesc))" class="cell-100 FlagNotify">
+                                                <span class="block input-icon input-icon-right padding-top-5">
+                                                    <label class="lbl-flag" style="margin-bottom: 0px!important; position: relative;">
+                                                        <input type="hidden" class="check-data" value="@flagNotify" />
+                                                        <input class="icon-flag @MvcHtmlString.Create(CUtils.StrValue(it.NotifyType))" type="checkbox" value="1" @MvcHtmlString.Create(checkFlagNotify) onchange="FlagNotify_Change(this)" />
+                                                        <span class="lbl"></span>
+                                                        <span class="lbl-title" style="position: absolute; width: 50px; padding-left: 3px;">@MvcHtmlString.Create(title)</span>
+                                                    </label>
+                                                </span>
+                                            </td>
+                                        }
+                                    }
+                                </tr>
+                                i++;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </aside>
+</div>
+

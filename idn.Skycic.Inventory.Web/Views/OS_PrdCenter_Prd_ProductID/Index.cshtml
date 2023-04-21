@@ -1,0 +1,545 @@
+﻿@model PageInfo<idn.Skycic.Inventory.Common.Models.ProductCentrer.Prd_ProductID>
+@{
+                /**/
+
+                Layout = "~/Views/Shared/_LayoutQuantri.cshtml";
+                var title = "QUẢN LÝ SẢN PHẨM";
+                ViewBag.Title = title;
+                ViewBag.OverflowX = true;
+                var startCount = 0;
+                var strStartCount = ViewBag.StartCount as string;
+                if (!CUtils.IsNullOrEmpty(strStartCount))
+                {
+                    startCount = Convert.ToInt32(strStartCount);
+                }
+                var lstPrdIDCustomField = ViewBag.lstPrdIDCustomField as List<Prd_PrdIDCustomField>;
+
+                var isparent = ViewBag.IsParent;
+
+                var lstNNT = ViewBag.lstNNT as List<Mst_NNT>;
+                var waOrgID = ViewBag.WaOrgID as string;
+                if (CUtils.IsNullOrEmpty(waOrgID))
+                {
+                    waOrgID = "";
+                }
+                var datasize = 2300;
+                if (isparent)
+                {
+                    datasize += 150;
+                }
+                if (lstPrdIDCustomField != null && lstPrdIDCustomField.Count > 0)
+                {
+                    datasize += lstPrdIDCustomField.Count * 150;
+                }
+}
+
+<style>
+    .ace-scroll, .scroll-content {
+        overflow: hidden !important;
+    }
+</style>
+
+<div class="row no-margin">
+    <div class="row no-margin">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="panel-group" id="steps">
+                <div class="panel panel-info">
+                    <div class="title">
+                        <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                    </div>
+                </div>
+                <div class="row no-margin layout-tk">
+                    @using (Html.BeginForm("Index", "OS_PrdCenter_Prd_ProductID", FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true)
+                        <div class="col-xs-12 box-shadow-tk">
+                            <div>
+                                <input hidden id="init" name="init" value="search" />
+                                <aside class="col-xs-4">
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã tổ chức")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <select id="OrgID" name="OrgID" class="col-xs-11 ">
+                                                    <option></option>
+                                                    @{
+                                                        var org = Request["OrgID"] == null ? "" : Request["OrgID"].ToString();
+                                                        foreach (var it in lstNNT)
+                                                        {
+                                                            var orgIdCur = CUtils.StrValueOrNull(it.OrgID);
+                                                            var mstCur = CUtils.StrValueOrNull(it.MST);
+                                                            <option @(orgIdCur.Equals(org) ? "selected" : "") value="@MvcHtmlString.Create(orgIdCur)">@MvcHtmlString.Create(mstCur + " (" + orgIdCur + ")")</option>
+                                                        }
+                                                    }
+                                                </select>
+                                                @*<input type="text" id="MST" name="MST" class="col-xs-11 " value="@(Request["MST"] == null ? "" : Request["MST"].ToString())" autocomplete="off" required />*@
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã sản phẩm")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="ProductID" name="ProductID" class="col-xs-11 " value="@(Request["ProductID"] == null ? "" : Request["ProductID"].ToString())" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã Spec")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="SpecCode" name="SpecCode" class="col-xs-11 " value="@(Request["SpecCode"] == null ? "" : Request["SpecCode"].ToString())" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </aside>
+                                <aside class="col-xs-4">
+
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên Spec")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="ms_SpecName" name="ms_SpecName" class="col-xs-11 " value="@(Request["ms_SpecName"] == null ? "" : Request["ms_SpecName"].ToString())" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Khách hàng")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="Buyer" name="Buyer" class="col-xs-11 " value="@(Request["Buyer"] == null ? "" : Request["Buyer"].ToString())" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </aside>
+                                <aside class="col-xs-4">
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="SourceInvoiceCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Brand")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="Brand" name="Brand" class="col-xs-11 " value="@(Request["Brand"] == null ? "" : Request["Brand"].ToString())" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Model")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                @*<select class="col-xs-11" id="ModelCode" name="ModelCode">
+                                                        <option value=""></option>
+                                                    </select>*@
+                                                <input type="text" id="ModelCode" name="ModelCode" class="col-xs-11 " value="@(Request["ModelCode"] == null ? "" : Request["ModelCode"].ToString())" autocomplete="off" required />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </aside>
+                                <div class="button-tk">
+                                    <div class="form-group margin-bottom-5">
+                                        <div class="col-xs-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right">
+                                                @RenderItemFormat("BTN_QL_SAN_PHAM_TK", "<a class=\"btn font-color mybtn-Button\" onclick=\"Search()\" href=\"javascript:void(0);\" style=\" \"><img class=\"img-button\" src='" + Url.Content("~/Images/search.svg") + "'></a>", "", "")
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 no-padding">
+                            <input type="hidden" id="checkmapping" value="true" />
+                            <a class="btn font-color mybtn-Button dropdown-toggle" data-toggle="dropdown" aria-expanded="false" style="float: right;font-size: 13px;margin-top: 20px;position: relative;">...</a>
+                            <ul class="dropdown-menu" role="menu" style="">
+                                <li>
+                                    @RenderItemFormat("BTN_QUAN_LY_SAN_PHAM_IMPORT", "<a class=\"mybtn-Button-1\" onclick=\"ShowPopupImportExcel(true)\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/import.svg") + "'>Nhập Excel</a>", "", "")
+                                </li>
+                                <li>
+                                    @RenderItemFormat("BTN_QUAN_LY_SAN_PHAM_EXPORT_EXCEL", "<a class=\"mybtn-Button-1\" onclick=\"Export()\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/export.svg") + "'>Xuất Excel</a>", "", "")
+                                </li>
+                                <li>
+                                    @RenderItemFormat("BTN_QUAN_LY_SAN_PHAM_EXPORTTEMPLATE", "<a class=\"mybtn-Button-1\" onclick=\"ExportTemplate(true)\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/export.svg") + "'>Xuất Excel template</a>", "", "")
+                                </li>
+                                @if (isparent)
+                                {
+                                    <li>
+                                        @RenderItemFormat("BTN_QUAN_LY_SAN_PHAM_IMPORT", "<a class=\"mybtn-Button-1\" onclick=\"ShowPopupImportExcel(false)\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/import.svg") + "'>Nhập Excel Mapping</a>", "", "")
+                                    </li>
+                                    <li>
+                                        @RenderItemFormat("BTN_QUAN_LY_SAN_PHAM_EXPORTTEMPLATE", "<a class=\"mybtn-Button-1\" onclick=\"ExportTemplate(false)\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/export.svg") + "'>Xuất Excel Mapping template</a>", "", "")
+                                    </li>
+                                }
+                            </ul>
+                            @RenderItemFormat("BTN_QUAN_LY_SAN_PHAM_TAO_MOI", "<a class=\"btn font-color mybtn-Button\" href=\"" + Url.Action("Create", "OS_PrdCenter_Prd_ProductID") + "\" style=\"float: right;font-size: 13px; margin-top: 20px;margin-right: 10px; \"><img class=\"img-button in-acti\" src='" + Url.Content("~/Images/Hoadon/Tao.svg") + "'><img class=\"img-button acti\" src='" + Url.Content("~/Images/Hoadon/Tao.svg") + "'>Tạo</a>", "", "")
+                        </div>
+                        <div class="col-xs-12 no-padding" style="margin-top: 15px;">
+                            <div class="col-xs-5 no-padding">
+                                Tổng số @Model.ItemCount kết quả trong @Model.PageCount trang
+                            </div>
+                            @if (Model != null && Model.DataList != null)
+                            {
+                                <div id="dynamic-table_paginate" class="dataTables_paginate paging_simple_numbers" style="">
+                                    @Html.PagerBootstrap((int)Model.PageSize, -1 + (int)Model.PageIndex, (int)Model.ItemCount, new { ProductID = Request["ProductID"], SpecCode = Request["SpecCode"], ms_SpecName = Request["ms_SpecName"], Buyer = Request["Buyer"], Brand = Request["Brand"], ModelCode = Request["ModelCode"], OrgID = Request["OrgID"], RecordCount = Request["RecordCount"], init = Request["init"] }, "<", ">", "<<", ">>")
+                                </div>
+                            }
+                            @Html.Partial("RecordCount")
+                        </div>
+                    }
+                </div>
+
+
+                <div class="panel panel-info">
+                    <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                        @Html.AntiForgeryToken()
+                        <aside class="col-xs-12 no-padding">
+                            <div class="scrollable-horizontal padding-left-0 padding-right-0 div-scrollable" data-size="@datasize" style="padding-top: 0!important;">
+                                <div>
+                                    <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center cell-50">@MvcHtmlString.Create("TT")</th>
+                                                <th class="text-center cell-150">
+                                                    @MvcHtmlString.Create("Mã tổ chức")
+                                                </th>
+                                                <th class="text-center cell-200">
+                                                    @MvcHtmlString.Create("Mã sản phẩm")
+                                                </th>
+                                                @*<th class="text-center cell-200">
+                                                        @MvcHtmlString.Create("Mã sản phẩm chung")
+                                                    </th>*@
+                                                <th class="text-center cell-200">
+                                                    @MvcHtmlString.Create("Mã Spec")
+                                                </th>
+                                                <th class="text-center cell-200">
+                                                    @MvcHtmlString.Create("Tên Spec")
+                                                </th>
+                                                <th class="text-center cell-150">
+                                                    @MvcHtmlString.Create("Số Lot")
+                                                </th>
+                                                <th class="text-center cell-150">
+                                                    @MvcHtmlString.Create("Ngày sản xuất")
+                                                </th>
+                                                <th class="text-center cell-150">
+                                                    @MvcHtmlString.Create("Ngày mua hàng")
+                                                </th>
+                                                <th class="text-center cell-150">
+                                                    @MvcHtmlString.Create("Thời gian bảo hành")
+                                                </th>
+                                                <th class="text-center cell-150">
+                                                    @MvcHtmlString.Create("Ngày BĐ bảo hành")
+                                                </th>
+                                                <th class="text-center cell-150">
+                                                    @MvcHtmlString.Create("Ngày hết bảo hành")
+                                                </th>
+                                                <th class="text-center cell-200">
+                                                    @MvcHtmlString.Create("Khách hàng")
+                                                </th>
+                                                @{
+                                                    if (isparent == true)
+                                                    {
+                                                        <th class="text-center cell-150">
+                                                            @MvcHtmlString.Create("Mã sản phẩm chung")
+                                                        </th>
+                                                    }
+                                                }
+                                                <th class="text-center cell-150">
+                                                    @MvcHtmlString.Create("Trạng thái")
+                                                </th>
+                                                @{
+                                                    foreach (var field in lstPrdIDCustomField)
+                                                    {
+                                                        <th class="text-center cell-150">
+                                                            @MvcHtmlString.Create(field.PrdCustomFieldName.ToString())
+                                                        </th>
+                                                    }
+                                                }
+                                                <th class="cell-120">&nbsp;</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                                <div class="scrollable" data-size="430" style="width: 100%; float: left;">
+                                    <table id="dynamic-table-tbody" class="table table-striped table-bordered table-hover table-tbody">
+                                        <tbody id="table-tbodyID">
+
+                                            @if (Model != null && Model.DataList != null && Model.DataList.Count > 0)
+                                            {
+                                                var idx = 0;
+                                                foreach (var item in Model.DataList)
+                                                {
+                                                    var orgId = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.OrgID))
+                                                    {
+                                                        orgId = CUtils.StrValueOrNull(item.OrgID);
+                                                    }
+                                                    var iindex = startCount + (idx + 1);
+                                                    <tr idx="@idx" class="data-item trdata">
+                                                        <td class="text-center cell-50" style="background: #D3EDE4;">
+                                                            @MvcHtmlString.Create(iindex.ToString())
+                                                        </td>
+                                                        <td class="text-center cell-150">
+                                                            @MvcHtmlString.Create(orgId)
+                                                        </td>
+                                                        <td class="cell-200 text-center">
+                                                            @if (!CUtils.IsNullOrEmpty(item.ProductID))
+                                                            {
+                                                                @MvcHtmlString.Create(item.ProductID.ToString())
+                                                            }
+                                                        </td>
+                                                        @*<td class="cell-200 text-center">
+                                                                                                                @if (!CUtils.IsNullOrEmpty(item.NetworkProductIDCode))
+                                                                    {
+                                                                                                        @MvcHtmlString.Create(item.NetworkProductIDCode.ToString())
+                                                            }
+                                                                                                            </td>*@
+                                                        <td class="text-center cell-200">
+                                                            @if (!CUtils.IsNullOrEmpty(item.SpecCode))
+                                                            {
+                                                                @MvcHtmlString.Create(item.SpecCode.ToString())
+                                                            }
+                                                        </td>
+                                                        <td class="text-center cell-200">
+                                                            @if (!CUtils.IsNullOrEmpty(item.ms_SpecName))
+                                                            {
+                                                                @MvcHtmlString.Create(item.ms_SpecName.ToString())
+                                                            }
+                                                        </td>
+                                                        <td class="text-center cell-150">
+                                                            @if (!CUtils.IsNullOrEmpty(item.LOTNo))
+                                                            {
+                                                                @MvcHtmlString.Create(item.LOTNo.ToString())
+                                                            }
+                                                        </td>
+                                                        <td class="text-center cell-150">
+                                                            @MvcHtmlString.Create(item.ProductionDate == null ? "" : Convert.ToDateTime(item.ProductionDate).ToString("yyyy-MM-dd"))
+                                                        </td>
+                                                        <td class="text-center cell-150">
+                                                            @MvcHtmlString.Create(item.BuyDate == null ? "" : Convert.ToDateTime(item.BuyDate).ToString("yyyy-MM-dd"))
+                                                        </td>
+                                                        <td class="text-center cell-150">
+                                                            @if (!CUtils.IsNullOrEmpty(item.WarrantyDuration))
+                                                            {
+                                                                @MvcHtmlString.Create(item.WarrantyDuration.ToString())
+                                                            }
+                                                        </td>
+                                                        <td class="text-center cell-150">
+                                                            @MvcHtmlString.Create(item.WarrantyStartDate == null ? "" : Convert.ToDateTime(item.WarrantyStartDate).ToString("yyyy-MM-dd"))
+                                                        </td>
+                                                        <td class="text-center cell-150">
+                                                            @MvcHtmlString.Create(item.WarrantyExpiredDate == null ? "" : Convert.ToDateTime(item.WarrantyExpiredDate).ToString("yyyy-MM-dd"))
+                                                        </td>
+                                                        <td class="text-center cell-200">
+                                                            @if (!CUtils.IsNullOrEmpty(item.Buyer))
+                                                            {
+                                                                @MvcHtmlString.Create(item.Buyer.ToString())
+                                                            }
+                                                        </td>
+                                                        @{
+                                                            if (isparent == true)
+                                                            {
+                                                                <td class="cell-150">@(item.NetworkProductIDCode == null ? "" : item.NetworkProductIDCode) </td>
+                                                            }
+
+                                                        }
+                                                        <td class="text-center cell-150">
+                                                            @(item.ProductIDStatus == null ? "" : item.ProductIDStatus)
+                                                        </td>
+                                                        @{
+                                                            foreach (var field in lstPrdIDCustomField)
+                                                            {
+                                                                var valField = "";
+                                                                if (field.PrdCustomFieldCode.Equals("CUSTOMFIELD1"))
+                                                                {
+                                                                    valField = item.CustomField1.ToString();
+                                                                }
+                                                                else if (field.PrdCustomFieldCode.Equals("CUSTOMFIELD2"))
+                                                                {
+                                                                    valField = item.CustomField2.ToString();
+                                                                }
+                                                                else if (field.PrdCustomFieldCode.Equals("CUSTOMFIELD3"))
+                                                                {
+                                                                    valField = item.CustomField3.ToString();
+                                                                }
+                                                                else if (field.PrdCustomFieldCode.Equals("CUSTOMFIELD4"))
+                                                                {
+                                                                    valField = item.CustomField4.ToString();
+                                                                }
+                                                                else if (field.PrdCustomFieldCode.Equals("CUSTOMFIELD5"))
+                                                                {
+                                                                    valField = item.CustomField5.ToString();
+                                                                }
+                                                                <td class="text-center cell-150">
+                                                                    @MvcHtmlString.Create(valField)
+                                                                </td>
+                                                            }
+                                                        }
+                                                        <td class="text-center cell-120">
+                                                            <div class="action-buttons padding-top-2">
+                                                                @{
+                                                                    var urlDetail = Url.Action("Detail", "OS_PrdCenter_Prd_ProductID", new { productID = item.ProductID, specCode = item.SpecCode });
+                                                                    var urlUpdate = Url.Action("Update", "OS_PrdCenter_Prd_ProductID", new { productID = item.ProductID, specCode = item.SpecCode });
+
+                                                                }
+                                                                @RenderItemFormat("BTN_QL_SAN_PHAM_CHI_TIET", "<a class=\"icon-edit\" href=\'" + urlDetail + "\' title=\"Chi tiết\"><img class=\"img-icon\" src='" + Url.Content("~/Images/Xem.svg") + "'></a>", "", "")
+                                                                @RenderItemFormat("BTN_QL_SAN_PHAM_SUA", "<a class=\"icon-edit\" href=\'" + urlUpdate + "\' title=\"Sửa\"><img class=\"img-icon\" src='" + Url.Content("~/Images/Sua.svg") + "'></a>", "", "")
+                                                                @if (waOrgID.Equals(item.OrgID))
+                                                                {
+
+                                                                    @RenderItemFormat("BTN_QL_SAN_PHAM_XOA", "<a href=\"javascript:;\" class=\"icon-delete\" title=\"Xóa\" onclick=\"Delete('" + item.ProductID + "','" + item.SpecCode + "','" + item.OrgID + "')\"><img class=\"img-icon\" src='" + Url.Content("~/Images/Xoa.svg") + "'></a>", "", "")
+                                                                }
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    idx++;
+                                                }
+                                            }
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+@*Import Excel*@
+<div class="modal fade" id="ImportExcelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/OS_PrdCenter_Prd_ProductID.js")"></script>
+    <script type="text/javascript">
+        setAdminCurrentUrl('@Url.Action("Index", "OS_PrdCenter_Prd_ProductID")');
+        $(document).ready(function () {
+        $('.scrollable-horizontal').each(function () {
+            var $this = $(this);
+            $(this).ace_scroll(
+                {
+                    horizontal: true,
+                    //styleClass: 'scroll-top',//show the scrollbars on top(default is bottom)
+                    size: $this.attr('data-size') || 6500,
+                    mouseWheelLock: true
+                }
+            ).css({ 'padding-top': 0 });
+        });
+    });
+        $('.scrollable').each(function () {
+            var $this = $(this);
+            $(this).ace_scroll({
+                //size: 500,
+                size: $this.attr('data-size') || 1000,
+                mouseWheelLock: true,
+                //styleClass: 'scroll-left scroll-margin scroll-thin scroll-dark scroll-light no-track scroll-visible'
+            });
+        });
+
+        function Search()
+        {
+            $('#manageForm').attr('action', '@Url.Action("Index", "OS_PrdCenter_Prd_ProductID")').submit();
+        }
+
+        $(document).on('keypress', function (e) {
+            if (e.which == 13) {
+                Search();
+            }
+        });
+        var OS_PrdCenter_Prd_ProductID = new OS_PrdCenter_Prd_ProductID();
+        function Delete(productID, specCode, orgID) {
+            //debugger;
+            var OS_PrdCenter_Prd_ProductID_Delete = {
+                productID: ProductID,
+                SpecCode: specCode,
+                OrgID: orgID,
+            };
+
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Delete", "OS_PrdCenter_Prd_ProductID")';
+
+            OS_PrdCenter_Prd_ProductID.Image_Message = "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO";
+            OS_PrdCenter_Prd_ProductID.Confirm_Message = "Đồng ý xóa mã sản phẩm '" + productID + "' - Mã Spec '" + specCode + "' ?";
+            OS_PrdCenter_Prd_ProductID.ajaxSettings = ajaxSettings;
+            OS_PrdCenter_Prd_ProductID.deleteData(OS_PrdCenter_Prd_ProductID_Delete);
+        }
+
+        var objCommonExcel = new CommonExcel();
+        var objVariablesInit = {
+            Id_FormMain: '',
+            Id_FormImportExcel: 'manageFormImportExcel',
+            Id_Modal: 'ImportExcelModal',
+            Id_FileInput: 'file',
+        };
+
+        var ajaxSettings_Excel = {};
+        ajaxSettings_Excel.Type = 'post';
+        ajaxSettings_Excel.DataType = 'json';
+
+        function ShowPopupImportExcel(check) {
+            ajaxSettings_Excel.Url = '@Url.Action("ShowPopupImportExcel", "Admin")';
+            ajaxSettings_Excel.Check = check;
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.variablesInit(objVariablesInit);
+            objCommonExcel.showPopupImportExcel();
+        }
+
+        function ImportFileExcel() {
+            ajaxSettings_Excel.Url = '@Url.Action("Import", "OS_PrdCenter_Prd_ProductID")';
+            if (ajaxSettings_Excel.Check === false) {
+                ajaxSettings_Excel.Url = '@Url.Action("ImportMapping", "OS_PrdCenter_Prd_ProductID")';
+            }
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.variablesInit(objVariablesInit);
+            objCommonExcel.importFileExcel();
+        }
+
+        function ExportTemplate(check) {
+            ajaxSettings_Excel.Url = '@Url.Action("ExportTemplate", "OS_PrdCenter_Prd_ProductID")';
+            if (check==false) {
+                ajaxSettings_Excel.Url = '@Url.Action("ExportTemplateMapping", "OS_PrdCenter_Prd_ProductID")';
+            }
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.exportExcel();
+        }
+        function Export() {
+            ajaxSettings_Excel.Url = '@Url.Action("Export", "OS_PrdCenter_Prd_ProductID")';
+
+            var orgid = commonUtils.returnValueTextOrNull('#OrgID');
+            var productid = commonUtils.returnValueTextOrNull('#ProductID');
+            var speccode = commonUtils.returnValueTextOrNull('#SpecCode');
+            var specname = commonUtils.returnValueTextOrNull('#ms_SpecName');
+            var buyer = commonUtils.returnValueTextOrNull('#Buyer');
+            var brand = commonUtils.returnValueTextOrNull('#Brand');
+            var modelcode = commonUtils.returnValueTextOrNull('#ModelCode');
+
+            var ListSearchInput = [
+                { Key: 'orgid', Value: orgid },
+                { Key: 'productid', Value: productid },
+                { Key: 'speccode', Value: speccode },
+                { Key: 'modelcode', Value: modelcode },
+                { Key: 'specname', Value: specname },
+                { Key: 'buyer', Value: buyer },
+                { Key: 'brand', Value: brand },
+                { Key: 'modelcode', Value: modelcode },
+            ];
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.exportExcel(ListSearchInput);
+        }
+        @*function Export() {
+
+            ajaxSettings_Excel.Url = '@Url.Action("Export", "OS_PrdCenter_Prd_ProductID")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.exportExcel();
+        }*@
+    </script>
+}

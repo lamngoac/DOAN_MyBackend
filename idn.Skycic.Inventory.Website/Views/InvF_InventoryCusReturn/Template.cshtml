@@ -1,0 +1,310 @@
+﻿@model RT_InvF_InventoryCusReturn
+@{
+    string viewType = CUtils.StrValue(ViewBag.ViewType);
+    var userState = ViewBag.UserState as UserState;
+    var tmpl_selected = "==selected==";
+    var disabledCss = "";
+    var objInvF_InventoryCusReturn = new InvF_InventoryCusReturn();
+    var iF_InvCusReturnStatus = "";
+
+    if (Model != null)
+    {
+        if (Model.Lst_InvF_InventoryCusReturn != null && Model.Lst_InvF_InventoryCusReturn.Count > 0)
+        {
+            objInvF_InventoryCusReturn = Model.Lst_InvF_InventoryCusReturn[0];
+            iF_InvCusReturnStatus = CUtils.StrValue(objInvF_InventoryCusReturn.IF_InvCusReturnStatus);
+        }
+    }
+    var disabled = "";
+    if (viewType.Equals("detail"))
+    {
+        disabled = "disabled-fix";
+    }
+
+
+
+    var flagActive = "0";
+    var flagdisplaynone = "";
+
+    if (userState.RT_Mst_Sys_Config != null && userState.RT_Mst_Sys_Config.Lst_Mst_Sys_Config != null && userState.RT_Mst_Sys_Config.Lst_Mst_Sys_Config.Count > 0)
+    {
+        foreach (var item in userState.RT_Mst_Sys_Config.Lst_Mst_Sys_Config)
+        {
+            if (item.SysConfigID.Equals("IF_InvCusReturn"))
+            {
+                flagActive = CUtils.StrValue(item.FlagActive);
+            }
+        }
+    }
+
+    if (flagActive.Equals("0"))
+    {
+        flagdisplaynone = "display-none";
+    }
+}
+@* Template lưới hàng hóa *@
+<script type="text/template" id="tmpl_ShowPopup_Product_FlagSerial">
+    <a href="javascript:;" title="Chi tiết Serial" onclick="showPopupSerial('==ProductCode==','==ProductName==','==ProductCodeRoot==')">(Serial)</a>
+</script>
+<script type="text/template" id="tmpl_ShowPopup_Product_FlagLot">
+    <a href="javascript:;" title="Chi tiết Lô" onclick="showPopupLot(this,'==ProductCodeRoot==')">(Lô)</a>
+</script>
+<script type="text/template" id="tmpl_ShowPopup_Product_InvCodeInActual">
+    <a href="javascript:;" title="Chọn vị trí nhập" onclick="showPopupInvCodeInActual('==ProductCode==','==ProductCodeUser==','==ProductName==','==ProductCodeBase==')"><i class="fa fa-caret-down"></i></a>
+</script>
+<script type="text/template" id="tmpl_ShowPopup_Product_FlagCombo">
+    <a href="javascript:;" title="Chi tiết Combo" onclick="ShowCombo(this, '==ProductCode==','==ProductCodeUser==','==ProductName==','==ProductCodeBase==')">(Combo)</a>
+</script>
+<script type="text/template" id="tmpl_options">
+    <option value="==UnitCode==" @MvcHtmlString.Create(tmpl_selected) productcode="==ProductCode==">==UnitCode==</option>
+</script>
+<script type="text/template" id="tmpl_products_list">
+    <div class="result display-none" productcode="==ProductCode==">
+        <input type="hidden" class="ProductCodeRoot" value="==ProductCodeRoot==" />
+        <input type="hidden" class="ProductCodeBase" value="==ProductCodeBase==" />
+        <input type="hidden" class="ProductCode" value="==ProductCode==" />
+        <input type="hidden" class="ProductCodeUser" value="==ProductCodeUser==" />
+        <input type="hidden" class="ProductName" value="==ProductName==" />
+        <input type="hidden" class="ProductType" value="==ProductType==" />
+        <input type="hidden" class="FlagSerial" value="==FlagSerial==" />
+        <input type="hidden" class="FlagLot" value="==FlagLot==" />
+        <input type="hidden" class="UnitCode" value="==UnitCode==" />
+        <input type="hidden" class="InvCodeInActual" value="==InvCodeInActual==" />
+        <input type="hidden" class="Qty" value="==Qty==" />
+        <input type="hidden" class="UPCusReturn" value="==UPCusReturn==" />
+        <input type="hidden" class="UPCusReturnDesc" value="==UPCusReturnDesc==" />
+        <input type="hidden" class="ValCusReturnAfterDesc" value="==ValCusReturnAfterDesc==" />
+        <input type="hidden" class="Remark" value="==Remark==" />
+    </div>
+</script>
+<script type="text/template" id="tmpl_InvF_InventoryCusReturn">
+    <tr class="trdata" productcode="==ProductCode==" idx="==idx==" rd="==rd==">
+        <td class="cell-30 td-event-delete @disabled">
+            <a href="javascript:;" title="Xóa" onclick="deleteRow(this)"><i class="fas fa-trash-alt"></i></a>
+            <div class="products-list">
+            </div>
+        </td>
+        <td class="text-left cell-100 productcodeuser @disabled">
+            <span class="==productcodeuserCss==">==ProductCodeUser==</span> &nbsp; <span class="==producttypeCss==">@*==ProductType==*@</span>
+        </td>
+        <td class="text-left cell-200 @disabled">
+            <span class="==productnameCss==">==ProductName==</span>
+            <input type="hidden" class="==productcodeCss==" value="==ProductCode==" />
+            <input type="hidden" class="==productcodeuserCss==" value="==ProductCodeUser==" />
+            <input type="hidden" class="==productcodebaseCss==" value="==ProductCodeBase==" />
+            <input type="hidden" class="==productcoderootCss==" value="==ProductCodeRoot==" />
+            <input type="hidden" class="==productnameCss==" value="==ProductName==" />
+            <input type="hidden" class="==flaglotCss==" value="==FlagLot==" />
+            <input type="hidden" class="==flagserialCss==" value="==FlagSerial==" />
+        </td>
+        <td class="cell-75 td-select2 @disabledCss @disabled">
+            <select class="select2 col-12 no-border ==select2Css==" onchange="changeProduct(this)" initdata="==ProductCode==" ischange="0">
+                <optgroup></optgroup>
+                <option></option>
+            </select>
+        </td>
+        <td class="text-center cell-100 Qty @disabled">
+            <input type="text" class="col-12 no-border text-right ==qtyCss==" initdata="==Qty==" value="==Qty==" onkeyup="inputQty(this)" />
+        </td>
+        <td class="text-left cell-150">
+            @*==InvCodeSuggest==*@
+            <input type="text" class="col-11 no-border text-left disabled-fix ==invcodeinactualCss==" value="==InvCodeInActual==" />
+            <span class="==invcodeinactualtypeCss==">@*==ShowPopupInvCodeInActual==*@</span>
+        </td>
+        <td class="text-left cell-100 @disabled @flagdisplaynone">
+            <input type="text" class="col-12 no-border text-right UPCusReturn ==upcusreturnCss==" initdata="==UPCusReturn==" value="==UPCusReturn==" onkeyup="inputUPCusReturn(this)" />
+        </td>
+
+        <td class="text-left cell-100 @disabled @flagdisplaynone">
+            <input type="text" class="col-12 no-border text-right UPCusReturnDesc ==upcusreturndescCss==" initdata="==UPCusReturnDesc==" value="==UPCusReturnDesc==" onkeyup="inputUPCusReturnDesc(this)" />
+        </td>
+
+        <td class="text-left cell-100 @disabled @flagdisplaynone">
+            <input type="text" class="col-12 no-border text-right disabled-fix ValCusReturnAfterDesc ==valcusreturnafterdescCss==" value="==ValCusReturnAfterDesc==" />
+        </td>
+        <td class="text-left cell-100 @disabled">
+            <textarea rows="1" class="col-12 no-border @disabledCss remark ==remarkCss==">==Remark==</textarea>
+        </td>
+    </tr>
+</script>
+<script type="text/template" id="tmpl_InvF_InventoryCusReturnExcel">
+    <tr class="trdata" productcode="==ProductCode==" idx="==idx==" rd="==rd==">
+        <td class="cell-30 td-event-delete @disabled">
+            <a href="javascript:;" title="Xóa" onclick="deleteRow(this)"><i class="fas fa-trash-alt"></i></a>
+            <div class="products-list">
+            </div>
+        </td>
+        <td class="text-left cell-100 productcodeuser">
+            <span class="==productcodeuserCss==">==ProductCodeUser==</span> &nbsp; <span class="==producttypeCss==">@*==ProductType==*@</span>
+        </td>
+        <td class="text-left cell-200">
+            <span class="==productnameCss==">==ProductName==</span>
+            <input type="hidden" class="==productcodeCss==" value="==ProductCode==" />
+            <input type="hidden" class="==productcodeuserCss==" value="==ProductCodeUser==" />
+            <input type="hidden" class="==productcodebaseCss==" value="==ProductCodeBase==" />
+            <input type="hidden" class="==productcoderootCss==" value="==ProductCodeRoot==" />
+            <input type="hidden" class="==productnameCss==" value="==ProductName==" />
+            <input type="hidden" class="==flaglotCss==" value="==FlagLot==" />
+            <input type="hidden" class="==flagserialCss==" value="==FlagSerial==" />
+        </td>
+        <td class="cell-75 td-select2 @disabled">
+            <select class="select2 col-12 no-border ==select2Css==" onchange="changeProduct(this)" initdata="==ProductCode==" ischange="0">
+                <optgroup></optgroup>
+                <option></option>
+            </select>
+        </td>
+        <td class="text-center cell-100 Qty">
+            <input type="text" class="col-12 no-border text-right ==qtyCss== @disabled" initdata="==Qty==" value="==Qty==" onkeyup="inputQty(this)" />
+        </td>
+        <td class="text-left cell-150">
+            @*==InvCodeSuggest==*@
+            <input type="text" class="col-11 no-border text-left disabled-fix ==invcodeinactualCss==" value="==InvCodeInActual==" />
+            <span class="==invcodeinactualtypeCss==">@*==ShowPopupInvCodeInActual==*@</span>
+        </td>
+        <td class="text-left cell-100 @flagdisplaynone">
+            <input type="text" class="col-12 no-border text-right UPCusReturn ==upcusreturnCss== @disabled" initdata="==UPCusReturn==" value="==UPCusReturn==" onkeyup="inputUPCusReturn(this)" />
+        </td>
+
+        <td class="text-left cell-100 @flagdisplaynone">
+            <input type="text" class="col-12 no-border text-right UPCusReturnDesc ==upcusreturndescCss== @disabled" initdata="==UPCusReturnDesc==" value="==UPCusReturnDesc==" onkeyup="inputUPCusReturnDesc(this)" />
+        </td>
+
+        <td class="text-left cell-100 @flagdisplaynone">
+            <input type="text" class="col-12 no-border text-right disabled-fix ValCusReturnAfterDesc ==valcusreturnafterdescCss== @disabled" value="==ValCusReturnAfterDesc==" />
+        </td>
+        <td class="text-left cell-100 ">
+            <textarea rows="1" class="col-12 no-border  remark ==remarkCss== @disabled">==Remark==</textarea>
+        </td>
+    </tr>
+</script>
+@* End template lưới hàng hóa *@
+@* Cache hàng hóa - vị trí - table-detailInvCodeInActual *@
+<script type="text/template" id="tmpl_product_invcodeinactual_list_cache">
+    <div class="result display-none" productcode="==ProductCode==">
+        <input type="hidden" class="ProductCode" value="==ProductCode==" />
+        <input type="hidden" class="InvCodeInActual" value="==InvCodeInActual==" />
+        <input type="hidden" class="Qty" value="==Qty==" />
+    </div>
+</script>
+<script type="text/template" id="tmpl_Product_InvCodeInActual">
+    <tr class="data-item trdata" productcode="==ProductCode==" idx="==idx==">
+        <td>
+            <div class="products-list-cache">
+            </div>
+        </td>
+    </tr>
+</script>
+@* End Cache hàng hóa - vị trí - table-detailInvCodeInActual *@
+
+@* Cached hàng hóa Combo - table-detailCombo *@
+<script type="text/template" id="tmpl_Product_Combo">
+    <tr class="data-item trdata" productcode="==ProductCode==" idx="==idx==" invCodeOutActual="==InvCodeOutActual==" productcoderoot="==ProductCodeRoot==">
+        <td>
+            @*<input type="hidden" class="ProductCodeRoot" value="==ProductCodeRoot==" />*@
+            <input type="hidden" class="ProductCode" value="==ProductCode==" />
+            <input type="hidden" class="ProductCodeRoot" value="==ProductCodeRoot==" />
+            <input type="hidden" class="Qty" value="==Qty==" />
+            <input type="hidden" class="InvCodeOutActual" value="==InvCodeOutActual==" />
+            <input type="hidden" class="UnitCode" value="==UnitCode==" />
+            <input type="hidden" class="Remark" value="==Remark==" />
+        </td>
+    </tr>
+</script>
+
+@* Thêm hàng hóa - vị trí Popup thêm vị trí hàng hóa *@
+<script type="text/template" id="tmpl_Product_InvCodeInActual_Add">
+    <tr class="data-item trdata" idx="==idx==" rd="==rd==">
+        <td class="text-center cell-50 action-buttons">
+            <a href="javascript:;" class="icon-delete" title="Xóa" onclick="product_InvCodeInActual_DeleteRow(this);"><i class="fas fa-trash-alt"></i></a>
+        </td>
+        <td class="cell-150 td-select2">
+            <select class="select2 col-12 no-border ==select2Css==" onchange="changeInvCodeInActual(this)" initdata="==InvCodeInActual==" ischange="0">
+                <optgroup></optgroup>
+                <option></option>
+            </select>
+        </td>
+        <td class="text-right cell-150">
+            <input type="text" class="col-12 no-border text-right ==qtyCss==" value="==Qty==" />
+        </td>
+    </tr>
+</script>
+@* End Thêm hàng hóa - vị trí Popup thêm vị trí hàng hóa *@
+@* tmpl_options_InvCodeInActual: dùng chung cho popup vị trí hàng hóa, popup serial, popup LOT *@
+<script type="text/template" id="tmpl_options_InvCodeInActual">
+    <option value="==InvCode==" invname="==InvName==" @MvcHtmlString.Create(tmpl_selected)>==InvName==</option>
+</script>
+@* End tmpl_options_InvCodeInActual: dùng chung cho popup vị trí hàng hóa, popup serial, popup LOT *@
+@* Cache hàng hóa - Serail - table-detailSerial *@
+<script type="text/template" id="tmpl_Product_Serial">
+    <tr class="data-item trdata" productcode="==ProductCode==" idx="==idx==">
+        <td>
+            @*<input type="hidden" class="ProductCodeRoot" value="==ProductCodeRoot==" />*@
+            <input type="hidden" class="ProductCode" value="==ProductCode==" />
+            <input type="hidden" class="ProductCodeRoot" value="==ProductCodeRoot==" />
+            <input type="hidden" class="SerialNo" value="==SerialNo==" />
+            <input type="hidden" class="InvCodeInActual" value="==InvCodeInActual==" />
+        </td>
+    </tr>
+</script>
+@* End Cache hàng hóa - Serail - table-detailSerial *@
+@* Thêm hàng hóa - Serial Popup thêm Serial hàng hóa *@
+<script type="text/template" id="tmpl_Product_Serial_Add">
+    <tr class="data-item trdata" idx="==idx==" rd="==rd==">
+        <td class="text-center cell-50 action-buttons">
+            <a href="javascript:;" class="icon-delete" title="Xóa" onclick="product_Serial_DeleteRow(this);"><i class="fas fa-trash-alt"></i></a>
+        </td>
+        <td class="text-left cell-150">
+            <input class="col-12 no-border text-left ==serialnoCss==" value="==SerialNo==" />
+            <input class="col-12 display-none no-border text-left ==productcoderootCss==" value="==ProductCodeRoot==" />
+        </td>
+        <td class="cell-150 td-select2">
+            <select class="select2 col-12 no-border ==select2Css==">
+                <optgroup></optgroup>
+                <option></option>
+            </select>
+        </td>
+    </tr>
+</script>
+@* End Thêm hàng hóa - Serial Popup thêm Serial hàng hóa *@
+@* Cache hàng hóa - LOT - table-detailLot *@
+<script type="text/template" id="tmpl_Product_LOT">
+    <tr class="data-item trdata" productcode="==ProductCode==" idx="==idx==">
+        <td>
+            <input type="hidden" class="ProductCodeRoot" value="==ProductCodeRoot==" />
+            <input type="hidden" class="ProductCode" value="==ProductCode==" />
+            <input type="hidden" class="ProductLotNo" value="==ProductLotNo==" />
+            <input type="hidden" class="ProductionDate" value="==ProductionDate==" />
+            <input type="hidden" class="ExpiredDate" value="==ExpiredDate==" />
+            <input type="hidden" class="InvCodeInActual" value="==InvCodeInActual==" />
+            <input type="hidden" class="Qty" value="==Qty==" />
+        </td>
+    </tr>
+</script>
+@* End Cache hàng hóa - LOT - table-detailLot *@
+@* Thêm hàng hóa - LOT Popup thêm LOT hàng hóa *@
+<script type="text/template" id="tmpl_Product_LOT_Add">
+    <tr class="data-item trdata" idx="==idx==" rd="==rd==">
+        <td class="text-center cell-50 action-buttons">
+            <a href="javascript:;" class="icon-delete" title="Xóa" onclick="product_LOT_DeleteRow(this);"><i class="fas fa-trash-alt"></i></a>
+        </td>
+        <td class="text-left cell-150">
+            <input class="col-12 no-border text-left ==productlotnoCss==" value="==ProductLotNo==" />
+        </td>
+        <td class="text-center cell-100">
+            <input class="col-12 text-center ==productiondateCss==" value="==ProductionDate==" />
+        </td>
+        <td class="text-center cell-100">
+            <input class="col-12 text-right ==expireddateCss==" value="==ExpiredDate==" />
+        </td>
+        <td class="text-left cell-150">
+            <input type="text" class="col-12 no-border text-right ==qtyCss==" value="==Qty==" />
+        </td>
+        <td class="cell-150 td-select2">
+            <select class="select2 col-12 no-border ==select2Css==">
+                <optgroup></optgroup>
+                <option></option>
+            </select>
+        </td>
+    </tr>
+</script>
+@* End Thêm hàng hóa - LOT Popup thêm LOT hàng hóa *@

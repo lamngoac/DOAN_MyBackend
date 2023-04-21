@@ -1,0 +1,151 @@
+﻿@model List<Mst_Product>
+
+<div class="modal-dialog" style="width: 500px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel"><b> Tìm kiếm hàng hóa</b></h2>
+            <a href="javascript:;" onclick="ClosePopupHangHoa()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body" style="">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupHangHoa" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="col-xs-12">
+                    <div class="form-group margin-bottom-5">
+                        <label for="ParentCode" class="col-xs-3 col-sm-2 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tìm số lô <span style=\"color: red\">*</span>")</label>
+                        <div class="col-xs-3 col-sm-4">
+                            <select id="Lo" style="width: 150px;" multiple>
+                                @{
+                                    foreach (var it in Model)
+                                    {
+                                        <option ProductCode="@(it.ProductCode)" ProductName="@(it.ProductName == null ? "" : it.ProductName)" UnitCode="@(it.UnitCode == null ? "" : it.UnitCode)">@it.ProductCode - @it.ProductName</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+                <div style="width: 100%; float: left;">
+                    <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                        <thead>
+                            <tr class="trthead">
+                                <th class="text-center cell-150">
+                                </th>
+                                <th fieldId="ProductCode" sorttype="T" fieldName="Mã hàng hóa" fieldActive="0" class="text-left cell-200">
+                                    @("Mã hàng hóa".HtmlItemString("productcode"))
+                                </th>
+                                <th fieldId="ProductName" sorttype="T" fieldName="Tên hàng hóa" fieldActive="0" class="text-left cell-200">
+                                    @("Tên hàng hóa".HtmlItemString("productname"))
+                                </th>
+                                <th fieldId="UnitCode" sorttype="T" fieldName="Đơn vị" fieldActive="0" class="text-left cell-200">
+                                    @("Đơn vị".HtmlItemString("unitcode"))
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                    <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                        <tbody id="table-tbodyID"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="SelectProduct()" style="float: right;font-size: 13px;">Chọn</a>
+            <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="SaveProduct()" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i>Lưu</a>
+        </div>
+    </div>
+</div>
+
+<table hidden>
+    <tbody id="rowtemplateProduct">
+        <tr class="data-item trdata">
+            <td fieldId="CONTROL" fieldActive="0" class="text-center cell-150 action-buttons">
+                @*@{
+                            var urlDetail = "";
+                            urlDetail += Url.Action("Detail", "Mst_Inventory", new { invCode = item.InvCode });
+                            var urlUpdate = "";
+                            urlUpdate += Url.Action("Update", "Mst_Inventory", new { invCode = item.InvCode });
+                        }
+                        @RenderItemFormat("BTN_QL_KHO_CHI_TIET", "<a class=\"icon-detail\" href=\'" + urlDetail + "\' title=\"Chi tiết\"><i class=\"far fa-eye green\"></i></a>", "", "")
+                        @RenderItemFormat("BTN_QL_KHO_SUA", "<a class=\"icon-edit\" href=\'" + urlUpdate + "\' title=\"Sửa\"><i class=\"fas fa-pencil-alt\"></i></a>", "", "")
+                        @RenderItemFormat("BTN_QL_KHO_XOA", "<a href=\"javascript:;\" class=\"icon-delete\" title=\"Xóa\" onclick=\"Delete('" + item.InvCode.ToString() + "','" + item.InvName.ToString() + "')\"><i class=\"fas fa-trash-alt\"></i></a>", "", "")
+                    </td>*@
+                @*<a class="icon-delete" title="Xóa" onclick="DeleteProduct(this);"><i class=\"fas fa-trash-alt\"></i></a>*@
+
+                <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteProduct(this);"><i class="fas fa-trash-alt"></i></a>
+            </td>
+            <td fieldActive="ProductCode" class="text-left cell-200">
+                ==ProductCode==
+            </td>
+            <td fieldId="ProductName" fieldActive="0" class="text-left cell-200">
+                ==ProductName==
+            </td>
+            <td fieldId="ValDateExpired" fieldActive="0" class="text-left cell-200">
+                ==UnitCode==
+            </td>                     
+        </tr>
+    </tbody>
+</table>
+
+<script>
+    $(function () {
+        $('select[id$="Product"]').multiselect({
+            includeSelectAlProductption: false,
+            enableFiltering: true,
+            maxHeight: 200,
+            max_selected_options: 100
+        });
+
+        //$('#Product').multiselect();
+    })
+
+    function SelectProduct() {
+        debugger;
+        //ProductGetSolution.cshtml
+        var length = $('#Product').find("option:selected").length;
+        if (length == 0) {
+            alert("Không có lô nào được chọn");
+            return;
+        }
+        var lstProduct = [];
+
+        for (var i = 0; i < length; i++) {
+            var Product = new Object();
+            var optselect = $('#Product').find("option:selected").eq(i);
+            Product.ProductCode = optselect.attr("ProductCode");
+            Product.ProductName = optselect.attr("ProductName");
+            Product.UnitCode = optselect.attr("UnitCode");           
+            lstProduct.push(Product);
+        }
+        var qtyProduct = lstProduct.length;
+        for (var i = 0; i < qtyProduct; i++) {
+            var item = lstProduct[i];
+            var strHtml = getHtmlFromTemplate($('#rowtemplateProduct'), {
+                ProductCode: item.ProductCode,
+                ProductName: item.ProductName,
+                UnitCode: item.UnitCode,                
+                //idx: 999999
+            });
+            $('#table-tbodyID').append(strHtml);
+        }
+    }
+
+    function DeleteProduct(thiz, maProduct) {
+        bootbox.confirm("Đồng ý xóa lô " + maProduct+"?", function (result) {
+                if (result) {
+                    var tr = $(thiz).parents('tr');
+                    if (tr != undefined) {
+                        tr.remove();
+                    }
+                }
+            });
+    }
+
+    function SaveProduct() {
+
+    }
+</script>

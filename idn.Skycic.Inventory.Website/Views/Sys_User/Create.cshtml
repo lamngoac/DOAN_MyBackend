@@ -1,0 +1,276 @@
+﻿@model Sys_User
+@{
+    // Layout = "~/Views/Shared/_LayoutQuantri.cshtml";
+    var title = "Tạo người dùng";
+    var titleMng = "Quản lý người dùng";
+    ViewBag.Title = title;
+    var listMst_Department = ViewBag.ListMst_Department as List<Mst_DepartmentExt>;
+    var listMst_Customer = ViewBag.ListMst_Customer as List<Mst_Customer>;
+
+    var listMst_NNT = ViewBag.ListMst_NNTCur as List<Mst_NNT>;
+    if (listMst_NNT == null || listMst_NNT.Count == 0)
+    {
+        listMst_NNT = new List<Mst_NNT>();
+    }
+    var isParent = ViewBag.IsParent;
+    var inosUrl = System.Configuration.ConfigurationManager.AppSettings["InosBaseUrl"];
+}
+<script type="text/javascript">
+    var parents = new Array();
+    parents.push("@Url.Action("Index", "Sys_User")");
+    parents.push("");
+    var parentsText = new Array();
+    parentsText.push("@MvcHtmlString.Create(titleMng)");
+    parentsText.push("@MvcHtmlString.Create(title)");
+    //setAdminCurrentTag(parents, parentsText);
+</script>
+
+<div class="">
+    <div class="col-12">
+        <aside class="row no-margin">
+            @using (Html.BeginForm("Create", "Sys_User", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <input type="hidden" name="FlagExist" id="FlagExist" value="0" />
+                <div class="layout-bot-top-16">
+                    <div class="col-12 no-padding">
+                        <div class="row no-margin">
+                            @RenderItemFormat("BTN_TAO_MOI_NGUOI_DUNG_LUU", "<a href=\"javascript: void(0); \" class=\"btn btn-nc-button\" style=\"\" onclick=\"SaveData();\"><i class=\"fas fa-save\" aria-hidden=\"true\"></i> Lưu</a>", "", "")
+                        </div>
+                    </div>
+                    <div class="row col-12 layout-bot-top-16">
+                        <div class="col-3 no-padding">
+                            <div class="avatar-user">
+                                <div class="avatar-user-img">
+                                    @{
+                                        var avartarImg = "";
+                                        if (!CUtils.IsNullOrEmpty(Model.ACAvatar))
+                                        {
+                                            avartarImg = @CUtils.StrValue(inosUrl.ToString() + Model.ACAvatar.Split('~')[1].ToString());
+                                        }
+                                        else
+                                        {
+                                            avartarImg = Url.Content("~/Images/no-image.png");
+                                        }
+                                    }
+                                    <img class="img-avatar" src="@CUtils.StrValue(avartarImg)" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4 no-padding">
+                            <div class="form-group margin-bottom-9">
+                                <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Họ tên <span style=\"color: red\">*</span>")</label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <input type="text" id="UserName" name="UserName" class="col-12  UserName" value="@if (Model != null && Model.UserName != null){@MvcHtmlString.Create(Model.UserName.ToString())} else { @("")}" autocomplete="off" required />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Email <span style=\"color: red\">*</span>")</label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <input type="text" id="UserCode" name="UserCode" class="col-12  UserCode" value="@if (Model != null && Model.EMail != null){@MvcHtmlString.Create(Model.EMail.ToString())} else { @("")}" autocomplete="off" onblur="CheckExistUser()" required />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Điện thoại")</label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <input type="text" maxlength="11" id="PhoneNo" name="PhoneNo" class="col-12 PhoneNo" onKeyPress="return commonUtils.isNumberKey(event)" value="@if (Model != null && Model.PhoneNo != null){@MvcHtmlString.Create(Model.PhoneNo.ToString())} else { @("")}" autocomplete="off" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9" style="display: none;">
+                                <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("User ID")</label>
+                                <div class="col-12 col-sm-8 disabled-fix">
+                                    <span class="block input-icon input-icon-right">
+                                        <input type="text" id="ACId" name="ACId" class="col-12  ACId" value="@if (Model != null && Model.ACId != null){@MvcHtmlString.Create(Model.ACId.ToString())} else { @("")}" autocomplete="off" required />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mật khẩu <span style=\"color: red\">*</span>")</label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <input type="password" id="UserPassword" name="UserPassword" class="col-12 UserPassword" value="@if (Model != null && Model.UserPassword != null){@MvcHtmlString.Create(Model.UserPassword.ToString())} else { @("")}" autocomplete="off" required />
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="form-group margin-bottom-9">
+                                <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Nhập lại mật khẩu <span style=\"color: red\">*</span>")</label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <input type="password" id="ConfirmPassword" name="ConfirmPassword" class="col-12 ConfirmPassword" value="@if (Model != null && Model.UserPassword != null){@MvcHtmlString.Create(Model.UserPassword.ToString())} else { @("")}" autocomplete="off" required />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Ngôn ngữ")</label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <select id="Language" name="Language" class="col-12" required>
+                                            <optgroup label="">
+                                                <option value="">Chọn</option>
+                                                <option value="vi" @(!CUtils.IsNullOrEmpty(Model.ACLanguage) && Model.ACLanguage.Equals("vi") ? "selected" : "")>Tiếng Việt</option>
+                                                <option value="en" @(!CUtils.IsNullOrEmpty(Model.ACLanguage) && Model.ACLanguage.Equals("en") ? "selected" : "")>English</option>
+                                            </optgroup>
+                                        </select>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Múi giờ")</label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <select id="TimeZone" name="TimeZone" class="col-12" required>
+                                            <optgroup label="">
+                                                <option value="">Chọn</option>
+                                                @for (int i = -12; i <= 12; ++i)
+                                                {
+                                                    string titleTimeZone = i.ToString();
+                                                    if (i > 0) { titleTimeZone = "+ " + titleTimeZone; }
+                                                    <option value="@i" @(!CUtils.IsNullOrEmpty(Model.ACTimeZone) && Model.ACTimeZone.Equals(i.ToString()) ? "selected" : "")>UTC @(titleTimeZone)</option>
+                                                }
+                                            </optgroup>
+                                        </select>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4 no-padding">
+                            <div class="form-group margin-bottom-9">
+                                <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Chi nhánh <span style=\"color: red\">*</span>")</label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        @*<input type="text" id="MST" name="MST" class="col-11 MST" value="@if (Model != null && Model.MST != null){@MvcHtmlString.Create(Model.MST.ToString())} else { @("")}" autocomplete="off" required />*@
+                                        <select id="MST" name="MST" class="col-12" required onchange="LoadMstCustomer(this);">
+                                            <optgroup label="">
+                                                <option value="">Chọn</option>
+                                                @{
+                                                    if (listMst_NNT != null && listMst_NNT.Count > 0)
+                                                    {
+                                                        foreach (var it in listMst_NNT.Where(x => x.MST.ToString() != "ALL"))
+                                                        {
+                                                            <option value="@MvcHtmlString.Create(it.MST.ToString().Trim())">@MvcHtmlString.Create(it.MST.ToString().Trim())</option>
+                                                        }
+                                                    }
+                                                }
+                                            </optgroup>
+                                        </select>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Đại lý")</label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <select id="CustomerCodeSys" name="CustomerCodeSys" class="col-12" required></select>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label for="Position" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Chức vụ")</label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <input type="text" name="Position" id="Position" value="" class="col-12" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <div class="col-12">
+                                    @if (isParent)
+                                    {
+                                        <div class="form-group group-flag">
+                                            <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">QT hệ thống</label>
+                                            <div class="col-12 col-sm-8">
+                                                <span class="block input-icon input-icon-right padding-top-5">
+                                                    <label class="lbl-flag">
+                                                        <input name="FlagSysAdmin" id="FlagSysAdmin" class="icon-flag" type="checkbox" value="1" />
+                                                        <span class="lbl"></span>
+                                                        <input name="FlagSysAdmin" type="hidden" value="0" />
+                                                    </label>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    }
+
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9 display-none">
+                                <div class="col-12">
+                                    <div class="form-group group-flag">
+                                        <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">QT đơn vị</label>
+                                        <div class="col-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right padding-top-5">
+                                                <label class="lbl-flag">
+                                                    <input name="FlagNNTAdmin" id="FlagNNTAdmin" class="icon-flag" type="checkbox" value="1" checked />
+                                                    <span class="lbl"></span>
+                                                    <input name="FlagNNTAdmin" type="hidden" value="0" />
+                                                </label>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </aside>
+    </div><!-- /.col -->
+</div>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Sys_User.js")"></script>
+    <script type="text/javascript">
+        setAdminCurrentUrl('@Url.Action("Index", "Sys_User")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+
+        });
+        var _getForm = document.getElementById("manageForm");
+        _getForm.addEventListener('reset', function () {
+            document.getElementById("UserCode").focus();
+        });
+        $('#MST').select2();
+        $('#DepartmentCode').select2();
+        $('#CustomerCodeSys').select2();
+        function SaveData() {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Create", "Sys_User")';
+
+            var objSys_User = new Sys_User();
+            objSys_User.ActionType = 'create';
+            objSys_User.ajaxSettings = ajaxSettings;
+            objSys_User.saveData();
+        }
+        function LoadMstCustomer(thiz) {
+            //debugger;
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("LoadMstCustomer", "Sys_User")';
+
+            var objSys_User = new Sys_User();
+            objSys_User.ajaxSettings = ajaxSettings;
+            objSys_User.loadMstCustomer();
+        }
+        function CheckExistUser() {
+            //debugger;
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("CheckUserExist", "Sys_User")';
+
+            var objSys_User = new Sys_User();
+            objSys_User.ajaxSettings = ajaxSettings;
+            objSys_User.checkExistUser();
+        }
+    </script>
+}

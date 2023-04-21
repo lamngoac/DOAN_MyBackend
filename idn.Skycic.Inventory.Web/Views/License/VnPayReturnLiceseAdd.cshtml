@@ -1,0 +1,105 @@
+﻿@{
+    ViewBag.Title = "VnPayReturnLiceseAdd";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var netWorkId = ViewBag.NetworkID == null ? "" : ViewBag.NetworkID as string;
+    var linkReturn = "/" + netWorkId + "/License";
+}
+<div id="divReturnVNPAY" style="display: none">
+    <div style="text-align: center; padding-top: 100px; font-weight: 600; font-size: 14px;">@MvcHtmlString.Create(ViewBag.msg)</div>
+    <p style="text-align: center">
+        <a value="Về trang chủ" id="btnClose" class="btn btn-default" href="@linkReturn">Về trang chủ</a>
+    </p>
+</div>
+
+<div id="loading" class="modal fade" role="dialog">
+    <img id="loading-image" src="/Content/assets/images/showloading/indicatorbig.gif" />
+</div>
+
+<style>
+    #loading {
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        position: fixed;
+        display: block;
+        opacity: 0.7;
+        background-color: #fff;
+        z-index: 99;
+        text-align: center;
+    }
+
+    #loading-image {
+        position: absolute;
+        top: 40%;
+        left: 45%;
+        /*240px;*/
+        z-index: 100;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+        debugger;
+        var flagOrderAppove = '0';
+        GetOrderStatus();
+    });
+
+    function Loading() {
+        $('#loading').show();
+    }
+
+    function Endloading() {
+        $('#loading').hide();
+    }
+
+    $(window).load(function () {
+        Endloading();
+    });
+
+    function GetOrderStatus() {
+        debugger;
+        Loading();
+        var link = window.location.host + '@linkReturn';
+        var url = '@Url.Action("CheckOrderStatus", "License")';
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: {},
+            traditional: true,
+            //contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                debugger;
+                if (data.Success) {
+                    if (data.RedirectUrl !== undefined &&
+                        data.RedirectUrl !== null &&
+                        data.RedirectUrl.toString().trim().length > 0) {
+                        Endloading();
+                        flagOrderAppove = '1';
+                        $('#divReturnVNPAY').css("display", "");
+                        //window.location.href = data.RedirectUrl;
+                    }
+                    else {
+                        setTimeout(GetOrderStatus, 20000);
+                    }
+                }
+                else {
+                    if (data.Detail != null) {
+                        Endloading();
+                        _showErrorMsg123("Lỗi!", data.Detail);
+                        window.location.href = link;//'@MvcHtmlString.Create(Url.Action("Index", "License"))';
+                    }
+                }
+            }, error: function (xmlHttpRequest, textStatus, errorThrown) {
+                debugger;
+                Endloading();
+                if (textStatus === 'Unauthorized') {
+                    alert('custom message. Error: ' + errorThrown);
+                } else {
+                    //alert('custom message. Error2: ' + errorThrown);
+                }
+            }
+        });
+    }
+</script>

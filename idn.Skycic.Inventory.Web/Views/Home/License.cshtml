@@ -1,0 +1,485 @@
+﻿@model PageInfo<Invoice_TempInvoice>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var title = "";
+    ViewBag.Title = title;
+    var startCount = 0;
+    var totalRowActive = 0;
+    var totalRowInactive = 0;
+    var strStartCount = ViewBag.StartCount as string;
+    if (!CUtils.IsNullOrEmpty(strStartCount))
+    {
+        startCount = Convert.ToInt32(strStartCount);
+    }
+
+    var now = DateTime.Now;
+}
+
+<style>
+    table:before, table:after {
+        content: none !important;
+    }
+
+    table td {
+        padding: 5px 20px;
+    }
+
+    .bold-package {
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+
+    table input {
+        border: 1px solid #d8d8d8 !important;
+        text-align: right;
+        padding: 5px 10px;
+        width: 70px;
+    }
+
+    .fee-row td:first-child {
+        padding: 20px 40px;
+    }
+
+    table tr {
+        border: 1px solid #d8d8d8;
+    }
+
+    tr.trdata button {
+        width: 25px;
+    }
+</style>
+
+<div class="clearfix"></div>
+<div class="row no-margin">
+    <div class="row no-margin">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="panel-group" id="steps">
+                <div class="panel panel-info">
+                    <div class="row no-margin layout-tk">
+                        @using (Html.BeginForm("Index", "Invoice_TempInvoice", FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="col-xs-12 no-padding">
+                                <div>
+                                    <input hidden id="init" name="init" value="search" />
+                                    <aside class="col-xs-9 box-shadow-tk">
+                                        <div class="col-xs-8">
+                                            <div class="form-group margin-bottom-5">
+                                                <label for="" class="col-xs-2 col-sm-2 control-label font-weight-500" style="width: 20%">Ngày tạo</label>
+                                                <div class="col-xs-4 col-sm-4">
+                                                    <div class="col-xs-12" style="padding-left: 0;padding-right: 17px;">
+                                                        <div class="input-group" id="dtfromdate">
+                                                            @{
+                                                                var ngaytu = "";
+                                                                if (Request["createdatefrom"] == null)
+                                                                {
+                                                                    ngaytu = new DateTime(now.Year, 1, 1).ToString("yyyy-MM-dd");
+                                                                }
+                                                                else
+                                                                {
+                                                                    ngaytu = Request["createdatefrom"];
+                                                                }
+                                                            }
+                                                            <input type="text" id="fromdate" name="fromdate" class="col-xs-12 fromdate" data-date-format="yyyy-mm-dd" value="@MvcHtmlString.Create(ngaytu)" autocomplete="off">
+                                                            <span class="input-group-addon">
+                                                                <i class="fa fa-calendar bigger-100"></i>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <label for="" class="col-xs-2 col-sm-2 control-label font-weight-500" style="width: 10%">đến</label>
+                                                <div class="col-xs-4 col-sm-4">
+                                                    <div class="col-xs-12" style="padding-left: 0;padding-right: 17px;">
+                                                        <div class="input-group" id="dttodate">
+                                                            <input type="text" id="todate" name="todate" class="col-xs-12 todate" data-date-format="yyyy-mm-dd" value="@MvcHtmlString.Create(now.ToString("yyyy-MM-dd"))" autocomplete="off">
+                                                            <span class="input-group-addon">
+                                                                <i class="fa fa-calendar bigger-100"></i>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="button-tk">
+                                            <div class="form-group margin-bottom-5">
+                                                <div class="col-xs-12 col-sm-8 no-padding-right ">
+                                                    <div class="col-xs-11" style="padding: 0">
+                                                        <span class="block input-icon input-icon-right" style="">
+                                                            @RenderItemFormat("BTN_QUAN_LY_HOA_DON_MAU_TK", "<a class=\"btn font-color mybtn-Button\" onclick=\"Search()\" href=\"javascript:void(0);\" style=\" \"><img class=\"img-button\" src='" + Url.Content("~/Images/search.svg") + "'></a>", "", "")
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </aside>
+                                    <aside class="col-xs-3 left-ton no-padding-right" style="margin-top: 4px;">
+                                        @*@{
+                                                var tongSLconlai = 0;
+                                                var tongsl = invoice_license.TotalQty == null ? 0 : Convert.ToInt32(invoice_license.TotalQty);
+                                                var tongsldadung = invoice_license.TotalQtyUsed == null ? 0 : Convert.ToInt32(invoice_license.TotalQtyUsed);
+                                                tongSLconlai = tongsl - tongsldadung;
+                                            }*@
+                                        <div class="row no-margin">
+                                            <div class="col-xs-7 no-padding ton-1" style="">
+                                                <p>Đã mua @*@MvcHtmlString.Create(CUtils.formatInteger(tongsl, Nonsense.INTEGER_DB_FORMAT).ToString())*@</p>
+                                            </div>
+                                            <div class="col-xs-5 no-padding ton-2" style="">
+                                                <p>Đã dùng @*@MvcHtmlString.Create(CUtils.formatInteger(invoice_license.TotalQtyUsed == null ? 0 : Convert.ToInt32(invoice_license.TotalQtyUsed), Nonsense.INTEGER_DB_FORMAT).ToString())*@</p>
+                                            </div>
+                                        </div>
+                                        <div class="row no-margin">
+                                            <div class="col-xs-7 no-padding ton-3" style="">
+                                                <p>Đã phát hành @*@MvcHtmlString.Create(CUtils.formatInteger(invoice_license.TotalQtyIssued == null ? 0 : Convert.ToInt32(invoice_license.TotalQtyIssued), Nonsense.INTEGER_DB_FORMAT).ToString())*@</p>
+                                            </div>
+                                            <div class="col-xs-5 no-padding ton-4" style="">
+                                                <p>Còn lại @*@MvcHtmlString.Create(CUtils.formatInteger(tongSLconlai, Nonsense.INTEGER_DB_FORMAT).ToString())*@</p>
+                                            </div>
+                                        </div>
+                                    </aside>
+                                </div>
+                                @RenderItemFormat("BTN_QUAN_LY_HOA_DON_MAU_MUA_LICENSE", " <a class=\"btn font-color mybtn-Button\" href=\"javascript:void(0);\" onclick=\"ShowModalBuyLicense()\" style=\"float: right;font-size: 13px; margin-top: 20px\"><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i> Mua License</a>", "", "")
+                            </div>
+                            <div class="col-xs-12 no-padding" style="margin-top: 15px;">
+                                <div class="col-xs-5 no-padding">
+                                    Tổng số @Model.ItemCount kết quả trong @Model.PageCount trang
+                                </div>
+                                @if (Model != null && Model.DataList != null)
+                                {
+                                    <div id="dynamic-table_paginate" class="dataTables_paginate paging_simple_numbers" style="">
+                                        @Html.PagerBootstrap((int)Model.PageSize, -1 + (int)Model.PageIndex, (int)Model.ItemCount, new { InvoiceType = Request["InvoiceType"], FormNo = Request["FormNo"], Sign = Request["Sign"], TInvoiceStatus = Request["TInvoiceStatus"], MST = Request["MST"], RecordCount = Request["RecordCount"], init = Request["init"] }, "<", ">", "<<", ">>")
+                                    </div>
+                                }
+                                @Html.Partial("RecordCount")
+                            </div>
+                        }
+                    </div>
+                    <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                        @Html.AntiForgeryToken()
+                        <aside class="col-xs-12 no-padding">
+
+                            <div class="scrollable-horizontal no-sc padding-left-0 padding-right-0 div-scrollable" style="padding-top: 0!important;">
+                                <div style="width: 100%; float: left;">
+                                    <table id="dynamic-table" class="table table-striped table-bordered table-hover table-cus table-bottom-0">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Mã package")
+                                                </th>
+                                                <th class="text-center cell-150">
+                                                    @MvcHtmlString.Create("Ngày")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Tổ chức mua")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Tên package")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Giá (VND)")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Kiểu thanh toán")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("SL hóa đơn")
+                                                </th>
+                                                <th class="text-center cell-75">
+                                                    @MvcHtmlString.Create("Trạng thái")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Ngày bắt đầu")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Ngày hết hiệu lực")
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="table-tbodyID">
+
+                                            @if (Model != null && Model.DataList != null && Model.DataList.Count > 0)
+                                            {
+                                                var idx = 0;
+                                                foreach (var item in Model.DataList)
+                                                {
+                                                    if (item.FlagActive.Equals("1"))
+                                                    {
+                                                        totalRowActive += 1;
+                                                    }
+                                                    else
+                                                    {
+                                                        totalRowInactive += 1;
+                                                    }
+                                                    var iindex = startCount + (idx + 1);
+                                                    var flagActive = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.FlagActive))
+                                                    {
+                                                        flagActive = CUtils.StrValueOrNull(item.FlagActive);
+                                                    }
+                                                    <tr idx="@idx" class="data-item trdata">
+                                                        <td class="text-center cell-10">@MvcHtmlString.Create(item.MST.ToString())</td>
+                                                        <td class="text-center cell-150">
+                                                            @MvcHtmlString.Create(item.TInvoiceName == null ? "" : item.TInvoiceName.ToString())
+                                                        </td>
+                                                        <td class="text-center cell-100">
+                                                            @MvcHtmlString.Create(item.InvoiceType == null ? "" : item.InvoiceType.ToString())
+                                                        </td>
+                                                        <td class="text-center cell-100">
+                                                            @MvcHtmlString.Create(item.FormNo == null ? "" : item.FormNo.ToString())<br />
+                                                            @MvcHtmlString.Create(item.Sign == null ? "" : item.Sign.ToString())
+                                                        </td>
+                                                        <td class="text-center cell-75 tuso">
+                                                            @MvcHtmlString.Create(item.StartInvoiceNo == null ? "" : View7So(item.StartInvoiceNo))
+                                                        </td>
+                                                        <td class="text-center cell-75 denso">
+                                                            @MvcHtmlString.Create(item.EndInvoiceNo == null ? "" : View7So(item.EndInvoiceNo))
+                                                        </td>
+                                                        <td class="text-center cell-100">
+                                                            @MvcHtmlString.Create(item.CreateDTimeUTC == null ? "" : Convert.ToDateTime(item.CreateDTimeUTC.ToString()).ToString("yyyy-MM-dd"))
+                                                        </td>
+                                                        <td class="text-center cell-100">
+                                                            @MvcHtmlString.Create(item.EffDateStart == null ? "" : Convert.ToDateTime(item.EffDateStart.ToString()).ToString("yyyy-MM-dd"))
+                                                        </td>
+                                                    </tr>
+                                                    idx++;
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+<div class="modal fade" id="BuyLicense" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 90%; margin-top: -60px !important">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="col-xs-6" style="font-size: 15px; font-weight: 600;">MUA LICENSE</div>
+                <a href="javascript:void();" onclick="CloseModalBuyLicense()" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </a>
+            </div>
+            <div class="modal-body" style="">
+                <table class="" style="box-shadow: 0px 0px 8px #e2e2e2; width: 100%">
+                    <tbody id="tbodyLicense">
+                        <tr idx="0" class="trdata">
+                            <input type="hidden" name="ListSys_Modules[0].UnitPrice" value="1000000" />
+                            <td class="text-left">
+                                <div class="bold-package">Phí khởi tạo</div>
+                                <div>1,000,000 VNĐ / Tài khoản (MST)</div>
+                            </td>
+                            <td class="text-center">
+                                <button name="Decrease[0]" onclick="Decrease(this); totalPrice();">-</button>
+                                <input type="text" name="ListSys_Modules[0].Qty" onKeyPress="return isNumberKey(event);" onblur="SetDefaultValueZero(this); totalPrice();" min="0" max="999" maxlength="3" value="1" />
+                                <button name="Increase[0]" onclick="Increase(this); totalPrice();">+</button>
+                            </td>
+                            <td class="text-right">
+                                <div class="formatnumber">1000000</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="bold-package">Phí sử dụng hóa đơn</td>
+                        </tr>
+                        <tr idx="1" class="fee-row trdata">
+                            <input type="hidden" name="ListSys_Modules[1].UnitPrice" value="200000" />
+                            <input type="hidden" name="ListSys_Modules[1].QtyLicense" value="200" />
+                            <td class="text-left">
+                                <div class="bold-package">Gói 200 hóa đơn (Q-200)</div>
+                                <div>200,000 VNĐ / Gói</div>
+                            </td>
+                            <td class="text-center">
+                                <button name="Decrease[1]" onclick="Decrease(this); totalPrice();">-</button>
+                                <input type="text" name="ListSys_Modules[1].Qty" onKeyPress="return isNumberKey(event);" onblur="SetDefaultValueZero(this); totalPrice();" min="0" max="999" maxlength="3" value="1" />
+                                <button name="Increase[1]" onclick="Increase(this); totalPrice();">+</button>
+                            </td>
+                            <td class="text-right">
+                                <div class="formatnumber">200000</div>
+                            </td>
+                        </tr>
+                        <tr idx="2" class="fee-row trdata">
+                            <input type="hidden" name="ListSys_Modules[2].UnitPrice" value="425000" />
+                            <input type="hidden" name="ListSys_Modules[2].QtyLicense" value="500" />
+                            <td class="text-left">
+                                <div class="bold-package">Gói 500 hóa đơn (Q-500)</div>
+                                <div>425,000 VNĐ / Gói</div>
+                            </td>
+                            <td class="text-center">
+                                <button name="Decrease[2]" onclick="Decrease(this); totalPrice();">-</button>
+                                <input type="text" name="ListSys_Modules[2].Qty" onKeyPress="return isNumberKey(event);" onblur="SetDefaultValueZero(this); totalPrice();" min="0" max="999" maxlength="3" value="0" />
+                                <button name="Increase[2]" onclick="Increase(this); totalPrice();">+</button>
+                            </td>
+                            <td class="text-right">
+                                <div class="formatnumber">0</div>
+                            </td>
+                        </tr>
+                        <tr idx="3" class="fee-row trdata">
+                            <input type="hidden" name="ListSys_Modules[3].UnitPrice" value="650000" />
+                            <input type="hidden" name="ListSys_Modules[3].QtyLicense" value="1000" />
+                            <td class="text-left">
+                                <div class="bold-package">Gói 1000 hóa đơn (Q-1000)</div>
+                                <div>650,000 VNĐ / Gói</div>
+                            </td>
+                            <td class="text-center">
+                                <button name="Decrease[3]" onclick="Decrease(this); totalPrice();">-</button>
+                                <input type="text" name="ListSys_Modules[3].Qty" onKeyPress="return isNumberKey(event);" onblur="SetDefaultValueZero(this); totalPrice();" min="0" max="999" maxlength="3" value="0" />
+                                <button name="Increase[3]" onclick="Increase(this); totalPrice();">+</button>
+                            </td>
+                            <td class="text-right">
+                                <div class="formatnumber">0</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot id="tfootLicense">
+                        <tr>
+                            <input type="hidden" id="TotalQtyLicense" value="200" />
+                            <td class="text-left"></td>
+                            <td class="text-center">
+                                <div class="bold-package">TỔNG TIỀN</div>
+                            </td>
+                            <td class="text-right">
+                                <div class="bold-package formatnumber">1200000</div>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <p class="text-center" style="margin-top: 10px">(Giá trên chưa bao gồm VAT)</p>
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn mybtn-Button" onclick="IncreaseQty()" id="" style="padding-left: 10px!important; padding-right: 10px!important; font-size: 16px; font-weight: 500;">Mua ngay</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*Active Menu*@
+<script type="text/javascript">
+    setAdminCurrentUrl('@Url.Action("License", "Home")');
+</script>
+
+<script>
+    function totalPrice() {
+        var rows = $("tbody#tbodyLicense tr.trdata").length;
+        if (rows > 0) {
+            var _totalPrice = 0.0;
+            var TotalQtyLicense = 0;
+            $("tbody#tbodyLicense tr.trdata").each(function () {
+                debugger;
+                var trCur = $(this);
+                var idx = trCur.attr('idx');
+                var unitPrice = ReturnValue(trCur.find('input[type="hidden"][name="ListSys_Modules[' + idx + '].UnitPrice"]').val());
+                var qtyLicense = ReturnValue(trCur.find('input[type="hidden"][name="ListSys_Modules[' + idx + '].QtyLicense"]').val());
+                var qty = ReturnValue(trCur.find('input[type="text"][name="ListSys_Modules[' + idx + '].Qty"]').val());
+                if (IsNullOrEmpty(unitPrice)) {
+                    unitPrice = 0;
+                }
+                if (IsNullOrEmpty(qtyLicense)) {
+                    qtyLicense = 0;
+                }
+                if (IsNullOrEmpty(qty)) {
+                    qty = 0;
+                }
+                TotalQtyLicense += (parseFloat(qty) * parseFloat(qtyLicense));
+                var _totalPriceCur = (parseFloat(qty) * parseFloat(unitPrice));
+                _totalPrice += _totalPriceCur;
+                $(trCur).find('div.formatnumber').html(formatNumberInteger(_totalPriceCur));
+            });
+            $('tfoot#tfootLicense').find('div.formatnumber').html(formatNumberInteger(_totalPrice));
+            $('#TotalQtyLicense').val(TotalQtyLicense);
+        }
+    }
+
+    function Decrease(thiz) {
+        debugger
+        var rows = $("tbody#tbodyLicense tr.trdata").length;
+        if (rows > 0) {
+            var idx = $(thiz).parents("tr").attr('idx');
+            var inputCur = $('input[type="text"][name="ListSys_Modules[' + idx + '].Qty"]');
+            var qty = parseInt(inputCur.val());
+            if (qty == 0) {
+                qty = qty;
+            }
+            else {
+                qty = qty - 1;
+            }
+            inputCur.val(qty);
+        }
+    }
+
+    function Increase(thiz) {
+        debugger
+        var rows = $("tbody#tbodyLicense tr.trdata").length;
+        if (rows > 0) {
+            var idx = $(thiz).parents("tr").attr('idx');
+            var inputCur = $('input[type="text"][name="ListSys_Modules[' + idx + '].Qty"]');
+            var qty = parseInt(inputCur.val());
+
+            qty = qty + 1;
+
+            inputCur.val(qty);
+        }
+    }
+
+    function CloseModalBuyLicense() {
+        $('#BuyLicense').modal("hide");
+    }
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.scrollable-horizontal').each(function () {
+            var $this = $(this);
+            $(this).ace_scroll(
+                {
+                    horizontal: true,
+                    //styleClass: 'scroll-top',//show the scrollbars on top(default is bottom)
+                    size: $this.attr('data-size') || 6500,
+                    mouseWheelLock: true
+                }
+            ).css({ 'padding-top': 0 });
+        });
+
+        //
+        $('#fromdate, #todate').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: 'yyyy-mm-dd'
+        })
+            //show datepicker when clicking on the icon
+            .next().on(ace.click_event, function () {
+                $(this).prev().focus();
+            });
+    });
+    $('.scrollable').each(function () {
+        var $this = $(this);
+        $(this).ace_scroll({
+            //size: 500,
+            size: $this.attr('data-size') || 1000,
+            mouseWheelLock: true,
+            //styleClass: 'scroll-left scroll-margin scroll-thin scroll-dark scroll-light no-track scroll-visible'
+        });
+    });
+</script>
+
+<script>
+    function Search()
+    {
+        $('#manageForm').attr('action', '@Url.Action("Index", "Invoice_TempInvoice")').submit();
+    }
+</script>
+
+<script>
+    $(document).on('keypress', function (e) {
+        if (e.which == 13) {
+            Search();
+        }
+    });
+</script>

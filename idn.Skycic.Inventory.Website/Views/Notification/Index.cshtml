@@ -1,0 +1,408 @@
+﻿
+@model InosNotificationResult
+@{
+    ViewBag.Title = "Thông báo";
+    var errorDetail = CUtils.StrValueNew(ViewBag.ErrorDetail);
+    var totalPage = "0";
+
+}
+@if (!CUtils.IsNullOrEmpty(errorDetail))
+{
+    <input type="hidden" id="ErrorDetailMethodGet" value="@MvcHtmlString.Create(errorDetail)" />
+    <script type="text/javascript">
+        $(document).ready(function () {
+            _showErrorMsg123_MothodGet('Lỗi!');
+        });
+    </script>
+}
+else
+{
+    @*<link href="~/Content/Notify.css" rel="stylesheet" />*@
+    using (Html.BeginForm("", "", FormMethod.Post, new { id = "form-notify" }))
+    {
+        <div class="row no-margin">
+            <div class="col-12 setting-box">
+                <div class="title-setting col-8" style="float: left;">
+                    Thông báo
+                </div>
+                <div class="col-4" style="float: right; padding: 0px;">
+                    <a href="javascript: void(0); " class="btn btn-nc-button" onclick="notificationAllReadIndex();"> Đánh dấu đã đọc tất cả</a>
+                    &nbsp;&nbsp;
+                    <input type="hidden" id="notify-status-init" value="99" />
+                    <a href="javascript: void(0); " class="btn btn-nc-button" onclick="SearchDataUnread();"> Chưa đọc <img class="img-button-search-notify" src="/Images/search.svg"></a>
+                    &nbsp;&nbsp;
+                    <a href="@Url.Action("setting", "notification")" class="btn btn-nc-button"> Cài đặt</a>
+                </div>
+
+            </div>
+            <div class="col-12 detail-setting-box">
+                <ul id="notification-list-index" class="col-12 no-margin no-padding notification-list-index"></ul>
+            </div>
+        </div>
+    }
+
+    @section Scripts{
+        <script type="text/javascript">
+        var $ulIndex = $('#notification-list-index');
+        var _dUtcOffset = 0.0;
+        @if (Model != null && Model.List != null && Model.List.Count > 0)
+        {
+            var dateCur = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            var utcOffset = CUtils.StrValueNew(ViewBag.UtcOffset);
+            if (CUtils.IsNullOrEmpty(utcOffset))
+            {
+                utcOffset = "0";
+            }
+            <text>
+            _dUtcOffset = commonUtils.parseFloat('@utcOffset');
+            </text>
+            foreach (var item in Model.List)
+            {
+                var status = CUtils.StrValueNew(item.Status);
+                if (status.Equals("READ"))
+                {
+                    status = "1";
+                }
+                else
+                {
+                    status = "0";
+                }
+                var detail = !CUtils.IsNullOrEmpty(item.Detail) ? item.Detail.Replace("\n", "<br />") : "";
+                var detailRemoveTagsHtml = !CUtils.IsNullOrEmpty(item.Detail) ? CUtils.CatChuoi(CUtils.StripTagsRegexCompiled(item.Detail.Replace("\n", "<br />")), 100) : "";
+                var jsonInosNotification = JsonConvert.SerializeObject(item);
+                <text>
+                    debugger;
+
+                    var objInosNotificationCur = @(MvcHtmlString.Create(jsonInosNotification));
+                    objInosNotificationCur.UtcOffset = _dUtcOffset;
+                    objInosNotificationCur.DateTime = '@dateCur';
+                    objInosNotificationCur.DetailRemoveTagsHtml = '@MvcHtmlString.Create(detailRemoveTagsHtml)';
+                    var $item = genNotifyItem(objInosNotificationCur);
+                    $ulIndex.append($item);
+
+                    //var $item = $(commonUtils.getHtmlFromTemplate($(tmpl), data));
+                    //$item.attr('data-detail', data.detail);
+                    //$item.appendTo($('#list_docs_kthd'));
+                    //$ulIndex.append($item);
+                </text>
+
+
+            }
+        }
+        </script>
+
+        <script type="text/javascript">
+
+        // Biến dùng kiểm tra nếu đang gửi ajax thì ko thực hiện gửi thêm
+        var is_busyIndex = false;
+
+        // Biến lưu trữ trang hiện tại
+        var pageIndex = 0;
+
+        // Biến lưu trữ rạng thái phân trang
+        var stoppedIndex = false;
+
+        $(document).ready(function () {
+            // Khi kéo scroll thì xử lý
+            $(window).scroll(function () {
+                debugger;
+                var ipage = $('input#pagenotificationhd').val();
+                var pagenotification = commonUtils.parseInt(ipage);
+                // Element append nội dung
+                $element = $('#notification-list-index');
+                var iCountLi = $('ul#notification-list-index li.notifi-content').length;
+                // Nếu màn hình đang ở dưới cuối thẻ thì thực hiện ajax
+                var winTop = $(this).scrollTop();
+                var winHeight = $(window).height();
+                //var winHeight = 270;
+                var elementHeight = $element.height();
+                //if ($(window).scrollTop() + $(window).height() >= $element.height())
+                if (winTop + winHeight >= elementHeight)
+                {
+                    // Nếu đang gửi ajax thì ngưng
+                    if (is_busyIndex == true) {
+                        return false;
+                    }
+
+                    // Nếu hết dữ liệu thì ngưng
+                    if (stoppedIndex == true) {
+                        return false;
+                    }
+
+                    // Thiết lập đang gửi ajax
+                    is_busyIndex = true;
+
+                    // Tăng số trang lên 1
+                    pageIndex++;
+                    if (pageIndex >= pagenotification) {
+                        stopped = true;
+                        return false;
+                    }
+                    else {
+                        var token = $('#form-notify input[name=__RequestVerificationToken]').val();
+                        var url = '@Url.Action("SearchIndex", "Notification")';
+                        var status = commonUtils.returnValueText('#notify-status-init');
+                        $.ajax({
+                            type: 'post',
+                            data: {
+                                __RequestVerificationToken: token
+                                , status: status
+                                , page: pageIndex
+                                , totalitem: iCountLi
+                            },
+                            url: url,
+                            dataType: 'json',
+                            async: false,
+                            beforeSend: function () {
+                                //if ($("#show-loading").length > 0) {
+                                //    $("#show-loading").remove();
+                                //}
+                            }
+                        }).done(function (objResult) {
+                            doneFunctionSearchIndex(objResult);
+                        }).fail(function (jqXHR, textStatus, errorThrown) {
+                            //failFunction(jqXHR, textStatus, errorThrown);
+                        }).always(function () {
+                            //alwaysFunction();
+                            is_busyIndex = false;
+                        });
+                    }
+
+                    return false;
+                }
+            });
+        });
+
+        function doneFunctionSearchIndex(objResult) {
+            if (objResult !== undefined && objResult !== null) {
+                if (objResult.Success) {
+                    var dateCur = '';
+                    if (!commonUtils.isNullOrEmpty(objResult.DateTime) && commonUtils.checkDate(objResult.DateTime)) {
+                        dateCur = commonUtils.returnValue(objResult.DateTime);
+                        var daterejult = new Date(dateCur);
+                        var month = daterejult.getMonth() + 1;
+                        //strdateCur = daterejult.getFullYear() + "-" + month + "-" + daterejult.getDate();
+                        strdateCur = daterejult.getFullYear() + "-" + month + "-" + daterejult.getDate() + " " + daterejult.getHours() + ":" + daterejult.getMinutes() + ":" + daterejult.getSeconds();
+                        dateCur = new Date(strdateCur);
+                    }
+
+                    var objInosNotificationResult = objResult.InosNotificationResult;
+
+                    if (objInosNotificationResult !== undefined && objInosNotificationResult !== null) {
+
+                        if (commonUtils.checkElementExists('.notification-cd')) {
+                            iCount = objInosNotificationResult.UnreadCount;
+                            $('.notification-cd').text(iCount);
+                        }
+
+                        var listInosNotification = objInosNotificationResult.List;
+                        if (listInosNotification !== undefined && listInosNotification !== null && listInosNotification.length > 0) {
+                            $('#pagenotificationhd').val(commonUtils.parseInt(objInosNotificationResult.PageCount));
+
+                            var $ul = $('#notification-list-index');
+                            if ($ul !== undefined && $ul !== null) {
+                                var dUtcOffset = 0.0;
+                                var utcOffset = commonUtils.returnValueText('#UtcOffset');
+                                if (commonUtils.isNullOrEmpty(utcOffset)) {
+                                    utcOffset = '0';
+                                }
+                                dUtcOffset = commonUtils.parseFloat(utcOffset);
+
+
+                                for (var i = 0; i < listInosNotification.length; i++) {
+                                    var objInosNotification = listInosNotification[i];
+                                    objInosNotification.UtcOffset = dUtcOffset;
+                                    objInosNotification.DateTime = dateCur;
+                                    var $item = genNotifyItem(objInosNotification);
+                                    $ul.append($item);
+
+
+
+                                    //var createDTime = commonUtils.dateTimeAddHours(objInosNotification.CreateDTime, dUtcOffset);
+                                    //var convertcreateDTime = createDTime.formatDate('yyyy-MM-dd HH:mm:ss');
+                                    //var timeAgo = commonUtils.getTimeAgo(convertcreateDTime, dateCur);
+                                    //var status = commonUtils.returnValue(objInosNotification.Status);
+                                    //var solutionCode = commonUtils.returnValue(objInosNotification.SolutionCode);
+                                    //var pathimageinit = '/Images/SolutionImage/XXXIMAGESXXX.svg';
+                                    //var pathimage = '';
+                                    //if (!commonUtils.isNullOrEmpty(solutionCode)) {
+                                    //    pathimage = commonUtils.replaceAll(pathimageinit, 'XXXIMAGESXXX', solutionCode);
+                                    //}
+                                    //else {
+                                    //    pathimage = '/Images/no-image.png';
+                                    //}
+                                    //var data = {
+                                    //    id: commonUtils.returnValue(objInosNotification.Id),
+                                    //    networkid: commonUtils.returnValue(objInosNotification.NetworkId),
+                                    //    solutioncode: solutionCode,
+                                    //    typecode: commonUtils.returnValue(objInosNotification.TypeCode),
+                                    //    subtype: commonUtils.returnValue(objInosNotification.SubType),
+                                    //    userid: commonUtils.returnValue(objInosNotification.UserId),
+                                    //    detail: commonUtils.returnValue(objInosNotification.Detail),
+                                    //    //detailshort: commonUtils.returnValue(objInosNotification.DetailShort),
+                                    //    detailshort: commonUtils.returnValue(objInosNotification.DetailRemoveTagsHtml),
+                                    //    status: status,
+                                    //    senduserid: commonUtils.returnValue(objInosNotification.SendUserId),
+                                    //    createdtime: convertcreateDTime,
+                                    //    time: timeAgo,
+                                    //    pathimage: pathimage,
+                                    //};
+                                    //var tmpl = '#tmpl_notify_read_item';
+                                    //if (status === '1') {
+                                    //    tmpl = '#tmpl_notify_read_item';
+                                    //}
+                                    //else {
+                                    //    tmpl = '#tmpl_notify_unread_item';
+                                    //}
+                                    //var $item = $(commonUtils.getHtmlFromTemplate($(tmpl), data));
+                                    //$item.attr('data-detail', data.detail);
+                                    ////$item.appendTo($('#list_docs_kthd'));
+                                    //$ul.append($item);
+                                }
+
+                            }
+
+                            $('[data-toggle="tooltip"]').tooltip();
+                        }
+                    }
+
+                } else {
+                    if (!commonUtils.isNullOrEmpty(objResult.Detail)) {
+                        _showErrorMsg123('Lỗi!', objResult.Detail);
+                    }
+                }
+            }
+        }
+        </script>
+
+        <script type="text/javascript">
+        function SearchDataUnread() {
+            $('#notify-status-init').val('0');
+            var token = $('#form-notify input[name=__RequestVerificationToken]').val();
+            var url = '@Url.Action("SearchIndex", "Notification")';
+            var status = commonUtils.returnValueText('#notify-status-init');
+            $.ajax({
+                type: 'post',
+                data: {
+                    __RequestVerificationToken: token
+                    , status: status
+                    , page: 0
+                    , totalitem: 0
+                },
+                url: url,
+                dataType: 'json',
+                async: false,
+                beforeSend: function () {
+                    //if ($("#show-loading").length > 0) {
+                    //    $("#show-loading").remove();
+                    //}
+                }
+            }).done(function (objResult) {
+                debugger;
+                var $ul = $('#notification-list-index');
+                if ($ul !== undefined && $ul !== null) {
+                    $ul.empty();
+                }
+                doneFunctionSearchIndex(objResult);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                //failFunction(jqXHR, textStatus, errorThrown);
+            }).always(function () {
+                //alwaysFunction();
+            });
+        }
+        </script>
+
+        <script type="text/javascript">
+        function Notification_All_Read_Index() {
+            var iCount = $('ul#notification-list-index li.unread').length;
+            if (iCount > 0) {
+                var listInosNotification = [];
+
+                var listLi = [];
+
+                $('ul#notification-list-index li.unread').each(function () {
+
+                    var liCur = $(this);
+                    var id = commonUtils.returnValue($(liCur).find('input[type="hidden"][name="Id"]').val());
+                    var solutionCode = commonUtils.returnValue($(liCur).find('input[type="hidden"][name="SolutionCode"]').val());
+                    var objInosNotification = {};
+                    objInosNotification.Id = id;
+                    objInosNotification.SolutionCode = solutionCode;
+                    objInosNotification.Status = '1';
+                    listInosNotification.push(objInosNotification);
+                    listLi.push(liCur);
+                });
+
+                if (listInosNotification !== undefined && listInosNotification !== null) {
+                    var modelCur = commonUtils.returnJSONValue(listInosNotification);
+                    var token = $('#form-notify input[name=__RequestVerificationToken]').val();
+                    var url = '@Url.Action("Notification_Change", "Notification")';
+                    $.ajax({
+                        type: 'post',
+                        data: {
+                            __RequestVerificationToken: token
+                            , model: modelCur
+                        },
+                        url: url,
+                        dataType: 'json',
+                        async: false,
+                        beforeSend: function () {
+
+                        }
+                    }).done(function (objResult) {
+                        if (objResult.Success) {
+                            var iCount = 0;
+                            var count = $('.notification-cd').text();
+                            if (commonUtils.isNullOrEmpty(count)) {
+                                count = '0';
+                            }
+                            iCount = commonUtils.parseInt(count);
+                            if (iCount > 0) {
+                                iCount = iCount - listLi.length;
+                                if (iCount <= 0) {
+                                    iCount = 0;
+                                }
+                                $('.notification-cd').text(iCount);
+
+                                for (var i = 0; i < listLi.length; i++) {
+                                    var $li = listLi[i];
+
+                                    UpdateLi($li, '1');
+
+                                }
+                                debugger;
+                                // update cho popup notify
+                                var $ulNotify = undefined;
+                                if ($('#notification-list').length > 0) {
+                                    $ulNotify = $('#notification-list');
+                                }
+                                if ($ulNotify !== undefined && $ulNotify !== null) {
+                                    for (var i = 0; i < listLi.length; i++) {
+                                        var idCur = commonUtils.returnValue($(listLi[i]).find('input[type="hidden"][name="Id"]').val());
+                                        var $liNotify = $ulNotify.find('li[liid="' + idCur + '"]');
+                                        if ($liNotify !== undefined && $liNotify !== null) {
+                                            UpdateLi($liNotify, '1');
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                        else {
+
+                            _showErrorMsg123('Lỗi', objResult.Detail);
+                        }
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        //failFunction(jqXHR, textStatus, errorThrown);
+                    }).always(function () {
+                        //alwaysFunction();
+                    });
+                }
+
+            }
+        }
+        </script>
+    }
+
+}
+

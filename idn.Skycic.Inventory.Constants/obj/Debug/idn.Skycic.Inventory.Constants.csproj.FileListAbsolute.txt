@@ -1,0 +1,12 @@
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Constants\bin\Debug\idn.Skycic.Inventory.Constants.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Constants\bin\Debug\idn.Skycic.Inventory.Constants.pdb
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Constants\obj\Debug\idn.Skycic.Inventory.Constants.csproj.CoreCompileInputs.cache
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Constants\obj\Debug\idn.Skycic.Inventory.Constants.dll
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Constants\obj\Debug\idn.Skycic.Inventory.Constants.pdb
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Constants\obj\Debug\idn.Skycic.Inventory.Constants.csprojAssemblyReference.cache
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Constants\bin\Debug\idn.Skycic.Inventory.Constants.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Constants\bin\Debug\idn.Skycic.Inventory.Constants.pdb
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Constants\obj\Debug\idn.Skycic.Inventory.Constants.csproj.CoreCompileInputs.cache
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Constants\obj\Debug\idn.Skycic.Inventory.Constants.dll
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Constants\obj\Debug\idn.Skycic.Inventory.Constants.pdb
+E:\0_DOAN_Project\BackEnd\V1.0\idn.Skycic.Inventory.Constants\obj\Debug\idn.Skycic.Inventory.Constants.csprojAssemblyReference.cache

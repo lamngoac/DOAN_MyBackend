@@ -1,0 +1,74 @@
+﻿@{
+    Layout = null;
+    var listMstInventory = ViewBag.List_Mst_Inventory as List<Mst_Inventory>;
+}
+
+<div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+    <div style="width: 100%; float: left;">
+        <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+            <thead>
+                <tr class="trthead">
+                    <th fieldId="InvCode" sorttype="T" fieldName="Mã kho" fieldActive="0" class="text-center cell-150">
+                        @("Mã kho".HtmlItemString("invf_inventoryin"))
+                    </th>
+                    <th fieldId="InvName" sorttype="T" fieldName="Tên kho" fieldActive="0" class="text-center cell-150">
+                        @("Tên kho".HtmlItemString("invf_inventoryin"))
+                    </th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+        <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+            <tbody id="tbodySearchInventoryInNew">
+                @if (listMstInventory != null && listMstInventory.Count > 0)
+                {
+                    var i = 0;
+                    foreach (var item in listMstInventory)
+                    {
+                        <tr idx="@i" class="data-item trdata" onclick="ClickInventoryIn(this)">
+                            <!-- Khách hàng -->
+                            <input type="hidden" name="InventoryInPopUp[@i].InvCode" value="@item.InvCode" />
+                            <input type="hidden" name="InventoryInPopUp[@i].InvName" value="@item.InvName" />
+
+                            <td class="text-center cell-150">@item.InvCode</td>
+                            <td class="text-center cell-150">@item.InvName</td>
+
+                        </tr>
+                        i++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function ClickInventoryIn(thiz) {
+        $('.selected').removeClass('selected');
+        $(thiz).addClass('selected');
+
+        var rows = $('tbody#tbodySearchInventoryInNew tr').length;
+        if (rows > 0) {
+            var rowsSelected = $('tbody#tbodySearchInventoryInNew tr.selected').length;
+            if(rowsSelected > 0) {
+                var tr = $('tbody#tbodySearchInventoryInNew').find('tr.selected');
+                if (tr != null) {
+                    var idx = $(tr).attr('idx');
+                    var invCode = $(tr).find('input[type="hidden"][name="InventoryInPopUp[' + idx + '].InvCode"]').val();
+
+                    $('select#InvCodeIn').val(invCode);
+                    $('select#InvCodeIn').trigger('change');
+                    ClosePopupInvCodeIn();
+                }
+            }
+            else {
+                alert("@MvcHtmlString.Create("Chưa chọn kho!")");
+                return false;
+            }
+        } else {
+            alert("Lưới danh sách kho trống!");
+            return false;
+        }
+        return true;
+    }</script>

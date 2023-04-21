@@ -1,0 +1,155 @@
+﻿
+@{
+    var tmpl_selected = "==selected==";
+}
+<!-- Row hàng hóa -->
+<script type="text/template" id="templateRowProduct">
+    <tr class="data-item trdata" rd="==rd==" productcodebase="==ProductCodeBase==" productcode="==ProductCode==" productname="==ProductName==" unitcode="==UnitCode==">
+        <td class="text-center cell-25">
+            <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteProductRow(this)">
+                <i class="fas fa-trash-alt"></i>
+            </a>
+            <div class="products-list">
+            </div>
+        </td>
+        <td class="cell-120 td-prdcodeuser ==productcodeuserCss==">
+            <span class="==productcodeuserCss==">==ProductCodeUser==</span>
+            <span class="serial-lot-text"></span>
+        </td>
+        <td class="text-left cell-100 ==productnameCss==">
+            <span class="==productnameCss==">==ProductName==</span>
+            <input type="hidden" class="==productcodeCss==" value="==ProductCode==" />
+            <input type="hidden" class="==productcodeuserCss==" value="==ProductCodeUser==" />
+            <input type="hidden" class="==productcodebaseCss==" value="==ProductCodeBase==" />
+            <input type="hidden" class="==productcoderootCss==" value="==ProductCodeRoot==" />
+            <input type="hidden" class="==productnameCss==" value="==ProductName==" />
+            <input type="hidden" class="==flaglotCss==" value="==FlagLot==" />
+            <input type="hidden" class="==flagserialCss==" value="==FlagSerial==" />
+            <input type="hidden" class="==qtytotalokCss==" value="==QtyTotalOK==" />
+        </td>
+        <td class="cell-50 td-select2">
+            <select class="select2 col-12 no-border ==select2Css==" onchange="changeProduct(this)" initdata="==ProductCode==" ischange="0">
+                <optgroup></optgroup>
+                <option></option>
+            </select>
+        </td>
+        <td class="text-right cell-50">
+            <input type="text" class="col-12 no-border text-right ==qtytotalokCss==" initdata="==QtyTotalOK==" value="==QtyTotalOK==" readonly/>
+        </td>
+        <td class="text-center cell-75">
+            <input type="text" name="Qty" class="col-12 text-right ==qtyCss==" value="==Qty==" readonly="">
+        </td>
+        <td class="text-center cell-75 ==listInvCodeOutCss==" name="ListInvCodeOut"></td>
+        <td class="text-center cell-75 ==listInvCodeInCss==" name="ListInvCodeIn"></td>
+        <td class="text-center cell-110">
+            <textarea type="text" name="Remark" class="col-12 ==remarkCss==" value=""></textarea>
+        </td>
+    </tr>
+</script>
+
+<!-- vị trí xuất -->
+<script type="text/template" id="templateListInvCodeOut">
+    <input readonly="readonly" class="col-md-11" name="InvCodeOut" value="" style="float:left">
+    <a href="javascript:;" title="Chọn vị trí" onclick="ShowPopupInvInOut(this)">
+        <i class="fa fa-caret-down" style="line-height:24px"></i>
+    </a>
+</script>
+<!-- vị trí nhập -->
+<script type="text/template" id="templateListInvCodeIn">
+    <input readonly="readonly" class="col-md-11" name="InvCodeIn" value="" style="float:left">
+    <a href="javascript:;" title="Chọn vị trí" onclick="ShowPopupInvInOut(this)">
+        <i class="fa fa-caret-down" style="line-height:24px"></i>
+    </a>
+</script>
+<!-- Thêm link với Hàng serial -->
+<script type="text/template" id="templateLinkSerial">
+    <a href="javascript:;" class="float-right" title="Danh sách Serial" onclick="ShowPopupSerial(this)">Serial</a>
+</script>
+<!-- Thêm link với Hàng Lot -->
+<script type="text/template" id="templateLinkLot">
+    <a href="javascript:;" class="float-right" title="Danh sách Lô" onclick="ShowPopupLo(this)">Lô</a>
+</script>
+
+<!-- Popup Show Serial Add row -->
+<script type="text/template" id="templateSerialRow">
+    <tr class="data-item trdata ==disabled==">
+        <input type="hidden" name="SerialNo" value="==serialno==">
+        <input type="hidden" name="InvCodeOut" value="==invcodeout==">
+        <td class="text-center cell-25">
+            <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteSerialRow(this)">
+                <i class="fas fa-trash-alt"></i>
+            </a>
+        </td>
+        <td class="cell-100">==serialno==</td>
+        <td class="text-center cell-100">==invcodeout==</td>
+        <td class="text-center cell-100">
+            <select class="select2-selection" name="InvCodeIn" serialno="==serialno==">
+                <option value="">Vị trí nhập</option>
+            </select>
+        </td>
+    </tr>
+</script>
+
+<script type="text/template" id="templateOptionInvCodeInSerial">
+    <option value="==invcode==">==invcode==</option>
+</script>
+
+<!-- Popup Show Lot Add row -->
+<script type="text/template" id="templateRowLot">
+    <tr class="data-item trdata ==disabled==" productlotno="==productlotno==">
+        <input type="hidden" name="ProductLotNo" value="==productlotno==">
+        <input type="hidden" name="ProductionDate" value="==productiondate==">
+        <input type="hidden" name="ExpiredDate" value="==expiredate==">
+        <input type="hidden" name="Qty" value="==qty==">
+        <input type="hidden" name="InvCodeOut" value="==invcodeout==">
+        <td class="text-center cell-30 ==disableFix==">
+            <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteLotRow(this)">
+                <i class="fas fa-trash-alt"></i>
+            </a>
+        </td>
+        <td class="cell-100">==productlotno==</td>
+        <td class="text-center cell-75">==productiondate==</td>
+        <td class="text-center cell-75">==expiredate==</td>
+        <td class="text-right cell-75 qty-lot">==qty==</td>
+        <td class="text-center cell-75">==invcodeout==</td>
+        <td class="text-center cell-75">
+            <input type="text" name="MoveQty" class="col-12 text-right moveqty ==disableFix==" value="==qtymove==" autocomplete="off" >
+        </td>
+        <td class="text-center cell-100 ==disableFix==">
+            <select class="select2-selection" name="InvCodeIn" productlotno="==productlotno==">
+                <option value="">Vị trí nhập</option>
+            </select>
+        </td>
+    </tr>
+</script>
+
+<script type="text/template" id="templateOptionInvCodeInLot">
+    <option value="==invcode==">==invcode==</option>
+</script>
+
+@*tmpl_options_InvCodeInActual: dùng chung cho popup vị trí hàng hóa, popup serial, popup LOT*@
+<script type="text/template" id="tmpl_options_InvCodeInActual">
+    <option value="==InvCode==" invname="==InvName==" @MvcHtmlString.Create(tmpl_selected)>==InvName==</option>
+</script>
+
+<script type="text/template" id="tmpl_products_list">
+    <div class="result display-none" productcode="==ProductCode==">
+        <input type="hidden" class="ProductCodeRoot" value="==ProductCodeRoot==" />
+        <input type="hidden" class="ProductCodeBase" value="==ProductCodeBase==" />
+        <input type="hidden" class="ProductCode" value="==ProductCode==" />
+        <input type="hidden" class="ProductCodeUser" value="==ProductCodeUser==" />
+        <input type="hidden" class="ProductName" value="==ProductName==" />
+        <input type="hidden" class="ProductType" value="==ProductType==" />
+        <input type="hidden" class="FlagSerial" value="==FlagSerial==" />
+        <input type="hidden" class="FlagLot" value="==FlagLot==" />
+        <input type="hidden" class="UnitCode" value="==UnitCode==" />
+        <input type="hidden" class="Qty" value="==Qty==" />
+        <input type="hidden" class="QtyTotalOK" value="==QtyTotalOK==" />
+        <input type="hidden" class="Remark" value="==Remark==" />
+    </div>
+</script>
+
+
+<script type="text/template" id="tmpl_options">
+    <option value="==UnitCode==" @MvcHtmlString.Create(tmpl_selected) productcode="==ProductCode==">==UnitCode==</option>
+</script>

@@ -1,0 +1,206 @@
+﻿
+@model PageInfo<Mst_ProductUI>
+@{
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+    var recordCount = CUtils.StrValue(ViewBag.RecordCount);
+    var totalPage = "0";
+    if (Model != null)
+    {
+        totalPage = CUtils.StrValue(Model.PageCount);
+    }
+
+    var showtext = "";
+    if (Model.ItemCount > 0)
+    {
+        var recordstart = (Model.PageIndex) * Model.PageSize + 1;
+        var recordend = (Model.PageIndex + 1) * Model.PageSize;
+        if (recordend > Model.ItemCount)
+        {
+            recordend = Model.ItemCount;
+        }
+        showtext = recordstart + "-" + recordend + " trong số " + Model.ItemCount;
+    }
+}
+
+<input type="hidden" id="page" value="@ViewBag.PageCur" />
+<input type="hidden" id="totalpage" value="@Model.PageCount" />
+
+<div class="col-12 row no-margin no-padding">
+    <div class="col-4">
+    </div>
+    <div class="col-8 no-padding-right layout-bot-top-16">
+        @Html.Partial("Pagination", null, new ViewDataDictionary() { { "PageCur", MvcHtmlString.Create(pageCur) }, { "RecordCount", MvcHtmlString.Create(recordCount) }, { "ShowText", showtext } })
+    </div>
+</div>
+<div class="panel-body no-padding" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+    <aside class="col-xs-12 layout-table no-padding">
+        <div class="scrollable-horizontal padding-left-0 padding-right-0" style="padding-top: 0!important;">
+            <div style="width: 100%; float: left;">
+                <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                    <thead>
+                        <tr class="trthead">
+                            <th fieldId="CONTROL" fieldName="CONTROL" fieldActive="0" class="text-center cell-15">
+                                <input type="checkbox" class="cl-check idn-checkbox" onclick="CheckAll(this);" name="check-box-all" id="check-box-all" />
+                                <label for="check-box-all"><span></span></label>
+                            </th>
+                            <th class="text-center cell-100">@("Mã hàng hoá".HtmlItemString("inventory"))</th>
+                            <th class="text-center cell-175">@("Tên hàng hoá".HtmlItemString("inventory"))</th>
+                            <th class="text-center cell-50">@("Đơn vị tính".HtmlItemString("inventory"))</th>
+                            <th class="text-center cell-50">@("Số lượng tồn".HtmlItemString("inventory"))</th>
+                            <th class="text-center cell-50">@("Vị trí".HtmlItemString("inventory"))</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                    <tbody id="table-tbodyID">
+                       
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </aside>
+</div>
+
+<!-- Check all rows-->
+<script>
+    function CheckAll(thiz) {
+        debugger;
+        let trArr = $('#ShowPopupProductSearch #dynamic-table-thead-tbody tr');
+        if (trArr !== null && trArr.length > 0) {
+            for (var i = 0; i < trArr.length; i++) {
+                var trCur = trArr[i];
+                if (trCur !== null && trCur !== undefined) {
+                    var inputCkb = $(trCur).find('input[type="checkbox"]');
+                    var check = false;
+                    if ($(thiz).is(":checked")) {
+                        check = true;
+                    }
+                    $(inputCkb).prop("checked", check);
+                }
+            }
+        }
+    }
+</script>
+<!-- Search Product -->
+<script>
+    function SearchData() {
+        debugger
+        var recordcount = commonUtils.returnValueText('#recordcount');
+        var pagecur = commonUtils.returnValueText('#page');
+        var productCode = commonUtils.returnValueText('#ShowPopupProductSearch #ProductName');
+        var token = $('#ShowPopupProductSearch #manageForm input[name=__RequestVerificationToken]').val();
+        var url = '@Url.Action("SearchProduct", "InvFInvAudit")';
+
+        var invBUPattern = "";
+        var selectKho = $('select.mstinventory').eq(0);
+        var optionSelect = $(selectKho).find('option:selected');
+        invBUPattern = optionSelect.attr("invBUPattern");
+
+
+        $.ajax({
+        type: "post",
+        data: {
+            __RequestVerificationToken: token,
+            productcode: productCode,
+            InvBUPattern: invBUPattern,
+            recordcount: recordcount,
+            page: pagecur
+        },
+        url: url,
+        dataType: 'json',
+            beforeSend: function () { }
+        }).done(function (result) {
+            if (result.Success) {
+                $('#List_Product_Data').html('');
+                $('#List_Product_Data').html(result.Html);
+                //Disabled_previous_Next();
+                //$('.numberic').number(true, 2);
+            } else {
+                if (!commonUtils.isNullOrEmpty(result.Detail)) {
+                    showErrorDialog(result.Detail);
+                }
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+
+        }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+            //alert("complete");
+        });
+        }
+</script>
+
+<script type="text/template" id="tmplRenderRowProductPopupSearchs">
+    <tr rd="==rd==" idx="==idx==" class="data-item trdata">
+        <!-- Product -->
+        <input type="hidden" class="==productcoderootCss==" value="==ProductCodeRoot==" />
+        <input type="hidden" class="==productcodebaseCss==" value="==ProductCodeBase==" />
+        <input type="hidden" class="==productcodeCss==" value="==ProductCode==" />
+        <input type="hidden" class="==productcodeuserCss==" value="==ProductCodeUser==" />
+        <input type="hidden" class="==productnameCss==" value="==ProductName==" />
+        <input type="hidden" class="==qtyeffstCss==" value="==QtyEffSt==" />
+        <input type="hidden" class="==unitcodeCss==" value="==UnitCode==" />
+        <input type="hidden" class="==qtytotalokCss==" value="==QtyTotalOK==" />
+        <input type="hidden" class="==flagloCss==" value="==FlagLo==" />
+        <input type="hidden" class="==flagcomboCss==" value="==FlagCombo==" />
+        <input type="hidden" class="==flagserialCss==" value="==FlagSerial==" />
+        <input type="hidden" class="==valconvertCss==" value="==ValConvert==" />
+        <td class="text-center cell-15">
+            <input type="checkbox" class="check checkProduct cl-check idn-checkbox" name="ckb" id="check-box-==rd==" />
+            <label for="check-box-==rd=="><span></span></label>
+        </td>
+        <td class="text-center cell-100">==ProductCodeUser==</td>
+        <td class="text-center cell-175">==ProductName==</td>
+        <td class="text-center cell-50">==UnitCode==</td>
+        <td class="text-center cell-50 QtyTotalOKPopup">==QtyTotalOK==</td>
+        <td class="text-center cell-50">==InvCode==</td>
+    </tr>
+</script>
+
+
+<script>
+    var Lst_Data_ProductPopup = [];
+    @if(Model!=null && Model.DataList.Count > 0)
+    {
+        foreach (var item in Model.DataList)
+        {
+            <text>
+                var objProduct = {
+                    ProductCode: '@item.ProductCode',
+                    ProductCodeBase: '@item.ProductCodeBase',
+                    ProductCodeRoot: '@item.ProductCodeRoot',
+                    ProductCodeUser: '@item.ProductCodeUser',
+                    ProductName: '@item.ProductName',
+                    QtyEffSt: '@item.QtyEffSt',
+                    UnitCode: '@item.UnitCode',
+                    QtyTotalOK: '@item.QtyTotalOK',
+                    FlagLo: '@item.FlagLo',
+                    FlagCombo: '@item.FlagCombo',
+                    FlagSerial: '@item.FlagSerial',
+                    ValConvert: '@item.ValConvert',
+                    InvCode: '@item.InvCode',
+                }
+                Lst_Data_ProductPopup.push(objProduct);
+            </text>
+        }
+    }
+</script>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        debugger;
+        @*Add danh sách serial vào Popup*@
+        if (Lst_Data_ProductPopup !== undefined && Lst_Data_ProductPopup !== null && Lst_Data_ProductPopup.length > 0) {
+            for (var i = 0; i < Lst_Data_ProductPopup.length; i++) {
+                renderRowProductSearchPopup(Lst_Data_ProductPopup[i]);
+            }
+
+            var tableName = 'InvFInvAudit';
+            var qtyformat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'Qty');
+            $('.QtyTotalOKPopup').number(true, qtyformat);
+        }
+
+
+    });
+</script>

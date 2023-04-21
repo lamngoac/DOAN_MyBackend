@@ -1,0 +1,389 @@
+﻿@model idn.Skycic.Inventory.Common.Models.ProductCentrer.Prd_ProductID
+@{
+    Layout = "~/Views/Shared/_LayoutQuantri.cshtml";
+    var title = "CẬP NHẬT SẢN PHẨM";
+    var titleMng = "Sản phẩm";
+    ViewBag.Title = title;
+    var lstPrdIDCustomField = ViewBag.lstPrdIDCustomField as List<Prd_PrdIDCustomField>;
+    var lst_MstSpec = ViewBag.lst_MstSpec as List<Mst_Spec>;
+    var isparent = ViewBag.IsParent;
+
+    var isshow = false;
+    var istao = false;
+    var usercode = ViewBag.UserCode == null ? "" : ViewBag.UserCode;
+    if (usercode == Model.LogLUBy.ToString())
+    {
+        istao = true;
+    }
+    if (isparent == true)
+    {
+        if (istao == true)
+        {
+            isshow = false;
+        }
+        else
+        {
+            isshow = true;
+        }
+    }
+    else
+    {
+        isshow = false;
+    }
+
+    var waOrgID = ViewBag.WaOrgID as string;
+    if (CUtils.IsNullOrEmpty(waOrgID))
+    {
+        waOrgID = "";
+    }
+    var orgID = "";
+    if (Model != null && !CUtils.IsNullOrEmpty(Model.OrgID))
+    {
+        orgID = CUtils.StrValueOrNull(Model.OrgID);
+    }
+    var disabledfix = "";
+    var disabledcheckboxfix = "";
+    if (isparent && !waOrgID.Equals(orgID))
+    {
+        disabledfix = "disabled-fix";
+        disabledcheckboxfix = "disabled-checkbox-fix";
+    }
+
+}
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+
+                    <aside class="col-xs-12 no-padding box-shadow-tk">
+                        <div class="widget-main">
+                            <div id="fuelux-wizard-container" class="no-steps-container">
+                                @using (Html.BeginForm("Update", "OS_PrdCenter_Prd_ProductID", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.ValidationSummary(true)
+                                    <div class="step-content pos-rel">
+                                        <div id="step1" class="step-pane active no-padding" data-step="1">
+                                            <div class="row" style=" margin-top: 10px; padding: 5px">
+                                                <aside class="col-xs-6">
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="OrgID" class="col-xs-12 col-sm-4 w-180 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã tổ chức")</label>
+                                                        <div class="col-xs-12 col-sm-8">
+                                                            <span class="block input-icon input-icon-right">
+                                                                <input type="text" id="OrgID" name="OrgID" class="col-xs-11 OrgID disabled-fix" value="@Model.OrgID" autocomplete="off" required />
+                                                            </span>
+                                                            <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="" class="col-xs-12 col-sm-4 w-180 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã sản phẩm")</label>
+                                                        <div class="col-xs-12 col-sm-8">
+                                                            <span class="block input-icon input-icon-right">
+                                                                <input type="text" id="ProductID" name="model.ProductID" class="col-xs-11 disabled-fix" value="@Model.ProductID" autocomplete="off" required />
+                                                            </span>
+                                                            <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                                        </div>
+                                                    </div>
+                                                    @if (isparent && !waOrgID.Equals(orgID))
+                                                    {
+                                                        <div class="form-group margin-bottom-5">
+                                                            <label for="NetworkProductIDCode" class="col-xs-12 col-sm-4 w-180 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã sản phẩm Chung ")</label>  @*<span style=\"color: red\">*</span>*@
+                                                            <div class="col-xs-12 col-sm-8">
+                                                                <span class="block input-icon input-icon-right">
+                                                                    <input type="text" id="NetworkProductIDCode" name="NetworkProductIDCode" class="col-xs-11 NetworkProductIDCode" onkeyup="locdau(this);" value="@if (Model != null && Model.NetworkProductIDCode != null){@MvcHtmlString.Create(Model.NetworkProductIDCode.ToString())} else { @("")}" autocomplete="off" />
+                                                                </span>
+                                                            </div>
+
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <input type="hidden" id="NetworkProductIDCode" name="NetworkProductIDCode" class="col-xs-11 NetworkProductIDCode" value="@if (Model != null && Model.NetworkProductIDCode != null){@MvcHtmlString.Create(Model.NetworkProductIDCode.ToString())} else { @("")}" />
+                                                    }
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="" class="col-xs-12 col-sm-4 w-180 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã Spec")</label>
+                                                        <div class="col-xs-12 col-sm-8">
+                                                            <span class="block input-icon input-icon-right">
+                                                                <select id="SpecCode" name="SpecCode" class="col-xs-11 disabled-fix" required="" onchange="SetSpecName();">
+                                                                    <option value=""></option>
+                                                                    @{
+                                                                        var specCode = "";
+                                                                        if (Model != null && !CUtils.IsNullOrEmpty(Model.SpecCode))
+                                                                        {
+                                                                            specCode = CUtils.StrValueOrNull(Model.SpecCode);
+                                                                        }
+                                                                        foreach (var it in lst_MstSpec)
+                                                                        {
+                                                                            var specCodeCur = "";
+                                                                            if (!CUtils.IsNullOrEmpty(it.SpecCode))
+                                                                            {
+                                                                                specCodeCur = CUtils.StrValueOrNull(it.SpecCode);
+                                                                            }
+                                                                            <option value="@MvcHtmlString.Create(specCodeCur)" @(specCodeCur.Equals(specCode) ? "selected" : "")>@MvcHtmlString.Create(specCodeCur)</option>
+                                                                        }
+                                                                    }
+                                                                </select>
+                                                            </span>
+                                                            <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="" class="col-xs-12 col-sm-4 w-180 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên Spec")</label>
+                                                        <div class="col-xs-12 col-sm-8">
+                                                            <span class="block input-icon input-icon-right">
+                                                                <input type="text" id="ms_SpecName" name="ms_SpecName" class="col-xs-11 disabled-fix" value="@Model.ms_SpecName" autocomplete="off" required />
+                                                            </span>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="" class="col-xs-12 col-sm-4 w-180 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Ngày sản xuất")</label>
+                                                        <div class="col-xs-12 col-sm-8">
+                                                            <span class="block input-icon input-icon-right">
+                                                                <input type="text" id="ProductionDate" name="ProductionDate" class="col-xs-11 @disabledfix date" value="@(Model.ProductionDate == null ? "" : Convert.ToDateTime(Model.ProductionDate).ToString("yyyy-MM-dd"))" autocomplete="off" required />
+                                                            </span>
+                                                            @*<label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">  *</label>*@
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="" class="col-xs-12 col-sm-4 w-180 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Số LOT")</label>
+                                                        <div class="col-xs-12 col-sm-8">
+                                                            <span class="block input-icon input-icon-right">
+                                                                <input type="text" id="LOTNo" name="LOTNo" class="col-xs-11 @disabledfix" value="@Model.LOTNo" autocomplete="off" required />
+                                                            </span>
+                                                            @*<label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>*@
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="" class="col-xs-12 col-sm-4 w-180 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Ngày mua hàng")</label>
+                                                        <div class="col-xs-12 col-sm-8">
+                                                            <span class="block input-icon input-icon-right">
+                                                                <input type="text" id="BuyDate" name="BuyDate" class="col-xs-11 @disabledfix date" value="@(Model.BuyDate == null ? "" : Convert.ToDateTime(Model.BuyDate).ToString("yyyy-MM-dd"))" autocomplete="off" required />
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="" class="col-xs-12 col-sm-4 w-180 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã số bí mật")</label>
+                                                        <div class="col-xs-12 col-sm-8">
+                                                            <span class="block input-icon input-icon-right">
+                                                                <input type="text" id="SecretNo" name="SecretNo" class="col-xs-11 @disabledfix" value="@Model.SecretNo" autocomplete="off" required />
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="" class="col-xs-12 col-sm-4 w-180 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Ngày bắt đầu BH")</label>
+                                                        <div class="col-xs-12 col-sm-8">
+                                                            <span class="block input-icon input-icon-right">
+                                                                <input type="text" id="WarrantyStartDate" name="WarrantyStartDate" class="col-xs-11 @disabledfix date" value="@(Model.WarrantyStartDate == null ? "" : Convert.ToDateTime(Model.WarrantyStartDate).ToString("yyyy-MM-dd"))" autocomplete="off" required />
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="" class="col-xs-12 col-sm-4 w-180 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Ngày hết BH")</label>
+                                                        <div class="col-xs-12 col-sm-8">
+                                                            <span class="block input-icon input-icon-right">
+                                                                <input type="text" id="WarrantyExpiredDate" name="WarrantyExpiredDate" class="col-xs-11 @disabledfix date" value="@(Model.WarrantyExpiredDate == null ? "" : Convert.ToDateTime(Model.WarrantyExpiredDate).ToString("yyyy-MM-dd"))" autocomplete="off" required />
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="" class="col-xs-12 col-sm-4 w-180 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("TG bảo hành")</label>
+                                                        <div class="col-xs-12 col-sm-8">
+                                                            <span class="block input-icon input-icon-right">
+                                                                <input type="text" id="WarrantyDuration" name="WarrantyDuration" class="col-xs-11 WarrantyDuration" value="@Model.WarrantyDuration" autocomplete="off" required />
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="" class="col-xs-12 col-sm-4 w-180 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Số tham chiếu 1")</label>
+                                                        <div class="col-xs-12 col-sm-8">
+                                                            <span class="block input-icon input-icon-right">
+                                                                <input type="text" id="RefNo1" name="RefNo1" class="col-xs-11 @disabledfix" value="@Model.RefNo1" autocomplete="off" required />
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="" class="col-xs-12 col-sm-4 w-180 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Loại tham chiếu 1")</label>
+                                                        <div class="col-xs-12 col-sm-8">
+                                                            <span class="block input-icon input-icon-right">
+                                                                <input type="text" id="RefBiz1" name="RefBiz1" class="col-xs-11 @disabledfix" value="@Model.RefBiz1" autocomplete="off" required />
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </aside>
+
+                                                <aside class="col-xs-6">
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="" class="col-xs-12 col-sm-4 w-180 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Số tham chiếu 2")</label>
+                                                        <div class="col-xs-12 col-sm-8">
+                                                            <span class="block input-icon input-icon-right">
+                                                                <input type="text" id="RefNo2" name="RefNo2" class="col-xs-11 @disabledfix" value="@Model.RefNo2" autocomplete="off" required />
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="" class="col-xs-12 col-sm-4 w-180 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Loại tham chiếu 2")</label>
+                                                        <div class="col-xs-12 col-sm-8">
+                                                            <span class="block input-icon input-icon-right">
+                                                                <input type="text" id="RefBiz2" name="RefBiz2" class="col-xs-11 @disabledfix" value="@Model.RefBiz2" autocomplete="off" required />
+                                                            </span>
+                                                            @*<label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>*@
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="" class="col-xs-12 col-sm-4 w-180 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Số tham chiếu 3")</label>
+                                                        <div class="col-xs-12 col-sm-8">
+                                                            <span class="block input-icon input-icon-right">
+                                                                <input type="text" id="RefNo3" name="RefNo3" class="col-xs-11 @disabledfix" value="@Model.RefNo3" autocomplete="off" required />
+                                                            </span>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="" class="col-xs-12 col-sm-4 w-180 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Loại tham chiếu 3")</label>
+                                                        <div class="col-xs-12 col-sm-8">
+                                                            <span class="block input-icon input-icon-right">
+                                                                <input type="text" id="RefBiz3" name="RefBiz3" class="col-xs-11 @disabledfix" value="@Model.RefBiz3" autocomplete="off" required />
+                                                            </span>
+                                                            @*<label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">  *</label>*@
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="" class="col-xs-12 col-sm-4 w-180 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Khách hàng")</label>
+                                                        <div class="col-xs-12 col-sm-8">
+                                                            <span class="block input-icon input-icon-right">
+                                                                <input type="text" id="Buyer" name="Buyer" class="col-xs-11 @disabledfix" value="@Model.Buyer" autocomplete="off" required />
+                                                            </span>
+                                                            @*<label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>*@
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="" class="col-xs-12 col-sm-4 w-180 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Trạng thái")</label>
+                                                        <div class="col-xs-12 col-sm-8">
+                                                            <span class="block input-icon input-icon-right">
+                                                                <select id="ProductIDStatus" name="ProductIDStatus" class="col-xs-11 @disabledfix" required="">
+                                                                    <option value="OK" @(Model.ProductIDStatus.ToString() == "OK" ? "selected" : "")>OK</option>
+                                                                    <option value="NG" @(Model.ProductIDStatus.ToString() == "NG" ? "selected" : "")>NG</option>
+                                                                    <option value="REPAIRING" @(Model.ProductIDStatus.ToString() == "REPAIRING" ? "selected" : "")>REPAIRING</option>
+                                                                    <option value="CHECKING" @(Model.ProductIDStatus.ToString() == "CHECKING" ? "selected" : "")>CHECKING</option>
+                                                                </select>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    @{
+                                                        foreach (var it in lstPrdIDCustomField)
+                                                        {
+                                                            <div class="form-group margin-bottom-5">
+                                                                <label for="" class="col-xs-12 col-sm-4 w-180 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create(it.PrdCustomFieldName.ToString())</label>
+                                                                <div class="col-xs-12 col-sm-8">
+                                                                    <span class="block input-icon input-icon-right">
+                                                                        @{
+                                                                            var value = "";
+                                                                            if (it.PrdCustomFieldCode.ToString() == "CUSTOMFIELD1")
+                                                                            {
+                                                                                value = Model.CustomField1.ToString();
+                                                                            }
+                                                                            else if (it.PrdCustomFieldCode.ToString() == "CUSTOMFIELD2")
+                                                                            {
+                                                                                value = Model.CustomField2.ToString();
+                                                                            }
+                                                                            else if (it.PrdCustomFieldCode.ToString() == "CUSTOMFIELD3")
+                                                                            {
+                                                                                value = Model.CustomField3.ToString();
+                                                                            }
+                                                                            else if (it.PrdCustomFieldCode.ToString() == "CUSTOMFIELD4")
+                                                                            {
+                                                                                value = Model.CustomField4.ToString();
+                                                                            }
+                                                                            else if (it.PrdCustomFieldCode.ToString() == "CUSTOMFIELD5")
+                                                                            {
+                                                                                value = Model.CustomField5.ToString();
+                                                                            }
+                                                                        }
+                                                                        <input type="text" id="@it.PrdCustomFieldCode" name="@it.PrdCustomFieldCode" class="col-xs-11 @disabledcheckboxfix customfield" value="@value" autocomplete="off" required />
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    }
+
+                                                </aside>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                    </aside>
+
+                    <div id="btnShow" class="col-xs-12 no-padding">
+                        <div class="clearfix">
+                            <div class="row no-margin" style="float: right">
+                                @RenderItemFormat("BTN_SUA_SANPHAM_LUU", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px;\" onclick=\"SaveData();\">Lưu</a>", "", "")
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.date').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: 'yyyy-mm-dd'
+        })
+            //show datepicker when clicking on the icon
+            .next().on(ace.click_event, function () {
+                $(this).prev().focus();
+            });
+    });
+</script>
+
+@*Active Menu*@
+<script type="text/javascript">
+    setAdminCurrentUrl('@Url.Action("Index", "OS_PrdCenter_Prd_ProductID")');
+</script>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/OS_PrdCenter_Prd_ProductID.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "OS_PrdCenter_Prd_ProductID")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+        });
+        @* Set focus *@
+        $(document).ready(function () {
+            $('#ProductID').focus();
+        });
+        function SaveData() {
+            //debugger;
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Update", "OS_PrdCenter_Prd_ProductID")';
+
+            var objOS_PrdCenter_Prd_ProductID = new OS_PrdCenter_Prd_ProductID();
+            objOS_PrdCenter_Prd_ProductID.ActionType = 'edit';
+            objOS_PrdCenter_Prd_ProductID.ajaxSettings = ajaxSettings;
+            objOS_PrdCenter_Prd_ProductID.saveData();
+        }
+    </script>
+}

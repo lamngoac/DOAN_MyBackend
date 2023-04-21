@@ -1,0 +1,361 @@
+﻿@model List<Inv_InventoryBalanceLot>
+@{
+    var List_Mst_InventoryIn = ViewBag.List_Mst_InventoryIn as List<Mst_Inventory>;
+    var ProductCode = ViewBag.ProductCode;
+    var ProductName = ViewBag.ProductName;
+    var viewtype = ViewBag.viewtype;
+}
+<!--Model Add-->
+<div class="modal-dialog" style="width: 1000px; max-width: 1000px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title"><b>Danh sách Lô</b></h2>
+            <a href="javascript:;" onclick="ClosePopupLo()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body" style="">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupLot" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="col-12 no-padding">
+                    <div class="form-group margin-bottom-5">
+                        <div class="col-xs-12 col-sm-4 no-padding-left">
+                            <span class="block input-icon input-icon-right">
+                                <select class="select2-selection" name="InventoryBalanceLot" id="InventoryBalanceLot" onchange="addLotToTable(this)">
+                                    <option value="">-- Chọn lô điều chuyển --</option>
+                                    @{
+                                        if (Model != null && Model.Count > 0)
+                                        {
+                                            foreach (var inv in Model)
+                                            {
+                                                <option value="@inv.ProductLotNo"
+                                                        InvCode="@inv.InvCode"
+                                                        ProductionDate="@inv.ProductionDate"
+                                                        ExpiredDate="@inv.ExpiredDate"
+                                                        Qty="@inv.QtyTotalOK">
+                                                    @inv.InvCode : @inv.ProductLotNo
+                                                </option>
+                                            }
+                                        }
+                                    }
+                                </select>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 no-padding layout-bot-top-16">
+                    <div class="scrollable-horizontal padding-left-0 padding-right-0" style="padding-top: 0!important;">
+                        <div style="width: 100%; float: left;">
+                            <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                                <thead>
+                                    <tr class="trthead">
+                                        <th fieldId="CONTROL" fieldName="CONTROL" fieldActive="0" class="text-center cell-30">
+                                        </th>
+                                        <th class="text-center cell-100">@("Số lô".HtmlItemString("inventory"))</th>
+                                        <th class="text-center cell-75">@("Ngày sản xuất".HtmlItemString("inventory"))</th>
+                                        <th class="text-center cell-75">@("Ngày hết hạn".HtmlItemString("inventory"))</th>
+                                        <th class="text-center cell-75">@("Số lượng tồn".HtmlItemString("inventory"))</th>
+                                        <th class="text-center cell-75">@("Vị trí tồn".HtmlItemString("inventory"))</th>
+                                        <th class="text-center cell-75">@("SL điều chuyển".HtmlItemString("inventory"))</th>
+                                        <th class="text-center cell-100">@("Vị trí nhập".HtmlItemString("inventory"))</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                            <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                                <tbody id="Lst_InvF_MoveOrdInstLot" lot-productcode="@ProductCode"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="modal-footer">
+            <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="saveInvBalanceLot()" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Chọn</a>
+        </div>
+    </div>
+</div>
+<!-- Init Data on Popup -->
+<script>
+    $(document).ready(function () {
+        $('#InventoryBalanceLot').select2();
+        let listBalaceLot = JSON.parse('@Html.Raw(Json.Encode(Model))');
+        let productCode = '@ProductCode';
+
+        if (lst_InvF_MoveOrdInstLot != undefined && lst_InvF_MoveOrdInstLot.length > 0) {
+            let productListLotCur = lst_InvF_MoveOrdInstLot
+                .filter(function (el) { return el.ProductCode == productCode });
+            if (productListLotCur.length > 0) {
+                for (const productLot of productListLotCur) {
+                    for (const lot of productLot.LstMoveOrd_Lot) {
+                        let instanceLot = {
+                            ProductLotNo:lot.ProductLotNo,
+                            InvCodeIn: lot.InvCodeIn
+                        };
+                        var lotInfo = listBalaceLot
+                            .filter(function (el) { return el.ProductLotNo == lot.ProductLotNo });
+                        if (lotInfo != undefined && lotInfo.length > 0) {
+                            instanceLot.ExpiredDate = commonUtils.returnValue(lotInfo[0].ExpiredDate);
+                            instanceLot.ProductionDate = commonUtils.returnValue(lotInfo[0].ProductionDate);
+                            instanceLot.InvCodeOut = commonUtils.returnValue(lotInfo[0].InvCode);
+                            instanceLot.QtyMove = commonUtils.returnValue(lot.Qty);
+                            instanceLot.Qty = commonUtils.returnValue(lotInfo[0].QtyTotalOK);
+                            renderLot(instanceLot);
+                        }
+                    }
+                }
+            }
+
+            var tableName = 'InvF_MoveOrd';
+            var qtyformat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'Qty');
+            $(".qty-lot").number(true, qtyformat);
+        }
+    })
+
+    function DeleteLotRow(thiz) {
+        var productCode = '@ProductCode';
+        var tr = $(thiz).parents('tr');
+        if (tr != undefined) {
+            tr.remove();
+            // Remove from current UI
+        }
+    }
+</script>
+<!-- Add Lot -->
+<script>
+    // Global scope variable with var
+    var listInventoryIn = JSON.parse('@Html.Raw(Json.Encode(List_Mst_InventoryIn))');
+    function addLotToTable(thiz) {
+        // Data
+        var selected = $(thiz).find('option:selected');
+        var ProductLotNo = $(selected).val();
+        var InvCodeOut = $(selected).attr('InvCode');
+        var ProductionDate = $(selected).attr('ProductionDate');
+        var ExpiredDate = $(selected).attr('ExpiredDate');
+        var Qty = $(selected).attr('Qty');
+
+        // Click vào chọn
+        if (ProductLotNo.length == 0) {
+            return false;
+        }
+
+        // Check list hiện tại trên table body
+        var listLotCur = $('#Lst_InvF_MoveOrdInstLot').find('tr.trdata');
+        if (listLotCur != undefined && listLotCur.length > 0) {
+            for (let lot of listLotCur) {
+                var lotNoCur = $(lot)
+                    .find('input[type="hidden"][name="ProductLotNo"]').val();
+                var invCodeOutCur = $(lot)
+                    .find('input[type="hidden"][name="InvCodeOut"]').val();
+                if (lotNoCur == ProductLotNo && invCodeOutCur == InvCodeOut) {
+                    return false;
+                }
+            }
+        }
+        var rowInfo = new InvF_MoveOrdInstLot(); //
+        rowInfo.ProductLotNo = ProductLotNo;
+        rowInfo.InvCodeIn = '';
+        rowInfo.InvCodeOut = InvCodeOut;
+        rowInfo.ProductionDate = ProductionDate;
+        rowInfo.ExpiredDate = ExpiredDate;
+        rowInfo.Qty = Qty;
+        rowInfo.QtyMove = '';
+        renderLot(rowInfo);
+    }
+
+    function renderLot({
+        ProductLotNo = '',
+        ProductionDate = '',
+        InvCodeIn = '',
+        InvCodeOut = '',
+        ExpiredDate = '',
+        Qty = '',
+        QtyMove = '0'
+    }) {
+        // Disable ở màn hình chi tiết
+        let disabled = '';
+        if (flagIsCreate != undefined && flagIsCreate === "0"){
+            disabled = flagIsCreate ? 'disabled-fix' : '';
+        }
+        //disable input ở chi tiết
+        let viewtype = '@viewtype';
+        let disableFix = '';
+        let idnHidden = '';
+        if (viewtype === 'viewdetail') {
+            disableFix = 'disabled-fix';
+            idnHidden = 'idn-hidden';
+        }
+        var objRowData = {
+            productlotno: ProductLotNo,
+            productiondate: ProductionDate,
+            invcodeout: InvCodeOut,
+            expiredate: ExpiredDate,
+            qty: Qty,
+            qtymove: QtyMove,
+            disabled: disabled,
+            disableFix: disableFix,
+            idnHidden: idnHidden,
+        };
+        var $itemRow = $(commonUtils.getHtmlFromTemplate($('#templateRowLot'), objRowData));
+        var $invCodeSelect = $itemRow.find('select[name="InvCodeIn"]');
+
+        
+        // Render list vị trí nhập
+        for (let item of listInventoryIn) {
+            if (item['InvCode'] == InvCodeOut) {
+                continue;
+            }
+            let selected = '';
+            if (!commonUtils.isNullOrEmpty(InvCodeIn)) {
+                selected = InvCodeIn == item['InvCode'] ? 'selected' : '';
+            }
+            var $optionSelect = $(commonUtils.getHtmlFromTemplate($("#templateOptionInvCodeInLot"), {
+                invcode: item['InvCode'],
+            }));
+            if (selected === "selected") {
+                $optionSelect.attr("selected", selected);
+            }
+            $invCodeSelect.append($optionSelect);
+        }
+        $('#Lst_InvF_MoveOrdInstLot').append($itemRow);
+        let $select2 = $('#Lst_InvF_MoveOrdInstLot tr.trdata[ProductLotNo="' + ProductLotNo + '"] select[name="InvCodeIn"]');
+
+        var tableName = 'InvF_MoveOrd';
+        var qtyformat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'Qty');
+        var qtymoveformat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'QtyMove');
+        $(".qty-lot").number(true, qtyformat);
+        $(".moveqty").number(true, qtyformat);
+
+        $($select2).select2();
+    }
+</script>
+<!-- Save and show on UI -->
+<script>
+    function saveInvBalanceLot() {
+        // Check if exist rows in Lot table
+        var listLotChoosen = $('#Lst_InvF_MoveOrdInstLot').find('tr.trdata');
+        var productCodeCur = $('#Lst_InvF_MoveOrdInstLot').attr('lot-productcode');
+        if (listLotChoosen == undefined || listLotChoosen.length == 0) {
+            ClosePopupLo();
+            return false;
+        }
+
+        // Reset list lot điều chuyển
+        for (let listLot of lst_InvF_MoveOrdInstLot) {
+            lst_InvF_MoveOrdDtl = lst_InvF_MoveOrdDtl
+                .filter(function (el) { return el.ProductCode != listLot['ProductCode'] });
+            if (listLot['ProductCode'] == productCodeCur) {
+                listLot.LstMoveOrd_Lot = [];
+                listLot.LstMoveOrd_LotDistinc = [];
+            }
+        }
+
+        // Show on UI
+        let QtySum = 0;
+        let LstInvCodeIn = [];
+        let LstInvCodeOut = [];
+
+        var ListMoveOrd_Lot = [];
+        var ListMoveOrd_LotDistinc = [];
+        for (let lotRow of listLotChoosen) {
+            // SL điều chuyển
+            let listToastr = [];
+            let qtyMove = $(lotRow).find('input[name="MoveQty"]').val();
+            let qtyTotalOK = $(lotRow).find('input[name="Qty"]').val();
+            debugger;
+            if (commonUtils.isNullOrEmpty(qtyMove) || qtyMove <= 0) {
+                let objToastr = {
+                    ToastrType: 'error',
+                    ToastrMessage: 'SL điều chuyển phải lớn hơn 0!'
+                };
+                listToastr.push(objToastr);
+                commonUtils.showToastr(listToastr);
+                $(lotRow).find('input[name="MoveQty"]').focus();
+                return false;
+            }
+            if (Number(qtyMove) > Number(qtyTotalOK)) {
+                let objToastr = {
+                    ToastrType: 'error',
+                    ToastrMessage: 'SL điều chuyển phải nhỏ hơn tồn kho hiện tại!'
+                };
+                listToastr.push(objToastr);
+                commonUtils.showToastr(listToastr);
+                $(lotRow).find('input[name="MoveQty"]').focus();
+                return false;
+            }
+            QtySum += Number(qtyMove);
+            let productLotNoCur = $(lotRow).find('input[type="hidden"][name="ProductLotNo"]').val();
+            // DS vị trí xuất
+            let InvCodeOutCur = $(lotRow).find('input[type="hidden"][name="InvCodeOut"]').val();
+
+            if (!LstInvCodeOut.includes(InvCodeOutCur)) {
+                LstInvCodeOut.push(InvCodeOutCur);
+            }
+            let InvCodeInCur = $(lotRow).find('select[name="InvCodeIn"]').val();
+            if (InvCodeInCur == undefined || InvCodeInCur.length == 0) {
+                let objToastr = {
+                    ToastrType: 'error',
+                    ToastrMessage: 'Chưa chọn vị trí nhập kho!'
+                };
+                listToastr.push(objToastr);
+                commonUtils.showToastr(listToastr);
+                $(lotRow).find('select[name="InvCodeIn"]').focus();
+                return false;
+            }
+            //
+            if (!LstInvCodeIn.includes(InvCodeInCur)) {
+                LstInvCodeIn.push(InvCodeInCur);
+            }
+
+            let obj_InvF_MoveOrdInstLot = new InvF_MoveOrdInstLot();
+            obj_InvF_MoveOrdInstLot.InvCodeOut = InvCodeOutCur;
+            obj_InvF_MoveOrdInstLot.InvCodeIn = InvCodeInCur;
+            obj_InvF_MoveOrdInstLot.Qty = qtyMove;
+            obj_InvF_MoveOrdInstLot.ProductCode = productCodeCur;
+            obj_InvF_MoveOrdInstLot.ProductLotNo = productLotNoCur;
+            ListMoveOrd_Lot.push(obj_InvF_MoveOrdInstLot);
+
+            var existLot = ListMoveOrd_LotDistinc.filter(function (el) {
+                return el.ProductCode == productCodeCur
+                    && el.InvCodeOut == InvCodeOutCur
+                    && el.InvCodeIn == InvCodeInCur
+            });
+            if (existLot != undefined && existLot.length > 0) {
+                continue;
+            }
+            let obj_InvF_MoveOrdInstLotDistinc = new InvF_MoveOrdInstLot();
+            obj_InvF_MoveOrdInstLotDistinc.InvCodeOut = InvCodeOutCur;
+            obj_InvF_MoveOrdInstLotDistinc.InvCodeIn = InvCodeInCur;
+            obj_InvF_MoveOrdInstLotDistinc.Qty = "";
+            obj_InvF_MoveOrdInstLotDistinc.ProductCode = productCodeCur;
+            obj_InvF_MoveOrdInstLotDistinc.ProductLotNo = productLotNoCur;
+            ListMoveOrd_LotDistinc.push(obj_InvF_MoveOrdInstLotDistinc);
+        }
+        //
+        for (let listLot of lst_InvF_MoveOrdInstLot) {
+            if (listLot['ProductCode'] == productCodeCur) {
+                listLot.LstMoveOrd_Lot = [...listLot.LstMoveOrd_Lot, ...ListMoveOrd_Lot];
+                listLot.LstMoveOrd_LotDistinc = [...listLot.LstMoveOrd_LotDistinc, ...ListMoveOrd_LotDistinc];
+            }
+        }
+
+        // Thêm vào danh sách hàng hoá ở màn hình chính
+        var $thisPrdTrOnMainTable = $('#Lst_InvF_MoveOrdProduct')
+            .find('tr.trdata[ProductCode="' + productCodeCur + '"]');
+        // SL điều chuyển
+        $thisPrdTrOnMainTable
+            .find('input[name="Qty"]').val(QtySum).attr('readonly', true);
+        // Vị trí xuất
+        let inputInvOut = '';
+        var strLstInvCodeOut = LstInvCodeOut.join(',');
+        inputInvOut += `<input readonly="readonly" class="col-md-11" name="InvCodeOut" value="${strLstInvCodeOut}">`
+        $thisPrdTrOnMainTable.find('td[name="ListInvCodeOut"]').html(inputInvOut);
+        // Vị trí nhập
+        let inputInvIn = '';
+        var strLstInvCodeIn = LstInvCodeIn.join(',');
+        inputInvIn += `<input readonly="readonly" class="col-md-11" name="InvCodeIn" value="${strLstInvCodeIn}">`
+        $thisPrdTrOnMainTable.find('td[name="ListInvCodeIn"]').html(inputInvIn);
+
+        ClosePopupLo();
+    }
+</script>

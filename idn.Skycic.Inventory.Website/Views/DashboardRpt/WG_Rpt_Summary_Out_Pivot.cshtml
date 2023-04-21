@@ -1,0 +1,153 @@
+﻿@model List<Rpt_Summary_In_Out_Pivot>
+@{
+    ViewBag.Title = "Báo cáo xuất kho tháng";
+    Layout = "~/Views/Shared/_LayoutHome.cshtml";
+    var Lst_Mst_Inventory = new List<Mst_Inventory>();
+    if (ViewBag.List_Mst_InventoryInOut != null)
+    {
+        Lst_Mst_Inventory = ViewBag.List_Mst_InventoryInOut as List<Mst_Inventory>;
+    }
+    var networkId = ViewBag.NetworkID ?? "";
+}
+<style>
+    @@media screen and (max-width: 480px) {
+        #PopupMstInventory {
+            padding-left: 0 !important;
+        }
+    }
+</style>
+<div class="col-12 row no-margin layout-bot-top-16 report-title">
+    <h3 class="title no-padding">Báo cáo xuất kho theo tháng</h3>
+    <i class="fas fa-bars" onclick="ShowModalMstInventory();" style="font-size: 18px; margin-left: 10px; cursor: pointer;color: #ccc;"></i>
+</div>
+
+<div class="panel-body no-padding" id="panel-body">
+    <aside class="col-12 layout-table">
+        @Html.AntiForgeryToken()
+        <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+            <div style="width: 100%; float: left;">
+                <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                    <thead>
+                        <tr class="trthead">
+                            <th fieldName="Mã sản phẩm" class="text-center cell-100">
+                                @("Mã sản phẩm".HtmlItemString(""))
+                            </th>
+                            @*<th fieldName="Tên sản phẩm" fieldActive="0" class="text-center cell-150">
+                                    @("Tên sản phẩm".HtmlItemString(""))
+                                </th>*@
+                            <th fieldName="Đơn vị" fieldActive="0" class="text-center cell-50">
+                                @("Đơn vị".HtmlItemString(""))
+                            </th>
+                            <th fieldName="Số lượng" fieldActive="0" class="text-center cell-50">
+                                @("Số lượng".HtmlItemString(""))
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div id="scrollable_1" class="scrollable">
+                <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                    <tbody id="table-tbodyID_BindData_WG_Rpt_Summary_In_Pivot">
+                        @Html.Partial("BindData_WG_Rpt_Summary_In_Pivot", Model)
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </aside>
+</div>
+
+@*modal*@
+<div class="modal fade" id="PopupMstInventory" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="exampleModalLabel">Chọn kho</h3>
+                <a href="javascript:;" onclick="ClosePopupMstInventory()" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </a>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "manageCreate" }))
+                {
+                    @Html.AntiForgeryToken()
+                    if (Lst_Mst_Inventory != null)
+                    {
+                        foreach (var it in Lst_Mst_Inventory)
+                        {
+                            <div class="row no-margin chk">
+                                <input type="checkbox" class="idn-checkbox cb_invcode" name="@it.InvCode" id="@it.InvCode" InvCode="@it.InvCode" />
+                                <label for="@it.InvCode"><span></span>@it.InvName</label>
+                            </div>
+                        }
+                    }
+                }
+
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn btn-nc-button" onclick="SearchData()" id="btnCreate" style="padding-left: 10px!important; padding-right: 10px!important; font-size: 16px; font-weight: 500;">Chọn</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function ClosePopupMstInventory() {
+    $('#PopupMstInventory').modal('hide');
+};
+function ShowModalMstInventory() {
+    $('#PopupMstInventory').modal('show');
+}
+
+function SearchData() {
+    var len = $('.cb_invcode:checked').length;
+    if (len == "") {
+        alert("Không có kho nào được chọn.");
+        return;
+    }
+    var lstInvCode = [];
+    $('.cb_invcode:checked').each(function () {
+        var invCode = $(this).attr("invcode");
+        lstInvCode.push(invCode);
+    })
+
+    $.ajax({
+    url: '@Url.Action("WG_Rpt_Summary_Out_Pivot", "DashboardRpt")',
+        data: {
+            lstinvcode: JSON.stringify(lstInvCode),
+            init: 'search',
+            networkid: '@networkId'
+    },
+    type: 'post',
+    dataType: 'json',
+    traditional: true,
+        success: function (data) {
+            if (data.Success) {
+                $('#table-tbodyID_BindData_WG_Rpt_Summary_In_Pivot').html(data.Html);
+            ClosePopupMstInventory();
+        } else {
+            showErrorDialog(data.Detail);
+        }
+    }
+});
+}
+</script>
+
+<script type="text/javascript">
+    function updateWindowSize()
+    {
+        var json = JSON.stringify({
+            act: 'resize',
+            //detail: { clientId: '@Request["clientId"]', height: $(document).height() }
+            detail: { clientId: '@Request["clientId"]', height: 250 }
+        });
+        window.parent.postMessage(json, '*');
+    }
+    $(document).ready(function () {
+        updateWindowSize();
+    });
+    $(window).resize(function () {
+
+
+        updateWindowSize();
+    });
+</script>

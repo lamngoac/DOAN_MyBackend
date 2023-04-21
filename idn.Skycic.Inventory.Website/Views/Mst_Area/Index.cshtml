@@ -1,0 +1,413 @@
+﻿@model PageInfo<Mst_Area>
+@{
+    ViewBag.Title = "Quản lý vùng thị trường";
+
+    var startCount = 0;
+    var strStartCount = ViewBag.StartCount as string;
+    var recordCount = CUtils.StrValue(ViewBag.RecordCount);
+    if (!CUtils.IsNullOrEmpty(strStartCount))
+    {
+        startCount = Convert.ToInt32(strStartCount);
+    }
+    var init = CUtils.StrValue(ViewBag.init);
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+    var pageCount = CUtils.StrValue(ViewBag.PageCount);
+    var totalPage = "0";
+    if (Model != null)
+    {
+        totalPage = CUtils.StrValue(Model.PageCount);
+    }
+
+    var showtext = "";
+    if (Model.ItemCount > 0)
+    {
+        var recordstart = (Model.PageIndex) * Model.PageSize + 1;
+        var recordend = (Model.PageIndex + 1) * Model.PageSize;
+        if (recordend > Model.ItemCount)
+        {
+            recordend = Model.ItemCount;
+        }
+        showtext = recordstart + "-" + recordend + " trong số " + Model.ItemCount;
+    }
+
+    var userType = "";
+    var userState = ViewBag.UserState as UserState;
+    if (userState != null)
+    {
+        userType = CUtils.StrValue(userState.UserType);
+    }
+
+    var viewid = string.Format("{0}_{1}_{2}_{3}", CUtils.StrValue(userState.SysUser.UserCode), CUtils.StrValue(ViewBag.SolutionCodeSignature), CUtils.StrValue(userState.Mst_NNT.OrgID), "Mst_Area_Mng");
+    var htmlStr = "mstorg";
+}
+
+
+<div>
+    <div class="row no-margin">
+        <aside class="col-12">
+            @using (Html.BeginForm(null, null, FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+            {
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="viewid" name="viewid" value="@MvcHtmlString.Create(viewid)" />
+                <div class="layout-bot-top-16">
+                    <div class="row">
+                        <div class="col-6">
+                            @RenderItemFormat("BTN_QL_VUNG_THI_TRUONG_TAO", "<a class=\"btn btn-nc-button\" href=\'" + @Url.Action("Create", "Mst_Area") + "\' style=\"font-size: 13px;\" title=\"Tạo mới\"><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i> " + ("Tạo mới".HtmlItemString(htmlStr)) + "</a>", "", "")
+                            @RenderItemFormat("BTN_QL_VUNG_THI_TRUONG_EXCEL", "<a class=\"btn btn-nc-button\" onclick=\"Export()\" href=\"javascript:void(0);\" style=\"\"><i class=\"fas fa-download\" aria-hidden=\"true\" style=\"\"></i> " + ("Xuất Excel".HtmlItemString(htmlStr)) + "</a>", "", "")
+
+                        </div>
+                        <div class="col-6">
+                            @if (CheckAccess("BTN_QL_VUNG_THI_TRUONG_TK"))
+                            {
+                                @Html.Partial("Pagination", null, new ViewDataDictionary() { { "PageCur", MvcHtmlString.Create(pageCur) }, { "RecordCount", MvcHtmlString.Create(Model.PageSize.ToString()) }, { "ShowText", showtext }, { "groupname", Request["groupname"] } })
+                            }
+                            <input type="hidden" value="@MvcHtmlString.Create(pageCur)" name="page" id="page" />
+                            <input type="hidden" id="totalpage" value="@Model.PageCount" />
+                        </div>
+                    </div>
+                </div>
+            }
+        </aside>
+
+        <div class="col-12 panel-body" id="panel-body">
+            <aside class="col-12 layout-table no-padding">
+                @Html.AntiForgeryToken()
+                <div class="scrollable-horizontal padding-left-0 padding-right-0" style="padding-top: 0!important;">
+                    <div style="width: 100%; float: left;">
+                        <table id="dynamic-table-thead" idn-datatable-id="dynamic-table-thead-tbody" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                            <thead>
+                                <tr class="trthead" filterroot="" bfilter="0">
+                                    @*<th fieldId="CONTROL" fieldName="CONTROL" fieldActive="0" class="cell-100">&nbsp;</th>*@
+                                    <th fieldId="CONTROL" fieldName="CONTROL" fieldActive="0" class="cell-100">&nbsp;</th>
+                                    <th fieldId="AREACODE" fieldName="Mã khu vực" fieldActive="0" class="cell-120">
+                                        @("Mã khu vực".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="AREANAME" fieldName="Tên khu vực" fieldActive="0" class="cell-200">
+                                        @("Tên khu vực".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="DESC" fieldName="Mô tả" fieldActive="0" class="cell-120">
+                                        @("Mô tả".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="AREAPARRENTCODE" fieldName="Mã khu vực cha" fieldActive="0" class="cell-150">
+                                        @("Mã khu vực cha".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="FLAGACTIVE" fieldName="Trạng thái" fieldActive="0" class="cell-120">
+                                        @("Trạng thái".HtmlItemString("product"))
+                                    </th>
+
+
+                                </tr>
+                            </thead>
+                        </table>
+
+                    </div>
+                    <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                        <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                            <tbody id="table-tbodyID">
+                                @if (Model != null && Model.DataList != null && Model.DataList.Count > 0)
+                                {
+                                    var idx = 0;
+                                    foreach (var item in Model.DataList)
+                                    {
+                                        <tr idx="@idx" class="data-item trdata">
+                                            <td fieldId="CONTROL" fieldActive="0" class="text-center cell-100">
+                                                <div class="action-buttons padding-top-2">
+                                                    @{
+                                                        var urlDetail = Url.Action("Detail", "Mst_Area", new { areaCode = item.AreaCode });
+                                                        var urlUpdate = Url.Action("Update", "Mst_Area", new { areaCode = item.AreaCode });
+
+                                                    }
+
+                                                    @RenderItemFormat("BTN_QL_VUNG_THI_TRUONG_CHI_TIET", "<a class=\"icon-detail\" href=\'" + urlDetail + "\' title=\"Chi tiết\"><i class=\"fas fa-eye\"></i></a>", "", "")
+                                                    @RenderItemFormat("BTN_QL_VUNG_THI_TRUONG_SUA", "<a class=\"icon-edit\" href=\'" + urlUpdate + "\' title=\"Sửa\"><i class=\"fas fa-pencil-alt\"></i></a>", "", "")
+                                                    @RenderItemFormat("BTN_QL_VUNG_THI_TRUONG_XOA", "<a href=\"javascript:;\" class=\"icon-delete\" title=\"Xóa\" onclick=\"Delete('" + item.AreaCode + "','" + item.AreaName + "')\"><i class=\"fas fa-trash-alt\"></i></a>", "", "")
+                                                    @*@RenderItemFormat("BTN_QL_VUNG_THI_TRUONG_XOA", "<a href=\"javascript:;\" class=\"icon-delete\" title=\"Xóa\" onclick=\"Delete()\"><i class=\"fas fa-trash-alt\"></i></a>", "", "")*@
+                                                </div>
+                                            </td>
+                                            <td fieldId="AREACODE" fieldActive="0" class="cell-120">
+                                                @MvcHtmlString.Create(CUtils.StrValue(item.AreaCode))
+                                            </td>
+                                            <td fieldId="AREANAME" fieldActive="0" class="cell-200">
+                                                @MvcHtmlString.Create(CUtils.StrValue(item.AreaName))
+                                            </td>
+                                            <td fieldId="DESC" fieldActive="0" class="cell-120">
+                                                @MvcHtmlString.Create(CUtils.StrValue(item.AreaDesc))
+                                            </td>
+                                            <td fieldId="AREAPARRENTCODE" fieldActive="0" class="cell-150">
+                                                @MvcHtmlString.Create(CUtils.StrValue(item.AreaCodeParent))
+                                            </td>
+                                            <td fieldId="FLAGACTIVE" fieldActive="0" class="cell-120 text-center">
+                                                @*@MvcHtmlString.Create(CUtils.StrValue(item.FlagActive))*@
+
+                                                @if (item.FlagActive.Equals("1"))
+                                                {
+                                                    <div class="status approve">Active</div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="status cancel">Inactive</div>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+
+    </div>
+</div>
+
+
+
+
+
+@section Scripts{
+
+    <script>
+         setAdminCurrentUrl('@Url.Action("Index", "Mst_Area")');
+        $(document).ready(function () {
+            //tablesort();
+        });
+        $(document).on('keypress', function (e) {
+            if (e.which == 13) {
+                SearchData();
+            }
+        });
+
+          function SearchData()
+          {
+              debugger
+            $('#manageForm').attr('action', '@Url.Action("Index", "Mst_Area")').submit();
+        }
+    </script>
+
+
+    <script type="text/javascript">
+        var objCommonExcel = new CommonExcel();
+        var objVariablesInit = {
+            Id_FormMain: '',
+            Id_FormImportExcel: 'manageFormImportExcel',
+            Id_Modal: 'ImportExcelModal',
+            Id_FileInput: 'file',
+        };
+
+        var ajaxSettings_Excel = {};
+        ajaxSettings_Excel.Type = 'post';
+        ajaxSettings_Excel.DataType = 'json';
+
+         function Export()
+    {
+        ajaxSettings_Excel.Url = '@Url.Action("Export", "Mst_Area")';
+        var token = $('input[name=__RequestVerificationToken]').val();
+        var url = '@Url.Action("Export", "Mst_Organization")';
+        //var groupcode = commonUtils.returnValueText('#GroupCode');
+        //var listParams = [
+        //    { "Key": 'groupcode', "Value": groupcode }
+        //];
+        objCommonExcel.ajaxSettingsInit();
+        objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+        objCommonExcel.exportExcel();
+    }
+    </script>
+
+
+    <script>
+        var initDefault = function () {
+            $('#dynamic-table-thead').idnTable({
+                searchTextbox: '#dynamic-table-thead-search', columnToggleButton: '#togglecolumn',
+                cookieId: '#viewid',
+            });
+        };
+        var initCustom = function () {
+            var tb = $('#dynamic-table-thead').idnTable();
+
+            $('#dynamic-table-thead-search').keyup(function () {
+                var kw = $(this).val();
+                tb.search(kw);
+            });
+
+            //tb.showColumns(['STT'], false);
+            //tb.reload();
+            var colList = tb.getAllColumns();
+            $('#togglecolumn').html('');
+
+            for (var i = 0; i < colList.length; ++i) {
+
+                var col = colList[i];
+                var fieldid = col.id;
+                var title = col.name;
+
+                if (title !== undefined && title !== null && title.toString().trim().length > 0) {
+                    title = title.toString().trim();
+                } else {
+                    title = '';
+                }
+
+                var fieldactive = col.show;
+
+                //B2: Sinh popup tùy chỉnh các cột trong bảng #dynamic-table-thead
+                var $input = $('<input>');
+                $input.attr('type', 'checkbox');
+                $input.attr('name', fieldid);
+
+                if (fieldactive === true) { //Nếu trạng thái bằng 0 cho hiện cột và checked ô input tương ứng
+                    $input.attr('checked', 'checked');
+
+                }
+
+                var $spaninput = $('<span>');
+                $spaninput.append($input);
+                $spaninput.css('margin-right', '10px');
+
+                var $spantext = $('<span>');
+                $spantext.text(title);
+
+                var $li = $('<li>');
+                $li.css('line-height', '19px');
+                $li.css('margin-bottom', '18px');
+                $li.append($spaninput);
+                $li.append($spantext);
+
+                $('#togglecolumn').append($li);
+
+                $input.click(function () {
+                    if ($(this).is(':checked')) {
+                        tb.showColumns([$(this).attr('name')], false);
+                    }
+                    else {
+                        tb.hideColumns([$(this).attr('name')], false);
+                    }
+                });
+            }
+        };
+        $(document).ready(function () {
+            initDefault();
+            //initCustom();
+        });
+        $(document).ready(function () {
+            (function ($) {
+                var body = $('body');
+                body.on('keyup', '#dynamic-table-thead-search', function () {
+                    var datafilter = $(this).val();
+                    if (datafilter !== undefined && datafilter !== null && datafilter.toString().trim()) {
+                        datafilter = datafilter.toUpperCase().trim();
+                    }
+                    var rex = new RegExp($(this).val(), 'i');
+                    $('#table-tbodyID tr').hide();
+                    $('#table-tbodyID tr').filter(function () {
+                        //debugger
+                        var dataOfRow = $(this).text();
+                        if (dataOfRow !== undefined && dataOfRow !== null && dataOfRow.toString().trim().length > 0) {
+                            dataOfRow = dataOfRow.toUpperCase().trim();
+                        }
+                        if (dataOfRow.toUpperCase().indexOf(datafilter) > -1) {
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }
+                    }).show();
+                });
+
+            }(jQuery));
+
+        });
+        $(document).ready(function () {
+            //debugger;
+            var viewId = commonUtils.returnValueText('#viewid');
+            if (!commonUtils.isNullOrEmpty(viewId)) {
+                var cookie = commonUtils.getCookie(viewId);
+                if (commonUtils.isNullOrEmpty(cookie)) {
+                    var cookieValue = 'CONTROL|AREACODE|AREANAME|DESC|AREAPARRENTCODE|FLAGACTIVE';
+                    commonUtils.setCookie(viewId, cookieValue, 10);
+                }
+            }
+            initDefault();
+        });
+    </script>
+    <!-- #endregion -->
+    <!-- #region cookies -->
+    <script>
+        document.addEventListener('DOMContentLoaded',
+            function () {
+                //debugger;
+                readCookies("Mst_Area");
+                var checkboxs = document.querySelectorAll('#togglecolumn.ulshowdata input[type="checkbox"]');
+                for (let checkbox of checkboxs) {
+                    checkbox.addEventListener('change', setCookie)
+                }
+            });
+
+        function saveSelectedToCookie() {
+            //debugger;
+            setCookie("Mst_Area",
+                {
+                    path: '/',
+                    expires: 10
+                });
+        }
+
+        function setCookie(name, options = {}) {
+            //debugger;
+            var checkboxs = document.querySelectorAll('#togglecolumn.ulshowdata input[type="checkbox"]');
+            var value = new Object();
+            for (const ckb of checkboxs) {
+                value[ckb.name] = ckb.checked === true ? "0" : "1";
+            }
+            let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(JSON.stringify(value));
+
+            if (options.expires instanceof Date) {
+                options.expires = options.expires.toUTCString();
+            }
+            //debugger;
+            for (let optionKey in options) {
+                updatedCookie += "; " + optionKey;
+                let optionValue = options[optionKey];
+                if (optionValue !== true) {
+                    updatedCookie += "=" + optionValue;
+                }
+            }
+            document.cookie = updatedCookie;
+        }
+
+        function readCookies(name) {
+            //debugger;
+            var result = document.cookie.match(new RegExp(name + '=([^;]+)'));
+            if (result != null && result != undefined && result.length > 0) {
+                var y = result[1];
+                var x = JSON.parse(decodeURIComponent(result[1]));
+                result && (result = JSON.parse(decodeURIComponent(result[1])));
+            }
+
+            if (result != null && result != undefined) {
+                for (const key in result) {
+                    $('#dynamic-table-thead').find('th[fieldid="' + key + '"]').attr('fieldactive', result[key]);
+                }
+            }
+        }
+    </script>
+    <!-- #endregion -->
+    <script src="@Url.Content("~/Scripts/mine/Mst_Area.js")"></script>
+    <script type="text/javascript">
+        function Delete(areaCode, areaName) {
+             debugger
+              var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Delete", "Mst_Area")';
+
+
+            var objMst_Area = new Mst_Area();
+            objMst_Area.ActionType = 'delete';
+            objMst_Area.Image_Message = "THÔNG BÁO";
+            objMst_Area.Confirm_Message = "Đồng ý xóa khu vực '" + areaName + "' ?";
+            objMst_Area.ajaxSettings = ajaxSettings;
+            objMst_Area.deleteData(areaCode);
+        }
+    </script>
+}

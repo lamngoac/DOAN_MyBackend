@@ -1,0 +1,110 @@
+﻿@model idn.Skycic.Inventory.Common.Models.ProductCentrer.Mst_VATRate
+@{
+
+    var title = "CHI TIẾT thuế suất";
+    var titleMng = "Danh mục thuế suất";
+    ViewBag.Title = title;
+}
+
+<div class="container">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="col-xs-12">
+                        @using (Html.BeginForm("Detail", "OS_PrdCenter_Mst_VATRate", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="col-sm-8">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="VATRateCode" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã thuế suất")</label>
+                                    <div class="col-xs-12 col-sm-5">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="VATRateCode" name="VATRateCode" class="col-xs-11 disabled-fix VATRateCode" onkeyup="locdau(this);" value="@if (Model != null && Model.VATRateCode != null){@MvcHtmlString.Create(Model.VATRateCode.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                        <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="VATRate" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Thuế suất")</label>
+                                    <div class="col-xs-12 col-sm-5">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="VATRate" name="VATRate" class="col-xs-11 disabled-fix VATRate" value="@if (Model != null && Model.VATRate != null){@MvcHtmlString.Create(Model.VATRate.ToString())} else { @("")}" autocomplete="off" required />
+                                        </span>
+                                        <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="VATDesc" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mô tả")</label>
+                                    <div class="col-xs-12 col-sm-5">
+                                        <span class="block input-icon input-icon-right">
+                                            @{
+                                                var vatDesc = "";
+                                                if (Model != null && !CUtils.IsNullOrEmpty(Model.VATDesc))
+                                                {
+                                                    vatDesc = CUtils.StrValueOrNull(Model.VATDesc);
+                                                }
+                                            }
+                                            <textarea id="VATDesc" name="VATDesc" class="col-xs-11 VATDesc" rows="4" cols="50" maxlength="400" readonly="readonly">@MvcHtmlString.Create(vatDesc)</textarea>
+                                        </span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    @{
+                                        var checkActive = "";
+                                        if (Model != null && Model.FlagActive.Equals("1"))
+                                        {
+                                            checkActive = "checked";
+                                        }
+                                        else
+                                        {
+                                            checkActive = "";
+                                        }
+                                    }
+                                    <label for="" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500 ">Trạng thái</label>
+                                    <div class="col-xs-12 col-sm-5">
+                                        <span class="block input-icon input-icon-right disabled-checkbox-fix padding-top-5">
+                                            <label>
+                                                <input name="FlagActive" id="FlagActive" class="ace ace-switch ace-switch-4 FlagActive" type="checkbox" value="1" @checkActive />
+                                                <span class="lbl"></span>
+                                                <input name="FlagActive" type="hidden" value="0" />
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </aside>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+<script type="text/javascript">
+    processAjaxForm($('#manageForm'), function (response) {
+        processAjaxFormResult(response);
+
+    });
+</script>
+
+
+
+
+
+
+
+
+
+

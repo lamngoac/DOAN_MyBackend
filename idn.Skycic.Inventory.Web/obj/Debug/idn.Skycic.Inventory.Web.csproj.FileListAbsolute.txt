@@ -1,0 +1,2 @@
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Web\obj\Debug\idn.Skycic.Inventory.Web.csprojAssemblyReference.cache
+E:\A_IdocNet_QRBox\Dev\V10\idn.Skycic.Inventory.Web\obj\Debug\idn.Skycic.Inventory.Web.csproj.CoreCompileInputs.cache

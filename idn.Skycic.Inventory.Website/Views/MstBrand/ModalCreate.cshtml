@@ -1,0 +1,137 @@
+﻿<div class="modal fade" id="PopupCreate" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="exampleModalLabel">POPUP tạo mới Brand</h3>
+                <a href="javascript:;" onclick="ClosePopupCreate()" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </a>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "manageCreate" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="row form-group margin-bottom-9">
+                        <label for="BrandCode" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Mã brand".HtmlItemString("brandcode"))<span style="color: red "> *</span></label>
+                        <div class="col-12 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <input type="text" id="BrandCode" name="BrandCode" class="col-12 BrandCode" value="" autocomplete="off" onkeyup="commonUtils.locDau(this);">
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="row form-group margin-bottom-9">
+                        <label for="BrandName" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Tên nhãn hiệu".HtmlItemString("brandname"))<span style="color: red "> *</span></label>
+                        <div class="col-12 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <input type="text" id="BrandName" name="BrandName" class="col-12 BrandName" value="" autocomplete="off">
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="row form-group margin-bottom-9">
+                        <label for="FlagActive" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Trạng thái".HtmlItemString("flagactive"))<span style="color: red "> *</span></label>
+                        <div class="col-12 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <select type="text" id="FlagActive" name="FlagActive" class="col-12 FlagActive">
+                                    <option>1</option>
+                                    <option>0</option>
+                                </select>
+                            </span>
+                        </div>
+                    </div>
+
+                }
+
+            </div>
+            <div class="modal-footer">
+                @RenderItemFormat("BTN_TAO_NHAN_HIEU_LUU", "<a href=\"javascript:void(0);\" class=\"btn mybtn-Button\" onclick=\"SaveData()\" id=\"btnCreate\" style=\"padding-left: 10px!important; padding-right: 10px!important; font-size: 16px; font-weight: 500;\">Lưu</a>", "", "")
+                @RenderItemFormat("BTN_TAO_NHAN_HIEU_LUU_VA_TAO_MOI", "<a href=\"javascript:void(0);\" class=\"btn mybtn-Button\" onclick=\"SaveDataAndCreate()\" id=\"btnCreate\" style=\"padding-left: 10px!important; padding-right: 10px!important; font-size: 16px; font-weight: 500;\">Lưu và tạo mới</a>", "", "")
+                @*<a href="javascript:void(0);" class="btn mybtn-Button" onclick="SaveData()" id="btnCreate" style="padding-left: 10px!important; padding-right: 10px!important; font-size: 16px; font-weight: 500;">Lưu</a>
+        <a href="javascript:void(0);" class="btn mybtn-Button" onclick="SaveDataAndCreate()" id="btnCreate" style="padding-left: 10px!important; padding-right: 10px!important; font-size: 16px; font-weight: 500;">Lưu và tạo mới</a>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function CheckForm() {
+        var brandcode = $('#BrandCode').val();
+        var brandname = $('#BrandName').val();
+        var flagActive = $('#FlagActive').val();
+        if (brandcode == "") {
+            alert("Mã nhãn hiệu không được trống.");
+            return false;
+        }
+        if (brandname == "") {
+            alert("Tên nhãn hiệu không được trống.");
+            return false;
+        }
+        if (flagActive == "") {
+            alert("Trạng thái không được trống.");
+            return false;
+        }
+        return true;
+    }
+    function SaveData() {
+        debugger;
+        var check = CheckForm();
+        if (check == false) return false;
+        var formdata = new window.FormData($('#manageCreate')[0]);
+        //formdata.append("page", pagecur);
+        //formdata.append("recordcount", recordcount);    
+         $.ajax({
+            url: '@Url.Action("Save","MstBrand")',
+            data: formdata,
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            type: 'POST',
+            success: function (data) {
+                if (data.Success) {
+                    debugger;
+                    if (data !== null) {
+                        alert(data.Messages[0]);
+                        window.location.href = data.RedirectUrl;
+                    }           
+                } else {
+                    showErrorDialog(data.Detail);
+                }
+            }
+        });  
+    }
+
+    
+
+    function SaveDataAndCreate() {
+        debugger;
+        var check = CheckForm();
+        if (check == false) return false;
+        var formdata = new window.FormData($('#manageCreate')[0]);          
+         $.ajax({
+            url: '@Url.Action("Save","MstBrand")',
+            data: formdata,
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            type: 'POST',
+            success: function (data) {
+                if (data.Success) {
+                    debugger;
+                    if (data !== null) {
+                        alert(data.Messages[0]);                        
+                        ClearDataModal();
+                    }           
+                } else {
+                    showErrorDialog(data.Detail);
+                }
+            }
+        });  
+    }
+
+    function ClearDataModal() {
+        $('#BrandCode').val("");
+        $('#BrandName').val("");
+        $('#FlagActive').val("");   
+     }
+</script>

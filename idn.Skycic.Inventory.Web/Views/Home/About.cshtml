@@ -1,0 +1,265 @@
+﻿@model List<Rpt_InvoiceForDashboard>
+@{
+    ViewBag.Title = "Home Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+@{
+    var doanhthungay = "0";
+    var doanhthuthang = "0";
+    var doanhthuquy = "0";
+    var doanhthunam = "0";
+    var hoadontaotrongngay = "0";
+    var hoadonchoky = "0";
+    var hoadontrongngay = "0";
+    var hoadontrongthang = "0";
+    var hoadontrongquy = "0";
+    var hoadontrongnam = "0";
+    var tongsoluongdamua = "0";
+    var tongsoluongdaphathanh = "0";
+    var tongsoluongdasudung = "0";
+    var tongsoluongconlai = "0";
+
+    if (ViewBag.Invoice_license != null)
+    {
+        var Invoice_license = ViewBag.Invoice_license;
+        foreach (var it in Invoice_license)
+        {
+            tongsoluongdamua = CUtils.formatNumeric(it.TotalQty == null ? 0 : Convert.ToDouble(it.TotalQty), Nonsense.INTEGER_DB_FORMAT).ToString();
+            tongsoluongdaphathanh = CUtils.formatNumeric(it.TotalQtyIssued == null ? 0 : Convert.ToDouble(it.TotalQtyIssued), Nonsense.INTEGER_DB_FORMAT).ToString();
+            tongsoluongdasudung = CUtils.formatNumeric(it.TotalQtyUsed == null ? 0 : Convert.ToDouble(it.TotalQtyUsed), Nonsense.INTEGER_DB_FORMAT).ToString();
+            tongsoluongconlai = CUtils.formatNumeric((it.TotalQty == null && it.TotalQtyUsed == null) ? 0 : (Convert.ToDouble(it.TotalQty) - Convert.ToDouble(it.TotalQtyUsed)), Nonsense.INTEGER_DB_FORMAT).ToString();
+        }
+    }
+
+    foreach (var item in Model)
+    {
+        if (item.ReportType.ToString() == "InvoiceInvoiceDate")
+        {
+            doanhthungay = CUtils.formatNumeric(item.TotalAmontAfterVAT == null ? 0 : Convert.ToDouble(item.TotalAmontAfterVAT), Nonsense.INTEGER_DB_FORMAT).ToString();
+            hoadontrongngay = CUtils.formatNumeric(item.TotalQtyInvoice == null ? 0 : Convert.ToDouble(item.TotalQtyInvoice), Nonsense.INTEGER_DB_FORMAT).ToString();
+        }
+        if (item.ReportType.ToString() == "InvoiceInvoiceMonth")
+        {
+            doanhthuthang = CUtils.formatNumeric(item.TotalAmontAfterVAT == null ? 0 : Convert.ToDouble(item.TotalAmontAfterVAT), Nonsense.INTEGER_DB_FORMAT).ToString();
+            hoadontrongthang = CUtils.formatNumeric(item.TotalQtyInvoice == null ? 0 : Convert.ToDouble(item.TotalQtyInvoice), Nonsense.INTEGER_DB_FORMAT).ToString();
+        }
+        if (item.ReportType.ToString() == "InvoiceInvoiceQuarter")
+        {
+            doanhthuquy = CUtils.formatNumeric(item.TotalAmontAfterVAT == null ? 0 : Convert.ToDouble(item.TotalAmontAfterVAT), Nonsense.INTEGER_DB_FORMAT).ToString();
+            hoadontrongquy = CUtils.formatNumeric(item.TotalQtyInvoice == null ? 0 : Convert.ToDouble(item.TotalQtyInvoice), Nonsense.INTEGER_DB_FORMAT).ToString();
+        }
+        if (item.ReportType.ToString() == "InvoiceInvoiceYear")
+        {
+            doanhthunam = CUtils.formatNumeric(item.TotalAmontAfterVAT == null ? 0 : Convert.ToDouble(item.TotalAmontAfterVAT), Nonsense.INTEGER_DB_FORMAT).ToString();
+            hoadontrongnam = CUtils.formatNumeric(item.TotalQtyInvoice == null ? 0 : Convert.ToDouble(item.TotalQtyInvoice), Nonsense.INTEGER_DB_FORMAT).ToString();
+        }
+        if (item.ReportType.ToString() == "InvoiceCreateDate")
+        {
+            hoadontaotrongngay = CUtils.formatNumeric(item.TotalQtyInvoice == null ? 0 : Convert.ToDouble(item.TotalQtyInvoice), Nonsense.INTEGER_DB_FORMAT).ToString();
+        }
+        if (item.ReportType.ToString() == "InvoicePending")
+        {
+            hoadonchoky = CUtils.formatNumeric(item.TotalQtyInvoice == null ? 0 : Convert.ToDouble(item.TotalQtyInvoice), Nonsense.INTEGER_DB_FORMAT).ToString();
+        }
+    }
+}
+
+<div class="clearfix"></div>
+<div class="row no-margin" style="padding: 0 25px">
+    <div class="row no-margin title-dashboard">
+        <div class="col-xs-4 no-padding">
+            <img class="img-responsive" style="display: inline-block" src="@Url.Content("~/images/Dashboard/dashboard.png")" />
+            <span>DASHBOARD</span>
+        </div>
+        <div class="col-xs-8 no-padding">
+            <span style="float: right">NGÀY: @ViewBag.Datetime | MST: @ViewBag.MST</span>
+            <img class="img-responsive" style="display: inline-block; float: right" src="@Url.Content("~/images/Dashboard/small-calendar.png")" />
+        </div>
+    </div>
+    <div class="row no-margin" style="padding: 0 120px">
+        <div class="col-xs-4">
+            <img class="img-responsive" src="@Url.Content("~/images/Dashboard/DoanhThu.png")" />
+            <div class=" row no-margin content-dashboard">
+                <div class="col-xs-12 padding-left-right-20">
+                    <div class="col-xs-6 no-padding title-con-das">
+                        Giá trị xuất HD (ngày)
+                    </div>
+                    <div class="col-xs-6 no-padding number-con-das">
+                        @MvcHtmlString.Create(doanhthungay)
+                    </div>
+                </div>
+                <div class="col-xs-12 padding-left-right-20">
+                    <div class="col-xs-6 no-padding title-con-das">
+                        Giá trị xuất HD (tháng)
+                    </div>
+                    <div class="col-xs-6 no-padding number-con-das">
+                        @MvcHtmlString.Create(doanhthuthang)
+                    </div>
+                </div>
+                <div class="col-xs-12 padding-left-right-20">
+                    <div class="col-xs-6 no-padding title-con-das">
+                        Giá trị xuất HD (quý)
+                    </div>
+                    <div class="col-xs-6 no-padding number-con-das">
+                        @MvcHtmlString.Create(doanhthuquy)
+                    </div>
+                </div>
+                <div class="col-xs-12 padding-left-right-20">
+                    <div class="col-xs-6 no-padding title-con-das">
+                        Giá trị xuất HD (năm)
+                    </div>
+                    <div class="col-xs-6 no-padding number-con-das">
+                        @MvcHtmlString.Create(doanhthunam)
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-4">
+            <img class="img-responsive" src="@Url.Content("~/images/Dashboard/HoaDon.png")" />
+            <div class=" row no-margin content-dashboard">
+                <div class="col-xs-12 padding-left-right-40">
+                    <div class="col-xs-9 no-padding title-con-das">
+                        Hóa đơn tạo trong ngày
+                    </div>
+                    <div class="col-xs-3 no-padding number-con-das">
+                        @MvcHtmlString.Create(hoadontaotrongngay)
+                    </div>
+                </div>
+                <div class="col-xs-12 padding-left-right-40">
+                    <div class="col-xs-9 no-padding title-con-das">
+                        Hóa đơn chờ ký
+                    </div>
+                    <div class="col-xs-3 no-padding number-con-das">
+                        @MvcHtmlString.Create(hoadonchoky)
+                    </div>
+                </div>
+                <div class="col-xs-12 padding-left-right-40">
+                    <div class="col-xs-9 no-padding title-con-das">
+                        Hóa đơn trong ngày
+                    </div>
+                    <div class="col-xs-3 no-padding number-con-das">
+                        @MvcHtmlString.Create(hoadontrongngay)
+                    </div>
+                </div>
+                <div class="col-xs-12 padding-left-right-40">
+                    <div class="col-xs-9 no-padding title-con-das">
+                        Hóa đơn trong tháng
+                    </div>
+                    <div class="col-xs-3 no-padding number-con-das">
+                        @MvcHtmlString.Create(hoadontrongthang)
+                    </div>
+                </div>
+                <div class="col-xs-12 padding-left-right-40">
+                    <div class="col-xs-9 no-padding title-con-das">
+                        Hóa đơn trong quý
+                    </div>
+                    <div class="col-xs-3 no-padding number-con-das">
+                        @MvcHtmlString.Create(hoadontrongquy)
+                    </div>
+                </div>
+                <div class="col-xs-12 padding-left-right-40">
+                    <div class="col-xs-9 no-padding title-con-das">
+                        Hóa đơn trong năm
+                    </div>
+                    <div class="col-xs-3 no-padding number-con-das">
+                        @MvcHtmlString.Create(hoadontrongnam)
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-4">
+            <img class="img-responsive" src="@Url.Content("~/images/Dashboard/SoLuong.png")" />
+            <div class=" row no-margin content-dashboard">
+                <div class="col-xs-12 padding-left-right-40">
+                    <div class="col-xs-9 no-padding title-con-das">
+                        Tổng số lượng đã mua
+                    </div>
+                    <div class="col-xs-3 no-padding number-con-das">
+                        @MvcHtmlString.Create(tongsoluongdamua)
+                    </div>
+                </div>
+                <div class="col-xs-12 padding-left-right-40">
+                    <div class="col-xs-9 no-padding title-con-das">
+                        Tổng số lượng đã phát hành
+                    </div>
+                    <div class="col-xs-3 no-padding number-con-das">
+                        @MvcHtmlString.Create(tongsoluongdaphathanh)
+                    </div>
+                </div>
+                <div class="col-xs-12 padding-left-right-40">
+                    <div class="col-xs-9 no-padding title-con-das">
+                        Tổng số lượng đã sử dụng
+                    </div>
+                    <div class="col-xs-3 no-padding number-con-das">
+                        @MvcHtmlString.Create(tongsoluongdasudung)
+                    </div>
+                </div>
+                <div class="col-xs-12 padding-left-right-40">
+                    <div class="col-xs-9 no-padding title-con-das">
+                        Tổng số lượng còn lại
+                    </div>
+                    <div class="col-xs-3 no-padding number-con-das">
+                        @MvcHtmlString.Create(tongsoluongconlai)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-margin" style="padding: 15px 270px;">
+        <div class="col-xs-12 no-padding" style="margin-bottom: 20px;">
+            <div class="col-xs-4">
+                <a href="@Url.Action("Index", "Invoice_TempInvoice")">
+                    <div class="col-xs-12 icon-dashboard">
+                        <img class="img-responsive" src="@Url.Content("~/images/Dashboard/MauHoaDon.png")" />
+                        <h3>Mẫu hóa đơn</h3>
+                    </div>
+                </a>
+            </div>
+            <div class="col-xs-4">
+                <a href="@Url.Action("Index", "Invoice_Invoice")">
+                    <div class="col-xs-12 icon-dashboard">
+                        <img class="img-responsive" src="@Url.Content("~/images/Dashboard/HoaDonDauRa.png")" />
+                        <h3>Hóa đơn đầu ra</h3>
+                    </div>
+                </a>
+            </div>
+            <div class="col-xs-4">
+                <a href="#">
+                    <div class="col-xs-12 icon-dashboard">
+                        <img class="img-responsive" src="@Url.Content("~/images/Dashboard/HoaDonDauVao.png")" />
+                        <h3>Hóa đơn đầu vào</h3>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-xs-12 no-padding">
+            <div class="col-xs-4">
+                <a href="@Url.Action("Rpt_InvoiceInvoice_ResultUsed", "Report")">
+                    <div class="col-xs-12 icon-dashboard">
+                        <img class="img-responsive" src="@Url.Content("~/images/Dashboard/BaoCao.png")" />
+                        <h3>Báo cáo</h3>
+                    </div>
+                </a>
+            </div>
+            <div class="col-xs-4">
+                <a href="#">
+                    <div class="col-xs-12 icon-dashboard">
+                        <img class="img-responsive" src="@Url.Content("~/images/Dashboard/License.png")" />
+                        <h3>License</h3>
+                    </div>
+                </a>
+            </div>
+            <div class="col-xs-4">
+                <a href="@Url.Action("Index", "Mst_CustomerNNT")">
+                    <div class="col-xs-12 icon-dashboard">
+                        <img class="img-responsive" src="@Url.Content("~/images/Dashboard/QuanTri.png")" />
+                        <h3>Quản trị</h3>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

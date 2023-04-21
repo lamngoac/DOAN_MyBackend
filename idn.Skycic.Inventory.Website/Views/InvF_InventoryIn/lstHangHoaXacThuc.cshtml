@@ -1,0 +1,89 @@
+﻿@model List<InvF_InventoryInQR>
+@{
+    var iF_InvInStatus = CUtils.StrValue(ViewBag.IF_InvInStatus);
+}
+
+<div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+    <div style="width: 100%; float: left;">
+        <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+            <thead>
+                <tr class="trthead">
+                    <th class="text-center cell-50">
+                    </th>
+                    <th fieldId="IDX" sorttype="T" fieldName="STT" fieldActive="0" class="text-center cell-50 stt">
+                        @("STT".HtmlItemString("invf_inventoryin"))
+                    </th>
+                    <th fieldId="ProductCode" sorttype="T" fieldName="Mã hàng hóa" fieldActive="0" class="text-left cell-100">
+                        @("Mã hàng hóa".HtmlItemString("invf_inventoryin"))
+                    </th>
+                    <th fieldId="ProductName" sorttype="T" fieldName="Tên hàng hóa" fieldActive="0" class="text-left cell-200">
+                        @("Tên hàng hóa".HtmlItemString("invf_inventoryin"))
+                    </th>
+                    <th fieldId="QRCode" sorttype="T" fieldName="Mã xác thực" fieldActive="0" class="text-left cell-100">
+                        @("Mã xác thực".HtmlItemString("invf_inventoryin"))
+                    </th>
+                    <th fieldId="BoxNo" sorttype="T" fieldName="Mã hộp" fieldActive="0" class="text-left cell-100">
+                        @("Mã hộp".HtmlItemString("invf_inventoryin"))
+                    </th>
+                    <th fieldId="CanNo" sorttype="T" fieldName="Mã thùng" fieldActive="0" class="text-left cell-100">
+                        @("Mã thùng".HtmlItemString("invf_inventoryin"))
+                    </th>
+                    <th fieldId="ProductLotNo" sorttype="T" fieldName="Lô sản xuất" fieldActive="0" class="text-left cell-100">
+                        @("Lô sản xuất".HtmlItemString("invf_inventoryin"))
+                    </th>
+                    <th fieldId="ShiftInCode" sorttype="T" fieldName="Ca sản xuất" fieldActive="0" class="text-left cell-100">
+                        @("Ca sản xuất".HtmlItemString("invf_inventoryin"))
+                    </th>
+                    <th fieldId="UserKCS" sorttype="T" fieldName="KCS" fieldActive="0" class="text-left cell-100">
+                        @("KCS".HtmlItemString("invf_inventoryin"))
+                    </th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+        <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+            <tbody id="table-tbodyIDXacThuc">
+                @Html.Partial("LoadQRCode", Model, new ViewDataDictionary() { { "IF_InvInStatus", iF_InvInStatus } })
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<table hidden>
+    <tbody id="rowtemplateQR">
+        <tr class="trdata" idx="==idx==" productCode="==ProductCode==">
+            <input type="hidden" class="productqrcode" name="Lst_InvF_InventoryInQR[==idx==].ProductCode" value="==ProductCode==" />
+            <input type="hidden" class="productqrcode" name="Lst_InvF_InventoryInQR[==idx==].ProductName" value="==ProductName==" />
+            <input type="hidden" class="productqrcode" name="Lst_InvF_InventoryInQR[==idx==].NetworkID" value="==NetworkID==" />
+            <td class="text-center cell-50">
+                <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteXacThuc(this)"><i class="fas fa-trash-alt"></i></a>
+            </td>
+            <td fieldId="IDX" sorttype="T" fieldName="STT" fieldActive="0" class="text-center cell-50 stt"></td>
+            <td fieldId="ProductCodeUser" sorttype="T" fieldName="Mã hàng hóa" fieldActive="0" class="text-left cell-100">
+                <input class="col-md-12 ProductCodeUser" readonly="readonly" name="Lst_InvF_InventoryInQR[==idx==].ProductCodeUser" value="==ProductCodeUser==" />
+            </td>
+            <td fieldId="ProductName" sorttype="T" fieldName="Tên hàng hóa" fieldActive="0" class="text-left cell-200">
+                <input class="col-md-12 ProductName" readonly="readonly" name="Lst_InvF_InventoryInQR[==idx==].ProductName" value="==ProductName==" />
+            </td>
+            <td fieldId="QRCode" sorttype="T" fieldName="Mã xác thực" fieldActive="0" class="text-left cell-100">
+                <input class="col-md-12 QRCode" name="Lst_InvF_InventoryInQR[==idx==].QRCode" value="==QRCode==" onkeyup="splitQRCode(this)" />
+            </td>
+            <td fieldId="BoxNo" sorttype="T" fieldName="Mã hộp" fieldActive="0" class="text-left cell-100">
+                <input class="col-md-12 BoxNo" name="Lst_InvF_InventoryInQR[==idx==].BoxNo" value="==BoxNo==" onkeyup="splitQRCode(this)" />
+            </td>
+            <td fieldId="CanNo" sorttype="T" fieldName="Mã thùng" fieldActive="0" class="text-left cell-100">
+                <input class="col-md-12 CanNo" name="Lst_InvF_InventoryInQR[==idx==].CanNo" value="==CanNo==" onkeyup="splitQRCode(this)" />
+            </td>
+            <td fieldId="ProductLotNo" sorttype="T" fieldName="Lô sản xuất" fieldActive="0" class="text-left cell-100">
+                <input class="col-md-12 ProductLotNo" name="Lst_InvF_InventoryInQR[==idx==].ProductLotNo" value="==ProductLotNo==" />
+            </td>
+            <td fieldId="ShiftInCode" sorttype="T" fieldName="Ca sản xuất" fieldActive="0" class="text-left cell-100">
+                <input class="col-md-12 ShiftInCode" name="Lst_InvF_InventoryInQR[==idx==].ShiftInCode" value="==ShiftInCode==" />
+            </td>
+            <td fieldId="UserKCS" sorttype="T" fieldName="KCS" fieldActive="0" class="text-left cell-100">
+                <input class="col-md-12 UserKCS" name="Lst_InvF_InventoryInQR[==idx==].UserKCS" value="==UserKCS==" />
+            </td>
+        </tr>
+    </tbody>
+</table>

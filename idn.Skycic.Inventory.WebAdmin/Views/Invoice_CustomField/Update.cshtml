@@ -1,0 +1,172 @@
+﻿@{
+    var title = "Cập nhật các trường tùy chỉnh";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var lstCustomField = new List<Invoice_CustomField>();
+    if (ViewBag.lstCustomField != null)
+    {
+        lstCustomField = ViewBag.lstCustomField;
+    }
+    var lstDtlCustomField = new List<Invoice_DtlCustomField>();
+    if (ViewBag.lstDtlCustomField != null)
+    {
+        lstDtlCustomField = ViewBag.lstDtlCustomField;
+    }
+}
+<script src="~/Scripts/mine/invoice_CustomField.js"></script>
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+
+                    <aside class="row no-margin box-shadow-tk">
+                        <div class="widget-main no-padding">
+                            <div id="fuelux-wizard-container" class="no-steps-container">
+                                @using (Html.BeginForm("", "", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.ValidationSummary(true)
+
+                                    <aside class="col-xs-5">
+                                        <div class="form-group margin-bottom-5">
+                                            <label for="NetworkID" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Network ID <span style=\"color: red \">*</span>")</label>
+                                            <div class="col-xs-12 col-sm-8">
+                                                <span class="block input-icon input-icon-right">
+                                                    <input type="text" id="NetworkID" name="NetworkID" class="col-xs-12 NetworkID disabled-fix" onkeyup="locdau(this);" value="@(Request["NetworkID"] == null ? "" : Request["NetworkID"].ToString())" autocomplete="off" required />
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group margin-bottom-5">
+                                            <label for="OrgID" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã tổ chức <span style=\"color: red \">*</span>")</label>
+                                            <div class="col-xs-12 col-sm-8">
+                                                <span class="block input-icon input-icon-right">
+                                                    <input type="text" id="OrgID" name="OrgID" class="col-xs-12 OrgID disabled-fix" onkeyup="locdau(this);" value="@(Request["orgID"] == null ? "" : Request["orgID"].ToString())" autocomplete="off" required />
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group margin-bottom-5">
+                                            <label for="OrgID" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên tổ chức")</label>
+                                            <div class="col-xs-12 col-sm-8">
+                                                <span class="block input-icon input-icon-right">
+                                                    <input type="text" id="" name="" class="col-xs-12 OrgID disabled-fix" onkeyup="locdau(this);" value="" autocomplete="off" required />
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </aside>
+
+                                    <aside class="col-xs-12">
+                                        <aside class="col-xs-6">
+                                            <label class="col-xs-12" style="padding: 5px; text-align: center; color: crimson; font-weight: 500; letter-spacing: 1px; font-size: 15px; font-weight: 500">Các trường tùy chỉnh Hóa đơn</label>
+                                            @{
+                                                for (var i = 1; i <= 10; i++)
+                                                {
+                                                    var flagactive = "0";
+                                                    var check = "";
+                                                    var name = "InvCF" + i;
+                                                    var fieldName = "CUSTOMFIELD" + i;
+                                                    //var value = "0";
+                                                    var value = "";
+                                                    var it = lstCustomField.Where(x => x.InvoiceCustomFieldCode.ToString() == fieldName).FirstOrDefault();
+                                                    if (it != null)
+                                                    {
+                                                        value = it.InvoiceCustomFieldName.ToString();
+                                                        flagactive = it.FlagActive.ToString();
+                                                        if (flagactive == "1")
+                                                        {
+                                                            check = "checked";
+                                                        }
+                                                    }
+
+
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="InvCF_@i" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create(name)</label>
+                                                        <div class="col-xs-12 col-sm-9">
+                                                            <div class="col-xs-2">
+                                                                <span class="block input-icon input-icon-right padding-top-5">
+                                                                    <label>
+                                                                        <input @check value="@flagactive" id="FlagActive_@i" class="ace ace-switch ace-switch-4" onclick="SetValueCheckBox(this)" type="checkbox" />
+                                                                        <span class="lbl"></span>
+                                                                    </label>
+                                                                </span>
+                                                            </div>
+                                                            <span class="block input-icon input-icon-right">
+                                                                <input type="text" id="InvCF_@i" name="@fieldName" class="col-xs-7" value="@value" autocomplete="off" required />
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                }
+
+
+                                            }
+                                        </aside>
+
+                                        <aside class="col-xs-6">
+                                            <label class="col-xs-12" style="padding: 5px; text-align: center; color: crimson; font-weight: 500; letter-spacing: 1px; font-size: 15px; font-weight: 500">Các trường tùy chỉnh danh sách hàng hóa</label>
+                                            @{
+                                                for (var i = 1; i <= 5; i++)
+                                                {
+                                                    var check = "";
+                                                    var ten = "InvCF" + i;
+                                                    var name = "InvDtlCF" + i;
+                                                    var fieldName = "CUSTOMFIELD_DTL" + i;
+                                                    var value = "";
+                                                    var flagactive = "0";
+                                                    var it = lstDtlCustomField.Where(x => x.InvoiceDtlCustomFieldCode.ToString() == fieldName).FirstOrDefault();
+                                                    if (it != null)
+                                                    {
+                                                        value = it.InvoiceDtlCustomFieldName.ToString();
+                                                        flagactive = it.FlagActive.ToString();
+                                                        if (flagactive == "1")
+                                                        {
+                                                            check = "checked";
+                                                        }
+                                                    }
+
+                                                    <div class="form-group margin-bottom-5">
+                                                        <label for="@name" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create(ten)</label>
+                                                        <div class="col-xs-12 col-sm-9">
+                                                            <div class="col-xs-2">
+                                                                <span class="block input-icon input-icon-right padding-top-5">
+                                                                    <label>
+                                                                        <input class="ace ace-switch ace-switch-4" onclick="SetValueCheckBox(this)" type="checkbox" @check value="@flagactive" id="InvDtlFlagActive_@i" />
+                                                                        <span class="lbl"></span>
+                                                                    </label>
+                                                                </span>
+                                                            </div>
+                                                            <span class="block input-icon input-icon-right">
+                                                                <input type="text" id="@name" name="@fieldName" class="col-xs-7" value="@value" autocomplete="off" required />
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+
+
+                                        </aside>
+                                    </aside>
+                                }
+                            </div>
+                        </div>
+
+                    </aside>
+
+                    <div id="btnShow" class="col-xs-12 no-padding">
+                        <div class="clearfix">
+                            <div class="row no-margin" style="float: right">
+                                @RenderItemFormat("BTN_CAP_NHAT_INVOICE_CUSTOMFIELD_LUU", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-left: 10px; padding-left: 15px!important; padding-right: 15px!important; margin-top: 20px;\" onclick=\"SaveData(1);\">Lưu</a>", "", "")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->

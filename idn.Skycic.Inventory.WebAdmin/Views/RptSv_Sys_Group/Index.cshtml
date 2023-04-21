@@ -1,0 +1,463 @@
+﻿
+@model PageInfo<RptSv_Sys_Group>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var title = "QUẢN LÝ NHÓM NGƯỜI DÙNG";
+    ViewBag.Title = title;
+    var startCount = 0;
+    var strStartCount = ViewBag.StartCount as string;
+    if (!CUtils.IsNullOrEmpty(strStartCount))
+    {
+        startCount = Convert.ToInt32(strStartCount);
+    }
+}
+
+<div class="row no-margin">
+    <div class="row no-margin">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="panel-group" id="steps">
+                <div class="panel panel-info">
+                    <div class="title">
+                        <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                    </div>
+                    <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                        <aside class="col-xs-12 no-padding layout-tk">
+                            @using (Html.BeginForm(null, null, FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" value="search" name="init" id="init" />
+                                <div class="col-xs-12 box-shadow-tk">
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="control-label no-padding-right font-weight-500" style="float: left">Tên nhóm người dùng</label>
+                                        <div class="col-xs-12 col-sm-3">
+                                            <input type="text" id="groupname" name="groupname" class="col-xs-11" value="@MvcHtmlString.Create(ViewBag.GroupName)" autocomplete="off">
+                                        </div>
+                                        <div class="col-xs-12 col-sm-1 button-tk no-padding">
+                                            <div class="col-xs-11" style="padding: 0">
+                                                <span class="block input-icon input-icon-right" style="">
+
+                                                    @RenderItemFormat("BTN_QL_NHOM_ND_TK", "<a class=\"btn font-color mybtn-Button\" onclick=\"Search()\" href=\"javascript: void(0);\"><img class=\"img-button\" src=" + @Url.Content("~/Images/search.svg") + "></a>", "", "")
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 no-padding">
+                                    <a class="btn font-color mybtn-Button dropdown-toggle" data-toggle="dropdown" aria-expanded="false" style="float: right;font-size: 13px;margin-top: 20px;position: relative;">...</a>
+                                    <ul class="dropdown-menu" role="menu" style="">
+                                        <li>
+                                            @RenderItemFormat("BTN_QL_NHOM_ND_NHAP_EXCEL", "<a class=\"mybtn-Button-1\" onclick=\"ShowPopupImportExcel()\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/import.svg") + "'>Nhập Excel</a>", "", "")
+                                        </li>
+                                        <li>
+                                            @RenderItemFormat("BTN_QL_NHOM_ND_XUAT_EXCEL_TEM", "<a class=\"mybtn-Button-1\" onclick=\"ExportTemplate()\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/export.svg") + "'>Xuất Template</a>", "", "")
+                                        </li>
+                                        <li>
+                                            @RenderItemFormat("BTN_QL_NHOM_ND_XUAT_EXCEL", "<a class=\"mybtn-Button-1\" onclick=\"Export()\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/export.svg") + "'>Export Excel</a>", "", "")
+                                        </li>
+                                    </ul>
+                                    @RenderItemFormat("BTN_QL_NHOM_ND_TAO", "<a class=\"btn font-color mybtn-Button\" href=\'" + @Url.Action("Create", "RptSv_Sys_Group") + "\' style=\"float: right;font-size: 13px; margin-top: 20px;margin-right: 10px; \" title=\"Tạo mới\"><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i> Tạo</a>", "", "")
+                                    </div>
+                                    <div class="col-xs-12 no-padding" style="margin-top: 15px;">
+                                        <div class="col-xs-5 no-padding">
+                                            Tổng số @Model.ItemCount kết quả trong @Model.PageCount trang
+                                        </div>
+                                        @if (Model != null && Model.DataList != null)
+                                        {
+                                            <div id="dynamic-table_paginate" class="dataTables_paginate paging_simple_numbers" style="">
+                                                @Html.PagerBootstrap((int)Model.PageSize, -1 + (int)Model.PageIndex, (int)Model.ItemCount, new { username = Request["username"], RecordCount = Request["RecordCount"], init = Request["init"] }, "<", ">", "<<", ">>")
+                                            </div>
+                                        }
+                                        @Html.Partial("RecordCount")
+                                    </div>
+                                    }
+                            </aside>
+                    </div>
+                </div>
+                <div class="panel panel-info">
+                    <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+
+                        <aside class="col-xs-12 layout-table no-padding">
+                            <div class="scrollable-horizontal padding-left-0 padding-right-0 div-scrollable" style="padding-top: 0!important;">
+                                <div style="width: 100%; float: left;">
+                                    <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center cell-50">@MvcHtmlString.Create("TT")</th>
+                                                <th class="text-center cell-250">
+                                                    @MvcHtmlString.Create("Tên nhóm")
+                                                </th>
+                                                <th class="text-center cell-200">
+                                                    @MvcHtmlString.Create("Mã nhóm")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Trạng thái")
+                                                </th>
+                                                <th class="cell-120">&nbsp;</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="table-tbodyID">
+                                            @if (Model != null && Model.DataList != null && Model.DataList.Count > 0)
+                                            {
+                                                var idx = 0;
+                                                foreach (var item in Model.DataList)
+                                                {
+                                                    var iindex = startCount + (idx + 1);
+
+                                            <tr idx="@idx" class="data-item trdata">
+                                                <td class="text-center cell-50" style="background: #D3EDE4;">
+                                                    @MvcHtmlString.Create(iindex.ToString())
+                                                </td>
+                                                <td class="text-center cell-250">
+                                                    @MvcHtmlString.Create(item.GroupName)
+                                                </td>
+                                                <td class="text-center cell-200">
+                                                    @MvcHtmlString.Create(item.GroupCode)
+                                                </td>
+                                                <td class="text-center cell-100">
+                                                    @if (item.FlagActive.Equals("1"))
+                                                    {
+                                                        <span class="label label-sm label-success">Active</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="label label-sm label-danger">Inactive</span>
+                                                    }
+                                                </td>
+                                                <td class="text-center cell-120">
+                                                    <div class="action-buttons padding-top-2">
+                                                        @{
+                                                            var urlDetail = Url.Action("Detail", "RptSv_Sys_Group", new { groupcode = item.GroupCode });
+                                                            var urlUpdate = Url.Action("Update", "RptSv_Sys_Group", new { groupcode = item.GroupCode });
+
+                                                        }
+
+                                                        @RenderItemFormat("BTN_QL_NHOM_ND_CHI_TIET", "<a class=\"icon-detail\" href=\'" + urlDetail + "\' title=\"Chi tiết\"><img class=\"img-icon\" src='" + Url.Content("~/Images/Xem.svg") + "'></a>", "", "")
+                                                        @RenderItemFormat("BTN_QL_NHOM_ND_SUA", "<a class=\"icon-edit\" href=\'" + urlUpdate + "\' title=\"Sửa\"><img class=\"img-icon\" src='" + Url.Content("~/Images/Sua.svg") + "'></a>", "", "")
+                                                        @if (item.FlagActive.Equals("1"))
+                                                        {
+
+                                                            @RenderItemFormat("BTN_QL_NHOM_ND_GAN_ND_VAO_NHOM", "<a href=\"javascript:;\" id=\"btnAddUserInGroup\" class=\"icon-freeze\" title=\"Gán người dùng vào nhóm\" onclick=\"GetSysUser('" + item.GroupCode + "')\"><img class=\"img-icon\" src='" + Url.Content("~/Images/group.svg") + "'></a>", "", "")
+                                                            @RenderItemFormat("BTN_QL_NHOM_ND_GAN_MENU_BUTTON_VAO_NHOM", "<a href=\"javascript:;\" id=\"btnAddMenuButtonInGroup\" class=\"icon-cardrenew\" title=\"Gán Menu - Button vào nhóm\" onclick=\"GetSysObject('" + item.GroupCode + "')\"><img class=\"img-icon\" src='" + Url.Content("~/Images/Menu.svg") + "'></a>", "", "")
+                                                        }
+                                                        @RenderItemFormat("BTN_QL_NHOM_ND_XOA", "<a href=\"javascript:;\" class=\"icon-delete\" title=\"Xóa\" onclick=\"Delete('" + item.GroupCode + "')\"><img class=\"img-icon\" src='" + Url.Content("~/Images/Xoa.svg") + "'></a>", "", "")
+
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                                    idx++;
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+<div class="modal fade" id="ShowPopup" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+
+@*Active Menu*@
+<script type="text/javascript">
+    setAdminCurrentUrl('@Url.Action("Index", "RptSv_Sys_Group")');
+</script>
+
+<script>
+    function Search()
+    {
+        $('#manageForm').attr('action', '@Url.Action("Index", "RptSv_Sys_Group")').submit();
+    }
+</script>
+
+<script>
+    function ClosePopup() {
+        $('#ShowPopup').modal("hide");
+        $('#ShowPopup').html('');
+    }
+    function Delete(GroupCode) {
+        if (!IsNullOrEmpty(GroupCode)) {
+            bootbox.confirm({
+                title: "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO",
+                message: "Đồng ý xóa nhóm người dùng '" + GroupCode + "' ?",
+                buttons: {
+                    'cancel': {
+                        label: 'Thoát',
+                        className: 'btn mybtn-Button btnButton'
+                    },
+                    'confirm': {
+                        label: 'Đồng ý',
+                        className: 'btn mybtn-Button btnButton'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        var url = '@Url.Action("Delete", "RptSv_Sys_Group")';
+                        var token = $('input[name=__RequestVerificationToken]').val();
+                        $.ajax({
+                            url: url,
+                            data: {
+                                groupcode: GroupCode,
+                                __RequestVerificationToken: token
+                            },
+                            type: 'post',
+                            dataType: 'json',
+                            success: function (data) {
+                                if (data.Success) {
+                                    if (data.Messages != null && data.Messages !== undefined && data.Messages.length > 0) {
+                                        alert(data.Messages[0]);
+                                    }
+                                    window.location.href = window.location.href;
+                                } else {
+                                    _showErrorMsg123("Lỗi!",data.Detail);
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        } else {
+            alert("Chưa chọn bản ghi cần xóa!");
+            return;
+        }
+    }
+
+    function GetSysUser(groupcode) {
+        if (groupcode !== undefined && groupcode !== null && groupcode.toString().trim().length > 0) {
+            var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+            var url = '@Url.Action("GetSysUser", "RptSv_Sys_Group")';
+            $.ajax({
+                url: url,
+                data: {
+                    __RequestVerificationToken: token
+                    , groupcode: groupcode
+                },
+                type: 'post',
+                dataType: 'json',
+                traditional: true,
+                success: function (data) {
+                    if (data.Success) {
+                        $('#ShowPopup').modal({
+                            backdrop: false,
+                            keyboard: true,
+                        });
+                        $("#ShowPopup").html(data.Html);
+                    } else {
+                        _showErrorMsg123("Lỗi!", data.Detail);
+                    }
+
+                }
+            });
+        }
+    }
+
+    function GetSysObject(groupcode) {
+        if (groupcode !== undefined && groupcode !== null && groupcode.toString().trim().length > 0) {
+            var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+            var url = '@Url.Action("GetSysObject", "RptSv_Sys_Group")';
+            $.ajax({
+                url: url,
+                data: {
+                    __RequestVerificationToken: token
+                    , groupcode: groupcode
+                },
+                type: 'post',
+                dataType: 'json',
+                traditional: true,
+                success: function (data) {
+                    if (data.Success) {
+                        $('#ShowPopup').modal({
+                            backdrop: false,
+                            keyboard: true,
+                        });
+                        $("#ShowPopup").html(data.Html);
+                    } else {
+                        _showErrorMsg123("Lỗi!", data.Detail);
+                    }
+
+                }
+            });
+        }
+    }
+
+     function GetDetailData(groupcode)
+    {
+        if (!IsNullOrEmpty(groupcode)) {
+            var url = '@Url.Action("GetDetailData", "RptSv_Sys_Group")';
+            var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+            $.ajax({
+                url: url,
+                data: {
+                    __RequestVerificationToken: token
+                    , groupcode: groupcode
+                },
+                type: 'post',
+                dataType: 'json',
+                traditional: true,
+                success: function (data) {
+                    if (data.Success) {
+                        $("#divDtl").html(data.Html);
+                    } else {
+                        _showErrorMsg123("Lỗi!", data.Detail);
+                    }
+
+                }
+            });
+        }
+    }
+</script>
+
+@*Import Excel*@
+<div class="modal fade" id="ImportExcelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+
+<script type="text/javascript">
+    function ShowPopupImportExcel() {
+        var url = '@Url.Action("ShowPopupImportExcel", "Admin")';
+        $.ajax({
+            url: url,
+            data: {},
+            type: 'post',
+            dataType: 'json',
+            traditional: true,
+            success: function (data) {
+                if (data.Success) {
+                    $('#ImportExcelModal').modal({
+                        backdrop: false,
+                        keyboard: true,
+                    });
+                    $("#ImportExcelModal").html(data.Html); // truyen html vao #form
+                } else {
+                    _showErrorMsg123('@MvcHtmlString.Create("Lỗi")', data.Detail);
+                }
+
+            }
+        });
+    }
+
+    function ImportFileExcel() {
+        var url = '@Url.Action("Import", "RptSv_Sys_Group")';
+        var formData = new window.FormData($('#manageFormImportExcel')[0]);
+        formData.append('tax_file', $('input[type=file]')[0].files[0]);
+        $.ajax({
+            url: url,
+            type: 'post',
+            beforeSend: function(){},
+            success: function (result) {
+                var mes = '';
+                if (result.Success) {
+                    mes = result.Messages[0];
+                    alert(mes);
+                    window.location.href = window.location.href;
+                } else {
+                    if (result.Messages !== null && result.Messages !== undefined && result.Messages.length > 0) {
+                        alert(result.Messages[0]);
+                    }
+                    else{
+                        mes = result.Detail;
+                        _showErrorMsg123("Lỗi!", mes);
+                    }
+                }
+
+            },
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    }
+</script>
+
+@*Export*@
+<script type="text/javascript">
+    function ExportTemplate()
+    {
+        var token = $('input[name=__RequestVerificationToken]').val();
+        var url = '@Url.Action("ExportTemplate", "RptSv_Sys_Group")';
+        ExportExcelTemplate(url, token);
+    }
+
+    function Export()
+    {
+        var token = $('input[name=__RequestVerificationToken]').val();
+        var url = '@Url.Action("Export", "RptSv_Sys_Group")';
+        var groupcode = ReturnValueText('#GroupCode');
+        $.ajax({
+            url: url,
+            data: {
+                __RequestVerificationToken: token
+                , groupcode: groupcode
+            },
+            type: 'post',
+            dataType: 'JSON',
+            contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+            traditional: true,
+            beforeSend: function () {
+                //bodycur.addClass("my-loading");
+            },
+            success: function (data) {
+                try {
+                    var getData = data;
+                    if (getData.Success === false || getData.Success === 'false') {
+                        _showErrorMsg123("Lỗi!", getData.Detail);
+                    } else {
+                        alert(getData.Title);
+                        if (getData.CheckSuccess === "1") {
+                            if (getData.strUrl !== null && getData.strUrl.length > 0) {
+                                window.location = getData.strUrl;
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.log(e.message);
+                }
+            },
+            complete: function (data) {
+                // Hide image container
+                //bodycur.removeClass("my-loading");
+            }
+        });
+    }
+</script>
+
+@*scroll*@
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.scrollable-horizontal').each(function () {
+            var $this = $(this);
+            $(this).ace_scroll(
+                {
+                    horizontal: true,
+                    //styleClass: 'scroll-top',//show the scrollbars on top(default is bottom)
+                    size: $this.attr('data-size') || 6500,
+                    mouseWheelLock: true
+                }
+            ).css({ 'padding-top': 0 });
+        });
+    });
+    $('.scrollable').each(function () {
+        var $this = $(this);
+        $(this).ace_scroll({
+            //size: 500,
+            size: $this.attr('data-size') || 1000,
+            mouseWheelLock: true
+            //styleClass: 'scroll-left scroll-margin scroll-thin scroll-dark scroll-light no-track scroll-visible'
+        });
+    });
+</script>
+
+<script>
+    $(document).on('keypress', function (e) {
+        if (e.which == 13) {
+            Search();
+        }
+    });
+</script>
+
+
+

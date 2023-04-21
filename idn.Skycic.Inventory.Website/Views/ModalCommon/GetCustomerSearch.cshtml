@@ -1,0 +1,154 @@
+﻿@model List<Mst_Customer>
+<div class="modal-dialog" style="width: 500px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel"><b>Tìm kiếm khách hàng</b></h2>
+            <a href="javascript:;" onclick="ClosePopupCustomer()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body" style="">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupCustomer" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="col-xs-10">                    
+                    <div class="form-group margin-bottom-5">
+                        @*<label for="ParentCode" class="col-xs-3 col-sm-2 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tìm số mã/tên <span style=\"color: red\">*</span>")</label>*@
+                        <div class="col-xs-3 col-sm-4">
+                            <input class="col-md-12" placeholder="Nhập mã/tên" style="height: 30px" id="customerkey" value="@(Request["customerkey"] == null ? "" : Request["customerkey"])" />
+                        </div>
+                        <div class="col-xs-2">
+                            <a href="javascript:void(0);" class="btn btn-nc-button"  onclick="SearchCustomer();">Tìm kiếm</a>
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+                <div style="width: 100%; float: left;">
+                    <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                        <thead>
+                            <tr class="trthead">
+                                <th class="text-center cell-50">
+                                </th>
+                                <th fieldId="CustomerCode" sorttype="T" fieldName="Mã khách hàng" fieldActive="0" class="text-left cell-150">
+                                    @("Mã khách hàng".HtmlItemString("CustomerCode"))
+                                </th>
+                                <th fieldId="CustomerName" sorttype="T" fieldName="Tên khách hàng" fieldActive="0" class="text-left cell-150">
+                                    @("Tên khách hàng".HtmlItemString("CustomerName"))
+                                </th>
+                                <th fieldId="CustomerAddress" sorttype="T" fieldName="Địa chỉ" fieldActive="0" class="text-left cell-150">
+                                    @("Địa chỉ".HtmlItemString("CustomerAddress"))
+                                </th>
+                                <th fieldId="UnitCode" sorttype="T" fieldName="Mã kho cha" fieldActive="0" class="text-left cell-150">
+                                    @("Người liên hệ".HtmlItemString("unitcode"))
+                                </th>
+                                <th fieldId="UnitCode" sorttype="T" fieldName="Mã kho cha" fieldActive="0" class="text-left cell-150">
+                                    @("Điện thoại".HtmlItemString("unitcode"))
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                    <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                        <tbody id="table-tbodyIDCustomer">
+                            @{
+                                if (Model != null && Model.Count != 0)
+                                {
+                                    var idx = 0;
+                                    foreach (var it in Model)
+                                    {
+                            <tr class="data-item trdata" idx="@idx">
+                                <input type="hidden" name="Lst_Mst_Customer[@idx].CustomerCode" value="@(it.CustomerCodeSys == null ? "" : it.CustomerCodeSys)" />
+                                <input type="hidden" name="Lst_Mst_Customer[@idx].CustomerName" value="@(it.CustomerName == null ? "" : it.CustomerName)" />
+                                <input type="hidden" name="Lst_Mst_Customer[@idx].CustomerAddress" value="@(it.CustomerAddress == null ? "" : it.CustomerAddress)" />
+                                <input type="hidden" name="Lst_Mst_Customer[@idx].ContactName" value="@(it.ContactName == null ? "" : it.ContactName)" />
+                                <input type="hidden" name="Lst_Mst_Customer[@idx].ContactPhone" value="@(it.ContactPhone == null ? "" : it.ContactPhone)" />
+                                <td fieldId="CONTROL" fieldActive="0" class="text-center cell-50 action-buttons">
+                                    <input type="radio" class="checkCustomer" name="checkCustomer" />
+                                </td>
+                                <td fieldActive="CustomerCode" class="text-left cell-150">
+                                    @(it.CustomerCode == null ? "" : it.CustomerCode)
+                                </td>
+                                <td fieldId="CustomerName" fieldActive="0" class="text-left cell-150">
+                                    @(it.CustomerName == null ? "" : it.CustomerName)
+                                </td>
+                                <td fieldId="CustomerAddress" fieldActive="0" class="text-left cell-150">
+                                    @(it.CustomerAddress == null ? "" : it.CustomerAddress)
+                                </td>
+                                <td fieldId="ContactName" fieldActive="0" class="text-left cell-150">
+                                    @(it.ContactName == null ? "" : it.ContactName)
+                                </td>
+                                <td fieldId="ContactPhone" fieldActive="0" class="text-left cell-150">
+                                    @(it.ContactPhone == null ? "" : it.ContactPhone)
+                                </td>
+                            </tr>
+                                        idx++;
+                                    }
+
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="SelectCustomer()" style="float: right;font-size: 13px;">Chọn</a>
+            @*<a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="SaveProduct()" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i>Lưu</a>*@
+        </div>
+    </div>
+</div>
+
+<script>
+    function SearchCustomer() {
+        debugger;
+        var customerkey = $('#customerkey').val();
+         $.ajax({
+                url: '@Url.Action("GetCustomerSearch", "ModalCommon")',
+                data: {
+                    customerkey: customerkey                    
+                },
+                type: 'post',
+                dataType: 'json',
+                traditional: true,
+                success: function (data) {
+                    if (data.Success) {
+                        $('#ShowPopupCustomer').modal({
+                            backdrop: false,
+                            keyboard: true,
+                        });
+                        $("#ShowPopupCustomer").html(data.Html);
+                        var display = $("#ShowPopupCustomer").css('display');
+                        if (display == "none") {
+                            $("#ShowPopupCustomer").show();
+                        }
+                    } else {
+                        showErrorDialog(data.Detail);
+                    }
+                }
+            });
+    }
+
+    function SelectCustomer() {
+        var length = $("tbody#table-tbodyIDCustomer tr.trdata input.checkCustomer:checked").length;
+        if (length == 0) {
+            alert("Không có hàng hóa nào được chọn");
+            return;
+        }
+        $("tbody#table-tbodyIDCustomer tr.trdata input.checkCustomer:checked").each(function () {
+            var tr = $(this).parents('tr');
+            var idx = $(tr).attr('idx');
+            var strCustomerCode = tr.find('input[name="Lst_Mst_Customer[' + idx + '].CustomerCode"]').val();
+            //var strCustomerName = tr.find('input[name="Lst_Mst_Customer[' + idx + '].CustomerName"]').val();
+            //var strCustomerAddress = tr.find('input[name="Lst_Mst_Customer[' + idx + '].CustomerAddress"]').val();
+            //var strContactName = tr.find('input[name="Lst_Mst_Customer[' + idx + '].ContactName"]').val();
+            //var strContactPhone = tr.find('input[name="Lst_Mst_Customer[' + idx + '].ContactPhone"]').val();
+
+            if (strCustomerCode != undefined && strCustomerCode != "") {
+                debugger;
+                $('#CustomerCode').val(strCustomerCode).trigger('change');
+            }
+            ClosePopupCustomer();
+        });
+    }
+
+</script>

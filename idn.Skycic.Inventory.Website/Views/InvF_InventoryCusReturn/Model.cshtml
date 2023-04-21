@@ -1,0 +1,541 @@
+﻿@model RT_InvF_InventoryCusReturn
+@{
+                /**/
+
+                /**/
+
+                string viewType = CUtils.StrValue(ViewBag.ViewType);
+                var userState = ViewBag.UserState as UserState;
+                var objInvF_InventoryCusReturn = new InvF_InventoryCusReturn();
+                var iF_InvCusReturnStatus = "";
+
+                if (Model != null)
+                {
+                    if (Model.Lst_InvF_InventoryCusReturn != null && Model.Lst_InvF_InventoryCusReturn.Count > 0)
+                    {
+                        objInvF_InventoryCusReturn = Model.Lst_InvF_InventoryCusReturn[0];
+                        iF_InvCusReturnStatus = CUtils.StrValue(objInvF_InventoryCusReturn.IF_InvCusReturnStatus);
+                    }
+                }
+}
+
+<div class="modal fade" id="ShowPopupLo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+<div class="modal fade" id="ShowPopupSerial" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+<div class="modal fade" id="ShowPopupCombo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+<div class="modal fade" id="ShowPopupInvCodeInActual" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+
+<!--Model Search InvCodeIn-->
+<div class="modal fade" id="ShowPopupInvCodeIn" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Tìm kiếm kho</b></h2>
+                <a href="javascript:;" onclick="ClosePopupInvCodeIn()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupInvCodeIn" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group margin-bottom-9">
+                        <div class="col-10 col-sm-5">
+                            <span class="block input-icon input-icon-right">
+                                <input type="text" id="InvCodeSearch" name="InvCodeSearch" class="col-12 InvCodeSearch" value="" autocomplete="off" placeholder="Tìm mã, tên" />
+                            </span>
+                        </div>
+                        <div>
+                            <a class="btn font-color mybtn-Button" onclick="SearchInvCodeIn()" href="javascript:void(0);" style="float: right;font-size: 13px;"><i class="fa fa-search" aria-hidden="true"></i> Tìm</a>
+                        </div>
+                    </div>
+                    <div class="col-12 margin-bottom-9">
+                        <div id="idSearchInvCodeIn" style="margin-top: 5px;">
+                            @Html.Partial("SearchInventoryIn")
+                        </div>
+
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Model Search Customer-->
+<div class="modal fade" id="ShowPopupCustomer" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 1000px; max-width: 1000px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Tìm kiếm khách hàng là nhà cung cấp</b></h2>
+                <a href="javascript:;" onclick="ClosePopupCustomer()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupCustomer" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group margin-bottom-9">
+                        <div class="col-10 col-sm-5">
+                            <span class="block input-icon input-icon-right">
+                                <input type="text" id="CustomerCodeSearch" name="CustomerCodeSearch" class="col-12 CustomerCodeSearch" value="" autocomplete="off" placeholder="Tìm mã, tên" />
+                            </span>
+                        </div>
+                        <div>
+                            <a class="btn font-color mybtn-Button" onclick="SearchCustomer()" href="javascript:void(0);" style="float: right;font-size: 13px;"><i class="fa fa-search" aria-hidden="true"></i> Tìm</a>
+                        </div>
+                    </div>
+                    <div class="col-12 margin-bottom-9">
+                        <div id="idSearchCustomer" style="margin-top: 5px;">
+                            @Html.Partial("SearchCustomer")
+                        </div>
+
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Model Search Product *@
+<div class="modal fade" id="ShowPopupProductSearch" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 1000px; max-width: 1000px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Tìm kiếm hàng hoá</b></h2>
+                <a href="javascript:;" onclick="ClosePopupProductSearch()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupAdd" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="layout-search">
+                        <div class="form-group margin-bottom-5 padding-bottom-10">
+                            <div class="col-xs-12 col-sm-6 no-padding-left">
+                                <span class="block input-icon input-icon-right">
+                                    Hàng hóa:<input type="text" id="ProductName" name="ProductName" class="col-10 ProductName" value="" autocomplete="off" required placeholder="Nhập mã hoặc tên hàng hoá" />
+                                </span>
+                            </div>
+                            <a class="btn btn-nc-button" onclick="SearchData()" href="javascript:void(0);" style=""><img class="img-button-search" src="@Url.Content("~/Images/search.svg")"></a>
+                        </div>
+                    </div>
+                    <div class="col-12 no-padding" id="List_Product_Data">
+
+                    </div>
+                }
+            </div>
+            <div class="modal-footer" style="display: flex;justify-content: center;text-align: center;">
+                <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="addProductItemsFromModal()" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Chọn</a>
+            </div>
+        </div>
+    </div>
+</div>
+@* End Model Search Product *@
+
+@*Modal Search Product In Order*@
+<div class="modal fade" id="ShowPopupProductInOrderSearch" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 1000px; max-width: 1000px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel"><b>Tìm kiếm hàng hoá</b></h2>
+                <a href="javascript:;" onclick="ClosePopupProductInOrderSearch()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+            </div>
+            <div class="modal-body" style="">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupAddPrdInOrder" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="layout-search">
+                        <div class="row no-margin">
+                            <div class="col-sm-11 row no-margin">
+                                <div class="col-sm-5 no-padding">
+                                    <div class="row form-group margin-bottom-9">
+                                        <label for="sRefNo" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Số RefNo".HtmlItemString("invf_inventorycusreturn"))</label>
+                                        <div class="col-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="sRefNo" name="sRefNo" class="col-12 sRefNo" value="" readonly="readonly" />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-5 no-padding">
+                                    <div class="row form-group margin-bottom-9">
+                                        <label for="sProductName" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Hàng hóa".HtmlItemString("invf_inventorycusreturn"))</label>
+                                        <div class="col-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right">
+                                                <input type="text" id="sProductName" name="sProductName" class="col-12 sProductName" value="" />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <span class="block input-icon input-icon-right">
+                                    <a class="btn btn-nc-button" onclick="SearchProductInOrder()" href="javascript:void(0);" style=""><img class="img-button-search" src="@Url.Content("~/Images/search.svg")"></a>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row margin-bottom-9">
+                            <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="AddItemsPrdInOrder()" style="float: right;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Chọn</a>
+                        </div>
+                    </div>
+
+                    <div class="col-12 no-padding" id="List_Product_Data_InOrder">
+
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('select#InvInType').select2().on('select2:close', function () { commonUtils.showPopup(this); });
+        $('select#InvCodeIn').select2().on('select2:close', function () { commonUtils.showPopup(this); });
+        $('select#CustomerCode').select2().on('select2:close', function () { commonUtils.showPopup(this); });
+        $('select#InvCodeInActualPopup').select2();
+        $('select.InvCodeInActual_Lot').select2();
+        $('select.listproductbase').select2();
+    })
+
+    function ShowPopupInvInType() {
+        $('#ShowPopupInvInType').modal({
+            backdrop: false,
+            keyboard: true,
+        });
+        $('#ShowPopupInvInType').modal('show');
+    }
+
+    function ClosePopupInvInType() {
+        $('#ShowPopupInvInType').modal('hide');
+        $('#ShowPopupInvInType').on('hidden.bs.modal', function () {
+            $('#ShowPopupInvInType form')[0].reset();
+        });
+    }
+
+    function SearchInvInType() {
+        var invInType = '';
+        if ($('#InvInTypeSearch').length > 0) {
+            invInType = $('#InvInTypeSearch').val();
+        }
+
+        var url = '@Url.Action("SearchInvInType", "InvF_InventoryCusReturn")';
+        $.ajax({
+            url: url,
+            data: { txtsearch: invInType },
+            type: 'post',
+            dataType: 'json',
+            traditional: true,
+            success: function (data) {
+                if (data.Success) {
+                    $("#idSearchInvInType").html(data.Html);
+                } else {
+                    _showErrorMsg123('Lỗi!', data.Detail);
+                }
+            }
+        });
+    }
+
+    function ShowPopupInvCodeIn() {
+        $('#ShowPopupInvCodeIn').modal({
+            backdrop: false,
+            keyboard: true,
+        });
+        $('#ShowPopupInvCodeIn').modal('show');
+    }
+
+    function ClosePopupInvCodeIn() {
+        $('#ShowPopupInvCodeIn').modal('hide');
+        $('#ShowPopupInvCodeIn').on('hidden.bs.modal', function () {
+            $('#ShowPopupInvCodeIn form')[0].reset();
+        });
+    }
+
+    function SearchInvCodeIn() {
+        var invCodeIn = '';
+        if ($('#InvCodeSearch').length > 0) {
+            invCodeIn = $('#InvCodeSearch').val();
+        }
+
+        var url = '@Url.Action("SearchInventoryIn", "InvF_InventoryCusReturn")';
+        $.ajax({
+            url: url,
+            data: { txtsearch: invCodeIn },
+            type: 'post',
+            dataType: 'json',
+            traditional: true,
+            success: function (data) {
+                if (data.Success) {
+                    $("#idSearchInvCodeIn").html(data.Html);
+                } else {
+                    _showErrorMsg123('Lỗi!', data.Detail);
+                }
+            }
+        });
+    }
+
+    function ShowPopupCustomerCode() {
+        $('#ShowPopupCustomer').modal({
+            backdrop: false,
+            keyboard: true,
+        });
+        $('#ShowPopupCustomer').modal('show');
+    }
+
+    function ClosePopupCustomer() {
+        $('#ShowPopupCustomer').modal('hide');
+        $('#ShowPopupCustomer').on('hidden.bs.modal', function () {
+            $('#ShowPopupCustomer form')[0].reset();
+        });
+    }
+
+    function SearchCustomer() {
+        var customerCode = '';
+        if ($('#CustomerCodeSearch').length > 0) {
+            customerCode = $('#CustomerCodeSearch').val();
+        }
+
+        var url = '@Url.Action("SearchCustomer", "InvF_InventoryCusReturn")';
+        $.ajax({
+            url: url,
+            data: { txtsearch: customerCode },
+            type: 'post',
+            dataType: 'json',
+            traditional: true,
+            success: function (data) {
+                if (data.Success) {
+                    $("#idSearchCustomer").html(data.Html);
+                } else {
+                    _showErrorMsg123('Lỗi!', data.Detail);
+                }
+            }
+        });
+    }
+</script>
+
+<script type="text/javascript">
+    function SearchData(){
+        let invcodein = $('#InvCodeIn').val();
+        if (invcodein === undefined || invcodein === '') {
+            alert("Kho nhập chưa được chọn");
+            //$('#InvCodeIn').focus();
+            return;
+        }
+        var recordcount = commonUtils.returnValueText('#recordcount');
+        var pagecur = commonUtils.returnValueText('#page');
+        var productCode = commonUtils.returnValueText('#ShowPopupProductSearch #ProductName');
+        var token = $('#ShowPopupProductSearch #manageForm input[name=__RequestVerificationToken]').val();
+        var url = '@Url.Action("SearchMstProduct", "InvF_InventoryCusReturn")';
+        $.ajax({
+        type: "post",
+        data: {
+            __RequestVerificationToken: token,
+            productcode: productCode,
+            invcode: invcodein,
+            recordcount: recordcount,
+            page: pagecur
+        },
+        url: url,
+        dataType: 'json',
+            beforeSend: function () { }
+        }).done(function (result) {
+            if (result.Success) {
+                $('#List_Product_Data').html('');
+                $('#List_Product_Data').html(result.Html);
+                //Disabled_previous_Next();
+                $('.numberic').number(true, 2);
+            } else {
+                if (!commonUtils.isNullOrEmpty(result.Detail)) {
+                    showErrorDialog(result.Detail);
+                }
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+
+        }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+            //alert("complete");
+        });
+    }
+
+    function ChangeUnitPrd(prdcode, prdhost) {
+
+        var thiz = document.getElementById('Unitchanged-' + prdcode + '-' + prdhost);
+        var prdcodenew = $('option:selected', $(thiz)).attr('prdcode');
+        var base = "#unitpu_" + prdcodenew + '-' + prdhost;
+        var unit = "#unitpu_" + prdcode + '-' + prdhost;
+        $(unit).css('display', 'none');
+        $(base).css('display', 'table-row');
+        var selected = $('#Unitchanged-' + prdcodenew + '-' + prdhost);
+        $(selected).val($(thiz).val()).prop('selected', true);
+        //$('.listproductbasepu').select2({
+        //    minimumResultsForSearch: -1
+        //});
+    }
+</script>
+
+<script type="text/javascript">
+    function addProductToTableMain(
+        ProductCode = '',
+        ProductCodeRoot = '',
+        mp_ProductCodeBase = '',
+        ProductCodeUser = '',
+        mp_ProductName = '',
+        UnitCode = '',
+        ificrc_UPIn = '',
+        FlagCombo = '',
+        mp_FlagLo = '',
+        mp_FlagSerial = '',
+    ){
+        debugger
+        let listToastr = [];
+
+        let listProductCur = [];
+        const $listProductCur = $('#table-tbodyID').find('tr.trdata');
+        if ($listProductCur != undefined && $listProductCur.length > 0) {
+            for (let item of $listProductCur) {
+                let productCodeCur = $(item).attr('ProductCode');
+                if (productCodeCur != undefined && productCodeCur.length > 0) {
+                    listProductCur.push(productCodeCur);
+                }
+            }
+
+            if (listProductCur.includes(ProductCode)) {
+                objToastr = {
+                    ToastrType: 'error',
+                    ToastrMessage: `Hàng hoá ${ProductName} đã có trên lưới`
+                };
+                listToastr.push(objToastr);
+            }
+
+            if (listToastr.length > 0) {
+                commonUtils.showToastr(listToastr);
+                return false;
+            }
+        }
+
+        let buPatternOut = $('#InvCodeOut option:selected').attr('bupattern');
+        let buPatternIn = $('#InvCodeIn option:selected').attr('bupattern');
+
+        var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+        var invCodeIn = commonUtils.returnValueText('#InvCodeIn');
+        var dataInput = {
+            prdid: ProductCode.ProductCode,
+            invcode: invCodeIn,
+            __RequestVerificationToken: token,
+        };
+        $.ajax({
+                type: "post",
+                data: dataInput,
+                url: '@Url.Action("GetProductExactly", "LoadData")',
+                dataType: 'json',
+                beforeSend: function () {
+                },
+        }).done(function (objResult) {
+            debugger;
+            if (objResult.Success) {
+                @*add hàng hóa vào lưới*@
+
+                if (objResult.Data !== undefined && objResult.Data !== null && objResult.Data.length > 0) {
+                    @* Khởi tạo *@
+                    var Lst_InvF_InventoryCusReturnDtl = [];
+
+                    for (var i = 0; i < objResult.Data.length; i++) {
+                        var objInvF_InventoryCusReturnDtl = {
+                            ProductCodeRoot: commonUtils.returnValue(objResult.Data[i].ProductCodeRoot),
+                            ProductCodeBase: commonUtils.returnValue(objResult.Data[i].ProductCodeBase),
+                            mp_ProductCodeBase: commonUtils.returnValue(objResult.Data[i].ProductCodeBase),
+                            ProductCode: commonUtils.returnValue(objResult.Data[i].ProductCode),
+                            ProductCodeUser: commonUtils.returnValue(objResult.Data[i].ProductCodeUser),
+                            ProductName: commonUtils.returnValue(objResult.Data[i].ProductName),
+                            FlagCombo: commonUtils.returnValue(objResult.Data[i].FlagCombo),
+                            mp_ProductName: commonUtils.returnValue(objResult.Data[i].ProductName),
+                            ProductType: commonUtils.returnValue(objResult.Data[i].ProductType),
+                            FlagLot: commonUtils.returnValue(objResult.Data[i].FlagLot),
+                            FlagSerial: commonUtils.returnValue(objResult.Data[i].FlagSerial),
+
+                            // Thông tin hàng hóa
+                            UnitCode: commonUtils.returnValue(objResult.Data[i].UnitCode),
+                            InvCodeInActual: commonUtils.returnValue(objResult.Data[i].InvCodeSuggest),
+                            Qty: '0',
+                            ificrc_UPCusReturn: commonUtils.returnValue(objResult.Data[i].UPBuy),
+                            ificrc_UPCusReturnDesc: '0',
+                            ValCusReturnAfterDesc: '0',
+                            Remark: '',
+                        };
+
+                        Lst_InvF_InventoryCusReturnDtl.push(objInvF_InventoryCusReturnDtl);
+                    }
+
+                    var objInvF_InventoryCusReturnDtlRender = {
+                        InvF_InventoryCusReturnDtl: Lst_InvF_InventoryCusReturnDtl[0],
+                        Lst_InvF_InventoryCusReturnDtl: Lst_InvF_InventoryCusReturnDtl,
+                    };
+
+                    renderInvF_InventoryCusReturnDtl(objInvF_InventoryCusReturnDtlRender);
+                    tongTienHang();
+                    $('#myInput').val('');
+                    commonUtils.setFocus('InvCodeIn');
+                    return false;
+                }
+
+            }
+            else {
+                if (!commonUtils.isNullOrEmpty(objResult.Detail)) {
+                    _showErrorMsg123('Lỗi!', objResult.Detail);
+                }
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+        }).always(function () {
+        });
+    }
+
+    function addProductItemsFromModal(){
+        debugger
+        const checkedRows = $('#ShowPopupProductSearch #dynamic-table-thead-tbody input[type="checkbox"]:checked');
+        if(checkedRows.length == 0){
+            var listToastr = [];
+            objToastr = {
+                ToastrType: 'error',
+                ToastrMessage: "Không có hàng hoá được chọn"
+            };
+            listToastr.push(objToastr);
+            commonUtils.showToastr(listToastr);
+            return false;
+        }
+        for (let item of checkedRows) {
+            let trRow = $(item).parent().parent();
+            let idx = $(trRow).attr('idx');
+            let productCode = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].ProductCode"]').val();
+            let productCodeRoot = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].ProductCodeRoot"]').val();
+            let productCodeBase = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].ProductCodeBase"]').val();
+            let productCodeUser = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].ProductCodeUser"]').val();
+            let productName = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].ProductName"]').val();
+            let unitCode = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].UnitCode"]').val();
+            let upin = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].UPBuy"]').val();
+            let flagLo = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].mp_FlagLot"]').val();
+            let flagCombo = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].FlagCombo"]').val();
+            let flagSerial = $(trRow).find('input[type="hidden"][name="ListProduct[' + idx + '].mp_FlagSerial"]').val();
+
+            let product = {
+                ProductCode : productCode,
+                ProductCodeRoot : productCodeRoot,
+                ProductCodeBase : productCodeBase,
+                ProductCodeUser : productCodeUser,
+                ProductName : productName,
+                UnitCode : unitCode,
+                ificrc_UPIn : upin,
+                FlagLo : flagLo,
+                FlagCombo : flagCombo,
+                FlagSerial : flagSerial,
+            }
+
+            addProductToTableMain(product);
+            ClosePopupProductSearch();
+        }
+    }
+</script>
+
+

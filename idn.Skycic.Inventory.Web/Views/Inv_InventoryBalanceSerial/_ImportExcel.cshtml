@@ -1,0 +1,99 @@
+﻿
+@{
+    var listMst_Inventory = ViewBag.ListMst_Inventory as List<Mst_Inventory>;
+}
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="exampleModalLabel">Nhập file Excel</h3>
+            <a href="javascript:void();" onclick="CloseModalImportExcel()" class="close" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </a>
+        </div>
+        <div class="modal-body">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "manageFormImportExcel" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="col-xs-12 no-padding">
+                    <div class="form-group margin-bottom-5 col-xs-6 no-padding">
+                        <label for="InvCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã kho <span style=\"color: red \">*</span>")</label>
+                        <div class="col-xs-12 col-sm-8">
+                            <span class="block input-icon input-icon-right">
+                                <select id="InvCode" name="InvCode" class="col-xs-12">
+                                    @{
+                                        var invcode = Request["invcode"] == null ? "" : Request["invcode"];
+                                    }
+                                    <option value=""></option>
+                                    @if (listMst_Inventory != null && listMst_Inventory.Count > 0)
+                                    {
+                                        foreach (var item in listMst_Inventory)
+                                        {
+                                            <option value="@MvcHtmlString.Create(item.InvCode.ToString().Trim())" desc="@MvcHtmlString.Create(item.InvCode.ToString().Trim())" @(invcode.Equals(item.InvCode.ToString().Trim()) ? "selected" : "")>@MvcHtmlString.Create(item.InvCode.ToString().Trim())</option>
+                                        }
+                                    }
+                                </select>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 no-padding">
+                    <div class="form-group margin-bottom-5">
+                        <input type="file" name="file" id="file" />
+                    </div>
+                </div>
+            }
+
+        </div>
+        <div class="modal-footer">
+            <a href="javascript:void(0);" class="btn mybtn-Button" onclick="Import()" id="btnSaveImport" style="padding-left: 10px!important; padding-right: 10px!important; font-size: 16px; font-weight: 500;">Nhập</a>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('input[type="file"]').change(function (e) {
+            checkFileExcelImport(this, e);
+        });
+
+    });
+
+    function CloseModalImportExcel() {
+        $('#ImportExcelModal').modal("hide");
+        $('#ImportExcelModal').html('');
+    }
+
+    function Import(title) {
+        var file = $("#file").val();
+        var invcode = $("#InvCode").val();
+
+        if (commonUtils.isNullOrEmpty(invcode)) {
+            alert("Bạn phải chọn kho!");
+            return false;
+        }
+
+        if (file.length === 0) {
+            alert("Nhập file cần Import");
+            $("#file").val('');
+            return false;
+        } else {
+            var checkFile = false;
+            var _index = file.lastIndexOf('.');
+            if (_index !== undefined && _index !== null && _index > 0) {
+                var fileType = file.substring(_index + 1, file.length).toLowerCase();
+                if (fileType === 'xls' || fileType.toLowerCase() === 'xlsx') {
+                    checkFile = true;
+                }
+            }
+            if (checkFile) {
+                ImportFileExcel();
+            } else {
+                alert("File Excel Import không hợp lệ!");
+            }
+        }
+    }
+</script>
+
+
+
+

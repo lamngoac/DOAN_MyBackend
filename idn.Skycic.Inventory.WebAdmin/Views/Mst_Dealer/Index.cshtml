@@ -1,0 +1,463 @@
+﻿@model PageInfo<Mst_Dealer>
+@{
+    var title = "QUẢN LÝ ĐẠI LÝ";
+    ViewBag.Title = title;
+    var startCount = 0;
+    var strStartCount = ViewBag.StartCount as string;
+    if (!CUtils.IsNullOrEmpty(strStartCount))
+    {
+        startCount = Convert.ToInt32(strStartCount);
+    }
+    var userState = ViewBag.UserState as UserState;
+}
+
+<div class="row no-margin">
+    <div class="row no-margin">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="panel-group" id="steps">
+                <aside class="panel panel-info">
+                    <div class="title">
+                        <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                    </div>
+                    @if (userState.RptSv_Sys_User.DLCode.Equals(Mst_Dealer_Client.IDOCNET))
+                    {
+                        <aside class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                            <aside class="col-xs-12 no-padding layout-tk">
+                                @using (Html.BeginForm(null, null, FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+                                {
+                                    <input type="hidden" value="search" name="init" id="init" />
+                                    <aside class="col-xs-12 box-shadow-tk">
+                                        <aside class="col-xs-4">
+                                            <div class="form-group margin-bottom-5">
+                                                <label for="dlcode" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Mã đại lý</label>
+                                                <div class="col-xs-12 col-sm-7">
+                                                    <input type="text" id="dlcode" name="dlcode" class="col-xs-11 dlcode" value="@MvcHtmlString.Create(ViewBag.DLCode)" autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="form-group margin-bottom-5">
+                                                <label for="dlname" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Tên đại lý</label>
+                                                <div class="col-xs-12 col-sm-7">
+                                                    <input type="text" id="dlname" name="dlname" class="col-xs-11 dlname" value="@MvcHtmlString.Create(ViewBag.dlname)" autocomplete="off">
+                                                </div>
+                                            </div>
+                                        </aside>
+                                        <aside class="col-xs-4">
+                                            <div class="form-group margin-bottom-5">
+                                                <label for="dtfromdate" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">Ngày tạo từ</label>
+                                                <div class="col-xs-12 col-sm-7" style="padding-right: 0px;">
+                                                    <div class="col-xs-11" style="padding-left: 0;padding-right: 12px;">
+                                                        <div class="input-group" id="dtfromdate">
+                                                            <input type="text" id="fromdate" name="fromdate" class="col-xs-12 fromdate" data-date-format="yyyy-mm-dd" value="@MvcHtmlString.Create(ViewBag.CreateDTimeFrom)" autocomplete="off" />
+                                                            <span class="input-group-addon">
+                                                                <i class="fa fa-calendar bigger-100"></i>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group margin-bottom-5">
+                                                <label for="dttodate" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">đến</label>
+                                                <div class="col-xs-12 col-sm-7" style="padding-right: 0px;">
+                                                    <div class="col-xs-11" style="padding-left: 0;padding-right: 12px;">
+                                                        <div class="input-group" id="dttodate">
+                                                            <input type="text" id="todate" name="todate" class="col-xs-12 todate" data-date-format="yyyy-mm-dd" value="@MvcHtmlString.Create(ViewBag.CreateDTimeTo)" autocomplete="off" />
+                                                            <span class="input-group-addon">
+                                                                <i class="fa fa-calendar bigger-100"></i>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </aside>
+                                        <aside class="col-xs-4">
+                                            <div class="form-group margin-bottom-5">
+                                                <label for="dlphoneno" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Điện thoại</label>
+                                                <div class="col-xs-12 col-sm-7">
+                                                    <input type="text" id="dlphoneno" name="dlphoneno" class="col-xs-11 dlphoneno" value="@MvcHtmlString.Create(ViewBag.dlphoneno)" autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="form-group margin-bottom-5">
+                                                <label for="dlemail" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500">Email</label>
+                                                <div class="col-xs-12 col-sm-7">
+                                                    <input type="text" id="dlemail" name="dlemail" class="col-xs-11 dlemail" value="@MvcHtmlString.Create(ViewBag.dlemail)" autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="form-group margin-bottom-5">
+                                                <label for="flagactive" class="col-xs-12 col-sm-5 control-label no-padding-right font-weight-500 ">Trạng thái</label>
+                                                <div class="col-xs-12 col-sm-7">
+                                                    @{
+                                                        var flagactive = "";
+                                                        if (!CUtils.IsNullOrEmpty(ViewBag.FlagActive))
+                                                        {
+                                                            flagactive = ViewBag.FlagActive.ToString().Trim();
+                                                        }
+
+                                                    }
+                                                    <select id="flagactive" name="flagactive" class="col-xs-11 flagactive" title="">
+                                                        <option value=""></option>
+                                                        <option value="@MvcHtmlString.Create("1")" @(flagactive.Equals("1") ? "selected" : "")>@MvcHtmlString.Create("Active")</option>
+                                                        <option value="@MvcHtmlString.Create("0")" @(flagactive.Equals("0") ? "selected" : "")>@MvcHtmlString.Create("Inactive")</option>
+
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </aside>
+                                        <div class="button-tk">
+                                            <div class="form-group margin-bottom-5">
+                                                <div class="col-xs-12 col-sm-8">
+                                                    <span class="block input-icon input-icon-right">
+                                                        @*@if (userState != null && userState.RptSv_Sys_User.FlagSysAdmin.Equals("1"))
+                                                            {
+
+                                                            }*@
+                                                        <a class="btn font-color mybtn-Button" onclick="Search()" href="javascript:void(0);" style="">
+                                                            <img class="img-button" src="~/Images/search.svg">
+                                                        </a>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </aside>
+                                    if (userState != null && userState.RptSv_Sys_User.FlagSysAdmin.Equals("1"))
+                                    {
+                                        @RenderItemFormat("BTN_QL_DAI_LY_TAO", "<a class=\"btn font-color mybtn-Button\" href=\"" + Url.Action("Create", "Mst_Dealer") + "\" style=\"float: right;font-size: 13px; margin-top: 20px\"><img class=\"img-button in-acti\" src='" + Url.Content("~/Images/Hoadon/Tao.svg") + "'><img class=\"img-button acti\" src='" + Url.Content("~/Images/Hoadon/TaoHDDieuChinh.svg") + "'>Tạo</a>", "", "")
+                                    }
+                                    <div class="col-xs-12 no-padding" style="margin-top: 15px; margin-bottom: 10px;">
+
+                                        @if (Model != null && Model.DataList != null)
+                                        {
+                                            @*<div class="col-xs-5 no-padding">
+                                                    Tổng số @Model.ItemCount kết quả trong @Model.PageCount trang
+                                                </div>*@
+                                            <div id="dynamic-table_paginate" class="dataTables_paginate paging_simple_numbers">
+                                                @Html.PagerBootstrap((int)Model.PageSize, -1 + (int)Model.PageIndex, (int)Model.ItemCount, new { taxtype = Request["taxtype"], init = Request["init"] }, "<", ">", "<<", ">>")
+                                            </div>
+                                        }
+                                        @*@Html.Partial("RecordCount")*@
+                                    </div>
+                                }
+                            </aside>
+                        </aside>
+                    }
+
+                </aside>
+                <div class="panel panel-info">
+                    <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;padding-top: 0;">
+                        @Html.AntiForgeryToken()
+                        <aside class="col-xs-12 no-padding">
+                            <div class="scrollable-horizontal padding-left-0 padding-right-0 div-scrollable" style="padding-top: 0!important;">
+                                <div style="width: 100%; float: left;">
+                                    <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center cell-50">@MvcHtmlString.Create("STT")</th>
+                                                <th class="text-center cell-75">
+                                                    @MvcHtmlString.Create("Mã đại lý cha")
+                                                </th>
+                                                <th class="text-center cell-75">
+                                                    @MvcHtmlString.Create("Mã đại lý")<br />
+                                                    @MvcHtmlString.Create("Tên đại lý")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Tỉnh/Thành phố")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Ngày đăng ký")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Loại đại lý")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Email")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Điện thoại")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Tổng số KH")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("KH đang sử dụng")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Trạng thái")
+                                                </th>
+                                                <th class="cell-100">&nbsp;</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="table-tbodyID">
+                                            @if (Model != null && Model.DataList != null && Model.DataList.Count > 0)
+                                            {
+                                                var idx = 0;
+                                                foreach (var item in Model.DataList)
+                                                {
+                                                    var iindex = startCount + (idx + 1);
+                                                    var dLCode = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.DLCode))
+                                                    {
+                                                        dLCode = CUtils.StrValue(item.DLCode);
+                                                    }
+                                                    var dLCodeParent = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.DLCodeParent))
+                                                    {
+                                                        dLCodeParent = CUtils.StrValue(item.DLCodeParent);
+                                                    }
+                                                    var provinceCode = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.ProvinceCode))
+                                                    {
+                                                        provinceCode = CUtils.StrValue(item.ProvinceCode);
+                                                    }
+                                                    var provinceName = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.mp_ProvinceName))
+                                                    {
+                                                        provinceName = CUtils.StrValue(item.mp_ProvinceName);
+                                                    }
+                                                    var dlname = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.DLName))
+                                                    {
+                                                        dlname = CUtils.StrValue(item.DLName);
+                                                    }
+                                                    var logLUDTimeUTC = "";
+                                                    var offset = 7.0;
+                                                    if (!CUtils.IsNullOrEmpty(item.LogLUDTimeUTC) && CUtils.IsDateTime(item.LogLUDTimeUTC))
+                                                    {
+                                                        var dLogLUDTimeUTC = CUtils.ConvertingUTCToLocalTime(item.LogLUDTimeUTC, offset);
+                                                        logLUDTimeUTC = dLogLUDTimeUTC.ToString(Nonsense.DATE_TIME_FORMAT);
+                                                    }
+                                                    var dltype = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.DLType))
+                                                    {
+                                                        dltype = CUtils.StrValue(item.DLType);
+                                                    }
+                                                    var dLAddress = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.DLAddress))
+                                                    {
+                                                        dLAddress = CUtils.StrValue(item.DLAddress);
+                                                    }
+                                                    var dLPresentBy = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.DLPresentBy))
+                                                    {
+                                                        dLPresentBy = CUtils.StrValue(item.DLPresentBy);
+                                                    }
+                                                    var dLGovernmentIDNumber = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.DLGovIDNumber))
+                                                    {
+                                                        dLGovernmentIDNumber = CUtils.StrValue(item.DLGovIDNumber);
+                                                    }
+                                                    var dlemail = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.DLEmail))
+                                                    {
+                                                        dlemail = CUtils.StrValue(item.DLEmail);
+                                                    }
+                                                    var dlphoneno = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.DLPhoneNo))
+                                                    {
+                                                        dlphoneno = CUtils.StrValue(item.DLPhoneNo);
+                                                    }
+                                                    var flagactive = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.FlagActive))
+                                                    {
+                                                        flagactive = CUtils.StrValue(item.FlagActive);
+                                                    }
+                                                    var count_MST = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.count_MST))
+                                                    {
+                                                        count_MST = CUtils.StrValue(item.count_MST);
+                                                        if (CUtils.IsNumeric(count_MST))
+                                                        {
+                                                            count_MST = CUtils.formatNumeric(Convert.ToDouble(count_MST), Nonsense.INTEGER_DB_FORMAT);
+                                                        }
+                                                    }
+                                                    var khdangsudung = "";
+                                                    <tr idx="@idx" class="data-item trdata">
+                                                        <td class="text-center cell-50" style="background: #D3EDE4;">
+                                                            @MvcHtmlString.Create(iindex.ToString())
+                                                        </td>
+                                                        <td class="text-left cell-75">
+                                                            @MvcHtmlString.Create(dLCodeParent)
+                                                        </td>
+                                                        <td class="text-left cell-75">
+                                                            @MvcHtmlString.Create(dLCode)<br />
+                                                            @MvcHtmlString.Create(dlname)
+                                                        </td>
+                                                        <td class="text-left cell-100">
+                                                            @MvcHtmlString.Create(provinceName)
+                                                        </td>
+                                                        <td class="text-center cell-100">
+                                                            @MvcHtmlString.Create(logLUDTimeUTC)
+                                                        </td>
+                                                        <td class="text-center cell-100">
+                                                            @MvcHtmlString.Create(dltype)
+                                                        </td>
+                                                        <td class="text-left cell-100">
+                                                            @MvcHtmlString.Create(dlemail)
+                                                        </td>
+                                                        <td class="text-left cell-100">
+                                                            @MvcHtmlString.Create(dlphoneno)
+                                                        </td>
+                                                        <td class="text-right cell-100">
+                                                            @MvcHtmlString.Create(count_MST)
+                                                        </td>
+                                                        <td class="text-right cell-100">
+                                                            @MvcHtmlString.Create(khdangsudung)
+                                                        </td>
+                                                        <td class="text-center cell-100">
+                                                            @if (flagactive.Equals("1"))
+                                                            {
+                                                                <span class="label label-sm label-success">Active</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="label label-sm label-danger">Inactive</span>
+                                                            }
+                                                        </td>
+                                                        <td class="text-center cell-100">
+                                                            <div class="action-buttons padding-top-2">
+                                                                @{
+                                                                    var urlDetail = Url.Action("Detail", "Mst_Dealer", new { dlcode = item.DLCode });
+                                                                    var urlUpdate = Url.Action("Update", "Mst_Dealer", new { dlcode = item.DLCode });
+
+                                                                }
+                                                                <a class="icon-detail" href="@urlDetail" title="Chi tiết"><img class="img-icon" src="/Images/Xem.svg"></a>
+                                                                @if (userState != null && userState.RptSv_Sys_User.FlagSysAdmin.Equals("1"))
+                                                                {
+                                                                    @RenderItemFormat("BTN_QL_DAI_LY_SUA", "<a class=\"icon-edit\" href=\'" + urlUpdate + "\' title=\"Sửa\"><img class=\"img-icon\" src='" + Url.Content("~/Images/Sua.svg") + "'></a>", "", "")
+                                                                    @RenderItemFormat("BTN_QL_DAI_LY_XOA", "<a href=\"javascript:;\" class=\"icon-delete\" title=\"Xóa\" onclick=\"Delete('" + item.DLCode.ToString() + "','" + item.DLName + "')\"><img class=\"img-icon\" src='" + Url.Content("~/Images/Xoa.svg") + "'></a>", "", "")
+                                                                }
+
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    idx++;
+                                                }
+                                            }
+
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+@*Active Menu*@
+<script type="text/javascript">
+    setAdminCurrentUrl('@Url.Action("Index", "Mst_Dealer")');
+</script>
+
+<script>
+    function Search()
+    {
+        $('#manageForm').attr('action', '@Url.Action("Index", "Mst_Dealer")').submit();
+    }
+</script>
+
+<script>
+    $(document).ready(function () {
+        //datepicker plugin
+        $('#fromdate, #todate').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: 'yyyy-mm-dd'
+        })
+            //show datepicker when clicking on the icon
+            .next().on(ace.click_event, function () {
+                $(this).prev().focus();
+            });
+
+    });
+</script>
+
+
+
+@*scroll*@
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.scrollable-horizontal').each(function () {
+            var $this = $(this);
+            $(this).ace_scroll(
+                {
+                    horizontal: true,
+                    //styleClass: 'scroll-top',//show the scrollbars on top(default is bottom)
+                    size: $this.attr('data-size') || 6500,
+                    mouseWheelLock: true
+                }
+            ).css({ 'padding-top': 0 });
+        });
+    });
+    $('.scrollable').each(function () {
+        var $this = $(this);
+        $(this).ace_scroll({
+            //size: 500,
+            size: $this.attr('data-size') || 1000,
+            mouseWheelLock: true
+            //styleClass: 'scroll-left scroll-margin scroll-thin scroll-dark scroll-light no-track scroll-visible'
+        });
+    });
+</script>
+
+<script>
+    $(document).on('keypress', function (e) {
+        if (e.which == 13) {
+            Search();
+        }
+    });
+</script>
+
+<script>
+    function Delete(dlcode, dlname) {
+        debugger;
+        if (!IsNullOrEmpty(dlcode) && !IsNullOrEmpty(dlname)) {
+            bootbox.confirm({
+                title: "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO",
+                message: "Đồng ý xóa đại lý '" + dlname + "' ?",
+                buttons: {
+                    'cancel': {
+                        label: 'Thoát',
+                        className: 'btn mybtn-Button btnButton'
+                    },
+                    'confirm': {
+                        label: 'Đồng ý',
+                        className: 'btn mybtn-Button btnButton'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        var url = '@Url.Action("Delete", "Mst_Dealer")';
+                        var token = $('input[name=__RequestVerificationToken]').val();
+                        $.ajax({
+                            url: url,
+                            data: {
+                                dlcode: dlcode,
+                                __RequestVerificationToken: token
+                            },
+                            type: 'post',
+                            dataType: 'json',
+                            success: function (data) {
+                                if (data.Success) {
+                                    if (data.Messages != null && data.Messages !== undefined && data.Messages.length > 0) {
+                                        alert(data.Messages[0]);
+                                    }
+                                    window.location.href = window.location.href;
+                                } else {
+                                    _showErrorMsg123("Lỗi!",data.Detail);
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        } else {
+            alert("Chưa chọn bản ghi cần xóa!");
+            return;
+        }
+    }
+</script>
+

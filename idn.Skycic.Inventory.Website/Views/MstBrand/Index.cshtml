@@ -1,0 +1,133 @@
+﻿@model PageInfo<Mst_Brand>
+@{
+    ViewBag.Title = "Quản lý nhãn hiệu";
+    var init = CUtils.StrValue(ViewBag.init);
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+    var recordCount = CUtils.StrValue(ViewBag.RecordCount);
+}
+<script src="~/Content/assets/js/bootbox.js"></script>
+<div>
+    <div class="row no-margin">
+        <div class="col-sm-12">
+            <aside class="row no-margin">
+                @using (Html.BeginForm("Index", "MstBrand", FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true)
+                    <input hidden id="init" name="init" value="search" />
+                }
+            </aside>
+            <div id="BindDataMstBrand" class="conten-table">
+                @Html.Partial("BindDataMstBrand", Model, new ViewDataDictionary() { @*{ "lstMstBrand", ViewBag.lstMstBrand },*@ { "PageCur", MvcHtmlString.Create(pageCur) }, { "RecordCount", MvcHtmlString.Create(recordCount) } })
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("ModalCreate")
+
+<div class="modal fade" id="PopupUpdate" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+</div>
+
+@*@Html.Partial("ModalUpdate")*@
+
+@section Scripts{
+    @*<script src="@Url.Content("~/Scripts/mine/Mst_PrdPrice.js")"></script>*@
+    <script type="text/javascript">
+
+        setAdminCurrentUrl('@Url.Action("Index", "MstBrand")');
+        function SearchData() {
+            debugger;
+            //var productCodeUserName = commonUtils.returnValueText('#ProductCodeUserName'); //Mã hàng hoặc tên hàng
+            //var prdpricename = commonUtils.returnValueText('#PrdPriceName'); //Tên bảng giá
+
+            var recordcount = commonUtils.returnValueText('#recordcount'); //Số bản ghi trên 1 trang
+            var page = commonUtils.returnValueText('#page'); //Trang hiện tại
+
+            var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+            var url = '@Url.Action("Index", "MstBrand")';
+            $.ajax({
+                type: "GET",
+                data: {
+                    __RequestVerificationToken: token,
+                    //productCodeUserName: productCodeUserName,
+                    //prdpricename: prdpricename,
+                    page: page,
+                    recordcount: recordcount,
+                    init: "search"
+                },
+                url: url,
+                dataType: 'json',
+                beforeSend: function () {
+
+                }
+            }).done(function (result) {
+                //debugger;
+                if (result.Success) {
+                    $('#BindDataMstBrand').html('');
+                    $('#BindDataMstBrand').html(result.Html);
+                    //$('.numberic').number(true, 2);
+                    readCookies(cookieName);
+                } else {
+                    if (!commonUtils.isNullOrEmpty(result.Detail)) {
+                        showErrorDialog(result.Detail);
+                    }
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+
+            }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+                //alert("complete");
+            });
+        }
+
+        var objCommonExcel = new CommonExcel();
+        var objVariablesInit = {
+            Id_FormMain: '',
+            Id_FormImportExcel: 'manageFormImportExcel',
+            Id_Modal: 'ImportExcelModal',
+            Id_FileInput: 'file',
+        };
+
+        var ajaxSettings_Excel = {};
+        ajaxSettings_Excel.Type = 'post';
+        ajaxSettings_Excel.DataType = 'json';
+
+
+
+    function ShowPopupCreate() {
+        $('#PopupCreate').modal('show');
+    }
+    function ClosePopupCreate() {
+        $('#PopupCreate').modal('hide');
+    }
+    function ShowPopupDetail() {
+        $('#PopupUpdate').modal('show');
+    }
+    function ClosePopupDetail() {
+        debugger;
+        $('#PopupUpdate').modal('hide');
+    }
+    function ShowDetail(brand_Code) {
+        $.ajax({
+            url: '@Url.Action("Detail","MstBrand")',
+            data: {
+                brandCode: brand_Code
+            },
+            type: 'post',
+            dataType: 'json',
+            traditional: true,
+            success: function (data) {
+                if (data.Success) {
+                    debugger;
+                    if (data.Html !== null) {
+                        $('#PopupUpdate').html(data.Html);
+                        $('#PopupUpdate').modal('show');
+                        }
+                } else {
+                    showErrorDialog(data.Detail);
+                }
+            }
+        });
+    }
+    </script>
+}

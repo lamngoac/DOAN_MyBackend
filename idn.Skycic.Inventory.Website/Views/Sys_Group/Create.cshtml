@@ -1,0 +1,88 @@
+﻿@model Sys_Group
+@{
+    // Layout = "~/Views/Shared/_LayoutQuantri.cshtml";
+    var title = "Tạo mới nhóm người dùng";
+    var titleMng = "Quản lý nhóm người dùng";
+    ViewBag.Title = title;
+}
+<script type="text/javascript">
+    @*var parents = new Array();
+    parents.push("@Url.Action("Index", "Sys_Group")");
+    parents.push("");
+    var parentsText = new Array();
+    parentsText.push("@MvcHtmlString.Create(titleMng)");
+    parentsText.push("@MvcHtmlString.Create(title)");
+    setAdminCurrentTag(parents, parentsText);*@
+</script>
+<script>
+    setAdminCurrentUrl('@Url.Action("Index", "Sys_Group")');
+</script>
+<div class="">
+    <div class="row no-margin">
+        <aside class="col-12">
+            @using (Html.BeginForm("Create", "Sys_Group", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <div class="layout-bot-top-16">
+                    <div class="col-4 no-padding">
+                        <div class="form-group margin-bottom-9">
+                            <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã nhóm người dùng <span style=\"color: red\">*</span>")</label>
+                            <div class="col-12 col-sm-8">
+                                <span class="block input-icon input-icon-right">
+                                    <input type="text" id="GroupCode" name="GroupCode" class="col-12 GroupCode" onkeyup="locdau(this);" value="" autocomplete="off" required />
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 no-padding">
+                        <div class="form-group margin-bottom-9">
+                            <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mô tả nhóm người dùng <span style=\"color: red\">*</span>")</label>
+                            <div class="col-12 col-sm-8">
+                                <span class="block input-icon input-icon-right">
+                                    <input type="text" id="GroupName" name="GroupName" class="col-12 GroupName" value="" autocomplete="off" required />
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            }
+        </aside>
+        <div class="col-12 no-padding">
+            <div class="clearfix">
+                <div class="row no-margin">
+                    @RenderItemFormat("BTN_TAO_MOI_NHOM_ND_LUU", "<a href=\"javascript: void(0); \" class=\"btn font-color mybtn-Button\" style=\"padding-left: 15px!important;\" onclick=\"SaveData();\">Lưu</a>", "", "")
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Sys_Group.js")"></script>
+    <script type="text/javascript">
+        setAdminCurrentUrl('@Url.Action("Index", "Sys_Group")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+
+        });
+        var _getForm = document.getElementById("manageForm");
+        _getForm.addEventListener('reset', function () {
+            document.getElementById("").focus();
+        });
+        function SaveData() {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Create", "Sys_Group")';
+
+            var objSys_Group = new Sys_Group();
+            objSys_Group.ActionType = 'create';
+            objSys_Group.ajaxSettings = ajaxSettings;
+            objSys_Group.saveData();
+        }
+    </script>
+}

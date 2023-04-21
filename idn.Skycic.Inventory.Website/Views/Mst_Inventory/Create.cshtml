@@ -1,0 +1,171 @@
+﻿@{
+    /**/
+    Layout = null;
+    var Lst_Mst_Inventory = ViewBag.Lst_Mst_Inventory as List<Mst_Inventory>;
+    var Lst_Mst_InventoryType = ViewBag.Lst_Mst_InventoryType as List<Mst_InventoryType>;
+    var Lst_Mst_InventoryLevelType = ViewBag.Lst_Mst_InventoryLevelType as List<Mst_InventoryLevelType>;
+}
+
+<div class="modal-dialog" style="width: 1000px; max-width: 1000px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel"><b>Tạo mới Kho</b></h2>
+            <a href="javascript:;" onclick="ClosePopupCreate()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body" style="">
+            <div class="col-12">
+                @using (Html.BeginForm("Create", "Mst_Inventory", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true)
+
+                    <div class="col-12 layout-bot-top-16 row">
+                        <div class="col-6">
+                            <div class="form-group margin-bottom-9">
+                                <label for="InvCode" class="col-sm-3 control-label no-padding-right font-weight-500 ">@("Mã kho".HtmlItemString("inventory")) <span style="color: red;">*</span></label>
+                                <div class="col-8">
+                                    <input type="text" name="InvCode" id="InvCode" class="col-12" value="">
+                                </div>
+                            </div>
+                            <div class="row form-group margin-bottom-9">
+                                <label for="InvCodeParent" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Mã kho cha".HtmlItemString("inventory")) <span style="color: red;">*</span></label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <select class="select2-selection" name="InvCodeParent" id="InvCodeParent">
+                                            <optgroup label="">
+                                                @{
+                                                    if (Lst_Mst_Inventory != null && Lst_Mst_Inventory.Count > 0)
+                                                    {
+                                                        foreach (var inv in Lst_Mst_Inventory)
+                                                        {
+                                                            <option value="@inv.InvCode">@inv.InvCode</option>
+                                                        }
+                                                    }
+                                                }
+                                            </optgroup>
+                                            @*<option value="ADDDATA">@("".HtmlItemString("product"))</option>*@
+                                        </select>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label for="InvName" class="col-sm-3 control-label no-padding-right font-weight-500 ">@("Tên kho".HtmlItemString("inventory")) <span style="color: red;">*</span></label>
+                                <div class="col-8">
+                                    <input type="text" name="InvName" id="InvName" class="col-12" value="">
+                                </div>
+                            </div>
+                            <div class="row form-group margin-bottom-9">
+                                <label for="InvType" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Loại kho".HtmlItemString("inventory")) <span style="color: red;">*</span></label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <select class="select2-selection" name="InvType" id="InvType">
+                                            <optgroup label="">
+                                                @{
+                                                    if (Lst_Mst_InventoryType != null && Lst_Mst_InventoryType.Count > 0)
+                                                    {
+                                                        foreach (var type in Lst_Mst_InventoryType)
+                                                        {
+                                                            <option value="@type.InvType">@type.InvType : @type.InvTypeName</option>
+                                                        }
+                                                    }
+                                                }
+                                            </optgroup>
+                                        </select>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="row form-group margin-bottom-9">
+                                <label for="InvLevelType" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Cấp kho".HtmlItemString("inventory")) <span style="color: red;">*</span></label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <select class="select2-selection" name="InvLevelType" id="InvLevelType">
+                                            <optgroup label="">
+                                                @{
+                                                    if (Lst_Mst_InventoryLevelType != null && Lst_Mst_InventoryLevelType.Count > 0)
+                                                    {
+                                                        foreach (var lvType in Lst_Mst_InventoryLevelType)
+                                                        {
+                                                            <option value="@lvType.InvLevelType">@lvType.InvLevelType : @lvType.InvLevelTypeName</option>
+                                                        }
+                                                    }
+                                                }
+                                            </optgroup>
+                                        </select>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label for="FlagActive" class="col-sm-3 control-label no-padding-right font-weight-500">@("Trạng thái".HtmlItemString("inventory"))</label>
+                                <div class="col-8">
+                                    <span class="block input-icon input-icon-right padding-top-5">
+                                        <label class="lbl-flag">
+                                            <input name="FlagActive" id="FlagActive" class="icon-flag" type="checkbox" value="1" checked>
+                                            <span class="lbl"></span>
+                                            <input name="FlagActive" type="hidden" value="0">
+                                        </label>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group margin-bottom-9">
+                                <label for="InvAddress" class="col-sm-2 control-label no-padding-right font-weight-500 ">@("Địa chỉ".HtmlItemString("inventory"))</label>
+                                <div class="col-8">
+                                    <input type="text" name="InvAddress" id="InvAddress" class="col-12" value="">
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label for="InvContactName" class="col-sm-2 control-label no-padding-right font-weight-500 ">@("Người quản lý".HtmlItemString("inventory"))</label>
+                                <div class="col-8">
+                                    <input type="text" name="InvContactName" id="InvContactName" class="col-12" value="">
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label for="InvContactEmail" class="col-sm-2 control-label no-padding-right font-weight-500 ">@("Email".HtmlItemString("inventory"))</label>
+                                <div class="col-8">
+                                    <input type="text" name="InvContactEmail" id="InvContactEmail" class="col-12" value="">
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label for="InvContactPhone" class="col-sm-2 control-label no-padding-right font-weight-500 ">@("Điện thoại".HtmlItemString("inventory"))</label>
+                                <div class="col-8">
+                                    <input type="text" name="InvContactPhone" id="InvContactPhone" class="col-12" value="">
+                                </div>
+                            </div>
+                            <div class="row form-group margin-bottom-9">
+                                <label for="FlagIn_Out" class="col-12 col-sm-2 control-label no-padding-right font-weight-500 ">@("Flag kho nhập/xuất".HtmlItemString("inventory"))</label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right">
+                                        <select class="select2-selection" name="FlagIn_Out" id="FlagIn_Out">
+                                            <optgroup label="">
+                                                <option value="0">0</option>
+                                                <option value="1">1</option>
+                                            </optgroup>
+                                        </select>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="col-6">
+                            @RenderItemFormat("BTN_KHO_TAO_MOI", "<a href=\"javascript: void(0); \" class=\"btn btn-nc-button\" onclick=\"SaveData();\"  style=\"float: right;\"><i class=\"fas fa-save\" aria-hidden=\"true\"></i> Lưu</a>", "", "")
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Mst_Inventory.js")"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.select2-selection').select2();
+            $('#FlagIn_Out').select2({
+                minimumResultsForSearch: -1
+            })
+        });
+    </script>
+}

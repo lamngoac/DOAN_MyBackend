@@ -1,0 +1,227 @@
+﻿@{
+    var Lst_Mst_Inventory = ViewBag.Lst_Mst_Inventory as List<Mst_Inventory>;
+    var Lst_Mst_InventoryType = ViewBag.Lst_Mst_InventoryType as List<Mst_InventoryType>;
+    var Lst_Mst_InventoryLevelType = ViewBag.Lst_Mst_InventoryLevelType as List<Mst_InventoryLevelType>;
+    var IFInvAudNo = ViewBag.IFInvAudNo == null ? "" : ViewBag.IFInvAudNo.ToString();
+
+    var lst_Mst_InvOutType = new List<Mst_InvOutType>();
+    if (ViewBag.Lst_Mst_InvOutType != null)
+    {
+        lst_Mst_InvOutType = ViewBag.Lst_Mst_InvOutType as List<Mst_InvOutType>;
+    }
+
+    var lstCustomer = new List<Mst_Customer>();
+    if (ViewBag.Lst_MstCustomer != null)
+    {
+        lstCustomer = ViewBag.Lst_MstCustomer as List<Mst_Customer>;
+    }
+
+    var lst_Mst_ProductUI = new List<Mst_ProductUI>();
+    if (ViewBag.Lst_Mst_ProductUI != null)
+    {
+        lst_Mst_ProductUI = ViewBag.Lst_Mst_ProductUI;
+    }
+}
+@{
+    ViewBag.Title = "Tạo phiếu kiểm kê";
+}
+@*<script src="~/Content/assets/js/myjs/invfinvaudit.js"></script>*@
+<style>
+    .ui-menu a {
+        color: #212529;
+        display: block;
+        padding: 7px 10px;
+    }
+
+    .ui-menu li:hover {
+        background-color: #098850;
+    }
+
+        .ui-menu li:hover a {
+            color: #fff;
+        }
+
+    .ui-menu li#search-product a {
+        color: #098850 !important;
+        background-color: #CBEFDF !important;
+    }
+</style>
+
+@section RenderButton {
+    <aside class="col-md-6 breadcrumb-menu">
+        <div class="form-group">
+            @RenderItemFormat("BTN_INVFINVAUDIT_SAVE", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnSave\" onclick=\"SaveData('" + Url.Action("Save", "InvFInvAudit") + "', '0');\"><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i> Lưu</a>", "", "")
+            @RenderItemFormat("BTN_INVFINVAUDIT_SAVE_NEW", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\" id=\"btnSaveAndCreate\" onclick=\"SaveData('" + Url.Action("Save", "InvFInvAudit") + "', 'saveandcreate');\"><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i> Lưu và tạo mới</a>", "", "")
+        </div>
+    </aside>
+}
+
+    <div class="mt-3">
+        <div class="col-12">
+            @using (Html.BeginForm("Create", "InvFInvAudit", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <input type="hidden" name="FlagView" id="FlagView" value="create" />
+
+            <div class="col-12 row">
+                <div class="col-12 row">
+                    <aside class="col-md-4">
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="IFInvAudNo">
+                                @("Số phiếu kiểm kê".HtmlItemString("ifinvaudno_invfinvaudit"))
+                            </label>
+                            <div class="col-md-8">
+                                <input type="text" class="col-md-12 text-bold" name="IFInvAudNo" id="IFInvAudNo" readonly="readonly" value="@IFInvAudNo" />
+                            </div>
+                        </div>
+
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="IFInvAudNo">
+                                @("Ngày tạo".HtmlItemString("createdtime_invfinvaudit"))
+                            </label>
+                            <div class="col-md-8">
+                                <input type="text" class="col-md-12 text-bold" readonly="readonly" value="@(DateTime.Today.ToString("yyyy-MM-dd"))" />
+                            </div>
+                        </div>
+                    </aside>
+                    <aside class="col-md-4">
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="InvCodeOut">
+                                @("Kho kiểm kê".HtmlItemString("invcode_invfinvaudit"))
+                                <span style="color: red "> *</span>
+                            </label>
+                            <div class="col-md-8">
+                                <span class="block input-icon input-icon-right">
+                                    <select id="InvCodeAudit" name="InvCodeAudit" class="col-md-12 mstinventory">
+                                        <optgroup label="">
+                                            <option value="">--Chọn kho kiểm kê--</option>
+                                            @if (Lst_Mst_Inventory != null && Lst_Mst_Inventory.Count > 0)
+                                            {
+                                                foreach (var item in Lst_Mst_Inventory)
+                                                {
+                                                    var invCode = CUtils.StrValue(item.InvCode);
+                                                    var invName = CUtils.StrValue(item.InvName);
+                                                    <option invBUPattern="@(item.InvBUPattern == null ? "" : item.InvBUPattern)" value="@MvcHtmlString.Create(invCode)">@MvcHtmlString.Create(invName)</option>
+                                                }
+                                            }
+                                        </optgroup>
+                                        @*<option value="Search">Tìm kiếm</option>*@
+                                        @*<option value="SEARCHDATA">@("Tìm kiếm".HtmlItemString("invf_inventoryout"))</option>*@
+                                    </select>
+                                </span>
+                            </div>
+                        </div>
+                    </aside>
+                    <aside class="col-md-4">
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4" for="Remark">
+                                @("Ghi chú".HtmlItemString("remark_invfinvaudit"))
+                            </label>
+                            <div class="col-md-8">
+                                <textarea class="col-md-12" name="Remark" id="Remark" rows="2"></textarea>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+                <div class="col-12 row">
+                    <aside class="col-md-4">
+                        <div class="form-group margin-bottom-9">
+                            <label class="control-label col-md-4">
+                                @("Hàng hóa".HtmlItemString("productcode_invfinvaudit"))
+                            </label>
+                            <div class="col-md-8">
+                                <div class="col-12 form-group no-padding">
+                                    <input class="col-12" type="text" name="ProductCodeSearch" id="ProductCodeSearch" value="" autocomplete="off" placeholder="Quét mã vạch, mã hh, tên hh,serial, số xác thực, hoặc nhập để tìm kiếm" />
+                                    <input class="col-12 idn-hidden" type="text" name="ProductScan" id="ProductScan" value="" autocomplete="off" placeholder="Quét mã vạch, mã hh, tên hh,serial, số xác thực, hoặc nhập để tìm kiếm" />
+                                    <div class="product-list">
+                                        <ul class="no-padding no-margin"></ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </aside>
+                    <aside class="col-md-4">
+                        <a href="javascript:void(0);" class="btn btn-nc-button" style="margin-left: 10px" id="btnScanProduct" onclick="ScanProduct();">@("Quét".HtmlItemString("productscan_inventoryout"))</a>
+                        <a href="javascript:void(0);" class="btn btn-nc-button" id="btnMore" onclick="AddMoreProduct()">Tất cả kho</a>
+                        <a class="btn font-color mybtn-Button" data-toggle="dropdown" aria-expanded="false" style="font-size: 13px; position: relative;"><i class="fas fa-ellipsis-h"></i></a>
+                        <ul class="dropdown-menu dropdown-action" role="menu" style="">
+                            @if (CheckAccess("BTN_TAO_DC_XUAT_EXCEL_TEMP_HH"))
+                            {
+                                <li style="padding: 5px">
+                                    <a class="row no-margin col-12 no-padding" @*onclick="ExportTempMoveOrdPrd()"*@ href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" aria-hidden="true"></i> Xuất Excel template hàng hoá</a>
+                                </li>
+                            }
+                            @if (CheckAccess("BTN_TAO_DC_XUAT_EXCEL_TEMP_LOT"))
+                            {
+                                <li style="padding: 5px">
+                                    <a class="row no-margin col-12 no-padding" @*onclick="ExportTempMoveOrdLot()"*@ href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" aria-hidden="true"></i> Xuất Excel Template Lot</a>
+                                </li>
+                            }
+                            @if (CheckAccess("BTN_TAO_DC_XUAT_EXCEL_TEMP_SERIAL"))
+                            {
+                                <li style="padding: 5px">
+                                    <a class="row no-margin col-12 no-padding" @*onclick="ExportTempMoveOrdSerial()"*@ href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" aria-hidden="true"></i> Xuất Excel Template Serial</a>
+                                </li>
+                            }
+                            <li style="padding: 5px">
+                                <a class="row no-margin col-12 no-padding" style="border-bottom: 1px dashed;"></a>
+                            </li>
+                            @if (CheckAccess("BTN_TAO_DC_NHAP_EXCEL_HH"))
+                            {
+                                <li style="padding: 5px">
+                                    <a class="row no-margin col-12 no-padding" @*onclick="ShowPopupImportExcelMoveOrdDtl()"*@ data-toggle="modal" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" aria-hidden="true"></i> Nhập Excel hàng hoá</a>
+                                </li>
+                            }
+                            @if (CheckAccess("BTN_TAO_DC_NHAP_EXCEL_LOT"))
+                            {
+                                <li style="padding: 5px">
+                                    <a class="row no-margin col-12 no-padding" @*onclick="ShowPopupImportExcelMoveOrdLot()"*@ href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" aria-hidden="true"></i> Nhập Excel Lot</a>
+                                </li>
+                            }
+                            @if (CheckAccess("BTN_TAO_DC_NHAP_EXCEL_SERIAL"))
+                            {
+                                <li style="padding: 5px">
+                                    <a class="row no-margin col-12 no-padding" @*onclick="ShowPopupImportExcelMoveOrdSerial()"*@ href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" aria-hidden="true"></i> Nhập Excel Serial</a>
+                                </li>
+                            }
+
+                        </ul>
+                    </aside>
+                    
+
+                </div>
+            </div>
+        }
+        </div>
+    </div>
+
+    @Html.Partial("LstProduct")
+    @Html.Partial("_TemplateHtml")
+    @Html.Partial("_CommonJs", new ViewDataDictionary() { { "viewonly", "1" } })
+    @*@Html.Partial("~/Views/ModalCommon/_ModalShow.cshtml")*@
+    <script src="~/Scripts/mine/InvF_Audit.js"></script>
+    @section Scripts{
+        <script type="text/javascript">
+        $(document).ready(function () {
+            $("select#InvCodeAudit,#ProductGroup").select2();
+            $("select#ProductCode").select2();
+        });
+        </script>
+
+        <!-- Lưu phiếu -->
+        <script>
+        function SaveData(urlSave, savetype) {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = urlSave;
+            var objInvF_InvAudit = new InvF_InvAudit();
+            objInvF_InvAudit.ActionType = 'create';
+            objInvF_InvAudit.ajaxSettings = ajaxSettings;
+            objInvF_InvAudit.saveData(savetype);
+        }
+        </script>
+        <!-- End Lưu phiếu -->
+    }

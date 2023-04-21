@@ -1,0 +1,150 @@
+﻿@{
+    var listMst_Inventory = ViewBag.ListMst_Inventory as List<Mst_Inventory>;
+    if (listMst_Inventory == null || listMst_Inventory.Count == 0)
+    {
+        listMst_Inventory = new List<Mst_Inventory>();
+    }
+    listMst_Inventory.Insert(0, new Mst_Inventory()
+    {
+        InvCode = "",
+        InvName = "--Chọn vị trí--",
+    });
+    var listInventoryCusReturnDtl = ViewBag.ListInvF_InventoryCusReturnDtl as List<InvF_InventoryCusReturnDtl>;
+    var invCodeMax = ViewBag.InvCodeMax as string;
+
+    var iF_InvCusReturnStatus = CUtils.StrValue(ViewBag.If_InvCusReturnStatus);
+    var viewType = CUtils.StrValue(ViewBag.ViewType);
+}
+<div class="modal-dialog" style="width: 500px;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel"><b>Chọn vị trí nhập hàng hóa: @MvcHtmlString.Create(CUtils.StrValue(ViewBag.ProductName))</b></h2>
+            <a href="javascript:;" onclick="closePopupInvCodeInActual()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+        </div>
+        <div class="modal-body" style="">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormShowPopupInvCodeInActual" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="col-xs-12" style="float: left;">
+                    <input type="hidden" class="ProductCode_Popup_InvCodeInActual" value="@MvcHtmlString.Create(CUtils.StrValue(ViewBag.ProductCode))" />
+                    @if (!viewType.Equals("detail") && iF_InvCusReturnStatus.Equals(Client_Status.PENDING))
+                    {
+                        <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="product_InvCodeInActual_AddNewRow()" style="float: left;font-size: 13px;"><i class="fa fa-plus-circle" aria-hidden="true"></i> Thêm</a>
+                        <a class="btn font-color mybtn-Button" href="javascript:void(0);" onclick="product_InvCodeInActual_Save()" style="float: left;font-size: 13px;margin-left: 10px"><i class="fa fa-save" aria-hidden="true"></i> OK</a>
+                    }
+
+                </div>
+                <div class=" col-xs-12" style="float: left;">
+                    <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+                        <div style="width: 100%; float: left;">
+                            <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                                <thead>
+                                    <tr class="trthead">
+                                        <th class="text-center cell-50">
+                                        </th>
+                                        <th class="text-left cell-150">
+                                            @("Mã vị trí".HtmlItemString("invf_inventoryin"))
+                                        </th>
+                                        <th class="text-left cell-150">
+                                            @("Số lượng".HtmlItemString("invf_inventoryin"))
+                                        </th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                            <table class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                                <tbody id="table-tbodyIDInvCodeInActual"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    $(document).ready(function () {
+        $('select.InvCodeInActual_Dtl').select2();
+
+        if ($('.numberQty').length) {
+            //$('.numberQty').number(true, 2);
+            format_Number();
+        }
+    })
+
+
+</script>
+
+<script type="text/javascript">
+    function format_Number(){
+        var tableName = 'Rpt_Inv_InventoryBalance_Extend';
+         var QtyFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'Qty');
+    $('.numberQty').number(true, QtyFormat);
+    }
+</script>
+
+
+<script type="text/javascript">
+    var Lst_Mst_Inventory = []; @*Danh sách vị trí kho*@
+    @if(listMst_Inventory != null && listMst_Inventory.Count > 0)
+    {
+        foreach(var item in listMst_Inventory)
+        {
+            var invCode = CUtils.StrValue(item.InvCode);
+            var invName = CUtils.StrValue(item.InvName);
+            <text>
+                var objMst_Inventory = {
+                    InvCode: '@invCode',
+                    InvName: '@invName',
+                };
+                Lst_Mst_Inventory.push(objMst_Inventory);
+            </text>
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    var ListInvF_InventoryCusReturnDtl = [];
+    @if(listInventoryCusReturnDtl != null && listInventoryCusReturnDtl.Count > 0)
+    {
+        foreach(var item in listInventoryCusReturnDtl)
+        {
+            var invCodeInActual = CUtils.StrValue(item.InvCodeInActual);
+            var qty = CUtils.StrValue(item.Qty);
+            if (CUtils.IsNullOrEmpty(qty))
+            {
+                qty = "0";
+            }
+            <text>
+                var objProduct_InvCodeInActual = {
+                    InvCodeInActual: '@invCodeInActual',
+                    Qty: '@qty',
+                }
+                ListInvF_InventoryCusReturnDtl.push(objProduct_InvCodeInActual);
+            </text>
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        @*Add danh sách vị trí kho vào Popup*@
+        if (ListInvF_InventoryCusReturnDtl !== undefined && ListInvF_InventoryCusReturnDtl !== null && ListInvF_InventoryCusReturnDtl.length > 0) {
+            for (var i = 0; i < ListInvF_InventoryCusReturnDtl.length; i++) {
+                var objProduct_InvCodeInActual_AddRow = {
+                    Product_InvCodeInActual: ListInvF_InventoryCusReturnDtl[i],
+                    Lst_Mst_Inventory: Lst_Mst_Inventory,
+                };
+
+                renderProductInvCodeInActual(objProduct_InvCodeInActual_AddRow);
+            }
+        }
+    })
+
+
+</script>

@@ -1,0 +1,275 @@
+﻿@model List<Rpt_Inv_InventoryBalance_ExtendUI>
+@{
+    var init = CUtils.StrValue(ViewBag.init);
+    ViewBag.Title = "BindDataRpt_Inv_InventoryBalance_Extend";
+    var List_Rpt_Inv_InventoryBalanceExtendChild = ViewBag.List_Rpt_Inv_InventoryBalanceExtendChild;
+    string strFlagShowPopup = ViewBag.FlagShowPopup as string;
+    bool flagShowPopup = strFlagShowPopup == "1";
+}
+
+<style>
+    .hidden {
+        display: none;
+    }
+</style>
+
+<div class="col-xs-12 layout-bot-top-16" style="">
+    <div class="row">
+        <div class="col-6">
+            @RenderItemFormat("BTN_BC_TON_KHO_MO_RONG_EXCEL", "<a class=\"btn btn-nc-button\" style=\"line-height: 13px; color: #000000\" onclick=\"Export()\" href=\"javascript:void(0);\" style=\"\"><i class=\"fas fa-file-excel\" aria-hidden=\"true\" style=\"margin-right: 7px\"></i> Xuất Excel</a>", "", "")
+            @*<a class="btn btn-nc-button" href="javascript:;" onclick="Print()" style=""><i class="fas fa-print" aria-hidden="true"></i> In</a>*@
+            @*<a class="btn btn-nc-button" href="javascript:;" onclick="Export()" style=""><i class="far fa-file-excel" aria-hidden="true"></i> Xuất Excel</a>*@
+        </div>
+    </div>
+</div>
+<div class="panel-body no-padding" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+    <aside class="col-xs-12 layout-table no-padding">
+        @Html.AntiForgeryToken()
+        <div class="scrollable-horizontal padding-left-0 padding-right-0" style="padding-top: 0!important;">
+            <div style="width: 100%; float: left;">
+                <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                    <thead>
+                        <tr class="trthead">
+                            <th fieldId="STT" fieldName="STT" fieldActive="0" class="text-center cell-30">
+                                @("STT".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="PRODUCTCODE" sorttype="T" fieldName="Mã hàng hoá" fieldActive="0" class="text-left cell-120">
+                                @("Mã hàng hoá".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="PRODUCTNAME" sorttype="T" fieldName="Tên hàng hoá" fieldActive="0" class="text-left cell-180">
+                                @("Tên hàng hoá".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="UNITCODE" sorttype="T" fieldName="Đơn vị" fieldActive="0" class="text-left cell-100">
+                                @("Đơn vị".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="QTYTOTALOK" sorttype="T" fieldName="Số lượng tổng" fieldActive="0" class="text-left cell-100">
+                                @("Tổng tồn kho".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="QTYBLOCKOK" sorttype="T" fieldName="SL block" fieldActive="0" class="text-left cell-100">
+                                @("SL block".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="QTYAVAILOK" sorttype="T" fieldName="SL Available" fieldActive="0" class="text-left cell-100">
+                                @("SL Available".HtmlItemString("inventory"))
+                            </th>
+
+                            <th fieldId="INVCODE" fieldName="Kho" fieldActive="0" class="text-left cell-120">
+                                @("Mã kho".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="QTYBACKORDER" sorttype="T" fieldName="SL sắp về" fieldActive="0" class="text-left cell-100">
+                                @("SL sắp về".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="QTYSTOCKEXT" sorttype="T" fieldName="Tồn kho mở rộng" fieldActive="0" class="text-left cell-100">
+                                @("Tồn kho mở rộng".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="QTYMINST" sorttype="T" fieldName="Tồn kho tối thiểu" fieldActive="0" class="text-left cell-100">
+                                @("Tồn kho tối thiểu".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="QTYMAXS" sorttype="T" fieldName="Tồn kho tối đa" fieldActive="0" class="text-left cell-100">
+                                @("Tồn kho tối đa".HtmlItemString("inventory"))
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                    <tbody id="table-tbodyID">
+                        @if (Model != null && Model.Count > 0)
+                        {
+                            int stt = 1;
+                            var mp_ProductCodeUser = "";
+
+
+                            foreach (var item in Model)
+                            {
+                                <tr class="data-item trdata" productcode="@item.ProductCode" productcodeuser="@item.mp_ProductCodeUser" listinvcode="@item.ListInvCode" productname="@item.mp_ProductName" productcodebase="@item.ProductCode" valconvert="1">
+                                    <td fieldId="STT" fieldActive="0" class="text-center cell-30">
+                                        @stt
+                                    </td>
+                                    <td fieldId="PRODUCTCODE" fieldActive="0" class="text-left cell-120">
+                                        @MvcHtmlString.Create(CUtils.StrValue(item.mp_ProductCodeUser))
+                                        @if (flagShowPopup && item.mp_FlagLot != null && item.mp_FlagLot.Equals("1"))
+                                        {
+                                            <a href="javascript:;" class="float-right" onclick="ShowPopupLo(this)">Lô</a>
+                                        }
+                                        @if (flagShowPopup && item.mp_FlagSerial != null && item.mp_FlagSerial.Equals("1"))
+                                        {
+                                            <a href="javascript:;" class="float-right" onclick="ShowPopupSerial(this)">Serial</a>
+                                        }
+                                    </td>
+                                    <td fieldId="PRODUCTNAME" fieldActive="0" class="text-left cell-180">
+                                        @MvcHtmlString.Create(CUtils.StrValue(item.mp_ProductName))
+                                    </td>
+                                    <td fieldId="UNITCODE" fieldActive="0" class="text-left cell-100">
+                                        <select class="select2-selection1 col-12" name="UnitCode" onchange="ChangeProduct(this)">
+                                            <option value="@item.ProductCode" productcode="@item.ProductCode">@item.mp_UnitCode</option>
+                                            @if (item.ListRpt_Inv_InventoryBalanceExtendUIChild != null && item.ListRpt_Inv_InventoryBalanceExtendUIChild.Count > 0)
+                                            {
+                                                foreach (var unitCodeChild in item.ListRpt_Inv_InventoryBalanceExtendUIChild)
+                                                {
+                                                    <option value="@unitCodeChild.ProductCode" productcode="@unitCodeChild.ProductCode">@unitCodeChild.mp_UnitCode</option>
+                                                }
+                                            }
+                                        </select>
+                                    </td>
+                                    <td fieldId="QTYTOTALOK" fieldActive="0" class="text-right cell-100 valTotalOK">
+                                        @MvcHtmlString.Create(CUtils.StrValue(item.QtyTotalOK))
+                                    </td>
+                                    <td fieldId="QTYBLOCKOK" fieldActive="0" class="text-right cell-100 valBlockOK">
+                                        @MvcHtmlString.Create(CUtils.StrValue(item.QtyBlockOK))
+                                    </td>
+                                    <td fieldId="QTYAVAILOK" fieldActive="0" class="text-right cell-100 valAvailOK">
+                                        @MvcHtmlString.Create(CUtils.StrValue(item.QtyAvailOK))
+                                    </td>
+
+                                    <td fieldId="INVCODE" class="text-left cell-120">
+                                        @{
+                                            var listInvCode = item.ListInvCode.ToString().Split(',');
+                                            foreach (var invCode in listInvCode)
+                                            {
+                                                <span class="badges-sm">@invCode</span>
+                                            }
+                                        }
+                                    </td>
+                                    <td fieldId="QTYBACKORDER" fieldActive="0" class="text-right cell-100 valBackOrder">
+                                        @MvcHtmlString.Create(CUtils.StrValue(item.QtyBackOrder))
+                                    </td>
+                                    <td fieldId="QTYSTOCKEXT" fieldActive="0" class="text-right cell-100 valStockExt">
+                                        @MvcHtmlString.Create(CUtils.StrValue(item.QtyStockExt))
+                                    </td>
+                                    <td fieldId="QTYMINST" fieldActive="0" class="text-right cell-100 valMinSt">
+                                        @MvcHtmlString.Create(CUtils.StrValue(item.QtyMinSt))
+                                    </td>
+                                    <td fieldId="QTYMAXS" fieldActive="0" class="text-right cell-100 valMaxSt">
+                                        @MvcHtmlString.Create(CUtils.StrValue(item.QtyMaxSt))
+                                    </td>
+                                </tr>
+
+                                if (item.ListRpt_Inv_InventoryBalanceExtendUIChild != null && item.ListRpt_Inv_InventoryBalanceExtendUIChild.Count > 0)
+                                {
+                                    foreach (var child in item.ListRpt_Inv_InventoryBalanceExtendUIChild)
+                                    {
+                                        <tr class="data-item trdata hidden" productcode="@child.ProductCode" productcodeuser="@child.mp_ProductCodeUser" listinvcode="@child.ListInvCode" productname="@child.mp_ProductName" productcodebase="@child.mp_ProductCodeBase" valconvert="@child.mp_ValConvert">
+                                            <td fieldId="STT" fieldActive="0" class="text-center cell-30">
+                                                @stt
+                                            </td>
+                                            <td fieldId="PRODUCTCODE" fieldActive="0" class="text-left cell-120">
+                                                @MvcHtmlString.Create(CUtils.StrValue(child.mp_ProductCodeUser))
+                                                @if (flagShowPopup && child.mp_FlagLot != null && child.mp_FlagLot.Equals("1"))
+                                                {
+                                                    <a href="javascript:;" class="float-right" onclick="ShowPopupLo(this)">Lô</a>
+                                                }
+                                                @if (flagShowPopup && child.mp_FlagSerial != null && child.mp_FlagSerial.Equals("1"))
+                                                {
+                                                    <a href="javascript:;" class="float-right" onclick="ShowPopupSerial(this)">Serial</a>
+                                                }
+                                            </td>
+                                            <td fieldId="PRODUCTNAME" fieldActive="0" class="text-left cell-180">
+                                                @MvcHtmlString.Create(CUtils.StrValue(child.mp_ProductName))
+                                            </td>
+                                            <td fieldId="UNITCODE" fieldActive="0" class="text-left cell-100">
+                                                <select class="select2-selection1 col-12" name="UnitCode" onchange="ChangeProduct(this)">
+
+                                                    @if (item.ListRpt_Inv_InventoryBalanceExtendUIChild != null && item.ListRpt_Inv_InventoryBalanceExtendUIChild.Count > 0)
+                                                    {
+                                                        <option value="@item.ProductCode" productcode="@item.ProductCode">@item.mp_UnitCode</option>
+                                                        foreach (var unitCodeChild in item.ListRpt_Inv_InventoryBalanceExtendUIChild)
+                                                        {
+                                                            var selected = !CUtils.IsNullOrEmpty(child.mp_UnitCode) && child.mp_UnitCode.Equals(unitCodeChild.mp_UnitCode) ? "selected" : "";
+                                                            <option value="@unitCodeChild.ProductCode" productcode="@unitCodeChild.ProductCode">@unitCodeChild.mp_UnitCode</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </td>
+                                            <td fieldId="QTYTOTALOK" fieldActive="0" class="text-right cell-100 valTotalOK">
+                                                @MvcHtmlString.Create(CUtils.StrValue(child.QtyTotalOK))
+                                            </td>
+                                            <td fieldId="QTYBLOCKOK" fieldActive="0" class="text-right cell-100 valBlockOK">
+                                                @MvcHtmlString.Create(CUtils.StrValue(child.QtyBlockOK))
+                                            </td>
+                                            <td fieldId="QTYAVAILOK" fieldActive="0" class="text-right cell-100 valAvailOK">
+                                                @MvcHtmlString.Create(CUtils.StrValue(child.QtyAvailOK))
+                                            </td>
+
+                                            <td fieldId="INVCODE" class="text-left cell-120">
+                                                @{
+                                                    foreach (var invCode in listInvCode)
+                                                    {
+                                                        <span class="badges-sm">@invCode</span>
+                                                    }
+                                                }
+                                            </td>
+                                            <td fieldId="QTYBACKORDER" fieldActive="0" class="text-right cell-100 valBackOrder">
+                                                @MvcHtmlString.Create(CUtils.StrValue(child.QtyBackOrder))
+                                            </td>
+                                            <td fieldId="QTYSTOCKEXT" fieldActive="0" class="text-right cell-100 valStockExt">
+                                                @MvcHtmlString.Create(CUtils.StrValue(child.QtyStockExt))
+                                            </td>
+                                            <td fieldId="QTYMINST" fieldActive="0" class="text-right cell-100 valMinSt">
+                                                @MvcHtmlString.Create(CUtils.StrValue(child.QtyMinSt))
+                                            </td>
+                                            <td fieldId="QTYMAXS" fieldActive="0" class="text-right cell-100 valMaxSt">
+                                                @MvcHtmlString.Create(CUtils.StrValue(child.QtyMaxSt))
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                stt++;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </aside>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        tablesort();
+        $('.scrollable-horizontal').hScroll();
+    });
+
+
+    function tablesort() {
+        var listColumns = {
+            'PRODUCTCODE': [],
+            'PRODUCTNAME': [],
+            'QTYTOTALOK': [],
+            'QTYAVAILOK': [],
+            'QTYBLOCKOK': [],
+            'INVCODE': [],
+            'QTYBACKORDER': [],
+            'QTYSTOCKEXT': [],
+            'QTYMINST': [],
+            'QTYMAXS': [],
+        };
+        var options = {};
+        options.Columns = listColumns;
+        $('#dynamic-table-thead').table_Sortable(options);
+    }
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('.select2-selection1').select2({
+            minimumResultsForSearch: -1
+        });
+    })
+</script>
+
+
+<script>
+    function ChangeProduct(thiz) {
+        debugger
+        var targetPrdCode = $(thiz).find('option:selected').attr('productcode');
+        var currentRow = $(thiz).parent().parent();
+        var targetRow = $(thiz).closest('tbody').find('tr.trdata.hidden[productcode="' + targetPrdCode + '"]')
+        $(currentRow).addClass('hidden');
+        $(targetRow).find('select[name="UnitCode"]').val(targetPrdCode).prop('selected', true);
+        $(targetRow).find('select[name="UnitCode"]').select2({
+            minimumResultsForSearch: -1
+        });
+        $(targetRow).removeClass('hidden');
+    }
+</script>
+

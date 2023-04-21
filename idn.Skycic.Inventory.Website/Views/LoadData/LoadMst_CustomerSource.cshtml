@@ -1,0 +1,20 @@
+﻿@model List<Mst_CustomerSource>
+@{
+    //Layout = null;
+    var customerSourceCode = CUtils.StrValue(ViewBag.CustomerSourceCode);
+}
+
+<optgroup label="">
+    <option value="">&nbsp;</option>
+    @if (Model != null && Model.Count > 0)
+    {
+        foreach (var item in Model)
+        {
+            var customerSourceCodeCur = CUtils.StrValue(item.CustomerSourceCode);
+            var customerSourceNameCur = CUtils.StrValue(item.CustomerSourceName);
+
+            <option value="@MvcHtmlString.Create(customerSourceCodeCur)" desc="@MvcHtmlString.Create(customerSourceNameCur)" @(customerSourceCodeCur.Equals(customerSourceCode) ? "selected" : "")>@MvcHtmlString.Create(customerSourceNameCur)</option>
+        }
+    }
+</optgroup>
+<option value="ADDDATA">@("Thêm".HtmlItemString("product"))</option>

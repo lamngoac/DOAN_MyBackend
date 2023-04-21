@@ -1,0 +1,474 @@
+﻿@model Mst_Spec
+@{
+    Layout = "~/Views/Shared/_LayoutQuantri.cshtml";
+    var title = "TẠO MỚI HÀNG HÓA";
+    var titleMng = "Danh mục Spec";
+    ViewBag.Title = title;
+    var listOS_PrdCenter_Mst_SpecType1 = ViewBag.ListOS_PrdCenter_Mst_SpecType1 as List<Mst_SpecType1>;
+    if (listOS_PrdCenter_Mst_SpecType1 == null || listOS_PrdCenter_Mst_SpecType1.Count == 0)
+    {
+        listOS_PrdCenter_Mst_SpecType1 = new List<Mst_SpecType1>();
+    }
+    var listOS_PrdCenter_Mst_Unit = ViewBag.ListOS_PrdCenter_Mst_Unit as List<Mst_Unit>;
+    if (listOS_PrdCenter_Mst_Unit == null || listOS_PrdCenter_Mst_Unit.Count == 0)
+    {
+        listOS_PrdCenter_Mst_Unit = new List<Mst_Unit>();
+    }
+    var list_OS_PrdCenter_Mst_SpecCustomField = ViewBag.List_OS_PrdCenter_Mst_SpecCustomField as List<Mst_SpecCustomField>;
+    if (list_OS_PrdCenter_Mst_SpecCustomField == null || list_OS_PrdCenter_Mst_SpecCustomField.Count == 0)
+    {
+        list_OS_PrdCenter_Mst_SpecCustomField = new List<Mst_SpecCustomField>();
+    }
+}
+<style>
+    .scroll-track {
+        width: 8px;
+    }
+</style>
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="col-xs-12 no-padding">
+                        @using (Html.BeginForm("Create", "OS_PrdCenter_Mst_Spec", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="col-xs-12 col-sm-5 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="OrgID" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã tổ chức")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="OrgID" name="OrgID" class="col-xs-11 disabled-fix" onkeyup="locdau(this);" value="@ViewBag.OrgID" autocomplete="off" required />
+                                        </span>
+                                        <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group margin-bottom-5">
+                                    <label for="SpecCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã hàng hóa")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="SpecCode" name="SpecCode" class="col-xs-11 SpecCode" onkeyup="locdau(this);" value="" autocomplete="off" required />
+                                        </span>
+                                        <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="SpecName" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên hàng hóa")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="SpecName" name="SpecName" class="col-xs-11 SpecName" value="" autocomplete="off" required />
+                                        </span>
+                                        <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5" hidden>
+                                    <label for="ModelCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã Model")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <select id="ModelCode" name="ModelCode" class="col-xs-11" required>
+                                                <option value="SYSMODEL" selected>SYSMODEL</option>
+                                                @*@{
+                                                        if (listOS_PrdCenter_Mst_Model != null && listOS_PrdCenter_Mst_Model.Count > 0)
+                                                        {
+                                                            foreach (var it in listOS_PrdCenter_Mst_Model)
+                                                            {
+                                                                <option value="@MvcHtmlString.Create(it.ModelCode.ToString().Trim())" desc="@MvcHtmlString.Create(it.ModelName.ToString().Trim())">@MvcHtmlString.Create(it.ModelCode.ToString().Trim())</option>
+                                                            }
+                                                        }
+                                                    }*@
+                                            </select>
+                                        </span>
+                                        <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="SpecType1" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Loại sản phẩm")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <select id="SpecType1" name="SpecType1" class="col-xs-11" required>
+                                                @*<option></option>*@
+                                                @{
+                                                    if (listOS_PrdCenter_Mst_SpecType1 != null && listOS_PrdCenter_Mst_SpecType1.Count > 0)
+                                                    {
+                                                        foreach (var it in listOS_PrdCenter_Mst_SpecType1)
+                                                        {
+                                                            <option value="@MvcHtmlString.Create(it.SpecType1.ToString().Trim())" desc="@MvcHtmlString.Create(it.SpecType1Name.ToString().Trim())">@MvcHtmlString.Create(it.SpecType1.ToString().Trim())</option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </span>
+                                        <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5" hidden>
+                                    <label for="SpecType2" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Nhóm sản phẩm")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <select id="SpecType2" name="SpecType2" class="col-xs-11" required>
+                                                <option value="SYSSPECTYPE2" selected>SYSSPECTYPE2</option>
+                                                @*@{
+                                                        if (listOS_PrdCenter_Mst_SpecType2 != null && listOS_PrdCenter_Mst_SpecType2.Count > 0)
+                                                        {
+                                                            foreach (var it in listOS_PrdCenter_Mst_SpecType2)
+                                                            {
+                                                                <option value="@MvcHtmlString.Create(it.SpecType2.ToString().Trim())" desc="@MvcHtmlString.Create(it.SpecType2Name.ToString().Trim())">@MvcHtmlString.Create(it.SpecType2.ToString().Trim())</option>
+                                                            }
+                                                        }
+                                                    }*@
+                                            </select>
+                                        </span>
+                                        <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                    </div>
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="Color" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên màu")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="Color" name="Color" class="col-xs-11 Color" value="" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="FlagHasSerial" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">Cờ quản lý Serial</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right padding-top-5">
+                                            <label>
+                                                <input name="FlagHasSerial" id="FlagHasSerial" class="ace ace-switch ace-switch-4 FlagHasSerial" type="checkbox" value="1" />
+                                                <span class="lbl"></span>
+                                                <input name="FlagHasSerial" type="hidden" value="0" />
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group margin-bottom-5" hidden>
+                                    <label for="FlagHasLOT" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">Cờ quản lý LOT</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right padding-top-5">
+                                            <label>
+                                                <input name="FlagHasLOT" id="FlagHasLOT" class="ace ace-switch ace-switch-4 FlagHasLOT" type="checkbox" value="1" />
+                                                <span class="lbl"></span>
+                                                <input name="FlagHasLOT" type="hidden" value="0" />
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="DefaultUnitCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Đơn vị thường dùng")</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right">
+                                            <select id="DefaultUnitCode" name="DefaultUnitCode" class="col-xs-11" required>
+                                                <option value=""></option>
+                                                @{
+                                                    if (listOS_PrdCenter_Mst_Unit != null && listOS_PrdCenter_Mst_Unit.Count > 0)
+                                                    {
+                                                        foreach (var it in listOS_PrdCenter_Mst_Unit)
+                                                        {
+                                                            <option value="@MvcHtmlString.Create(it.UnitCode.ToString().Trim())" desc="@MvcHtmlString.Create(it.UnitName.ToString().Trim())">@MvcHtmlString.Create(it.UnitCode.ToString().Trim())</option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </span>
+                                        <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                    </div>
+
+                                </div>
+                                @*<div class="form-group margin-bottom-5">
+                                        <label for="StandardUnitCode" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Đơn vị chuẩn")</label>
+                                        <div class="col-xs-12 col-sm-8">
+                                            <span class="block input-icon input-icon-right">
+                                                <select id="StandardUnitCode" name="StandardUnitCode" class="col-xs-11" required>
+                                                    <option></option>
+                                                    @{
+                                                        if (listOS_PrdCenter_Mst_Unit != null && listOS_PrdCenter_Mst_Unit.Count > 0)
+                                                        {
+                                                            foreach (var it in listOS_PrdCenter_Mst_Unit)
+                                                            {
+                                                                <option value="@MvcHtmlString.Create(it.UnitCode.ToString().Trim())" desc="@MvcHtmlString.Create(it.UnitName.ToString().Trim())">@MvcHtmlString.Create(it.UnitCode.ToString().Trim())</option>
+                                                            }
+                                                        }
+                                                    }
+                                                </select>
+                                            </span>
+                                            <label class="span-input" style="color: red; padding-left: 10px; padding-top: 10px;">*</label>
+                                        </div>
+
+                                    </div>*@
+
+                                @if (list_OS_PrdCenter_Mst_SpecCustomField != null && list_OS_PrdCenter_Mst_SpecCustomField.Count > 0)
+                                {
+                                    var lstName = new List<int>();
+                                    foreach (var it in list_OS_PrdCenter_Mst_SpecCustomField)
+                                    {
+                                        var CustomFieldCode = it.SpecCustomFieldCode.ToString().Replace("CUSTOMFIELD", "");
+                                        lstName.Add(Convert.ToInt32(CustomFieldCode));
+                                    }
+                                    lstName.Sort();
+
+                                    foreach (var it in lstName)
+                                    {
+                                        var customFieldCode = "CUSTOMFIELD" + it;
+                                        var itSpecCustomField = list_OS_PrdCenter_Mst_SpecCustomField.Where(x => x.SpecCustomFieldCode.ToString() == customFieldCode).FirstOrDefault();
+                                        if (itSpecCustomField != null)
+                                        {
+                                            var specCustomFieldCode = itSpecCustomField.SpecCustomFieldCode.ToString().Trim();
+                                            var specCustomFieldName = itSpecCustomField.SpecCustomFieldName.ToString().Trim();
+                                            <div class="form-group margin-bottom-5">
+                                                <label for="@MvcHtmlString.Create(specCustomFieldCode)" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create(specCustomFieldName)</label>
+                                                <div class="col-xs-12 col-sm-8">
+                                                    <span class="block input-icon input-icon-right">
+                                                        <input type="text" id="@MvcHtmlString.Create(specCustomFieldCode)" name="@MvcHtmlString.Create(specCustomFieldCode)" class="col-xs-11 @MvcHtmlString.Create(specCustomFieldCode)" value="" autocomplete="off" />
+                                                    </span>
+                                                </div>
+
+                                            </div>
+                                        }
+
+                                    }
+                                    @*foreach (var item in list_OS_PrdCenter_Mst_SpecCustomField)
+                                        {
+                                            var specCustomFieldCode = item.SpecCustomFieldCode.ToString().Trim();
+                                            var specCustomFieldName = item.SpecCustomFieldName.ToString().Trim();
+                                            <div class="form-group margin-bottom-5">
+                                                <label for="@MvcHtmlString.Create(specCustomFieldCode)" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create(specCustomFieldName)</label>
+                                                <div class="col-xs-12 col-sm-8">
+                                                    <span class="block input-icon input-icon-right">
+                                                        <input type="text" id="@MvcHtmlString.Create(specCustomFieldCode)" name="@MvcHtmlString.Create(specCustomFieldCode)" class="col-xs-11 @MvcHtmlString.Create(specCustomFieldCode)" value="" autocomplete="off" />
+                                                    </span>
+                                                </div>
+
+                                            </div>
+                                        }*@
+
+                                }
+
+                            </div>
+                            <div class="col-xs-12 col-sm-7 no-padding">
+                                <div style="min-height: 400px; width: 100%; float: left;">
+                                    <div class="tabbable tabs-below padding-left-0 padding-right-0">
+                                        <div class="tab-content" style="margin-left: 0px; margin-right: 0px;">
+                                            <div id="uploadimages" class="tab-pane col-xs-12" style="padding-left: 0px; height: 360px;">
+                                                <a href="javascript:void(0);" id="selectedImage" class="btn btn-sm btn-success font-color mybtn-Button file-button"><img class="img-icon" src="@Url.Content("~/Images/attachment.svg")">Upload ảnh</a>
+                                                <input type="file" name="fileImage" id="fileImage" class="uploadfile" onchange="handleImageFileSelect(this)" style="display: none;" multiple />
+                                            </div>
+
+                                            <div id="media" class="tab-pane col-xs-12 active" style="padding-left: 0px; padding-right: 0px;">
+
+                                                <div style="float: left; width: 100%;">
+                                                    <div class="col-xs-12" style="padding-left: 0; padding-right: 0; float: left;">
+                                                        <a href="javascript:;" onclick="RemoveImages(this)" class="thumb-delete" title="@MvcHtmlString.Create("Xóa ảnh")">
+                                                            &nbsp;
+                                                        </a>
+                                                        <span class="block input-icon input-icon-right" style="float: right; top: 35px; right: -20px;" title="Thiết lập ảnh mặc định">
+                                                            <label>
+                                                                <input name="FlagPrimaryImage" id="FlagPrimaryImage" class="ace ace-switch ace-switch-4" type="checkbox" onchange="SetPrimaryImage(this)" />
+                                                                <span class="lbl"></span>
+                                                            </label>
+                                                        </span>
+                                                        <div style="margin-left: auto; margin-right: auto; width: 400px; height: 330px; border: 1px solid #e1e1e1; padding: 3px;">
+                                                            <img idximg="" flagprimaryimage="" id="imgView" class="img-responsive" style="width: 394px; height: 324px;" src="@Url.Content("~/Images/DK_TVAN.png")" />
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-xs-12" style="float: left; padding: 5px; background: azure">
+                                                        <div class="scrollable-horizontal" data-size="10024">
+                                                            <div id="listImagesThumb" class="" style="padding-bottom: 5px; z-index: 200;">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+                                        <ul class="nav nav-tabs" id="myTab" style="position: unset;">
+                                            <li class="">
+                                                <a data-toggle="tab" href="#uploadimages" aria-expanded="false">Upload images</a>
+                                            </li>
+                                            <li class="active">
+                                                <a data-toggle="tab" href="#media" aria-expanded="true">Media</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                </div>
+                                <div style="">
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="SpecDesc" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mô tả")</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <textarea cols="50" rows="3" id="SpecDesc" name="SpecDesc" class="col-xs-11 SpecDesc"></textarea>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group margin-bottom-5">
+                                        <label for="" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500">Tệp tin đính kèm</label>
+                                        <div class="col-xs-12 col-sm-7">
+                                            <span class="block input-icon input-icon-right">
+                                                <a href="javascript:void(0);" id="selectedFile" class="btn btn-sm btn-success font-color mybtn-Button file-button"><img class="img-icon" src="@Url.Content("~/Images/attachment.svg")">Thêm file đính kèm</a>
+                                                <input type="file" name="fileInput" id="fileInput" class="uploadfile" inputid="thumbimage" onchange="handleFileSelect(this);" multiple style="display: none;" />
+                                            </span>
+                                            <div class="clearfix"></div>
+                                            <div style="width: 100%; float: left; padding-top: 15px;">
+                                                <table class="padding-left-right-25">
+                                                    <tbody id="tbody-FileUpload"></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        }
+                    </aside>
+                    <div class="col-xs-12 no-padding">
+                        <div class="clearfix">
+                            <div class="row no-margin" style="float: right">
+                                @RenderItemFormat("BTN_TAO_OS_PrdCenter_Mst_Spec_LUU", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px; padding-right: 15px!important; \" onclick=\"SaveData();\">Lưu</a>", "", "")
+                                @*<a download='FileName' href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,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">open</a>
+                                    <a download='FileName' href="data:text/xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48REt5VGh1ZURUdSB4bWxucz0iaHR0cDovL2tla2hhaXRodWUuZ2R0Lmdvdi52bi9IU29ES3kiPjxES3lUaHVlIGlkPSJfTk9ERV9UT19TSUdOIj48VFRpbkNodW5nPjxDUVQ+PG1hQ1FUPjEwMTAwPC9tYUNRVD48dGVuQ1FUPkNRVCDEkOG7kW5nIMSQYTwvdGVuQ1FUPjxEVnU+PG1hRFZ1PjAwMTk8L21hRFZ1Pjx0ZW5EVnU+aWRvY05ldDwvdGVuRFZ1Pjxzb0dQaGVwS0RvYW5oPjwvc29HUGhlcEtEb2FuaD48L0RWdT48L0NRVD48VFRpbkRLeVRodWU+PG1hREt5PjIxNjwvbWFES3k+PG1hdURLeT4wMS1ES19ULVZhbjwvbWF1REt5Pjx0ZW5ES3k+xJDEg25nIGvDvSBz4butIGThu6VuZyBk4buLY2ggduG7pSBUVkFOPC90ZW5ES3k+PHBCYW5ES3k+Mi4wLjk8L3BCYW5ES3k+PG5nYXlES3k+MjAxOS0wMy0yNzwvbmdheURLeT48dElOPjAxMDAxMTIxODc8L3RJTj48dGVuTk5UPkPDlE5HIFRZIEPhu5QgUEjhuqZOIFFV4buQQyBU4bq+IExPTkcgUVVBTkc8L3Rlbk5OVD48L1RUaW5ES3lUaHVlPjwvVFRpbkNodW5nPjxORHVuZ0RLeT48ZGlhRGllbVRCPjwvZGlhRGllbVRCPjxpc3N1ZXI+TkVXVEVMLUNBIHYyPC9pc3N1ZXI+PHN1YmplY3Q+Q8OUTkcgVFkgQ+G7lCBQSOG6pk4gUVXhu5BDIFThur4gTE9ORyBRVUFORzwvc3ViamVjdD48c2VyaWFsPjU0MDEwMTA5OTJBRkRCRUMzRTVERTMyQjlGQzBDQUExPC9zZXJpYWw+PGVtYWlsPmFuQGdtYWlsLmNvbS52bjwvZW1haWw+PHRlbD4wNDM2NjQ1MTEwPC90ZWw+PGZyb21EYXRlQ0E+MjAxOS0wMS0xMSAxNjo0Mzo0OTwvZnJvbURhdGVDQT48dG9EYXRlQ0E+MjAyMC0wMS0xMSAxNjo0Mzo0OTwvdG9EYXRlQ0E+PGRreVREVD5mYWxzZTwvZGt5VERUPjxra1REVD50cnVlPC9ra1REVD48dGVuVG9DaHVjPk5FV1RFTC1DQSB2MjwvdGVuVG9DaHVjPjxzb0dpYXlDTmhhbj4xMDEwMDwvc29HaWF5Q05oYW4+PC9ORHVuZ0RLeT48L0RLeVRodWU+PENLeURUdT48U2lnbmF0dXJlIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjIj48U2lnbmVkSW5mbz48Q2Fub25pY2FsaXphdGlvbk1ldGhvZCBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnL1RSLzIwMDEvUkVDLXhtbC1jMTRuLTIwMDEwMzE1IiAvPjxTaWduYXR1cmVNZXRob2QgQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjcnNhLXNoYTEiIC8+PFJlZmVyZW5jZSBVUkk9IiNfTk9ERV9UT19TSUdOIj48VHJhbnNmb3Jtcz48VHJhbnNmb3JtIEFsZ29yaXRobT0iaHR0cDovL3d3dy53My5vcmcvMjAwMC8wOS94bWxkc2lnI2VudmVsb3BlZC1zaWduYXR1cmUiIC8+PC9UcmFuc2Zvcm1zPjxEaWdlc3RNZXRob2QgQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjc2hhMSIgLz48RGlnZXN0VmFsdWU+OXhBYUFmZzVuaHVmVnZqS0tmWDRPckJyWFFrPTwvRGlnZXN0VmFsdWU+PC9SZWZlcmVuY2U+PC9TaWduZWRJbmZvPjxTaWduYXR1cmVWYWx1ZT5jSldrV2psWGw1NzdqVUxZTWNoUFZEbmxtZFNjYUdjT1Q2cVcvcW5DYWJJTWIwTWU1cldNUzZHNTNTc0xwUWRJWmxGNDQ1Q00rMnRXcjdGcmFFYVRnTGpaUndrbEdtU0xzZDhkL1BPL1RFbzJKdmlVY0t0dzdPZHZlU1hWU0k0V3BDQUs5Q1IrOUF1ZE5BMUNSQVJWa0hnbmxRMG10eG16VXRmSXFTOFUyRm89PC9TaWduYXR1cmVWYWx1ZT48S2V5SW5mbz48S2V5VmFsdWU+PFJTQUtleVZhbHVlPjxNb2R1bHVzPjh0UzRxN01WdTN4bnhYSS9OTTM3aGM0NmNIcnRvRTlXckFNOWFMVFIyMVFCaWZFTmRYcXNvVXZzTVQzdnpyRUpNMURRQjRZckprVWREUXF0OGVoVW00MGFaQjBDNFRZOVlFMGZ0RENSV2RSUVYxUytHYWQrdDY5REpZc0dVOFdjM296ejg5Rmwrc21BN0pnODFyOG1lRDd5c3FhbnVOcktHWkZML3liSjJKaz08L01vZHVsdXM+PEV4cG9uZW50PkFRQUI8L0V4cG9uZW50PjwvUlNBS2V5VmFsdWU+PC9LZXlWYWx1ZT48WDUwOURhdGE+PFg1MDlTdWJqZWN0TmFtZT5DPVZOLCBDTj1Dw5RORyBUWSBD4buUIFBI4bqmTiBRVeG7kEMgVOG6viBMT05HIFFVQU5HLCBPSUQuMC45LjIzNDIuMTkyMDAzMDAuMTAwLjEuMT1NU1Q6MDEwNzYwMDkwOTwvWDUwOVN1YmplY3ROYW1lPjxYNTA5Q2VydGlmaWNhdGU+TUlJRWlEQ0NBM0NnQXdJQkFnSVFWQUVCQ1pLdjIrdytYZU1ybjhES29UQU5CZ2txaGtpRzl3MEJBUVVGQURCZ01Rc3dDUVlEVlFRR0V3SldUakU2TURnR0ExVUVDZ3d4UThPVVRrY2dWRmtnUStHN2xDQlFTT0c2cGs0Z1Zrbmh1NFJPSUZSSXc1Uk9SeUJPUlZkVVJVd3RWRVZNUlVOUFRURVZNQk1HQTFVRUF4TU1Ua1ZYVkVWTUxVTkJJSFl5TUI0WERURTVNREV4TVRBNU5ETTBPVm9YRFRJd01ERXhNVEE1TkRNME9Wb3dZekVlTUJ3R0NnbVNKb21UOGl4a0FRRU1EazFUVkRvd01UQTNOakF3T1RBNU1UUXdNZ1lEVlFRRERDdER3NVJPUnlCVVdTQkQ0YnVVSUZCSTRicW1UaUJSVmVHN2tFTWdWT0c2dmlCTVQwNUhJRkZWUVU1SE1Rc3dDUVlEVlFRR0V3SldUakNCbnpBTkJna3Foa2lHOXcwQkFRRUZBQU9CalFBd2dZa0NnWUVBOHRTNHE3TVZ1M3hueFhJL05NMzdoYzQ2Y0hydG9FOVdyQU05YUxUUjIxUUJpZkVOZFhxc29VdnNNVDN2enJFSk0xRFFCNFlySmtVZERRcXQ4ZWhVbTQwYVpCMEM0VFk5WUUwZnREQ1JXZFJRVjFTK0dhZCt0NjlESllzR1U4V2Mzb3p6ODlGbCtzbUE3Smc4MXI4bWVEN3lzcWFudU5yS0daRkwveWJKMkprQ0F3RUFBYU9DQWIwd2dnRzVNQXdHQTFVZEV3RUIvd1FDTUFBd0h3WURWUjBqQkJnd0ZvQVVndkR4SWUvK1RsZzBjVy81akVJUFB5SGRWWnN3YXdZSUt3WUJCUVVIQVFFRVh6QmRNQzRHQ0NzR0FRVUZCekFDaGlKb2RIUndPaTh2Y0hWaU1pNXVaWGRqWVM1MmJpOXVaWGQwWld3dFkyRXVZM0owTUNzR0NDc0dBUVVGQnpBQmhoOW9kSFJ3T2k4dmIyTnpjREl1Ym1WM1kyRXVkbTR2Y21WemNHOXVaR1Z5TUNRR0ExVWRFUVFkTUJ1QkdXdHBibWhrYjJGdWFFQmpiMjVuZEhsaGJtZHBZUzVqYjIwd1d3WURWUjBnQkZRd1VqQlFCZ3dyQmdFRUFZSHRBd0VKQXdFd1FEQVpCZ2dyQmdFRkJRY0NBakFOREF0UFUxOVNaVzVsZDE4eFdUQWpCZ2dyQmdFRkJRY0NBUllYYUhSMGNEb3ZMM0IxWWk1dVpYZGpZUzUyYmk5eWNHRXdOQVlEVlIwbEJDMHdLd1lJS3dZQkJRVUhBd0lHQ0NzR0FRVUZCd01FQmdvckJnRUVBWUkzQ2dNTUJna3Foa2lHOXk4QkFRVXdNd1lEVlIwZkJDd3dLakFvb0NhZ0pJWWlhSFIwY0RvdkwyTnliREl1Ym1WM1kyRXVkbTR2Ym1WM2RHVnNMV05oTG1OeWJEQWRCZ05WSFE0RUZnUVVIMUl5TVlIaGFqbFlQOUJGdXRqRVpLVGpjYmt3RGdZRFZSMFBBUUgvQkFRREFnVHdNQTBHQ1NxR1NJYjNEUUVCQlFVQUE0SUJBUUFyWW92OEhnSmh6cTZFTVlOelNWVUpNN1A4aC9qOGF6R2ltU0ZpM2VubVVZMm8wVGVudWtGV0crenFtSU5GZ05TVHNKNFM1SGV0cjhrY3J4cGtZclF2a1JleVZ2VThuaUtwanFzdm5aWXBzNHlNdm9kRjV3NmxvOFhvVEJ3ajQvbTY5QmZwd2NSLzUwOHRpU1AzZUtRY0FGU1RwTUhsYW1NMXo2TGw5S2NVaVVORFdPc2E5OGhGVi83cmxBM2xKOWswaTNTMEY1N1FKbFdob3J0NE5GZGdzVTkrenk2Tnk3U1FYY3ZTNXZ0c3hkMThIaXNaZE9RbG43b0htNHorWFlIaWVjQmQwUm95MU8xZ2pJS1phYkF2dXZvYkd2aDV1QlZ5THQxdm5PYTloSWw3M21Qbi9RL3NoaG1LU05IM3VrNVg2TWNsRFBKNmcxT3dWTjVOK1YrYjwvWDUwOUNlcnRpZmljYXRlPjwvWDUwOURhdGE+PC9LZXlJbmZvPjwvU2lnbmF0dXJlPjxTaWduYXR1cmUgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvMDkveG1sZHNpZyMiPjxTaWduZWRJbmZvPjxDYW5vbmljYWxpemF0aW9uTWV0aG9kIEFsZ29yaXRobT0iaHR0cDovL3d3dy53My5vcmcvVFIvMjAwMS9SRUMteG1sLWMxNG4tMjAwMTAzMTUiIC8+PFNpZ25hdHVyZU1ldGhvZCBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvMDkveG1sZHNpZyNyc2Etc2hhMSIgLz48UmVmZXJlbmNlIFVSST0iI19OT0RFX1RPX1NJR04iPjxUcmFuc2Zvcm1zPjxUcmFuc2Zvcm0gQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjZW52ZWxvcGVkLXNpZ25hdHVyZSIgLz48L1RyYW5zZm9ybXM+PERpZ2VzdE1ldGhvZCBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvMDkveG1sZHNpZyNzaGExIiAvPjxEaWdlc3RWYWx1ZT45eEFhQWZnNW5odWZWdmpLS2ZYNE9yQnJYUWs9PC9EaWdlc3RWYWx1ZT48L1JlZmVyZW5jZT48L1NpZ25lZEluZm8+PFNpZ25hdHVyZVZhbHVlPng5dUxlaXZuQzl2SDdna3gzMGdoaVUzRnZtNENaU0pPaTNIaXBzWU5pQ0NpWTZBMmFWZ3gxVWdMN0ZyY2F5S05PU3AvdWFBNitiS0orUlhJYmRES2NxQmtpS2l1a2x6M05rckNLamNGaUdtemljb08vR3lhYWNpNHRXVDlXK3hmNnFSRU8ybkwrT3pGZ0pFWlMvbjJINXR1NWVqU25hdkg4UGtGc1JlR3ArQT08L1NpZ25hdHVyZVZhbHVlPjxLZXlJbmZvPjxLZXlWYWx1ZT48UlNBS2V5VmFsdWU+PE1vZHVsdXM+eXB5Mmt0emt1cG9QVHZIdTVHNkdGZWxDQTFrTzJ1UDJRaEx5blFlNnNYRjRUNVFDa0NpZFN0ZlBVc2tKbVZTYnI4Y2xESVM1KzIzZU9uMzI2NW9WSjB5YU9wSEE2Ukk1dldKV0VhMGcrVFlkNDlldm5scURmYnhJV1MydUxYTGR5RnVEL3VBbkhVOGdubi8wajVNL3l2cExudE9obUZSWkxDbmMyamVURHZrPTwvTW9kdWx1cz48RXhwb25lbnQ+QVFBQjwvRXhwb25lbnQ+PC9SU0FLZXlWYWx1ZT48L0tleVZhbHVlPjxYNTA5RGF0YT48WDUwOVN1YmplY3ROYW1lPkM9Vk4sIENOPUPDlE5HIFRZIEPhu5QgUEjhuqZOIMSQ4bqmVSBUxq8gVsOAIEPDlE5HIE5HSOG7hiBJRE9DTkVULCBPSUQuMC45LjIzNDIuMTkyMDAzMDAuMTAwLjEuMT1NU1Q6MDEwNDYxNDY5MjwvWDUwOVN1YmplY3ROYW1lPjxYNTA5Q2VydGlmaWNhdGU+TUlJRVpEQ0NBMHlnQXdJQkFnSVFWQUVCQ1RKMFNUWVJjcXVLRjdEQ1pEQU5CZ2txaGtpRzl3MEJBUVVGQURCZ01Rc3dDUVlEVlFRR0V3SldUakU2TURnR0ExVUVDZ3d4UThPVVRrY2dWRmtnUStHN2xDQlFTT0c2cGs0Z1Zrbmh1NFJPSUZSSXc1Uk9SeUJPUlZkVVJVd3RWRVZNUlVOUFRURVZNQk1HQTFVRUF4TU1Ua1ZYVkVWTUxVTkJJSFl5TUI0WERURTVNRE14TlRBek1URTFORm9YRFRJd01ETXhOREF6TVRFMU5Gb3djREVlTUJ3R0NnbVNKb21UOGl4a0FRRU1EazFUVkRvd01UQTBOakUwTmpreU1VRXdQd1lEVlFRREREaER3NVJPUnlCVVdTQkQ0YnVVSUZCSTRicW1UaURFa09HNnBsVWdWTWF2SUZiRGdDQkR3NVJPUnlCT1Iwamh1NFlnU1VSUFEwNUZWREVMTUFrR0ExVUVCaE1DVms0d2daOHdEUVlKS29aSWh2Y05BUUVCQlFBRGdZMEFNSUdKQW9HQkFNcWN0cExjNUxxYUQwN3g3dVJ1aGhYcFFnTlpEdHJqOWtJUzhwMEh1ckZ4ZUUrVUFwQW9uVXJYejFMSkNabFVtNi9ISlF5RXVmdHQzanA5OXV1YUZTZE1tanFSd09rU09iMWlWaEd0SVBrMkhlUFhyNTVhZzMyOFNGa3RyaTF5M2NoYmcvN2dKeDFQSUo1LzlJK1RQOHI2UzU3VG9aaFVXU3dwM05vM2t3NzVBZ01CQUFHamdnR01NSUlCaURBZkJnTlZIU01FR0RBV2dCU0M4UEVoNy81T1dEUnhiL21NUWc4L0lkMVZtekJyQmdnckJnRUZCUWNCQVFSZk1GMHdMZ1lJS3dZQkJRVUhNQUtHSW1oMGRIQTZMeTl3ZFdJeUxtNWxkMk5oTG5adUwyNWxkM1JsYkMxallTNWpjblF3S3dZSUt3WUJCUVVITUFHR0gyaDBkSEE2THk5dlkzTndNaTV1WlhkallTNTJiaTl5WlhOd2IyNWtaWEl3SkFZRFZSMFJCQjB3RzRFWmEybHVhR1J2WVc1b1FHTnZibWQwZVdGdVoybGhMbU52YlRCWkJnTlZIU0FFVWpCUU1FNEdEQ3NHQVFRQmdlMERBUWtEQWpBK01DTUdDQ3NHQVFVRkJ3SUJGaGRvZEhSd09pOHZjSFZpTG01bGQyTmhMblp1TDNKd1lUQVhCZ2dyQmdFRkJRY0NBakFMREFsUFUxOU9aWGRmTVZrd0V3WURWUjBsQkF3d0NnWUlLd1lCQlFVSEF3SXdNd1lEVlIwZkJDd3dLakFvb0NhZ0pJWWlhSFIwY0RvdkwyTnliREl1Ym1WM1kyRXVkbTR2Ym1WM2RHVnNMV05oTG1OeWJEQWRCZ05WSFE0RUZnUVVVakt1NmpNM1dwalg5MUVxekRzdEE1b1JaY1l3RGdZRFZSMFBBUUgvQkFRREFnZUFNQTBHQ1NxR1NJYjNEUUVCQlFVQUE0SUJBUUJwRmJuRXVtNE9jMktZRTdjV0x4N1k0Q3REcm9hVXJ1K1R4N1NZWUhGWm5QWDAvLzdEdEdHVEVmMTJYendZZkwyODErYk1pdWF0SmdqWi9PQmYwRVhmREd6bTBtWUNOem8zRS9PdXMzbWU0R1F5d3Y5c08yYUtGNGJpR1RhL01HaUhSZmRCbmI1QjhLK3hUTjNJUEVHYUk5dlhreUpNRnEvQkpBZ2x1UVdlVjNjQjhxQ042Y0plZ0NHYnVCc3FZeE5BVC81U0x6RER3SmdYRVZxVkhLQUVXaVVKMHlpNFVJeVdpSEQ3cGd2K2tVTUxvM1ZaUEJ2U25XbHRPZU1HaU1GTHBSOEpaczRyVTVFR0lxYnBDQWFXemNVa1dwSHg2eEFqRkp4eXRyTVNTR2xmeFNFMnA5Q2QwYkczakhsS2Zja0FZcXdaUUU2U2R2K3JEWVpXcDB2MDwvWDUwOUNlcnRpZmljYXRlPjwvWDUwOURhdGE+PC9LZXlJbmZvPjwvU2lnbmF0dXJlPjwvQ0t5RFR1PjwvREt5VGh1ZURUdT4=">open xml</a>*@
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+<table style="display: none;">
+    <tbody id="rowtemplateFileUpload">
+        <tr class="data-item trdata" idx="==idx==" specfilename="==specfilename==" specfiletype="==specfiletype==">
+            <input type="hidden" name="ListFiles[==idx==].SpecFileName" value="==specfilename==">
+            <input type="hidden" name="ListFiles[==idx==].SpecFilePath" value="==specfilepath==">
+            <input type="hidden" name="ListFiles[==idx==].SpecFileType" value="==specfiletype==">
+            <input type="hidden" name="ListFiles[==idx==].SpecFileDesc" value="==specfiledesc==">
+            <td>
+                <a download='==specfilename==' href="==specfilepath==" target="_blank">==specfilename==</a>
+            </td>
+            <td>
+                <span style="padding-left: 10px">
+                    <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleteFile(this)"><img class="img-icon" src="/Images/Xoa.svg"></a>
+                </span>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/OS_PrdCenter_Mst_Spec.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "OS_PrdCenter_Mst_Spec")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+        });
+
+        @* Set focus *@
+        $(document).ready(function () {
+            $('#BrandCode').focus();
+        });
+
+        @* Scroll *@
+        $(document).ready(function () {
+            $('.scrollable-horizontal').each(function () {
+                var $this = $(this);
+                $(this).ace_scroll(
+                    {
+                        horizontal: true,
+                        size: $this.attr('data-size') || 6500,
+                        mouseWheelLock: true
+                    }
+                ).css({ 'padding-top': 0 });
+            });
+        });
+
+        var maxImageWidth = 800,
+        totalFiles = 0,
+        currentTotalFiles = 0,
+        fileTypeError = false,
+        fileSizeError = false,
+        ListImages = [],
+        ListFiles = [],
+        ImgId = 0,
+        FileId = 0;
+
+        document.getElementById("fileImage").addEventListener('change', handleImageFileSelect, false);
+        
+        $(document).ready(function () {
+            $("#selectedImage").bind('click', function () {
+                $('#fileImage').click();
+            });
+
+            $("#selectedFile").bind('click', function () {
+                $('#fileInput').click();
+            });
+        });
+        
+        var objOS_PrdCenter_Mst_Spec = new OS_PrdCenter_Mst_Spec();
+
+        function RemoveImages(thiz) {
+            objOS_PrdCenter_Mst_Spec.removeImages(thiz);
+        }
+
+        function SelectedImages(thiz) {
+            objOS_PrdCenter_Mst_Spec.selectedImages(thiz);
+        }
+
+        function SetPrimaryImage(thiz) {
+            objOS_PrdCenter_Mst_Spec.setPrimaryImages(thiz);
+        }
+
+        function handleImageFileSelect(event) {
+            objOS_PrdCenter_Mst_Spec.handleImageFileSelect(event);
+        }
+
+        function renderImageFileInfo(file, id) {
+            objOS_PrdCenter_Mst_Spec.renderImageFileInfo(file, id);
+        }
+
+        function checkError() {
+            objOS_PrdCenter_Mst_Spec.checkError();
+        }
+        document.getElementById("fileInput").addEventListener('change', handleFileSelect, false);
+
+        function handleFileSelect(event) {
+            objOS_PrdCenter_Mst_Spec.handleFileSelect(event);
+        }
+
+        function renderFileInfo(file, id) {
+            objOS_PrdCenter_Mst_Spec.renderFileInfo(file,id);
+        }
+
+        function DeleteFile(thiz) {
+            objOS_PrdCenter_Mst_Spec.deleteFile(thiz);
+        }
+        function SaveData() {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Create", "OS_PrdCenter_Mst_Spec")';
+            var objOS_PrdCenter_Mst_Spec = new OS_PrdCenter_Mst_Spec();
+            objOS_PrdCenter_Mst_Spec.ActionType = 'create';
+            objOS_PrdCenter_Mst_Spec.ajaxSettings = ajaxSettings;
+            objOS_PrdCenter_Mst_Spec.saveData();
+        }
+    </script>
+}

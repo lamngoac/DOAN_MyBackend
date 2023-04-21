@@ -1,0 +1,139 @@
+﻿@model Mst_Model
+@{
+    Layout = "~/Views/Shared/_LayoutQuantri.cshtml";
+    var title = "TẠO MỚI MODEL";
+    var titleMng = "Danh mục Model";
+    ViewBag.Title = title;
+    var listOS_PrdCenter_Mst_Brand = ViewBag.ListOS_PrdCenter_Mst_Brand as List<Mst_Brand>;
+    if (listOS_PrdCenter_Mst_Brand == null || listOS_PrdCenter_Mst_Brand.Count == 0)
+    {
+        listOS_PrdCenter_Mst_Brand = new List<Mst_Brand>();
+    }
+
+}
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                <div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>
+                <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                    <aside class="row no-margin box-shadow-tk">
+                        @using (Html.BeginForm("Create", "OS_PrdCenter_Mst_Model", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="OrgID" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã tổ chức <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="OrgID" name="OrgID" class="col-xs-11 OrgID disabled-fix" onkeyup="locdau(this);" value="@ViewBag.OrgID" autocomplete="off" required />
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group margin-bottom-5">
+                                    <label for="ModelCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã Model <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="ModelCode" name="ModelCode" class="col-xs-11 ModelCode" onkeyup="locdau(this);" value="" autocomplete="off" required />
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="ModelName" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Tên Model <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="ModelName" name="ModelName" class="col-xs-11 ModelName" value="" autocomplete="off" required />
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group margin-bottom-5">
+                                    <label for="OrgModelCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã OrgModel")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="OrgModelCode" name="OrgModelCode" class="col-xs-11 OrgModelCode" onkeyup="locdau(this);" value="" autocomplete="off" required />
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="BrandCode" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã Brand <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <select id="BrandCode" name="BrandCode" class="col-xs-11" required>
+                                                <option></option>
+                                                @{
+                                                    if (listOS_PrdCenter_Mst_Brand != null && listOS_PrdCenter_Mst_Brand.Count > 0)
+                                                    {
+                                                        foreach (var it in listOS_PrdCenter_Mst_Brand)
+                                                        {
+                                                            <option value="@MvcHtmlString.Create(it.BrandCode.ToString().Trim())" desc="@MvcHtmlString.Create(it.BrandName.ToString().Trim())">@MvcHtmlString.Create(it.BrandCode.ToString().Trim())</option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="Remark" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mô tả")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <textarea rows="3" cols="50" id="Remark" name="Remark" class="col-xs-11 Remark" maxlength="400" autocomplete="off"></textarea>
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                        }
+                    </aside>
+                    <div class="col-xs-12 no-padding">
+                        <div class="clearfix">
+                            <div class="row no-margin" style="float: right">
+                                @RenderItemFormat("BTN_TAO_OS_PRDCENTER_MST_MODEL_LUU", "<a href=\"javascript:void();\" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px; \" onclick=\"SaveData();\">Lưu</a>", "", "")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/OS_PrdCenter_Mst_Model.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "OS_PrdCenter_Mst_Model")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+        });
+        @* Set focus *@
+        $(document).ready(function () {
+            $('#ModelCode').focus();
+        });
+        function SaveData() {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Create", "OS_PrdCenter_Mst_Model")';
+            var objOS_PrdCenter_Mst_Model = new OS_PrdCenter_Mst_Model();
+            objOS_PrdCenter_Mst_Model.ActionType = 'create';
+            objOS_PrdCenter_Mst_Model.ajaxSettings = ajaxSettings;
+            objOS_PrdCenter_Mst_Model.saveData();
+        }
+    </script>
+}

@@ -1,0 +1,663 @@
+﻿@model PageInfo<InvF_InventoryOut>
+@{
+    ViewBag.Title = "Quản lý phiếu xuất";
+    var userState = ViewBag.UserState as UserState;
+    var init = CUtils.StrValue(ViewBag.init);
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+    var recordCount = CUtils.StrValue(ViewBag.RecordCount);
+    var totalPage = "0";
+    if (Model != null)
+    {
+        totalPage = CUtils.StrValue(Model.PageCount);
+    }
+
+
+    var listMst_Inventory = ViewBag.Lst_Mst_Inventory as List<Mst_Inventory>;
+    var listMst_InvOutType = new List<Mst_InvOutType>();
+    if (ViewBag.Lst_Mst_InvOutType != null)
+    {
+        listMst_InvOutType = ViewBag.Lst_Mst_InvOutType as List<Mst_InvOutType>;
+    }
+    var listCustomer = new List<Mst_Customer>();
+    if (ViewBag.Lst_MstCustomer != null)
+    {
+        listCustomer = ViewBag.Lst_MstCustomer as List<Mst_Customer>;
+    }
+
+    var listMst_NNT = new List<Mst_NNT>();
+    if (ViewBag.ListMst_NNT != null)
+    {
+        listMst_NNT = ViewBag.ListMst_NNT as List<Mst_NNT>;
+    }
+
+
+    var viewid = string.Format("{0}_{1}_{2}_{3}", CUtils.StrValue(userState.SysUser.UserCode), CUtils.StrValue(ViewBag.SolutionCodeSignature), CUtils.StrValue(userState.Mst_NNT.OrgID), "InvF_InventoryOut_Mng");
+
+
+}
+<script>
+    setAdminCurrentUrl('@Url.Action("Index", "InvF_InventoryOut")');
+</script>
+
+<style>
+    .chk {
+        width: 100px;
+    }
+</style>
+<script src="~/Content/assets/js/bootbox.js"></script>
+<script src="@Url.Content("~/Scripts/print.min.js")"></script>
+
+
+
+<div class="mt-3">
+    <div class="col-12">
+        @using (Html.BeginForm("Index", "InvF_InventoryOut", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+            <input type="hidden" id="viewid" name="viewid" value="@MvcHtmlString.Create(viewid)" />
+            <input hidden id="init" name="init" value="search" />
+            <div class="col-12 row">
+                <div class="col-12 row">
+                    <div class="col-11 no-padding row">
+                        <aside class="col-md-4">
+                            <div class="form-group margin-bottom-9">
+                                <label class="control-label col-md-4" for="IF_InvOutNo">
+                                    @("Số phiếu xuất".HtmlItemString("invf_inventoryout"))
+                                </label>
+                                <div class="col-md-8">
+                                    <input type="text" class="col-md-12 text-bold" name="IF_InvOutNo" id="IF_InvOutNo" value="" autocomplete="off" />
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label class="control-label col-md-4" for="">
+                                    @("Ngày tạo từ".HtmlItemString("createdatefrom"))
+                                </label>
+                                <div class="col-sm-8 row date-input-group no-margin">
+                                    <div class="col-fix-5 no-padding">
+                                        <div class="input-group col-12" id="dtfromDate">
+                                            <input type="text" id="createdtimefrom" name="createdtimefrom" class="col-9 cl-date EffDateStart hasDatepicker" data-date-format="yyyy-mm-dd" value="@(Request["createdtimefrom"] == null ? "" : Request["createdtimefrom"])" autocomplete="off">
+                                            <span class="input-group-addon col-3">
+                                                <i class="far fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <label class="control-label col-fix-2 text-center" for="">
+                                        @("đến".HtmlItemString("createdateto"))
+                                    </label>
+                                    <div class="col-fix-5 no-padding">
+                                        <div class="input-group col-12" id="dttoDate">
+                                            <input type="text" id="createdtimeto" name="createdtimeto" class="col-9 cl-date hasDatepicker" data-date-format="yyyy-mm-dd" value="@(Request["createdtimeto"] == null ? "" : Request["createdtimeto"])" autocomplete="off">
+                                            <span class="input-group-addon col-3">
+                                                <i class="far fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label class="control-label col-md-4" for="">
+                                    @("Ngày duyệt từ".HtmlItemString("approvedatefrom"))
+                                </label>
+                                <div class="col-sm-8 row date-input-group no-margin">
+                                    <div class="col-fix-5">
+                                        <div class="input-group" id="dtApprfromDate">
+                                            <input type="text" id="approvedtimefrom" name="approvedtimefrom" class="col-9 cl-date EffDateStart hasDatepicker" data-date-format="yyyy-mm-dd" value="@(Request["approvedtimefrom"] == null ? "" : Request["approvedtimefrom"])" autocomplete="off">
+                                            <span class="input-group-addon col-3">
+                                                <i class="far fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <label class="control-label col-fix-2 text-center" for="">
+                                        @("đến".HtmlItemString("approvedateto"))
+                                    </label>
+                                    <div class="col-fix-5">
+                                        <div class="input-group" id="dtApprtoDate">
+                                            <input type="text" id="approvedtimeto" name="approvedtimeto" class="col-9 cl-date hasDatepicker" data-date-format="yyyy-mm-dd" value="@(Request["approvedateto"] == null ? "" : Request["approvedateto"])" autocomplete="off">
+                                            <span class="input-group-addon col-3">
+                                                <i class="far fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </aside>
+                        <aside class="col-md-4">
+                            <div class="form-group margin-bottom-9">
+                                <label class="control-label col-md-4" for="InvInType">
+                                    @("Loại phiếu xuất".HtmlItemString("invf_inventoryout"))
+                                </label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right selection--multiple">
+                                        <select class="select2-selection" name="InvOutType" id="InvOutType">
+                                            <option value="">--Chọn loại phiếu xuất--</option>
+                                            @{
+                                                if (listMst_InvOutType != null && listMst_InvOutType.Count > 0)
+                                                {
+                                                    foreach (var invInType in listMst_InvOutType)
+                                                    {
+                                                        <option value="@invInType.InvOutType">@invInType.InvOutTypeName</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label class="control-label col-md-4" for="InvInType">
+                                    @("Khách hàng".HtmlItemString("invf_inventoryout"))
+                                </label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right selection--multiple">
+                                        <select class="select2-selection" name="CustomerCode" id="CustomerCode">
+                                            <option value="">--Chọn khách hàng--</option>
+                                            @{
+                                                if (listCustomer != null && listCustomer.Count > 0)
+                                                {
+                                                    foreach (var item in listCustomer)
+                                                    {
+                                                        <option value="@item.CustomerCodeSys">@item.CustomerCode - @item.CustomerName</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-9">
+                                <label class="control-label col-md-4" for="InvInType">
+                                    @("Kho xuất".HtmlItemString("invf_inventoryout"))
+                                </label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right selection--multiple">
+                                        <select class="select2-selection" name="InvCodeOut" id="InvCodeOut">
+                                            <option value="">--Chọn kho xuất--</option>
+                                            @{
+                                                if (listMst_Inventory != null && listMst_Inventory.Count > 0)
+                                                {
+                                                    foreach (var item in listMst_Inventory)
+                                                    {
+                                                        <option value="@item.InvCode">@item.InvName</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </span>
+                                </div>
+                            </div>
+                        </aside>
+                        <aside class="col-md-4">
+                            @*<div class="form-group margin-bottom-9">
+                                    <label class="control-label col-md-4" for="InvInType">
+                                        @("Chi nhánh".HtmlItemString("invf_inventoryin"))
+                                    </label>
+                                    <div class="col-12 col-sm-8">
+                                        <span class="block input-icon input-icon-right selection--multiple">
+                                            <select class="select2-selection" name="OrgID" id="OrgID">
+                                                <option value="">--Chọn chi nhánh--</option>
+                                                @{
+                                                    if (listMst_NNT != null && listMst_NNT.Count > 0)
+                                                    {
+                                                        foreach (var item in listMst_NNT)
+                                                        {
+                                                            <option value="@item.OrgID">@item.NNTFullName</option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </span>
+                                    </div>
+                                </div>*@
+
+
+
+                            <div class="form-group margin-bottom-9">
+                                <label class="control-label col-md-4" for="InvInType">
+                                    @("TT hồ sơ".HtmlItemString("invf_inventoryin"))
+                                </label>
+                                <div class="col-12 col-sm-8">
+                                    <span class="block input-icon input-icon-right selection--multiple">
+                                        <select class="select2-selection" name="profileStatus" id="profileStatus">
+                                            @*<optgroup label="">*@
+                                            <option value=""></option>
+                                            @*<option value=" " @(reftype.Equals("ORDERDL") ? "selected" : "")>Đơn hàng đại lý</option>*@
+                                            <option value="0">Chưa nhận</option>
+                                            <option value="1">Đã nhận đủ</option>
+
+                                            @*</optgroup>*@
+                                        </select>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="form-group margin-bottom-9">
+                                <label class="control-label col-md-4" for="InvInType">
+                                    @("RefNo".HtmlItemString("invf_inventoryin"))
+                                </label>
+                                <div class="col-md-8">
+                                    <input type="text" class="col-md-12 text-bold" name="refNo" id="refNo" value="" autocomplete="off" />
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+                    <div class="col-1 text-center">
+                        @{ var imgSearch = Url.Content("~/Images/search.svg");}
+                        @RenderItemFormat("BTN_INVENTORYOUT_SEARCH", "<a href=\"javascript:void(0);\" class=\"btn btn-nc-button\"  onclick=\"SearchData();\"><img class=\"img-button-search\" src=" + imgSearch + "></a>", "", "")
+                    </div>
+                </div>
+                <div class="col-12 no-padding margin-top-5">
+                    <div class="col-sm-11">
+                        <div class="form-group no-margin">
+                            <label for="" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 no-margin" style="max-width: 12.5%; padding-top: 0; padding-right: 15px!important;">@("Trạng thái".HtmlItemString("invf_inventoryin"))</label>
+
+
+                            @*<div class="row no-margin">
+                                    <div class="row chk">
+                                        <input type="checkbox" class="cl-check" name="chk-pending" id="pending" />
+                                        <div class="span-title-check">Mới tạo</div>
+                                    </div>
+                                    <div class="row chk">
+                                        <input type="checkbox" class="cl-check" name="chk-approved" id="approved" />
+                                        <div class="span-title-check">Đã duyệt</div>
+                                    </div>
+                                    <div class="row chk">
+                                        <input type="checkbox" class="cl-check" name="chk-canceled" id="canceled" />
+                                        <div class="span-title-check">Đã huỷ</div>
+                                    </div>
+                                </div>*@
+                            <div class="row no-margin checkbox-list">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" class="cl-check idn-checkbox" name="chk-pending" id="chk-pending" />
+                                    <label for="chk-pending">
+                                        <span></span>
+                                    </label>
+                                    <span class="span-title-check">Mới tạo</span>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" class="cl-check idn-checkbox" name="chk-approved" id="chk-approved" />
+                                    <label for="chk-approved">
+                                        <span></span>
+                                    </label>
+                                    <span class="span-title-check">Đã duyệt</span>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" class="cl-check idn-checkbox" name="chk-canceled" id="chk-canceled" />
+                                    <label for="chk-canceled">
+                                        <span></span>
+                                    </label>
+                                    <span class="span-title-check">Đã huỷ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        }
+    </div>
+</div>
+<div class="row no-margin">
+
+
+    <div class="col-sm-12">
+        <div id="BindDataInFInventoryOut" class="conten-table">
+            @Html.Partial("BindDataInFInventoryOut", Model, new ViewDataDictionary() { { "init", MvcHtmlString.Create(init) }, { "PageCur", MvcHtmlString.Create(pageCur) }, { "RecordCount", MvcHtmlString.Create(recordCount) }, { "UserState", userState } })
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/InvF_InventoryOut.js")"></script>
+    <script>
+        $(document).ready(function () {
+            $('.dropdown-menu').on('click', function (event) {
+                event.stopPropagation();
+            });
+        })
+        $(function () {
+            $('#createdtimefrom, #createdtimeto, #approvedtimefrom, #approvedtimeto').datepicker({
+                autoclose: true,
+                todayHighlight: true,
+                dateFormat: 'yy-mm-dd'
+            })
+                ////show datepicker when clicking on the icon
+                .next().on('click', function () {
+                    $(this).prev().focus();
+                });
+        });
+
+        $("select#InvCodeOut").select2();
+        $("select#InvOutType").select2();
+        $("select#CustomerCode").select2();
+        $("select#OrgID").select2();
+        $("select#profileStatus").select2();
+    </script>
+
+
+    <!-- #region table sort -->
+    <script>
+        var initDefault = function () {
+            $('#dynamic-table-thead').idnTable({
+                searchTextbox: '#dynamic-table-thead-search', columnToggleButton: '#togglecolumn',
+                cookieId: '#viewid',
+            });
+        };
+        var initCustom = function () {
+            var tb = $('#dynamic-table-thead').idnTable();
+
+            $('#dynamic-table-thead-search').keyup(function () {
+                var kw = $(this).val();
+                tb.search(kw);
+            });
+
+            //tb.showColumns(['STT'], false);
+            //tb.reload();
+            var colList = tb.getAllColumns();
+            $('#togglecolumn').html('');
+
+            for (var i = 0; i < colList.length; ++i) {
+
+                var col = colList[i];
+                var fieldid = col.id;
+                var title = col.name;
+
+                if (title !== undefined && title !== null && title.toString().trim().length > 0) {
+                    title = title.toString().trim();
+                } else {
+                    title = '';
+                }
+
+                var fieldactive = col.show;
+
+                //B2: Sinh popup tùy chỉnh các cột trong bảng #dynamic-table-thead
+                var $input = $('<input>');
+                $input.attr('type', 'checkbox');
+                $input.attr('name', fieldid);
+
+                if (fieldactive === true) { //Nếu trạng thái bằng 0 cho hiện cột và checked ô input tương ứng
+                    $input.attr('checked', 'checked');
+
+                }
+
+                var $spaninput = $('<span>');
+                $spaninput.append($input);
+                $spaninput.css('margin-right', '10px');
+
+                var $spantext = $('<span>');
+                $spantext.text(title);
+
+                var $li = $('<li>');
+                $li.css('line-height', '19px');
+                $li.css('margin-bottom', '18px');
+                $li.append($spaninput);
+                $li.append($spantext);
+
+                $('#togglecolumn').append($li);
+
+                $input.click(function () {
+                    if ($(this).is(':checked')) {
+                        tb.showColumns([$(this).attr('name')], false);
+                    }
+                    else {
+                        tb.hideColumns([$(this).attr('name')], false);
+                    }
+                });
+            }
+        };
+        $(document).ready(function () {
+            initDefault();
+            //initCustom();
+        });
+        $(document).ready(function () {
+            (function ($) {
+                var body = $('body');
+                body.on('keyup', '#dynamic-table-thead-search', function () {
+                    var datafilter = $(this).val();
+                    if (datafilter !== undefined && datafilter !== null && datafilter.toString().trim()) {
+                        datafilter = datafilter.toUpperCase().trim();
+                    }
+                    var rex = new RegExp($(this).val(), 'i');
+                    $('#table-tbodyID tr').hide();
+                    $('#table-tbodyID tr').filter(function () {
+                        //debugger
+                        var dataOfRow = $(this).text();
+                        if (dataOfRow !== undefined && dataOfRow !== null && dataOfRow.toString().trim().length > 0) {
+                            dataOfRow = dataOfRow.toUpperCase().trim();
+                        }
+                        if (dataOfRow.toUpperCase().indexOf(datafilter) > -1) {
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }
+                    }).show();
+                });
+
+            }(jQuery));
+
+        });
+        $(document).ready(function () {
+            //debugger;
+            var viewId = commonUtils.returnValueText('#viewid');
+            if (!commonUtils.isNullOrEmpty(viewId)) {
+                var cookie = commonUtils.getCookie(viewId);
+                if (commonUtils.isNullOrEmpty(cookie)) {
+                    var cookieValue = 'CONTROL|STT|IF_InvOutNo|ApprDTimeUTC|InvCodeOut|CustomerCode|TotalValOutAfterDesc|IF_InvOutStatus|Remark|CreateDTimeUTC|InvOutType|REFNO';
+                    commonUtils.setCookie(viewId, cookieValue, 10);
+                }
+            }
+            initDefault();
+
+            //initCustom();
+
+
+
+        });
+    </script>
+    <!-- #endregion -->
+    <!-- #region cookies -->
+    <script>
+        document.addEventListener('DOMContentLoaded',
+            function () {
+                //debugger;
+                readCookies("InvF_InventoryOut");
+                var checkboxs = document.querySelectorAll('#togglecolumn.ulshowdata input[type="checkbox"]');
+                for (let checkbox of checkboxs) {
+                    checkbox.addEventListener('change', setCookie)
+                }
+            });
+
+        function saveSelectedToCookie() {
+            //debugger;
+            setCookie("InvF_InventoryOut",
+                {
+                    path: '/',
+                    expires: 10
+                });
+        }
+
+        function setCookie(name, options = {}) {
+            //debugger;
+            var checkboxs = document.querySelectorAll('#togglecolumn.ulshowdata input[type="checkbox"]');
+            var value = new Object();
+            for (const ckb of checkboxs) {
+                value[ckb.name] = ckb.checked === true ? "0" : "1";
+            }
+            let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(JSON.stringify(value));
+
+            if (options.expires instanceof Date) {
+                options.expires = options.expires.toUTCString();
+            }
+
+            for (let optionKey in options) {
+                updatedCookie += "; " + optionKey;
+                let optionValue = options[optionKey];
+                if (optionValue !== true) {
+                    updatedCookie += "=" + optionValue;
+                }
+            }
+            document.cookie = updatedCookie;
+        }
+
+        function readCookies(name) {
+            //debugger;
+            var result = document.cookie.match(new RegExp(name + '=([^;]+)'));
+            result && (result = JSON.parse(decodeURIComponent(result[1])));
+            if (result != null && result != undefined) {
+                for (const key in result) {
+                    $('#dynamic-table-thead').find('th[fieldid="' + key + '"]').attr('fieldactive', result[key]);
+                }
+            }
+        }
+    </script>
+    <!-- #endregion -->
+
+    <script>
+        function SearchData() {
+            debugger
+            var objInvF_InventoryOut = new InvF_InventoryOut();
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+              ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("DoSearch", "InvF_InventoryOut")';
+            objInvF_InventoryOut.ajaxSettings = ajaxSettings;
+            objInvF_InventoryOut.doSearch();
+            //format_Number();
+        }
+    </script>
+
+    <script>
+        function Approve() {
+            debugger
+            var objInvF_InventoryOut = new InvF_InventoryOut();
+            var ajaxSettings = {};
+             ajaxSettings.Type = 'post';
+              ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Approve", "InvF_InventoryOut")';
+            objInvF_InventoryOut.ajaxSettings = ajaxSettings;
+            objInvF_InventoryOut.approveData();
+        }
+    </script>
+    <script>
+        function Cancel() {
+            debugger
+            var objInvF_InventoryOut = new InvF_InventoryOut();
+            var ajaxSettings = {};
+               ajaxSettings.Type = 'post';
+              ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Cancel", "InvF_InventoryOut")';
+            objInvF_InventoryOut.ajaxSettings = ajaxSettings;
+            objInvF_InventoryOut.cancelData();
+        }
+    </script>
+    <script>
+        function DeleteMulti() {
+            debugger
+            var objInvF_InventoryOut = new InvF_InventoryOut();
+            var ajaxSettings = {};
+             ajaxSettings.Type = 'post';
+              ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("DeleteMulti", "InvF_InventoryOut")';
+            objInvF_InventoryOut.ajaxSettings = ajaxSettings;
+            objInvF_InventoryOut.deleteMulti();
+        }
+    </script>
+
+
+    @*xử lý xuất excel*@
+    <script>
+        function Export() {
+            debugger
+            var objInvF_InventoryOut = new InvF_InventoryOut();
+             var ajaxSettings = {};
+             ajaxSettings.Type = 'post';
+              ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Export", "InvF_InventoryOut")';
+            objInvF_InventoryOut.ajaxSettings = ajaxSettings;
+            objInvF_InventoryOut.Export();
+        }
+    </script>
+
+    <script type="text/javascript">
+        var objCommonExcel = new CommonExcel();
+        var objVariablesInit = {
+            Id_FormMain: '',
+            Id_FormImportExcel: 'manageFormImportExcel',
+            Id_Modal: 'ImportExcelModal',
+            Id_FileInput: 'file',
+        };
+        var ajaxSettings_Excel = {};
+        ajaxSettings_Excel.Type = 'post';
+        ajaxSettings_Excel.DataType = 'json';
+
+
+        function Export() {
+            debugger
+            ajaxSettings_Excel.Url = '@Url.Action("Export", "InvF_InventoryOut")';
+            var token = $('input[name=__RequestVerificationToken]').val();
+            var url = '@Url.Action("Export", "InvF_InventoryOut")';
+            var IF_InvOutNo = commonUtils.returnValueText('#IF_InvOutNo');
+            var createdtimefrom = commonUtils.returnValueText('#createdtimefrom');
+            var createdtimeto = commonUtils.returnValueText('#createdtimeto');
+            var approvedtimefrom = commonUtils.returnValueText('#approvedtimefrom');
+            var approvedtimeto = commonUtils.returnValueText('#approvedtimeto');
+            var InvOutType = commonUtils.returnValueText('#InvOutType');
+            var CustomerCode = commonUtils.returnValueText('#CustomerCode');
+            var InvCodeOut = commonUtils.returnValueText('#InvCodeOut');
+            var OrgID = commonUtils.returnValueText('#OrgID');
+            var refNo = commonUtils.returnValueText('#refNo');
+            var ckpending = commonUtils.returnValueCheckBox('#pending');
+            var ckapprove = commonUtils.returnValueCheckBox('#approved');
+            var ckcancle = commonUtils.returnValueCheckBox('#canceled');
+
+
+            var listParams = [
+                { "Key": 'IF_InvOutNo', "Value": IF_InvOutNo },
+                { "Key": 'createdtimefrom', "Value": createdtimefrom },
+                { "Key": 'createdtimeto', "Value": createdtimeto },
+                { "Key": 'approvedtimefrom', "Value": approvedtimefrom },
+                { "Key": 'approvedtimeto', "Value": approvedtimeto },
+                { "Key": 'InvOutType', "Value": InvOutType },
+                { "Key": 'CustomerCode', "Value": CustomerCode },
+                { "Key": 'InvCodeOut', "Value": InvCodeOut },
+                { "Key": 'OrgID', "Value": OrgID },
+                { "Key": 'refNo', "Value": refNo },
+                { "Key": 'ckpending', "Value": ckpending },
+                { "Key": 'ckapprove', "Value": ckapprove },
+                { "Key": 'ckcancle', "Value": ckcancle },
+            ];
+
+
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.exportExcel(listParams);
+
+        }
+
+    </script>
+    <script>
+        function Print() {
+            debugger
+            var objInvF_InventoryOut = new InvF_InventoryOut();
+            var ajaxSettings = {};
+             ajaxSettings.Type = 'post';
+              ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("PrintTemp", "InvF_InventoryOut")';
+            objInvF_InventoryOut.ajaxSettings = ajaxSettings;
+            objInvF_InventoryOut.Print();
+        }
+    </script>
+
+
+    <script type="text/javascript">
+        function format_Number() {
+            var tableName = 'InvF_InventoryOut';
+            var totalValOutAfterDescFormat = objMst_ColumnConfig.returnValueColumnFormat_V2(tableName, 'TotalValOutAfterDesc');
+            $('.numberic').number(true, totalValOutAfterDescFormat);
+
+        }
+    </script>
+}

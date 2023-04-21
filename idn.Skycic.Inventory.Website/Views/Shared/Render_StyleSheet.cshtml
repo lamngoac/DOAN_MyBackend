@@ -1,0 +1,30 @@
+﻿@{
+
+}
+
+@*Thư viện khai báo CSS*@
+@Styles.Render("~/bundles/bootstrap-v4.3.1")
+@Styles.Render("~/bundles/font-awesome")
+@Styles.Render("~/bundles/jquery-ui-css")
+@Styles.Render("~/bundles/toastr-css")
+@Styles.Render("~/bundles/adminlte-css")
+@*Google Font: Source Sans Pro*@
+<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+@*CSS Fix IE*@
+<!--[if IE 9]>
+    @Styles.Render("~/bundles/bootstrap-fix-ie9")
+<![endif]-->
+<!--[if lte IE 8]>
+    @Styles.Render("~/bundles/bootstrap-fix-ie8")
+<![endif]-->
+@*Script Fix Html5 - CSS3*@
+<!--[if lte IE 8]>
+    @Scripts.Render("~/bundles/support-ie")
+<![endif]-->
+
+@Styles.Render("~/bundles/select2.min.css")
+@Styles.Render("~/bundles/bootstrap-tagsinput-css")
+@Styles.Render("~/bundles/StyleSheet")
+@Styles.Render("~/bundles/bootstrap-datepicker-css")
+
+

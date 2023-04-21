@@ -1,0 +1,77 @@
+﻿@{
+    var recordcount = CUtils.StrValue(ViewBag.RecordCount);
+    if (CUtils.IsNullOrEmpty(recordcount))
+    {
+        recordcount = "10";
+    }
+    var showText = CUtils.StrValue(ViewBag.ShowText);
+}
+<span style="float: right; line-height: 30px">
+    <a class="btn font-color mybtn-Button-1" data-toggle="dropdown" aria-expanded="false" style="font-size: 13px; position: relative; float: right"><i class="fas fa-ellipsis-v"></i></a>
+    <ul id="togglecolumn" class="dropdown-menu ulshowdata" role="menu" style="right: 0; width: 30px; left: none; box-shadow: rgb(0, 0, 0) 2px 2px 6px;"></ul>
+</span>
+<span style="float: right; margin-right: 10px; line-height: 30px;">
+    <a id="previousClick" href="javascript:void(0);" onclick="previousClick();"><i class="fa fa-chevron-left" aria-hidden="true"></i></a>
+    <a id="nextClick" href="javascript:void(0);" onclick="nextClick();"><i class="fa fa-chevron-right" aria-hidden="true"></i></a>
+</span>
+<span id="showText" style="float: right; margin-right: 10px; line-height: 30px;">@MvcHtmlString.Create(showText)</span>
+<div class="row col-4 no-padding" style="float: right; justify-content: flex-end; margin-right: 10px">
+    <label for="recordcount" class="no-margin font-weight-500 " style="float:left; line-height: 30px; padding-right: 20px;">@MvcHtmlString.Create("Hiển thị")</label>
+    <div class="row col-12 col-sm-5 no-padding-right">
+        <span class="block input-icon input-icon-right row col-12">
+            <select id="recordcount" name="recordcount" onchange="SearchAndResetPage()" class="row col-12 recordcount no-padding" style="height: 30px; border: 1px solid #ddd">
+                <option value="10" @(recordcount == "10" ? "selected" : "" )>10</option>
+                <option value="50" @(recordcount == "50" ? "selected" : "" )>50</option>
+                <option value="100" @(recordcount == "100" ? "selected" : "" )>100</option>
+                <option value="2147483644" @(recordcount == "2147483644" ? "selected" : "" )>Tất cả</option>
+            </select>
+        </span>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#recordcount').select2({
+            minimumResultsForSearch: -1
+        });
+
+        $('#nextClick').removeClass('disabled-fix');
+        $('#previousClick').removeClass('disabled-fix');
+        var page = parseInt($('#page').val());
+        var totalpage = parseInt($('#totalpage').val());
+        if (page <= 0) {
+            page = 0;
+            $('#previousClick').addClass('disabled-fix');
+        }
+        if (page >= (totalpage - 1)) {
+            $('#nextClick').addClass('disabled-fix');
+        }
+    });
+    function previousClick() {
+        var page = parseInt($('#page').val());
+        if (page <= 0) {
+            page = 0;
+        } else {
+            page = page - 1;
+        }
+        $('#page').val(page);
+        SearchData();
+    }
+    function nextClick() {
+        var page = parseInt($('#page').val());
+        var totalpage = parseInt($('#totalpage').val());
+        if (totalpage > 0) {
+            if (page > (totalpage - 1)) {
+                page = totalpage - 1;
+            } else {
+                page = page + 1;
+            }
+        }
+        $('#page').val(page);
+        SearchData();
+    }
+
+    function SearchAndResetPage() {
+        $('#page').val('0');
+        SearchData();
+    }
+</script>

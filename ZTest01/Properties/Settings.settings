@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ZTest01.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="ZTest01_vn_gov_gdt_daotaonhantokhai_KQuaGDichServicePort_KQuaGDichService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://daotaonhantokhai.gdt.gov.vn:80/ihtkk_van/KQuaGDichServicePort</Value>
+    </Setting>
+    <Setting Name="ZTest01_vn_gov_gdt_daotaonhantokhai_NhanHSoThueService_NhanHSoThueService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://daotaonhantokhai.gdt.gov.vn:80/ihtkk_van/NhanHSoThueServicePort</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

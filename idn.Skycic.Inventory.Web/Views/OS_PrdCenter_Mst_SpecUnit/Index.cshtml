@@ -1,0 +1,401 @@
+﻿@model PageInfo<Mst_SpecUnit>
+@{
+    Layout = "~/Views/Shared/_LayoutQuantri.cshtml";
+    var title = "DANH MỤC MAP SPEC - UNIT";
+    ViewBag.Title = title;
+    var startCount = 0;
+    var strStartCount = ViewBag.StartCount as string;
+    if (!CUtils.IsNullOrEmpty(strStartCount))
+    {
+        startCount = Convert.ToInt32(strStartCount);
+    }
+}
+
+<div class="row no-margin">
+    <div class="row no-margin">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="panel-group" id="steps">
+                <div class="panel panel-info">
+                    <div class="title">
+                        <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                    </div>
+                    <div class="panel-body no-padding" id="panel-body" style="">
+                        <aside class="col-xs-12 no-padding layout-tk">
+                            <a class="btn font-color mybtn-Button dropdown-toggle" data-toggle="dropdown" aria-expanded="false" style="float: right;font-size: 13px;margin-top: 20px;position: relative;">...</a>
+                            <ul class="dropdown-menu" role="menu" style="">
+                                <li>
+                                    @RenderItemFormat("BTN_QL_OS_PRDCENTER_MST_SPECUNIT_NHAP_EXCEL", "<a class=\"mybtn-Button-1\" onclick=\"ShowPopupImportExcel()\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/import.svg") + "'>Nhập Excel</a>", "", "")
+                                </li>
+                                <li>
+                                    @RenderItemFormat("BTN_QL_OS_PRDCENTER_MST_SPECUNIT_XUAT_EXCEL", "<a class=\"mybtn-Button-1\" onclick=\"Export()\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/export.svg") + "'>Xuất Excel</a>", "", "")
+                                </li>
+                                <li>
+                                    @RenderItemFormat("BTN_QL_OS_PRDCENTER_MST_SPECUNIT_XUAT_EXCEL_TEM", "<a class=\"mybtn-Button-1\" onclick=\"ExportTemplate()\" href=\"javascript:void(0);\" style=\"\"><img class=\"img-button\" src='" + Url.Content("~/Images/export.svg") + "'>Xuất Excel template</a>", "", "")
+                                </li>
+                            </ul>
+                            @RenderItemFormat("BTN_QL_OS_PRDCENTER_MST_SPECUNIT_TAO", "<a class=\"btn font-color mybtn-Button\" href=\"" + Url.Action("Create", "OS_PrdCenter_Mst_SpecUnit") + "\" style=\"float: right;font-size: 13px; margin-top: 20px;margin-right: 10px; \"><img class=\"img-button in-acti\" src='" + Url.Content("~/Images/Hoadon/Tao.svg") + "'><img class=\"img-button acti\" src='" + Url.Content("~/Images/Hoadon/Tao.svg") + "'>Tạo</a>", "", "")
+
+                        </aside>
+                    </div>
+                </div>
+                <div class="panel panel-info">
+                    <div class="panel-body" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+                        @Html.AntiForgeryToken()
+                        <aside class="col-xs-12 no-padding">
+                            <div class="scrollable-horizontal padding-left-0 padding-right-0 div-scrollable" data-size="1120" style="padding-top: 0!important;">
+                                <div>
+                                    <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center cell-50">@MvcHtmlString.Create("TT")</th>
+                                                <th class="text-center cell-120">
+                                                    @MvcHtmlString.Create("Mã Spec")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Mã đơn vị")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Mã đơn vị chuẩn")
+                                                </th>
+                                                <th class="text-center cell-100">
+                                                    @MvcHtmlString.Create("Mô tả")
+                                                </th>
+                                                <th class="text-center cell-50">
+                                                    @MvcHtmlString.Create("Số lượng")
+                                                </th>
+                                                <th class="text-center cell-50">
+                                                    @MvcHtmlString.Create("Dài")
+                                                </th>
+                                                <th class="text-center cell-50">
+                                                    @MvcHtmlString.Create("Rộng")
+                                                </th>
+                                                <th class="text-center cell-50">
+                                                    @MvcHtmlString.Create("Cao")
+                                                </th>
+                                                <th class="text-center cell-50">
+                                                    @MvcHtmlString.Create("Thể tích")
+                                                </th>
+                                                <th class="text-center cell-50">
+                                                    @MvcHtmlString.Create("Khối lượng")
+                                                </th>
+                                                <th class="text-center cell-75">
+                                                    @MvcHtmlString.Create("Trạng thái")
+                                                </th>
+                                                <th class="cell-120">&nbsp;</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                                <div class="scrollable" data-size="430" style="width: 100%; float: left;">
+                                    <table id="dynamic-table-tbody" class="table table-striped table-bordered table-hover table-tbody">
+                                        <tbody id="table-tbodyID">
+                                            @if (Model != null && Model.DataList != null && Model.DataList.Count > 0)
+                                            {
+                                                var idx = 0;
+                                                foreach (var item in Model.DataList)
+                                                {
+                                                    var iindex = startCount + (idx + 1);
+                                                    var specCode = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.SpecCode))
+                                                    {
+                                                        specCode = CUtils.StrValueOrNull(item.SpecCode);
+                                                    }
+                                                    var unitCode = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.UnitCode))
+                                                    {
+                                                        unitCode = CUtils.StrValueOrNull(item.UnitCode);
+                                                    }
+                                                    var standardUnitCode = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.StandardUnitCode))
+                                                    {
+                                                        standardUnitCode = CUtils.StrValueOrNull(item.StandardUnitCode);
+                                                    }
+                                                    var specUnitDesc = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.SpecUnitDesc))
+                                                    {
+                                                        specUnitDesc = CUtils.StrValueOrNull(item.SpecUnitDesc);
+                                                    }
+                                                    var qty = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.Qty) && CUtils.IsNumeric(item.Qty))
+                                                    {
+                                                        qty = CUtils.formatNumeric(Convert.ToDouble(CUtils.StrValueOrNull(item.Qty)), Nonsense.INTEGER_DB_FORMAT);
+                                                    }
+                                                    var length = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.Length) && CUtils.IsNumeric(item.Length))
+                                                    {
+                                                        length = CUtils.formatNumeric(Convert.ToDouble(CUtils.StrValueOrNull(item.Length)), Nonsense.NUMERIC_DB_FORMAT);
+                                                    }
+                                                    var width = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.Width) && CUtils.IsNumeric(item.Width))
+                                                    {
+                                                        width = CUtils.formatNumeric(Convert.ToDouble(CUtils.StrValueOrNull(item.Width)), Nonsense.NUMERIC_DB_FORMAT);
+                                                    }
+                                                    var height = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.Height) && CUtils.IsNumeric(item.Height))
+                                                    {
+                                                        height = CUtils.formatNumeric(Convert.ToDouble(CUtils.StrValueOrNull(item.Height)), Nonsense.NUMERIC_DB_FORMAT);
+                                                    }
+                                                    var volume = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.Volume) && CUtils.IsNumeric(item.Volume))
+                                                    {
+                                                        volume = CUtils.formatNumeric(Convert.ToDouble(CUtils.StrValueOrNull(item.Volume)), Nonsense.NUMERIC_DB_FORMAT);
+                                                    }
+                                                    var weight = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.Weight) && CUtils.IsNumeric(item.Weight))
+                                                    {
+                                                        weight = CUtils.formatNumeric(Convert.ToDouble(CUtils.StrValueOrNull(item.Weight)), Nonsense.NUMERIC_DB_FORMAT);
+                                                    }
+                                                    var flagActive = "";
+                                                    if (!CUtils.IsNullOrEmpty(item.FlagActive))
+                                                    {
+                                                        flagActive = CUtils.StrValueOrNull(item.FlagActive);
+                                                    }
+
+                                                    <tr idx="@idx" class="data-item trdata">
+                                                        <td class="text-center cell-50" style="background: #D3EDE4;">
+                                                            @MvcHtmlString.Create(iindex.ToString())
+                                                        </td>
+                                                        <td class="text-center cell-120">
+                                                            @MvcHtmlString.Create(specCode)
+                                                        </td>
+                                                        <td class="text-center cell-100">
+                                                            @MvcHtmlString.Create(unitCode)
+                                                        </td>
+                                                        <td class="text-center cell-100">
+                                                            @MvcHtmlString.Create(standardUnitCode)
+                                                        </td>
+                                                        <td class="text-center cell-100">
+                                                            @MvcHtmlString.Create(specUnitDesc)
+                                                        </td>
+                                                        <td class="text-center cell-50">
+                                                            @MvcHtmlString.Create(qty)
+                                                        </td>
+                                                        <td class="text-center cell-50">
+                                                            @MvcHtmlString.Create(length)
+                                                        </td>
+                                                        <td class="text-center cell-50">
+                                                            @MvcHtmlString.Create(width)
+                                                        </td>
+                                                        <td class="text-center cell-50">
+                                                            @MvcHtmlString.Create(height)
+                                                        </td>
+                                                        <td class="text-center cell-50">
+                                                            @MvcHtmlString.Create(volume)
+                                                        </td>
+                                                        <td class="text-center cell-50">
+                                                            @MvcHtmlString.Create(weight)
+                                                        </td>
+                                                        <td class="text-center cell-75">
+                                                            @if (flagActive.Equals("1"))
+                                                            {
+                                                                <span class="label label-sm label-success">Active</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="label label-sm label-danger">Inactive</span>
+                                                            }
+
+                                                        </td>
+                                                        <td class="text-center cell-120">
+                                                            <div class="action-buttons padding-top-2">
+                                                                @{
+                                                                    var urlDetail = Url.Action("Detail", "OS_PrdCenter_Mst_SpecUnit", new { speccode = item.SpecCode, unitcode = item.UnitCode });
+                                                                    var urlUpdate = Url.Action("Update", "OS_PrdCenter_Mst_SpecUnit", new { speccode = item.SpecCode, unitcode = item.UnitCode });
+
+                                                                }
+                                                                @RenderItemFormat("BTN_QL_OS_PRDCENTER_MST_SPECUNIT_CHI_TIET", "<a class=\"icon-detail\" href=\'" + urlDetail + "\' title=\"Chi tiết\"><img class=\"img-icon\" src='" + Url.Content("~/Images/Xem.svg") + "'></a>", "", "")
+                                                                @RenderItemFormat("BTN_QL_OS_PRDCENTER_MST_SPECUNIT_SUA", "<a class=\"icon-edit\" href=\'" + urlUpdate + "\' title=\"Sửa\"><img class=\"img-icon\" src='" + Url.Content("~/Images/Sua.svg") + "'></a>", "", "")
+                                                                @RenderItemFormat("BTN_QL_OS_PRDCENTER_MST_SPECUNIT_XOA", "<a href=\"javascript:;\" class=\"icon-delete\" title=\"Xóa\" onclick=\"Delete('" + item.SpecCode.ToString() + "','" + item.UnitCode.ToString() + "')\"><img class=\"img-icon\" src='" + Url.Content("~/Images/Xoa.svg") + "'></a>", "", "")
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    idx++;
+                                                }
+                                            }
+
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+@*<script>
+        function Search()
+        {
+            $('#manageForm').attr('action', '@Url.Action("Index", "OS_PrdCenter_Mst_SpecUnit")').submit();
+        }
+    </script>*@
+
+<script>
+    function Delete(speccode, unitcode) {
+        if (!IsNullOrEmpty(speccode) && !IsNullOrEmpty(unitcode)) {
+            bootbox.confirm({
+                title: "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO",
+                message: "Đồng ý xóa Spec '" + speccode + "' - '" + unitcode + "' ?",
+                buttons: {
+                    'cancel': {
+                        label: 'Thoát',
+                        className: 'btn mybtn-Button btnButton'
+                    },
+                    'confirm': {
+                        label: 'Đồng ý',
+                        className: 'btn mybtn-Button btnButton'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        var url = '@Url.Action("Delete", "OS_PrdCenter_Mst_SpecUnit")';
+                        var token = $('input[name=__RequestVerificationToken]').val();
+                        $.ajax({
+                            url: url,
+                            data: {
+                                speccode: speccode,
+                                unitcode: unitcode,
+                                __RequestVerificationToken: token
+                            },
+                            type: 'post',
+                            dataType: 'json',
+                            success: function (data) {
+                                if (data.Success) {
+                                    if (data.Messages != null && data.Messages !== undefined && data.Messages.length > 0) {
+                                        alert(data.Messages[0]);
+                                    }
+                                    window.location.href = window.location.href;
+                                } else {
+                                    _showErrorMsg123("Lỗi!",data.Detail);
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        } else {
+            alert("Chưa chọn bản ghi cần xóa!");
+            return;
+        }
+    }
+</script>
+
+@*Import Excel*@
+<div class="modal fade" id="ImportExcelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/OS_PrdCenter_Mst_SpecUnit.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "OS_PrdCenter_Mst_SpecUnit")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+        });
+
+        @* Set focus *@
+        $(document).ready(function () {
+            $('#SpecCode').focus();
+        });
+        @* scroll *@
+        $(document).ready(function () {
+            $('.scrollable-horizontal').each(function () {
+                var $this = $(this);
+                $(this).ace_scroll(
+                    {
+                        horizontal: true,
+                        //styleClass: 'scroll-top',//show the scrollbars on top(default is bottom)
+                        size: $this.attr('data-size') || 6500,
+                        mouseWheelLock: true
+                    }
+                ).css({ 'padding-top': 0 });
+            });
+        });
+        $('.scrollable').each(function () {
+            var $this = $(this);
+            $(this).ace_scroll({
+                //size: 500,
+                size: $this.attr('data-size') || 1000,
+                mouseWheelLock: true
+                //styleClass: 'scroll-left scroll-margin scroll-thin scroll-dark scroll-light no-track scroll-visible'
+            });
+        });
+        @* End scroll *@
+
+        @* keypress *@
+        $(document).on('keypress', function (e) {
+            if (e.which == 13) {
+                Search();
+            }
+        });
+
+        var objOS_PrdCenter_Mst_SpecUnit = new OS_PrdCenter_Mst_SpecUnit();
+        function Delete(speccode, unitcode) {
+            var objOS_PrdCenter_Mst_SpecUnit_Delete = {
+                SpecCode: speccode,
+                UnitCode: unitcode,
+            };
+
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Delete", "OS_PrdCenter_Mst_SpecUnit")';
+
+            objOS_PrdCenter_Mst_SpecUnit.Image_Message = "<img id=\"exclamation-circle\" style=\"width: 35px; float: left; margin-right: 10px\" src=\"@Url.Content("~/Images/exclamation-circle-solid.svg")\"> THÔNG BÁO";
+            objOS_PrdCenter_Mst_SpecUnit.Confirm_Message = "Đồng ý xóa mã sản phẩm '" + speccode + "' - '" + unitcode +"' ?";
+            objOS_PrdCenter_Mst_SpecUnit.ajaxSettings = ajaxSettings;
+            objOS_PrdCenter_Mst_SpecUnit.deleteData(objOS_PrdCenter_Mst_SpecUnit_Delete);
+        }
+
+        var objCommonExcel = new CommonExcel();
+        var objVariablesInit = {
+            Id_FormMain: '',
+            Id_FormImportExcel: 'manageFormImportExcel',
+            Id_Modal: 'ImportExcelModal',
+            Id_FileInput: 'file',
+        };
+
+        var ajaxSettings_Excel = {};
+        ajaxSettings_Excel.Type = 'post';
+        ajaxSettings_Excel.DataType = 'json';
+
+        function ShowPopupImportExcel() {
+            ajaxSettings_Excel.Url = '@Url.Action("ShowPopupImportExcel", "Admin")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.variablesInit(objVariablesInit);
+            objCommonExcel.showPopupImportExcel();
+        }
+
+        function ImportFileExcel() {
+            ajaxSettings_Excel.Url = '@Url.Action("Import", "OS_PrdCenter_Mst_SpecUnit")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.variablesInit(objVariablesInit);
+            objCommonExcel.importFileExcel();
+        }
+
+        function ExportTemplate() {
+            ajaxSettings_Excel.Url = '@Url.Action("ExportTemplate", "OS_PrdCenter_Mst_SpecUnit")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.exportExcel();
+        }
+
+        function Export() {
+            ajaxSettings_Excel.Url = '@Url.Action("Export", "OS_PrdCenter_Mst_SpecUnit")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.exportExcel();
+        }
+
+    </script>
+}

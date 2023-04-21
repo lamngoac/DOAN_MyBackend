@@ -1,0 +1,216 @@
+﻿@model PageInfo<Mst_InvOutType>
+@{
+    /**/
+    var init = CUtils.StrValue(ViewBag.init);
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+    var recordCount = CUtils.StrValue(ViewBag.RecordCount);
+    var totalPage = "0";
+    if (Model != null)
+    {
+        totalPage = CUtils.StrValue(Model.PageCount);
+    }
+
+
+    var showtext = "";
+    if (Model.ItemCount > 0)
+    {
+        var recordstart = (Model.PageIndex) * Model.PageSize + 1;
+        var recordend = (Model.PageIndex + 1) * Model.PageSize;
+        if (recordend > Model.ItemCount)
+        {
+            recordend = Model.ItemCount;
+        }
+        showtext = recordstart + "-" + recordend + " trong số " + Model.ItemCount;
+    }
+}
+<input type="hidden" id="page" value="@ViewBag.PageCur" />
+<input type="hidden" id="totalpage" value="@Model.PageCount" />
+
+<div class="col-xs-12 layout-bot-top-16" style="">
+    <div class="row">
+        <div class="col-6">
+            @*<a class="btn btn-nc-button" href="jsavascript:;" onclick="Create()" style=""><i class="fa fa-plus-circle" aria-hidden="true"></i> Tạo</a>*@
+            @RenderItemFormat("BTN_QL_LOAI_XUAT_KHO_TAO_MOI", "<a class=\"btn btn-nc-button\" href=\"javascript:;\" onclick=\"Create()\" style=\"\"><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i> Tạo</a>", "", "")
+            <a class="btn font-color mybtn-Button" data-toggle="dropdown" aria-expanded="false" style="font-size: 13px; position: relative;"><i class="fas fa-ellipsis-h"></i></a>
+            <ul class="dropdown-menu dropdown-action" role="menu" style="">
+
+                <li style="padding: 5px">
+                    @RenderItemFormat("BTN_QL_LOAI_XUAT_KHO_NHAP_EXCEL", "<a class=\"row no-margin col-12 no-padding\" style=\"line-height: 13px; color: #000000\" onclick=\"ShowPopupImportExcel()\" href=\"javascript:void(0);\" style=\"\"><i class=\"fas fa-upload\" aria-hidden=\"true\" style=\"margin-right: 7px\"></i> Nhập Excel</a>", "", "")
+                    @*<a class="row no-margin col-12 no-padding" onclick="ShowPopupImportExcel()" data-toggle="modal" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" aria-hidden="true"></i> Nhập Excel</a>*@
+                </li>
+                <li style="padding: 5px">
+                    @RenderItemFormat("BTN_QL_LOAI_XUAT_KHO_XUAT_EXCEL", "<a class=\"row no-margin col-12 no-padding\" style=\"line-height: 13px; color: #000000\" onclick=\"Export()\" href=\"javascript:void(0);\" style=\"\"><i class=\"fas fa-download\" aria-hidden=\"true\" style=\"margin-right: 7px\"></i> Xuất Excel</a>", "", "")
+                    @*<a class="row no-margin col-12 no-padding" onclick="Export()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" aria-hidden="true"></i> Xuất Excel</a>*@
+                </li>
+                <li style="padding: 5px">
+                    @RenderItemFormat("BTN_QL_LOAI_XUAT_KHO_XUAT_EXCEL_TEM", "<a class=\"row no-margin col-12 no-padding\" style=\"line-height: 13px; color: #000000\" onclick=\"ExportTemplate()\" href=\"javascript:void(0);\" style=\"\"><i class=\"fas fa-download\" aria-hidden=\"true\" style=\"margin-right: 7px\"></i> Xuất Excel template</a>", "", "")
+                    @*<a class="row no-margin col-12 no-padding" onclick="ExportTemplate()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" aria-hidden="true"></i> Xuất Excel template</a>*@
+                </li>
+            </ul>
+            <span class="search-bar" style="margin-left:5px;margin-top:3px;">
+                <input type="text" id="dynamic-table-thead-search" class="quicksearch txtSearchObj" name="search">
+                <input type="text" class="quicksearch1 txtSearchObj1" name="search" style="z-index: -1000; height: 0; padding: 0; margin: 0; border: 0">
+            </span>
+        </div>
+        <div class="col-6">
+            @Html.Partial("Pagination", null, new ViewDataDictionary() { { "PageCur", MvcHtmlString.Create(pageCur) }, { "RecordCount", MvcHtmlString.Create(recordCount) }, { "ShowText", showtext } })
+        </div>
+    </div>
+</div>
+<div class="panel-body no-padding" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+    <aside class="col-xs-12 layout-table no-padding">
+        @Html.AntiForgeryToken()
+        <div class="scrollable-horizontal padding-left-0 padding-right-0 table-responsive" style="padding-top: 0!important; ">
+            <div style="width: 100%; float: left;">
+                <table id="dynamic-table-thead" idn-datatable-id="dynamic-table-thead-tbody" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                    <thead>
+                        <tr class="trthead" filterroot="" bfilter="0">
+                            <th fieldId="CONTROL" fieldName="CONTROL" fieldActive="0" class="text-center cell-120">
+                            </th>
+                            <th fieldId="STT" fieldName="STT" fieldActive="0" class="text-center cell-50">
+                                @("STT".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="INVOUTTYPE" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" fieldName="Mã loại xuất kho" fieldActive="0" class="text-left cell-200">
+                                @("Mã loại nhập kho".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="INVOUTTYPENAME" idn-data-type="T" idn-data-sort="1" idn-data-filter="1" fieldName="Tên loại xuất kho" fieldActive="0" class="text-left cell-200">
+                                @("Tên loại xuất kho".HtmlItemString("inventory"))
+                            </th>
+                            <th fieldId="FLAGACTIVE" fieldName="Trạng thái" fieldActive="0" class="text-left cell-75">
+                                @("Trạng thái".HtmlItemString("inventory"))
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                    <tbody id="table-tbodyID">
+                        @if (Model != null && Model.DataList != null && Model.DataList.Count > 0)
+                        {
+                            int stt = Convert.ToInt32(pageCur) * Convert.ToInt32(recordCount) + 1;
+                            foreach (var item in Model.DataList)
+                            {
+                                <tr class="data-item trdata">
+                                    <td fieldId="CONTROL" fieldActive="0" class="text-center cell-120 action-buttons">
+                                        @RenderItemFormat("BTN_QL_LOAI_XUAT_KHO_CHI_TIET", "<a class=\"icon-detail\" href=\"javascript:;\" onclick=\"Detail('" + item.InvOutType + "')\" title=\"Chi tiết\"><i class=\"far fa-eye green\"></i></a>", "", "")
+                                        @RenderItemFormat("BTN_QL_LOAI_XUAT_KHO_SUA", "<a class=\"icon-edit\" href=\"javascript:;\" onclick=\"Update('" + item.InvOutType + "')\" title=\"Sửa\"><i class=\"fas fa-pencil-alt\"></i></a>", "", "")
+                                        @RenderItemFormat("BTN_QL_LOAI_XUAT_KHO_XOA", "<a href=\"javascript:;\" class=\"icon-delete\" title=\"Xóa\" onclick=\"Delete('" + item.InvOutType.ToString() + "','" + item.InvOutTypeName.ToString() + "')\"><i class=\"fas fa-trash-alt\"></i></a>", "", "")
+                                    </td>
+                                    <td fieldId="STT" fieldActive="0" class="text-center cell-50">
+                                        @stt
+                                    </td>
+                                    <td fieldId="INVOUTTYPE" fieldActive="0" class="text-left cell-200">
+                                        @item.InvOutType
+                                    </td>
+                                    <td fieldId="INVOUTTYPENAME" fieldActive="0" class="text-left cell-200">
+                                        @item.InvOutTypeName
+                                    </td>
+                                    <td fieldId="FLAGACTIVE" fieldActive="0" class="text-left cell-75">
+                                        @if (item.FlagActive.Equals("1"))
+                                        {
+                                            <div class="status active">Active</div>
+                                        }
+                                        else
+                                        {
+                                            <span class="status inactive">Inactive</span>
+                                        }
+                                    </td>
+                                </tr>
+                                stt++;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </aside>
+</div>
+
+<script>
+    function Create() {
+        var url = '@Url.Action("Create", "Mst_InvOutType")';
+        $.ajax({
+        type: "get",
+        data: {
+        },
+        url: url,
+        dataType: 'json',
+            beforeSend: function () { }
+        }).done(function (result) {
+            if (result.Success) {
+                debugger
+                $('#MstInvOutTypeCreateModal').html('');
+                $('#MstInvOutTypeCreateModal').html(result.Html);
+                $('#MstInvOutTypeCreateModal').modal('show');
+                $('#MstInvOutTypeCreateModal .select2-selection').select2();
+            } else {
+                if (!commonUtils.isNullOrEmpty(result.Detail)) {
+                    showErrorDialog(result.Detail);
+                }
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+
+        }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+            //alert("complete");
+        });
+    }
+
+    function Detail(invOutType) {
+        var url = '@Url.Action("Detail", "Mst_InvOutType")';
+        $.ajax({
+        type: "get",
+        data: {
+            InvOutType: invOutType
+        },
+        url: url,
+        dataType: 'json',
+            beforeSend: function () { }
+        }).done(function (result) {
+            debugger
+            if (result.Success) {
+                $('#MstInvOutTypeDetailModal').html('');
+                $('#MstInvOutTypeDetailModal').html(result.Html);
+                $('#MstInvOutTypeDetailModal').modal('show');
+                $('#MstInvOutTypeDetailModal .select2-selection').select2();
+            } else {
+                if (!commonUtils.isNullOrEmpty(result.Detail)) {
+                    showErrorDialog(result.Detail);
+                }
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+
+        }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+            //alert("complete");
+        });
+    }
+
+    function Update(invOutType) {
+        debugger
+        var url = '@Url.Action("Update", "Mst_InvOutType")';
+        $.ajax({
+        type: "get",
+        data: {
+            invOutType: invOutType,
+        },
+        url: url,
+        dataType: 'json',
+            beforeSend: function () { }
+        }).done(function (result) {
+            if (result.Success) {
+                $('#MstInvOutTypeUpdateModal').html('');
+                $('#MstInvOutTypeUpdateModal').html(result.Html);
+                $('#MstInvOutTypeUpdateModal').modal('show');
+                $('#MstInvOutTypeUpdateModal .select2-selection').select2();
+            } else {
+                if (!commonUtils.isNullOrEmpty(result.Detail)) {
+                    showErrorDialog(result.Detail);
+                }
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+
+        }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+            //alert("complete");
+        });
+    }
+</script>

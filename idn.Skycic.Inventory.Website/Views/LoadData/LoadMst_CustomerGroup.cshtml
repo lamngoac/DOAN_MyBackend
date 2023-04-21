@@ -1,0 +1,37 @@
+﻿@model List<Mst_CustomerGroup>
+@{
+    //Layout = null;
+    string customerGrpCode = CUtils.StrValue(ViewBag.CustomerGrpCode);
+}
+
+<optgroup label="">
+    @if (Model != null && Model.Count > 0)
+    {
+        var lstCustomerGrpCode = new List<string>();
+
+        if (customerGrpCode != null && customerGrpCode.Length > 0)
+        {
+            lstCustomerGrpCode = customerGrpCode.Split(',').ToList();
+        }
+        foreach (var item in Model)
+        {
+            var selected = "";
+            var customerGrpCodeCur = CUtils.StrValue(item.CustomerGrpCode);
+            var customerGrpNameCur = CUtils.StrValue(item.CustomerGrpName);
+            if (CUtils.IsNullOrEmpty(customerGrpNameCur))
+            {
+                customerGrpNameCur = "";
+            }
+            if (lstCustomerGrpCode.Contains(item.CustomerGrpCode.ToString()))
+            {
+                selected = "selected";
+            }
+            <option value="@MvcHtmlString.Create(customerGrpCodeCur)" desc="@MvcHtmlString.Create(customerGrpNameCur)" @selected>@MvcHtmlString.Create(customerGrpNameCur)</option>
+        }
+    }
+</optgroup>
+<option value="ADDDATA">@("Thêm".HtmlItemString("product"))</option>
+
+
+
+

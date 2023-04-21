@@ -1,0 +1,240 @@
+﻿@model List<Product_CustomField>
+@{
+    /**/
+    var title = "DANH SÁCH PRODUCT_CUSTOMFIELD";
+    ViewBag.Title = "Thiết lập trường động hàng hoá";
+    var userState = ViewBag.UserState as UserState;
+    var orgID = CUtils.StrValue(userState.Mst_NNT.OrgID);
+}
+
+<div>
+    <div class="col-xs-12 text-center">
+        <div class="clearfix">
+            <div class="row no-margin text-center">
+                <a href="javascript:void();" class="btn font-color mybtn-Button" style="margin-left: 10px; margin-top: 10px; padding-left: 15px!important; padding-right: 15px!important; " onclick="SaveData();">Lưu</a>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="mt-3">
+    <div class="col-12">
+
+
+        @using (Html.BeginForm("Index", "Product_CustomField", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+            <div class="col-12 row">
+                <div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>
+                <input type="hidden" class="OrgID" id="OrgID" value="@MvcHtmlString.Create(orgID)" />
+
+                @if (Model != null && Model.Count > 0)
+                {
+                    var i = 0;
+                    foreach (var item in Model)
+                    {
+                        var checkActive = "";
+                        var flagActive = "0";
+
+                        if (item != null && item.FlagActive.Equals("1"))
+                        {
+                            flagActive = item.FlagActive.ToString().Trim();
+                        }
+
+                        checkActive = flagActive.Equals("1") ? "checked" : "";
+
+                        <div class="col-12 row dtlcustomfield" idx="@i">
+                            <div class="col-6 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="" class="col-xs-12 col-sm-4 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create(CUtils.StrValue(item.ProductCustomFieldCode))</label>
+                                    <div class="col-xs-12 col-sm-8">
+                                        <div class="row">
+
+
+                                            <div class="col-3" style="margin-top:-3px">
+                                                <span class="block input-icon input-icon-right padding-top-5">
+                                                    <label>
+                                                        <input id="FlagActive_0" name="ListProduct_CustomFiled[@i].FlagActive" class="ace ace-switch ace-switch-4" onclick="SetValueCheckBox(this)" type="checkbox" value="@MvcHtmlString.Create(flagActive)" @checkActive>
+                                                        <span class="lbl"></span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                            <div class="col-9">
+                                                <span class="block input-icon input-icon-right">
+                                                    <input type="hidden" name="ListProduct_CustomFiled[@i].ProductCustomFieldCode" value="@MvcHtmlString.Create(CUtils.StrValue(item.ProductCustomFieldCode))">
+                                                    <input type="text" name="ListProduct_CustomFiled[@i].ProductCustomFieldName" class="col-10" value="@MvcHtmlString.Create(CUtils.StrValue(item.ProductCustomFieldName))" required />
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="" class="col-xs-12 col-sm-3 control-label no-padding-right font-weight-500 ">Kiểu dữ liệu </label>
+                                    <div class="col-xs-12 col-sm-5">
+                                        <span class="block input-icon input-icon-right">
+                                            <select class="col-md-12" name="ListProduct_CustomFiled[@i].DBPhysicalType">
+                                                <optgroup label="">
+                                                    <option value="">--Chọn kiểu dữ liệu--</option>
+                                                    @{
+                                                        var typedata = item.DBPhysicalType == null ? "" : item.DBPhysicalType.ToString();
+                                                    }
+                                                    <option value="@CLientTypeData.DATETIME" @(typedata == CLientTypeData.DATETIME ? "selected" : "")>@MvcHtmlString.Create(CLientTypeData_NameVN.DATETIME)</option>
+                                                    <option value="@CLientTypeData.DATE" @(typedata == CLientTypeData.DATE ? "selected" : "")>@MvcHtmlString.Create(CLientTypeData_NameVN.DATE)</option>
+                                                    <option value="@CLientTypeData.NUMBER" @(typedata == CLientTypeData.NUMBER ? "selected" : "")>@MvcHtmlString.Create(CLientTypeData_NameVN.NUMBER)</option>
+                                                    @*<option value="@CLientTypeData.INTEGERNUMBER" @(typedata == CLientTypeData.INTEGERNUMBER ? "selected" : "")>@MvcHtmlString.Create(CLientTypeData_NameVN.INTEGERNUMBER)</option>*@
+                                                    <option value="@CLientTypeData.TEXT" @(typedata == CLientTypeData.TEXT ? "selected" : "")>@MvcHtmlString.Create(CLientTypeData_NameVN.TEXT)</option>
+
+                                                </optgroup>
+                                            </select>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+
+        }
+
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        //$("select.DBPhysicalType").select2();
+
+        $('div.dtlcustomfield').each(function () {
+            debugger
+            idx = $(this).attr('idx');
+            $(this).find('select[name="ListProduct_CustomFiled[' + idx + '].DBPhysicalType"]').select2();
+        });
+    })
+</script>
+
+<script type="text/javascript">
+    function SetValueCheckBox(thiz) {
+        var checkbox = false;
+        if ($(thiz).is(":checked")) {
+            checkbox = true;
+            $(thiz).val('1');
+        } else {
+            $(thiz).val('0');
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    function checkForm() {
+        debugger
+        var listError = [];
+        $('div.dtlcustomfield').each(function () {
+            idx = $(this).attr('idx');
+            $(this).find('select[name="ListProduct_CustomFiled[' + idx + '].DBPhysicalType"]').select2();
+            var productCustomFieldName = commonUtils.returnValue($(this).find('input[type="text"][name="ListProduct_CustomFiled[' + idx + '].ProductCustomFieldName"]').val());
+            var flagActive = commonUtils.returnValue($(this).find('input[type="checkbox"][name="ListProduct_CustomFiled[' + idx + '].FlagActive"]').val());
+            var dBPhysicalType = commonUtils.returnValue($(this).find('select[name="ListProduct_CustomFiled[' + idx + '].DBPhysicalType"]').val());
+            if (flagActive == "1") {
+                if (dBPhysicalType == "" || dBPhysicalType == null) {
+                    var objToastr = {
+                        ToastrType: 'error',
+                        ToastrMessage: ' Không được để trống kiểu dữ liệu!'
+                    };
+                    listError.push(objToastr);
+
+                }
+                if (productCustomFieldName == "" || productCustomFieldName == null) {
+                    var objToastr = {
+                        ToastrType: 'error',
+                        ToastrMessage: ' Không được để trống tên trường!'
+                    };
+                    listError.push(objToastr);
+                }
+            }
+
+        });
+
+
+        if (listError !== undefined && listError !== null && listError.length > 0) {
+            commonUtils.showToastr(listError);
+            return false;
+        }
+
+        return true;
+    }
+</script>
+
+
+<script type="text/javascript">
+    function SaveData() {
+        debugger
+        var Lst_Product_CustomField = [];
+        var idx = 0;
+        $('div.dtlcustomfield').each(function () {
+            debugger
+            idx = $(this).attr('idx');
+            $(this).find('select[name="ListProduct_CustomFiled[' + idx + '].DBPhysicalType"]').select2();
+
+            var productCustomFieldCode = commonUtils.returnValue($(this).find('input[type="hidden"][name="ListProduct_CustomFiled[' + idx + '].ProductCustomFieldCode"]').val());
+            var productCustomFieldName = commonUtils.returnValue($(this).find('input[type="text"][name="ListProduct_CustomFiled[' + idx + '].ProductCustomFieldName"]').val());
+            var dBPhysicalType = commonUtils.returnValue($(this).find('select[name="ListProduct_CustomFiled[' + idx + '].DBPhysicalType"]').val());
+            var flagActive = commonUtils.returnValue($(this).find('input[type="checkbox"][name="ListProduct_CustomFiled[' + idx + '].FlagActive"]').val());
+            var orgID = $('#OrgID').val();
+            var objlstProduct_CustomField = {};
+
+            objlstProduct_CustomField.OrgID = orgID;
+            objlstProduct_CustomField.ProductCustomFieldCode = productCustomFieldCode;
+            objlstProduct_CustomField.ProductCustomFieldName = productCustomFieldName;
+            objlstProduct_CustomField.DBPhysicalType = dBPhysicalType;
+            objlstProduct_CustomField.FlagActive = flagActive;
+            Lst_Product_CustomField.push(objlstProduct_CustomField);
+        });
+
+        if (this.checkForm()) {
+            var token = $('#manageForm input[name=__RequestVerificationToken]').val();
+            var url = '@Url.ActionLocalized("Edit", "Product_CustomField")';
+            var modelCur = JSON.stringify(Lst_Product_CustomField);
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    __RequestVerificationToken: token
+                    , model: modelCur
+                },
+                traditional: true,
+                //contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    if (data.Success) {
+                        if (data.Messages != null && data.Messages !== undefined && data.Messages.length > 0) {
+                            alert(data.Messages[0]);
+                        }
+                        window.location.href = data.RedirectUrl;
+                    }
+                    else {
+                        if (data.Detail != null) {
+                            _showErrorMsg123("Lỗi!", data.Detail);
+                        }
+                    }
+                }, error: function (xmlHttpRequest, textStatus, errorThrown) {
+                    debugger;
+                    if (textStatus === 'Unauthorized') {
+                        alert('custom message. Error: ' + errorThrown);
+                    } else {
+                        //alert('custom message. Error2: ' + errorThrown);
+                    }
+                }
+            });
+        }
+    }
+</script>

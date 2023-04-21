@@ -1,0 +1,104 @@
+﻿@{
+                /**/
+
+                /**/
+
+                var TotalRow = ViewBag.TotalRow as string;
+}
+
+<div class="row" style="margin-left: 0; margin-right: 0;">
+    <div class="col-xs-12" style="display: inline-block; padding-top: 5px; background-color: #eff3f8;">
+        <div style="display: inline-block; width: 100%;" id="item">
+            <div id="left" class="col-xs-3" style="float:left; margin-top:5px; font-size: 14px; font-weight: 600; ">
+                <span>Tất cả (<span id="totalRowTable">@TotalRow</span>) &nbsp;&nbsp;|</span>
+            </div>
+            <div id="right" style="float:right;" class="col-xs-7">
+                <div style="float: right;">
+                    @*<a href="javascript:" class="btn mybtnButton fontSizePlus" style="margin-top:0">
+                            <b>A +</b>
+                        </a>
+                        <a href="javascript:" class="btn mybtnButton fontSizeMinus" style="margin-left: 5px;margin-top:0">
+                            <b>A -</b>
+                        </a>*@
+                </div>
+                <div class="input-group" style="width:100px; float: right; padding-top: 2px;">
+                    <input type="search" id="txtSearchObj" placeholder="search" @*onkeypress="SearchDataInTable(this)"*@ style="border-radius: 5px 0px 0px 5px !important; border: 1px solid rgb(213, 213, 213);">
+                    <span class="input-group-addon" style="position: inherit; left:-5px;border-radius:0 5px 5px 0 !important">
+                        <i class="glyphicon glyphicon-search" aria-hidden="true"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        (function ($) {
+            var body = $('body');
+            body.on('keyup', '#txtSearchObj', function () {
+                var datafilter = $(this).val();
+                if (datafilter !== undefined && datafilter !== null && datafilter.toString().trim())
+                {
+                    datafilter = datafilter.toUpperCase().trim();
+                }
+                var rex = new RegExp($(this).val(), 'i');
+                $('.table-tbody tbody#table-tbodyID-popup tr').hide();
+                $('.table-tbody tbody#table-tbodyID-popup tr').filter(function () {
+                    var dataOfRow = $(this).text();
+                    if (dataOfRow !== undefined && dataOfRow !== null && dataOfRow.toString().trim().length > 0)
+                    {
+                        dataOfRow = dataOfRow.toUpperCase().trim();
+                    }
+                    if (dataOfRow.toUpperCase().indexOf(datafilter) > -1)
+                    {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }).show();
+            });
+
+        }(jQuery));
+
+    });
+</script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        var min = 14;
+        var max = 36;
+        var reset = $('.scrollable-horizontal').css('fontSize');
+        var size = str_replace(reset, 'px', '');
+        var body = $('body');
+        body.on('click', '.fontSizePlus', function () {
+            var elmthead = $('.table-cus > thead > tr > th');
+            var elmtbody = $('.table-tbody > tbody > tr > td');
+            var elmtfoot = $('.table-tfoot > tfoot > tr > td');
+            if (size <= max) {
+                size++;
+                elmthead.css({ 'font-size': size });
+                elmtbody.css({ 'font-size': size });
+                elmtfoot.css({ 'font-size': size });
+            }
+            return false;
+        });
+        body.on('click', '.fontSizeMinus', function () {
+            var elmthead = $('.table-cus > thead > tr > th');
+            var elmtbody = $('.table-tbody > tbody > tr > td');
+            var elmtfoot = $('.table-tfoot > tfoot > tr > td');
+            if (size >= min) {
+                size--;
+                elmthead.css({ 'font-size': size });
+                elmtbody.css({ 'font-size': size });
+                elmtfoot.css({ 'font-size': size });
+            }
+            return false;
+        });
+    });
+</script>
+
+
+
+

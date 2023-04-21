@@ -1,0 +1,497 @@
+﻿
+@model PageInfo<Mst_CustomerGroup>
+@{
+    //Layout = "~/Views/Shared/_LayoutQuantri.cshtml";
+    var title = "QUẢN LÝ NHÓM KHÁCH HÀNG";
+    ViewBag.Title = title;
+    var startCount = 0;
+    var strStartCount = ViewBag.StartCount as string;
+    var recordCount = CUtils.StrValue(ViewBag.RecordCount);
+    if (!CUtils.IsNullOrEmpty(strStartCount))
+    {
+        startCount = Convert.ToInt32(strStartCount);
+    }
+    var init = CUtils.StrValue(ViewBag.init);
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+    var pageCount = CUtils.StrValue(ViewBag.PageCount);
+    var totalPage = "0";
+    if (Model != null)
+    {
+        totalPage = CUtils.StrValue(Model.PageCount);
+    }
+
+    var showtext = "";
+    if (Model.ItemCount > 0)
+    {
+        var recordstart = (Model.PageIndex) * Model.PageSize + 1;
+        var recordend = (Model.PageIndex + 1) * Model.PageSize;
+        if (recordend > Model.ItemCount)
+        {
+            recordend = Model.ItemCount;
+        }
+        showtext = recordstart + "-" + recordend + " trong số " + Model.ItemCount;
+    }
+    var userState = ViewBag.UserState as UserState;
+    var viewid = string.Format("{0}_{1}_{2}_{3}", CUtils.StrValue(userState.SysUser.UserCode), CUtils.StrValue(ViewBag.SolutionCodeSignature), CUtils.StrValue(userState.Mst_NNT.OrgID), "Mst_CustomerGroup_Mng");
+}
+<script>
+    setAdminCurrentUrl('@Url.Action("Index", "Mst_CustomerGroup")');
+</script>
+<div class="" style="padding-left: 10px">
+    <div class="row no-margin">
+        <aside class="col-12 no-padding">
+            @using (Html.BeginForm(null, null, FormMethod.Get, new { id = "manageForm", @class = "form-horizontal" }))
+            {
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="viewid" name="viewid" value="@MvcHtmlString.Create(viewid)" />
+                <input type="hidden" value="search" name="init" id="init" />
+                <div class="layout-search layout-bot-top-16">
+                    <div class="form-group margin-bottom-9">
+                        <label for="" class="control-label no-padding-right font-weight-500" style="float: left">Mã nhóm khách hàng</label>
+                        <div class="col-12 col-sm-3">
+                            <input type="text" id="CustomerGrpName" name="CustomerGrpName" class="col-11" value="@MvcHtmlString.Create(ViewBag.CustomerGrpName)" autocomplete="off">
+                        </div>
+                        <label for="" class="control-label no-padding-right font-weight-500" style="float: left">Tên nhóm khách hàng</label>
+                        <div class="col-12 col-sm-3">
+                            <input type="text" id="CustomerGrpDesc" name="CustomerGrpDesc" class="col-11" value="@MvcHtmlString.Create(ViewBag.CustomerGrpDesc)" autocomplete="off">
+                        </div>
+                        <div class="col-12 col-sm-1 button-tk no-padding">
+                            <div class="col-11" style="padding: 0">
+                                <span class="block input-icon input-icon-right" style="">
+
+                                    @RenderItemFormat("BTN_QL_NGUON_KH_TK", "<a class=\"btn font-color mybtn-Button\" onclick=\"SearchData()\" href=\"javascript: void(0);\"><img class=\"img-button\" src=" + @Url.Content("~/Images/search.svg") + "></a>", "", "")
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layout-bot-top-16">
+                    <div class="row">
+                        <div class="col-6">
+                            @RenderItemFormat("BTN_QL_NGUON_KH_TAO", "<a class=\"btn font-color mybtn-Button\"onclick=\"Create()\" href=\"javascript: void(0);\" style=\"font-size: 13px;\" title=\"Tạo mới\"><i class=\"fa fa-plus-circle\" aria-hidden=\"true\"></i> Tạo</a>", "", "")
+                            <a class="btn font-color mybtn-Button" data-toggle="dropdown" aria-expanded="false" style="font-size: 13px; position: relative;"><i class="fas fa-ellipsis-h"></i></a>
+                            <ul class="dropdown-menu" role="menu" style="">
+                                <li style="padding: 10px 5px">
+                                    @RenderItemFormat("BTN_QL_NGUON_KH_XUAT_EXCEL", "<a class=\"row no-margin col-12 no-padding\" onclick=\"Export()\" href=\"javascript:void(0);\" style=\"line-height: 13px; color: #000000\"><i class=\"fas fa-download\" aria-hidden=\"true\" style=\"margin-right: 7px\"></i> Xuất excel</a>", "", "")
+                                </li>
+                            </ul>
+
+                            <span class="search-bar">
+                                <input type="text" id="dynamic-table-thead-search" class="quicksearch dynamic-table-thead-search" name="search">
+                                <input type="text" class="quicksearch1 dynamic-table-thead-search1" name="search" style="z-index: -1000; height: 0; padding: 0; margin: 0; border: 0">
+                            </span>
+                        </div>
+                        <div class="col-6">
+                            @if (CheckAccess("BTN_QL_NGUON_KH_TK"))
+                            {
+                                @Html.Partial("Pagination", null, new ViewDataDictionary() { { "PageCur", MvcHtmlString.Create(pageCur) }, { "RecordCount", MvcHtmlString.Create(Model.PageSize.ToString()) }, { "ShowText", showtext }, { "groupname", Request["groupname"] } })
+                            }
+                            <input type="hidden" value="@MvcHtmlString.Create(pageCur)" name="page" id="page" />
+                            <input type="hidden" id="totalpage" value="@Model.PageCount" />
+                        </div>
+                    </div>
+
+                </div>
+            }
+        </aside>
+        <div class="col-12 panel-body no-padding" id="panel-body" style="padding-left: 0px; padding-right: 0px;">
+            <aside class="col-12 layout-table no-padding">
+                @Html.AntiForgeryToken()
+                <div class="scrollable-horizontal padding-left-0 padding-right-0" style="padding-top: 0!important;">
+                    <div style="width: 100%; float: left;">
+                        <table id="dynamic-table-thead" idn-datatable-id="dynamic-table-thead-tbody" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                            <thead>
+                                <tr class="trthead" filterroot="" bfilter="0">
+                                    <th fieldId="CONTROL" fieldName="CONTROL" fieldActive="0" class="cell-120">&nbsp;</th>
+                                    <th fieldId="STT" fieldName="STT" fieldActive="0" class="cell-50">@MvcHtmlString.Create("STT")</th>
+                                    <th fieldId="GROUPNAME" fieldName="Mã nhóm" fieldActive="0" sorttype="T" class="cell-200">
+                                        @("Mã nhóm khách hàng".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="GROUPCODE" fieldName="Tên nhóm" fieldActive="0" sorttype="T" class="cell-200">
+                                        @("Tên nhóm khách hàng".HtmlItemString("product"))
+                                    </th>
+                                    <th fieldId="FLAGACTIVE" fieldName="Trạng thái" fieldActive="0" class="cell-75">
+                                        @("Trạng thái".HtmlItemString("product"))
+                                    </th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                        <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                            <tbody id="table-tbodyID">
+                                @if (Model != null && Model.DataList != null && Model.DataList.Count > 0)
+                                {
+                                    var idx = 0;
+                                    foreach (var item in Model.DataList)
+                                    {
+                                        var iindex = startCount + (idx + 1);
+
+                                        <tr idx="@idx" class="data-item trdata">
+                                            <td fieldId="CONTROL" fieldActive="0" class="text-center cell-120">
+                                                <div class="action-buttons padding-top-2">
+                                                    @RenderItemFormat("BTN_QL_NGUON_KH_CHI_TIET", "<a class=\"icon-detail\" title=\"Chi tiết\" onclick=\"GetDetailData('" + item.CustomerGrpCode + "')\" href=\"javascript: void(0);\"><i class=\"fas fa-eye\"></i></a>", "", "")
+                                                    @RenderItemFormat("BTN_QL_NGUON_KH_SUA", "<a class=\"icon-edit\" title=\"Sửa\" onclick=\"Update('" + item.CustomerGrpCode + "')\" href=\"javascript: void(0);\"><i class=\"fas fa-pencil-alt\"></i></a>", "", "")
+                                                    @RenderItemFormat("BTN_QL_NGUON_KH_XOA", "<a href=\"javascript:;\" class=\"icon-delete\" title=\"Xóa\" onclick=\"Delete('" + item.CustomerGrpCode + "')\"><i class=\"fas fa-trash-alt\"></i></a>", "", "")
+                                                </div>
+                                            </td>
+                                            <td fieldId="STT" fieldActive="0" class="text-center cell-50">
+                                                @MvcHtmlString.Create(iindex.ToString())
+                                            </td>
+                                            <td fieldId="CUSTOMERSOURCENAME" fieldActive="0" class="cell-200">
+                                                @CUtils.StrValue(item.CustomerGrpName)
+                                            </td>
+                                            <td fieldId="CUSTOMERSOURCEDESC" fieldActive="0" class="cell-200">
+                                                @CUtils.StrValue(item.CustomerGrpDesc)
+                                            </td>
+                                            <td fieldId="FLAGACTIVE" fieldActive="0" class="text-center cell-75">
+                                                @if (item.FlagActive.Equals("1"))
+                                                {
+                                                    <div class="status approve">Active</div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="status cancel">Inactive</div>
+                                                }
+                                            </td>
+                                        </tr>
+                                        idx++;
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ShowPopup" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"></div>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Mst_CustomerGroup.js")"></script>
+
+    <script>
+        setAdminCurrentUrl('@Url.Action("Index", "Mst_CustomerGroup")');
+
+        $(document).on('keypress', function (e) {
+            if (e.which == 13) {
+                SearchData();
+            }
+        });
+
+        function SearchData()
+        {
+            $('#manageForm').attr('action', '@Url.Action("Index", "Mst_CustomerGroup")').submit();
+        }
+
+        function SaveData(flagAction) {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+
+            var objMst_CustomerGroup = new Mst_CustomerGroup();
+            if (flagAction == "1") {
+                ajaxSettings.Url = '@Url.Action("Create", "Mst_CustomerGroup")';
+                objMst_CustomerGroup.ActionType = 'create';
+            } else {
+                ajaxSettings.Url = '@Url.Action("Edit", "Mst_CustomerGroup")';
+                objMst_CustomerGroup.ActionType = 'edit';
+
+            }
+            objMst_CustomerGroup.ajaxSettings = ajaxSettings;
+            objMst_CustomerGroup.saveData();
+        }
+
+        function Delete(customerGrpCode) {
+        var objMst_CustomerGroup_Delete = {
+            CustomerGrpCode: customerGrpCode
+            };
+
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Delete", "Mst_CustomerGroup")';
+
+            var objMst_CustomerGroup = new Mst_CustomerGroup();
+            objMst_CustomerGroup.Image_Message = "<i class=\"fas fa-info-circle\"></i> THÔNG BÁO";
+            objMst_CustomerGroup.Confirm_Message = "Đồng ý xóa nhóm khách hàng '" + customerGrpCode + "' ?";
+            objMst_CustomerGroup.ajaxSettings = ajaxSettings;
+            objMst_CustomerGroup.deleteData(objMst_CustomerGroup_Delete);
+        }
+
+        function Create() {
+            var url = '@Url.Action("Create", "Mst_CustomerGroup")';
+            $.ajax({
+                url: url,
+                type: 'get',
+                cache: false,
+                dataType: 'json',
+                traditional: true,
+                success: function (data) {
+                    if (data.Success) {
+                        $("#ShowPopup").html(data.Html);
+                        ShowPopup();
+                    } else {
+                        _showErrorMsg123("Lỗi!", data.Detail);
+                    }
+                }
+            });
+
+        }
+
+        function Update(customerGrpCode) {
+            var url = '@Url.Action("Update", "Mst_CustomerGroup")';
+            $.ajax({
+                url: url,
+                type: 'get',
+                data: {
+                    customerGrpCode: customerGrpCode
+                },
+                cache: false,
+                dataType: 'json',
+                traditional: true,
+                success: function (data) {
+                    if (data.Success) {
+                        $("#ShowPopup").html(data.Html);
+                        ShowPopup();
+                    } else {
+                        _showErrorMsg123("Lỗi!", data.Detail);
+                    }
+                }
+            });
+
+        }
+
+        function GetDetailData(customerGrpCode)
+     {
+        var ajaxSettings = {};
+        ajaxSettings.Type = 'post';
+        ajaxSettings.DataType = 'json';
+        ajaxSettings.Url = '@Url.Action("GetDetailData", "Mst_CustomerGroup")';
+
+            var objMst_CustomerGroup = new Mst_CustomerGroup();
+            objMst_CustomerGroup.ajaxSettings = ajaxSettings;
+            objMst_CustomerGroup.getDetailData(customerGrpCode);
+    }
+
+        function ShowPopup() {
+            $('#ShowPopup').modal('show');
+        }
+
+        function ClosePopup() {
+            $('#ShowPopup').modal('hide');
+        }
+
+        function ClearPopup() {
+            $('#ShowPopup input[name=CustomerGrpName]').val('');
+            $('#ShowPopup input[name=CustomerGrpDesc]').val('');
+            $('#ShowPopup select[name=FlagActive]').val('');
+        }
+
+        var objCommonExcel = new CommonExcel();
+        var objVariablesInit = {
+            Id_FormMain: '',
+            Id_FormImportExcel: 'manageFormImportExcel',
+            Id_Modal: 'ImportExcelModal',
+            Id_FileInput: 'file',
+        };
+
+        var ajaxSettings_Excel = {};
+        ajaxSettings_Excel.Type = 'post';
+        ajaxSettings_Excel.DataType = 'json';
+
+    function Export()
+    {
+        ajaxSettings_Excel.Url = '@Url.Action("Export", "Mst_CustomerGroup")';
+        var token = $('input[name=__RequestVerificationToken]').val();
+        var url = '@Url.Action("Export", "Mst_CustomerGroup")';
+        var customerSourceName = commonUtils.returnValueText('#CustomerGrpName');
+        var customerSourceDesc = commonUtils.returnValueText('#CustomerGrpDesc');
+        var listParams = [
+            { "Key": 'customerSourceName', "Value": customerSourceName },
+            { "Key": 'customerSourceDesc', "Value": customerSourceDesc }
+        ];
+        objCommonExcel.ajaxSettingsInit();
+        objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+        objCommonExcel.exportExcel(listParams);
+        }
+
+    </script>
+    <!-- #region table sort -->
+    <script>
+        var initDefault = function () {
+            $('#dynamic-table-thead').idnTable({
+                searchTextbox: '#dynamic-table-thead-search', columnToggleButton: '#togglecolumn',
+                cookieId: '#viewid',
+            });
+        };
+        var initCustom = function () {
+            var tb = $('#dynamic-table-thead').idnTable();
+
+            $('#dynamic-table-thead-search').keyup(function () {
+                var kw = $(this).val();
+                tb.search(kw);
+            });
+
+            //tb.showColumns(['STT'], false);
+            //tb.reload();
+            var colList = tb.getAllColumns();
+            $('#togglecolumn').html('');
+
+            for (var i = 0; i < colList.length; ++i) {
+
+                var col = colList[i];
+                var fieldid = col.id;
+                var title = col.name;
+
+                if (title !== undefined && title !== null && title.toString().trim().length > 0) {
+                    title = title.toString().trim();
+                } else {
+                    title = '';
+                }
+
+                var fieldactive = col.show;
+
+                //B2: Sinh popup tùy chỉnh các cột trong bảng #dynamic-table-thead
+                var $input = $('<input>');
+                $input.attr('type', 'checkbox');
+                $input.attr('name', fieldid);
+
+                if (fieldactive === true) { //Nếu trạng thái bằng 0 cho hiện cột và checked ô input tương ứng
+                    $input.attr('checked', 'checked');
+
+                }
+
+                var $spaninput = $('<span>');
+                $spaninput.append($input);
+                $spaninput.css('margin-right', '10px');
+
+                var $spantext = $('<span>');
+                $spantext.text(title);
+
+                var $li = $('<li>');
+                $li.css('line-height', '19px');
+                $li.css('margin-bottom', '18px');
+                $li.append($spaninput);
+                $li.append($spantext);
+
+                $('#togglecolumn').append($li);
+
+                $input.click(function () {
+                    if ($(this).is(':checked')) {
+                        tb.showColumns([$(this).attr('name')], false);
+                    }
+                    else {
+                        tb.hideColumns([$(this).attr('name')], false);
+                    }
+                });
+            }
+        };
+        $(document).ready(function () {
+            initDefault();
+            //initCustom();
+        });
+        $(document).ready(function () {
+            (function ($) {
+                var body = $('body');
+                body.on('keyup', '#dynamic-table-thead-search', function () {
+                    var datafilter = $(this).val();
+                    if (datafilter !== undefined && datafilter !== null && datafilter.toString().trim()) {
+                        datafilter = datafilter.toUpperCase().trim();
+                    }
+                    var rex = new RegExp($(this).val(), 'i');
+                    $('#table-tbodyID tr').hide();
+                    $('#table-tbodyID tr').filter(function () {
+                        //debugger
+                        var dataOfRow = $(this).text();
+                        if (dataOfRow !== undefined && dataOfRow !== null && dataOfRow.toString().trim().length > 0) {
+                            dataOfRow = dataOfRow.toUpperCase().trim();
+                        }
+                        if (dataOfRow.toUpperCase().indexOf(datafilter) > -1) {
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }
+                    }).show();
+                });
+
+            }(jQuery));
+
+        });
+        $(document).ready(function () {
+            //debugger;
+            var viewId = commonUtils.returnValueText('#viewid');
+            if (!commonUtils.isNullOrEmpty(viewId)) {
+                var cookie = commonUtils.getCookie(viewId);
+                if (commonUtils.isNullOrEmpty(cookie)) {
+                    var cookieValue = 'CONTROL|STT|MST|GROUPCODE|GROUPNAME';
+                    commonUtils.setCookie(viewId, cookieValue, 10);
+                }
+            }
+            initDefault();
+
+            //initCustom();
+
+        });
+    </script>
+    <!-- #endregion -->
+    <!-- #region cookies -->
+    <script>
+        document.addEventListener('DOMContentLoaded',
+            function () {
+                //debugger;
+                readCookies("Mst_CustomerGroup");
+                var checkboxs = document.querySelectorAll('#togglecolumn.ulshowdata input[type="checkbox"]');
+                for (let checkbox of checkboxs) {
+                    checkbox.addEventListener('change', setCookie)
+                }
+            });
+
+        function saveSelectedToCookie() {
+            //debugger;
+            setCookie("Mst_CustomerGroup",
+                {
+                    path: '/',
+                    expires: 10
+                });
+        }
+
+        function setCookie(name, options = {}) {
+            //debugger;
+            var checkboxs = document.querySelectorAll('#togglecolumn.ulshowdata input[type="checkbox"]');
+            var value = new Object();
+            for (const ckb of checkboxs) {
+                value[ckb.name] = ckb.checked === true ? "0" : "1";
+            }
+            let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(JSON.stringify(value));
+
+            if (options.expires instanceof Date) {
+                options.expires = options.expires.toUTCString();
+            }
+
+            for (let optionKey in options) {
+                updatedCookie += "; " + optionKey;
+                let optionValue = options[optionKey];
+                if (optionValue !== true) {
+                    updatedCookie += "=" + optionValue;
+                }
+            }
+            document.cookie = updatedCookie;
+        }
+
+        function readCookies(name) {
+            //debugger;
+            var result = document.cookie.match(new RegExp(name + '=([^;]+)'));
+            result && (result = JSON.parse(decodeURIComponent(result[1])));
+            if (result != null && result != undefined) {
+                for (const key in result) {
+                    $('#dynamic-table-thead').find('th[fieldid="' + key + '"]').attr('fieldactive', result[key]);
+                }
+            }
+        }
+    </script>
+    <!-- #endregion -->
+}

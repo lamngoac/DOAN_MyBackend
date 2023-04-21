@@ -1,0 +1,179 @@
+﻿@model List<InvF_InventoryInDtlUI>
+@{
+    var iF_InvInStatus = CUtils.StrValue(ViewBag.IF_InvInStatus);
+    var strDisabled = "";
+    var strDisplay = "";
+    if (!string.IsNullOrEmpty(iF_InvInStatus) && iF_InvInStatus != "PENDING")
+    {
+        strDisabled = "disabled";
+        strDisplay = "display:none";
+    }
+ }
+
+@if (Model != null && Model.Count > 0)
+{
+    var idx = 0;
+    foreach (var item in Model)
+    {
+        var strReadOnly = "readonly";
+<tr id="unit_@item.ProductCode" idx="@idx" flagvisible="1" data-prdcode="@item.ProductCode" class="data-item trdata getbom @item.ProductCode" style="">
+    <td class="text-center cell-50">        
+        <a href="javascript:;" class="icon-delete" title="Xóa" onclick="DeleleRowPrd('@item.ProductCode')" style="@strDisplay"><i class="fas fa-trash-alt"></i></a>
+    </td>
+
+    <td fieldid="PRODUCTCODE" sorttype="T" class="cell-100 ">
+        @item.mp_ProductCodeUser &nbsp;
+        @if (Convert.ToString(item.mp_FlagLot) == "1")
+        {
+            <a href="javascript:;" title="Chi tiết Lô" onclick="ShowLo('@item.ProductCode')">(Lô)</a>
+        }
+        else if (Convert.ToString(item.mp_FlagSerial) == "1")
+        {
+            <a href="javascript:;" title="Chi tiết Serial" onclick="ShowSerial('@item.ProductCode')">(Serial)</a>
+        }
+        else
+        {
+            strReadOnly = "";
+        }
+    </td>
+
+    <td fieldid="PRODUCTNAME" sorttype="T" class="cell-200 "> @item.mp_ProductName </td>
+
+    <td fieldid="UNITCODE" sorttype="T" class="text-center cell-75" id="unitCode_@item.ProductCode">
+        <select class="listproductbase" name="Lst_InvF_InventoryInDtl[@idx].UnitCode" style="width:75px;" id="Unitchange-@item.ProductCode" onchange="ChangUnit('@item.ProductCode')" @strDisabled>
+            <optgroup label="">
+                @if (item.Lst_Mst_ProductBase != null && item.Lst_Mst_ProductBase.Count > 0)
+                {
+                    foreach (var prd in item.Lst_Mst_ProductBase)
+                    {
+                        <option value="@prd.UnitCode" prdcode="@prd.ProductCode" @(prd.ProductCode.ToString() == item.ProductCode.ToString() ? " selected" : "" )>@prd.UnitCode </option>
+                    }
+                }
+            </optgroup>
+        </select>
+    </td>
+
+    <td fieldid="QTY" sorttype="T" class="text-center cell-75 ">
+        <input arr="qty" style="width:75px;" type="text" class="text-right number @strReadOnly" name="Lst_InvF_InventoryInDtl[@idx].Qty" id="qty_@item.ProductCode" value="@item.Qty" onkeyup="inputQty(this)" @strDisabled/>
+    </td>
+
+    <td fieldid="INVCODEINACTUAL" sorttype="T" class="text-center cell-150">
+        <input arr="invcodeinactual" readonly="readonly" type="text" class="text-left col-md-11" name="Lst_InvF_InventoryInDtl[@idx].InvCodeInActual" id="invCodeInActual_@item.ProductCode" value="@item.InvCodeInActual" />
+        @if (Convert.ToString(item.mp_FlagSerial) != "1" && Convert.ToString(item.mp_FlagLot) != "1")
+        {
+            <a href="javascript:;" title="Chọn vị trí nhập" onclick="ShowVTNhap('@item.ProductCode','@item.mp_ProductCodeUser','@item.mp_ProductName','@item.mp_ProductCodeBase')"><i class="fa fa-caret-down"></i></a>
+        }
+    </td>
+
+    <td fieldid="UPIN" sorttype="T" class="text-center cell-100 ">
+        <input arr="upin" style="width:100px;" type="text" class="text-right number" name="Lst_InvF_InventoryInDtl[@idx].UPIn" id="uPIn_@item.ProductCode" value="@item.UPIn" onkeyup="inputUPIn(this)" @strDisabled/>
+    </td>
+
+    <td fieldid="UPINDESC" sorttype="T" class="text-center cell-100 ">
+        <input arr="upindesc" style="width:100px;" type="text" class="text-right number" name="Lst_InvF_InventoryInDtl[@idx].UPInDesc" id="uPInDesc_@item.ProductCode" value="@item.UPInDesc" onkeyup="inputUPInDesc(this)" @strDisabled/>
+    </td>
+
+    <td fieldid="VALINAFTERDESC" sorttype="T" class="text-center cell-100 ">
+        <input arr="valinafterdesc" style="width:100px;" readonly="readonly" type="text" class="text-right number" name="Lst_InvF_InventoryInDtl[@idx].ValInAfterDesc" id="valInAfterDesc_@item.ProductCode" value="@item.ValInAfterDesc" />
+    </td>
+
+    <td fieldid="REMARK" sorttype="T" class="text-center cell-100 ">
+        <input arr="remark" style="width:100px;" type="text" class="text-right" name="Lst_InvF_InventoryInDtl[@idx].Remark" id="remark_@item.ProductCode" value="@item.Remark" @strDisabled/>
+    </td>
+
+    <input type="hidden" name="Lst_InvF_InventoryInDtl[@idx].ProductCode" value="@item.ProductCode" />
+    <input type="hidden" name="Lst_InvF_InventoryInDtl[@idx].ProductCodeUser" value="@item.mp_ProductCodeUser" />
+    <input type="hidden" name="Lst_InvF_InventoryInDtl[@idx].ProductCodeBase" value="@item.mp_ProductCodeBase" />
+    <input type="hidden" name="Lst_InvF_InventoryInDtl[@idx].ProductName" value="@item.mp_ProductName" />
+    <input type="hidden" name="Lst_InvF_InventoryInDtl[@idx].FlagLot" value="@item.mp_FlagLot" />
+    <input type="hidden" name="Lst_InvF_InventoryInDtl[@idx].FlagSerial" value="@item.mp_FlagSerial" />
+</tr>
+
+        idx++;
+
+        if (item.Lst_Mst_ProductBase != null && item.Lst_Mst_ProductBase.Count > 0)
+        {
+            foreach (var itemBase in item.Lst_Mst_ProductBase)
+            {
+                var strReadOnlyBase = "readonly";
+                if (item.ProductCode.ToString() == itemBase.ProductCode.ToString())
+                { continue; }
+
+<tr id="unit_@itemBase.ProductCode" idx="@idx" flagvisible="0" data-prdcode="@itemBase.ProductCode" class="data-item trdata getbom @itemBase.ProductCode" style="display: none">
+    <td class="text-center cell-50" onclick="DeleleRowPrd('@itemBase.ProductCode')">
+        <div class="action-buttons padding - top - 2"><i class="fa fa-trash-alt"></i></div>
+    </td>
+
+    <td fieldid="PRODUCTCODE" sorttype="T" class="cell-100 ">
+        @itemBase.ProductCodeUser &nbsp;
+        @if (Convert.ToString(itemBase.FlagLot) == "1")
+        {
+            <a href="javascript:;" title="Chi tiết Lô" onclick="ShowLo(' @itemBase.ProductCode')">(Lô)</a>
+        }
+        else if (Convert.ToString(itemBase.FlagSerial) == "1")
+        {
+            <a href="javascript:;" title="Chi tiết Serial" onclick="ShowSerial('@itemBase.ProductCode')">(Serial)</a>
+        }
+        else
+        {
+            strReadOnlyBase = "";
+        }
+    </td>
+
+    <td fieldid="PRODUCTNAME" sorttype="T" class="cell-200 "> @itemBase.ProductName </td>
+
+    <td fieldid="UNITCODE" sorttype="T" class="text-center cell-75" id="unitCode_@itemBase.ProductCode">
+        <select class="listproductbase" name="Lst_InvF_InventoryInDtl[@idx].UnitCode" style="width:75px;" id="Unitchange-@itemBase.ProductCode" onchange="ChangUnit('@itemBase.ProductCode')">
+            <optgroup label="">
+                @if (item.Lst_Mst_ProductBase != null && item.Lst_Mst_ProductBase.Count > 0)
+                {
+                    foreach (var prd in item.Lst_Mst_ProductBase)
+                    {
+                        <option value="@prd.UnitCode" prdcode="@prd.ProductCode" @(prd.ProductCode.ToString() == itemBase.ProductCode.ToString() ? " selected" : "" )>@prd.UnitCode </option>
+                    }
+                }
+            </optgroup>
+        </select>
+    </td>
+
+    <td fieldid="QTY" sorttype="T" class="text-center cell-75 ">
+        <input arr="qty" style="width:75px;" type="text" class="text-right number @strReadOnlyBase" name="Lst_InvF_InventoryInDtl[@idx].Qty" id="qty_@itemBase.ProductCode" value="@item.Qty" onkeyup="inputQty(this)" />
+    </td>
+
+    <td fieldid="INVCODEINACTUAL" sorttype="T" class="text-center cell-150">
+        <input arr="invcodeinactual" readonly="readonly" type="text" class="text-left col-md-11" name="Lst_InvF_InventoryInDtl[@idx].InvCodeInActual" id="invCodeInActual_@itemBase.ProductCode" value="@item.InvCodeInActual" />
+        @if (Convert.ToString(itemBase.FlagSerial) != "1" && Convert.ToString(itemBase.FlagLot) != "1")
+        {
+            <a href="javascript:;" title="Chọn vị trí nhập" onclick="ShowVTNhap('@itemBase.ProductCode','@itemBase.ProductCodeUser','@itemBase.ProductName','@itemBase.ProductCodeBase')"><i class="fa fa-caret-down"></i></a>
+        }
+    </td>
+
+    <td fieldid="UPIN" sorttype="T" class="text-center cell-100 ">
+        <input arr="upin" style="width:100px;" type="text" class="text-right number" name="Lst_InvF_InventoryInDtl[@idx].UPIn" id="uPIn_@itemBase.ProductCode" value="@itemBase.UPBuy" onkeyup="inputUPIn(this)" />
+    </td>
+
+    <td fieldid="UPINDESC" sorttype="T" class="text-center cell-100 ">
+        <input arr="upindesc" style="width:100px;" type="text" class="text-right number" name="Lst_InvF_InventoryInDtl[@idx].UPInDesc" id="uPInDesc_@itemBase.ProductCode" value="0" onkeyup="inputUPInDesc(this)" />
+    </td>
+
+    <td fieldid="VALINAFTERDESC" sorttype="T" class="text-center cell-100 ">
+        <input arr="valinafterdesc" style="width:100px;" readonly="readonly" type="text" class="text-right number" name="Lst_InvF_InventoryInDtl[@idx].ValInAfterDesc" id="valInAfterDesc_@itemBase.ProductCode" value="" />
+    </td>
+
+    <td fieldid="REMARK" sorttype="T" class="text-center cell-100 ">
+        <input arr="remark" style="width:100px;" type="text" class="text-right" name="Lst_InvF_InventoryInDtl[@idx].Remark" id="remark_@itemBase.ProductCode" value="@item.Remark" />
+    </td>
+
+    <input type="hidden" name="Lst_InvF_InventoryInDtl[@idx].ProductCode" value="@itemBase.ProductCode" />
+    <input type="hidden" name="Lst_InvF_InventoryInDtl[@idx].ProductCodeUser" value="@itemBase.ProductCodeUser" />
+    <input type="hidden" name="Lst_InvF_InventoryInDtl[@idx].ProductCodeBase" value="@itemBase.ProductCodeBase" />
+    <input type="hidden" name="Lst_InvF_InventoryInDtl[@idx].ProductName" value="@itemBase.ProductName" />
+    <input type="hidden" name="Lst_InvF_InventoryInDtl[@idx].FlagLot" value="@itemBase.FlagLot" />
+    <input type="hidden" name="Lst_InvF_InventoryInDtl[@idx].FlagSerial" value="@itemBase.FlagSerial" />
+</tr>
+
+                idx++;
+            }
+        }
+    }
+}

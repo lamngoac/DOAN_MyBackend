@@ -1,0 +1,345 @@
+﻿@{
+    ViewBag.Title = "Tạo mới điều chuyển kho";
+    var List_Mst_InventoryInOut = ViewBag.List_Mst_InventoryInOut as List<Mst_Inventory>;
+    var List_Mst_InventoryPosition = ViewBag.List_Mst_InventoryPosition as List<Mst_Inventory>;
+    var InvF_MoveOrdNo = ViewBag.InvFMoveOrdNo;
+}
+<script>
+    setAdminCurrentUrl('@Url.Action("Index","InvF_MoveOrd")');
+</script>
+<style>
+    .padding-bottom-10 {
+        padding-bottom: 10px;
+    }
+
+    .no-padding-left {
+        padding-left: 0;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    li a i {
+        margin-right: 10px;
+    }
+
+    a:hover {
+        cursor: pointer;
+    }
+
+    input#ProductCode {
+        position: relative;
+    }
+
+        input#ProductCode:focus .product-list {
+            display: block;
+        }
+
+    .ui-menu a {
+        color: #212529;
+        display: block;
+        padding: 7px 10px;
+    }
+
+    .ui-menu li:hover {
+        background-color: #098850;
+    }
+
+        .ui-menu li:hover a {
+            color: #fff;
+        }
+
+    .ui-menu li#search-product a {
+        color: #098850 !important;
+        background-color: #CBEFDF !important;
+    }
+</style>
+
+@section RenderButton{
+
+    <div class="col-6 breadcrumb-menu">
+        @RenderItemFormat("BTN_TAO_DIEUCHUYEN_LUU", "<a href=\"javascript: void(0); \" class=\"btn btn-nc-button\" onclick=\"SaveData();\"><i class=\"fas fa-save\" aria-hidden=\"true\"></i> Lưu</a>", "", "")
+    </div>}
+
+
+<div class="col-12">
+    @using (Html.BeginForm("Create", "InvF_MoveOrd", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+
+        <div class="col-12 layout-bot-top-16 row">
+            <div class="col-4 row form-group margin-bottom-9">
+                <label for="IF_MONo" class="col-12 col-sm-4 control-label no-padding-right font-weight-500 ">@("Số phiếu điều chuyển".HtmlItemString("inventory")) <span style="color: red;">*</span></label>
+                <div class="col-8">
+                    <input type="text" name="IF_MONo" id="IF_MONo" class="col-12" value="@InvF_MoveOrdNo" readonly>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="row form-group margin-bottom-9">
+                    <label for="InvCodeOut" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Kho xuất".HtmlItemString("inventory")) <span style="color: red;">*</span></label>
+                    <div id="div-InvCodeOut" class="col-12 col-sm-8">
+                        <span class="block input-icon input-icon-right">
+                            <select class="select2-selection" name="InvCodeOut" id="InvCodeOut">
+                                <option value="">--Chọn kho xuất--</option>
+                                @{
+                                    if (List_Mst_InventoryInOut != null && List_Mst_InventoryInOut.Count > 0)
+                                    {
+                                        foreach (var invInOut in List_Mst_InventoryInOut)
+                                        {
+                                            <option value="@invInOut.InvCode" bupattern="@invInOut.InvBUPattern">@invInOut.InvName</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                        </span>
+                    </div>
+                </div>
+                <div class="row form-group margin-bottom-9">
+                    <label for="InvCodeIn" class="col-12 col-sm-3 control-label no-padding-right font-weight-500 ">@("Kho nhập".HtmlItemString("inventory")) <span style="color: red;">*</span></label>
+                    <div id="div-InvCodeIn" class="col-12 col-sm-8">
+                        <span class="block input-icon input-icon-right">
+                            <select class="select2-selection" name="InvCodeIn" id="InvCodeIn">
+                                <option value="">--Chọn kho nhập--</option>
+                                @{
+                                    if (List_Mst_InventoryInOut != null && List_Mst_InventoryInOut.Count > 0)
+                                    {
+                                        foreach (var inv in List_Mst_InventoryInOut)
+                                        {
+                                            <option value="@inv.InvCode" bupattern="@inv.InvBUPattern">@inv.InvName</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4 form-group margin-bottom-9">
+                <label for="Remark" class="col-sm-3 control-label no-padding-right font-weight-500 ">@("Nội dung xuất".HtmlItemString("inventory"))</label>
+                <div class="col-8">
+                    <textarea type="text" name="Remark" id="Remark" class="col-12" value=""></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="row col-12">
+            <p class="font-weight-bold">Danh mục hàng hóa</p>
+        </div>
+        <div class="col-12 row no-margin">
+            <div class="col-6">
+                <div class="form-group margin-bottom-9">
+                    <label for="" class="col-4 control-label no-padding-right font-weight-500 ">@("Hàng hoá".HtmlItemString("product"))<span style="color: red "> *</span></label>
+                    @if (CheckAccess("BTN_TAO_DC_TIMKIEM_HH"))
+                    {
+                        <div class="col-8">
+                            <div class="col-12 form-group no-padding">
+                                <input class="col-12" type="text" name="ProductCode" id="ProductCode" value="" autocomplete="off" placeholder="Quét mã vạch, mã hh, tên hh,serial, số xác thực, hoặc nhập để tìm kiếm" />
+                                <input class="col-12 idn-hidden" type="text" name="quetmavach" id="quetmavach" value="" autocomplete="off" placeholder="Quét mã vạch, mã hh, tên hh,serial, số xác thực, hoặc nhập để tìm kiếm" />
+                                <div class="product-list">
+                                    <ul class="no-padding no-margin"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="col-3">
+
+                @if (CheckAccess("BTN_TAO_DC_QUET"))
+                {
+                    <a class="btn btn-nc-button" href="javascript:;" onclick="ScanProduct()">Quét</a>
+                }
+                <a class="btn font-color mybtn-Button" data-toggle="dropdown" aria-expanded="false" style="font-size: 13px; position: relative;"><i class="fas fa-ellipsis-h"></i></a>
+                <ul class="dropdown-menu dropdown-action" role="menu" style="">
+                    @if (CheckAccess("BTN_TAO_DC_XUAT_EXCEL_TEMP_HH"))
+                    {
+                        <li style="padding: 5px">
+                            <a class="row no-margin col-12 no-padding" onclick="ExportTempMoveOrdPrd()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" aria-hidden="true"></i> Xuất Excel template hàng hoá</a>
+                        </li>
+                    }
+                    @if (CheckAccess("BTN_TAO_DC_XUAT_EXCEL_TEMP_LOT"))
+                    {
+                        <li style="padding: 5px">
+                            <a class="row no-margin col-12 no-padding" onclick="ExportTempMoveOrdLot()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" aria-hidden="true"></i> Xuất Excel Template Lot</a>
+                        </li>
+                    }
+                    @if (CheckAccess("BTN_TAO_DC_XUAT_EXCEL_TEMP_SERIAL"))
+                    {
+                        <li style="padding: 5px">
+                            <a class="row no-margin col-12 no-padding" onclick="ExportTempMoveOrdSerial()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" aria-hidden="true"></i> Xuất Excel Template Serial</a>
+                        </li>
+                    }
+                    <li style="padding: 5px">
+                        <a class="row no-margin col-12 no-padding" style="border-bottom: 1px dashed;"></a>
+                    </li>
+                    @if (CheckAccess("BTN_TAO_DC_NHAP_EXCEL_HH"))
+                    {
+                        <li style="padding: 5px">
+                            <a class="row no-margin col-12 no-padding" onclick="ShowPopupImportExcelMoveOrdDtl()" data-toggle="modal" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" aria-hidden="true"></i> Nhập Excel hàng hoá</a>
+                        </li>
+                    }
+                    @if (CheckAccess("BTN_TAO_DC_NHAP_EXCEL_LOT"))
+                    {
+                        <li style="padding: 5px">
+                            <a class="row no-margin col-12 no-padding" onclick="ShowPopupImportExcelMoveOrdLot()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" aria-hidden="true"></i> Nhập Excel Lot</a>
+                        </li>
+                    }
+                    @if (CheckAccess("BTN_TAO_DC_NHAP_EXCEL_SERIAL"))
+                    {
+                        <li style="padding: 5px">
+                            <a class="row no-margin col-12 no-padding" onclick="ShowPopupImportExcelMoveOrdSerial()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" aria-hidden="true"></i> Nhập Excel Serial</a>
+                        </li>
+                    }
+                    @*@if (CheckAccess("BTN_TAO_DC_XUAT_EXCEL_HH"))
+                        {
+                            <li style="padding: 5px">
+                                <a class="row no-margin col-12 no-padding" onclick="ExportExcelMoveOrdPrd()" href="javascript:void(0);" style="line-height: 13px; color: #000000"><i class="fas fa-download" aria-hidden="true"></i> Xuất Excel hàng hoá</a>
+                            </li>
+                        }*@
+                </ul>
+            </div>
+            <div class="col-3 text-right" style="margin-top: 9px;">
+                <span style="font-weight: bold">Tổng: </span><span id="spanTotalPrd" style="font-weight: bold">0</span>
+            </div>
+        </div>
+        <div class="col-12 layout-bot-top-16">
+            <div class="scrollable-horizontal padding-left-0 padding-right-0" style="padding-top: 0!important;">
+                <div style="width: 100%; float: left;">
+                    <table id="dynamic-table-thead" class="table table-bordered table-thead table-cus table-bottom-0 no-margin">
+                        <thead>
+                            <tr class="trthead">
+                                <th fieldId="CONTROL" fieldName="CONTROL" fieldActive="0" class="text-center cell-25">
+                                </th>
+                                <th class="text-center cell-120">@("Mã hàng hoá".HtmlItemString("inventory"))</th>
+                                <th class="text-center cell-100">@("Tên hàng hoá".HtmlItemString("inventory"))</th>
+                                <th class="text-center cell-50">@("Đơn vị".HtmlItemString("inventory"))</th>
+                                <th class="text-center cell-50">@("Tồn kho".HtmlItemString("inventory"))</th>
+                                <th class="text-center cell-75">@("Số lượng điều chuyển".HtmlItemString("inventory"))</th>
+                                <th class="text-center cell-75">@("Vị trí xuất".HtmlItemString("inventory"))</th>
+                                <th class="text-center cell-75">@("Vị trí nhập".HtmlItemString("inventory"))</th>
+                                <th class="text-center cell-110">@("Ghi chú".HtmlItemString("inventory"))</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div id="scrollable_1" class="scrollable" style="width: 100%; float: left">
+                    <table id="dynamic-table-thead-tbody" class="table table-borderedtable-cus table-bottom-0 dynamic-table-tbody dynamic-table-thead-tbody no-margin">
+                        <tbody id="Lst_InvF_MoveOrdProduct"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts{
+    <script src="~/Content/assets/js/bootbox.js"></script>
+    <script src="@Url.Content("~/Scripts/mine/InvF_MoveOrd.js")"></script>
+
+    <!-- document ready -->
+    <script>
+        // Use for popup: Thay đổi trạng thái cho phép sửa với flagIsCreate != 1
+        var flagIsCreate = 1;
+
+        $(document).ready(function () {
+            $("select#ProductCode").select2({
+            });
+            $('.select2-selection').select2();
+            $('select#ProductCode').select2().on('select2:close', function () { commonUtils.showPopup(this); });
+        });
+    </script>
+
+    <!-- Export excel Hàng hoá -->
+    <script>
+        function ExportExcelMoveOrdPrd() {
+            let lstProduct = [];
+            let mp_ProductCodeUser = '';
+            let mp_ProductName = '';
+            let UnitCode = '';
+            var listProduct = $('#Lst_InvF_MoveOrdProduct tr.trdata');
+            if (listProduct != undefined && listProduct.length > 0) {
+                for (const product of listProduct) {
+                    mp_ProductCodeUser = $(product).find('td')[1].textContent;
+                    mp_ProductName = $(product).find('td')[2].textContent;
+                    UnitCode = $(product).find('td')[3].textContent;
+                    //UnitCode = $(product).find('td')[3].textContent;
+                    let objProduct = {
+                        mp_ProductCodeUser: mp_ProductCodeUser,
+                        mp_ProductName: mp_ProductName,
+                        UnitCode : UnitCode
+                    };
+                    lstProduct.push(objProduct);
+                }
+            }
+            var objData = JSON.stringify(lstProduct);
+
+            $.ajax({
+                type: "post",
+                data: {
+                    model: objData,
+                },
+                url: '@Url.Action("ExportExcelPrdMoveOrd", "InvF_MoveOrd")',
+                dataType: 'json',
+                beforeSend: function () {
+                }
+            })
+            .done(function (objResult) {
+                if (objResult.Success) {
+                    var checkSuccess = commonUtils.returnValue(objResult.CheckSuccess);
+                    var strUrl = commonUtils.returnValue(objResult.strUrl);
+                    if (checkSuccess === '1') {
+                        var listToastr = [];
+                        objToastr = { ToastrType: 'success', ToastrMessage: objResult.Messages };
+                        listToastr.push(objToastr);
+                        commonUtils.showToastr(listToastr);
+                        commonUtils.window_location_href(strUrl);
+                    }
+                } else {
+                    if (!commonUtils.isNullOrEmpty(objResult.Detail)) {
+                        showErrorDialog(objResult.Detail);
+                    }
+                    if (!commonUtils.isNullOrEmpty(objResult.Messages)) {
+                        var listToastr = [];
+                        objToastr = { ToastrType: 'error', ToastrMessage: objResult.Messages };
+                        listToastr.push(objToastr);
+                        commonUtils.showToastr(listToastr);
+                    }
+                }
+            })
+            .fail(function (jqXHR, textStatus, errorThrown) { })
+            .always(function () {
+            });
+        }
+    </script>
+    <!-- Scan Product -->
+    <script>
+        function ScanProduct() {
+            if (!$('#ProductCode').hasClass('scanning')) {
+                $('#ProductCode').addClass('scanning').val('');
+                $("#quetmavach").removeClass("idn-hidden");
+                $('#ProductCode').addClass('idn-hidden');
+
+                var listToastr = [];
+                objToastr = { ToastrType: 'success', ToastrMessage: 'Chuyển sang chế dộ quét' };
+                listToastr.push(objToastr);
+                commonUtils.showToastr(listToastr);
+            }
+            else {
+                $('#ProductCode').removeClass('scanning');
+                $("#quetmavach").addClass("idn-hidden");
+                $('#ProductCode').removeClass('idn-hidden');
+
+                var listToastr = [];
+                objToastr = { ToastrType: 'success', ToastrMessage: 'Tắt chế dộ quét' };
+                listToastr.push(objToastr);
+                commonUtils.showToastr(listToastr);
+            }
+        }
+    </script>
+
+}
+
+@Html.Partial("_ModalShow")
+@Html.Partial("_CommonJs")
+@Html.Partial("Template")

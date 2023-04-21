@@ -1,0 +1,450 @@
+﻿@model PageInfo<Mst_InventoryType>
+@{
+    ViewBag.Title = "Quản lý loại kho";
+    var init = CUtils.StrValue(ViewBag.init);
+    var pageCur = CUtils.StrValue(ViewBag.PageCur);
+    var recordCount = CUtils.StrValue(ViewBag.RecordCount);
+    var totalPage = "0";
+    if (Model != null)
+    {
+        totalPage = CUtils.StrValue(Model.PageCount);
+    }
+
+
+    var showtext = "";
+    if (Model.ItemCount > 0)
+    {
+        var recordstart = (Model.PageIndex) * Model.PageSize + 1;
+        var recordend = (Model.PageIndex + 1) * Model.PageSize;
+        if (recordend > Model.ItemCount)
+        {
+            recordend = Model.ItemCount;
+        }
+        showtext = recordstart + "-" + recordend + " trong số " + Model.ItemCount;
+    }
+    var userState = ViewBag.UserState as UserState;
+    var viewid = string.Format("{0}_{1}_{2}_{3}", CUtils.StrValue(userState.SysUser.UserCode), CUtils.StrValue(ViewBag.SolutionCodeSignature), CUtils.StrValue(userState.Mst_NNT.OrgID), "Mst_InventoryType_Mng");
+
+}
+<script>
+    setAdminCurrentUrl('@Url.Action("Index", "Mst_InventoryType")');
+</script>
+<script src="~/Content/assets/js/bootbox.js"></script>
+
+<input type="hidden" id="page" value="@ViewBag.PageCur" />
+<input type="hidden" id="totalpage" value="@Model.PageCount" />
+
+<div class="row no-margin">
+    <div class="col-sm-12">
+        <div id="BindDataMst_InventoryType" class="conten-table">
+            <input type="hidden" id="viewid" name="viewid" value="@MvcHtmlString.Create(viewid)" />
+            @Html.Partial("BindDataMst_InventoryType", Model, new ViewDataDictionary() { { "init", MvcHtmlString.Create(init) }, { "PageCur", MvcHtmlString.Create(pageCur) }, { "RecordCount", MvcHtmlString.Create(recordCount) } })
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ImportExcelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="exampleModalLabel">Nhập excel loại kho</h3>
+                <a href="javascript:;" onclick="CloseModalImportExcel()" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </a>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "manageFormImportExcel" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group margin-bottom-9">
+                        <input type="file" name="file" id="file" />
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn mybtn-Button" onclick="Import()" id="btnSaveImport" style="padding-left: 10px!important; padding-right: 10px!important; font-size: 16px; font-weight: 500;">Nhập</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="MstInventoryTypeCreateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+</div>
+
+<div class="modal fade" id="MstInventoryTypeUpdateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+</div>
+
+<div class="modal fade" id="MstInventoryTypeDetailModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+</div>
+
+<!-- Search -->
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Mst_InventoryType.js")"></script>
+    <script type="text/javascript">
+        @*@*Active Menu*@
+        //setAdminCurrentUrl('@Url.Action("Index", "Mst_InventoryType")');
+        $(document).ready(function(){
+            $('.dropdown-menu').on('click', function (event) {
+                event.stopPropagation();
+            });
+        })
+        function SearchData() {
+            var recordcount = commonUtils.returnValueText('#recordcount');
+            var pagecur = commonUtils.returnValueText('#page');
+            var url = '@Url.Action("Index", "Mst_InventoryType")';
+            $.ajax({
+            type: "post",
+            data: {
+                init: 'search',
+                page: pagecur,
+                recordcount: recordcount,
+            },
+            url: url,
+            dataType: 'json',
+                beforeSend: function () { }
+            }).done(function (result) {
+                if (result.Success) {
+                    $('#BindDataMst_InventoryType').html('');
+                    $('#BindDataMst_InventoryType').html(result.Html);
+                    initDefault();
+                    readCookies("Mst_InventoryType");
+                    $('.dropdown-menu').on('click', function (event) {
+                        event.stopPropagation();
+                    });
+                    //Disabled_previous_Next();
+                    $('.numberic').number(true, 2);
+                } else {
+                    if (!commonUtils.isNullOrEmpty(result.Detail)) {
+                        showErrorDialog(result.Detail);
+                    }
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+
+            }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+                //alert("complete");
+            });
+        }
+    </script>
+    <!-- Delete -->
+    <script>
+        var objMst_InventoryType = new Mst_InventoryType();
+        function Delete(invtype, invtypename) {
+            var objMst_InventoryType_Delete = {
+                InvType: invtype,
+                InvTypeName: invtypename
+            };
+
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Delete", "Mst_InventoryType")';
+            var objMst_InventoryType = new Mst_InventoryType();
+
+            objMst_InventoryType.Image_Message = "<i class=\"fas fa-info-circle\"></i> THÔNG BÁO";
+            objMst_InventoryType.Confirm_Message = "Đồng ý xóa loại kho '" + invtypename + "' ?";
+            objMst_InventoryType.ajaxSettings = ajaxSettings;
+            objMst_InventoryType.deleteData(objMst_InventoryType_Delete);
+        }
+    </script>
+    <!-- Excel -->
+    <script>
+        var objCommonExcel = new CommonExcel();
+        var objVariablesInit = {
+            Id_FormMain: '',
+            Id_FormImportExcel: 'manageFormImportExcel',
+            Id_Modal: 'ImportExcelModal',
+            Id_FileInput: 'file',
+        };
+
+        var ajaxSettings_Excel = {};
+        ajaxSettings_Excel.Type = 'post';
+        ajaxSettings_Excel.DataType = 'json';
+
+        function ShowPopupImportExcel(check) {
+            $('#ImportExcelModal').modal('show')
+        }
+
+        function CloseModalImportExcel() {
+            $('#ImportExcelModal').modal('hide')
+            $('#ImportExcelModal').on('hidden.bs.modal', function () {
+                $(this).find('#manageFormImportExcel').trigger('reset');
+            });
+        }
+
+        function Import(title) {
+            var file = $("#file").val();
+            var listCheck = $('input[name="importChoose"]');
+            var flagImport = '';
+            listCheck.each(function () {
+                if ($(this).is(':checked')) {
+                    flagImport = $(this).val();
+                }
+            });
+            if (file.length === 0) {
+                alert("Nhập file cần Import");
+                $("#file").val('');
+                return false;
+            } else {
+                var checkFile = false;
+                var _index = file.lastIndexOf('.');
+                if (_index !== undefined && _index !== null && _index > 0) {
+                    var fileType = file.substring(_index + 1, file.length).toLowerCase();
+                    if (fileType === 'xls' || fileType.toLowerCase() === 'xlsx') {
+                        checkFile = true;
+                    }
+                }
+                if (checkFile) {
+                    ImportFileExcel();
+                } else {
+                    alert("File Excel Import không hợp lệ!");
+                }
+            }
+        }
+
+        function ImportFileExcel() {
+            ajaxSettings_Excel.Url = '@Url.Action("Import", "Mst_InventoryType")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.variablesInit(objVariablesInit);
+            objCommonExcel.importFileExcel();
+        }
+
+        function ExportTemplate() {
+            ajaxSettings_Excel.Url = '@Url.Action("ExportTemplate", "Mst_InventoryType")';
+
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.exportExcel();
+        }
+
+        function Export() {
+            ajaxSettings_Excel.Url = '@Url.Action("Export", "Mst_InventoryType")';
+            var recordcount = commonUtils.returnValueText('#recordcount');
+            var pagecur = commonUtils.returnValueText('#page');
+            var listParams = [
+                { "Key": 'recordcount', "Value": recordcount },
+                { "Key": 'pagecur', "Value": pagecur },
+            ];
+            objCommonExcel.ajaxSettingsInit();
+            objCommonExcel.ajaxSettings = ajaxSettings_Excel;
+            objCommonExcel.exportExcel(listParams);
+        }
+    </script>
+    <!-- Popup -->
+    <script>
+        function ClosePopupCreate() {
+            $('#MstInventoryTypeCreateModal').modal('hide');
+            $('#MstInventoryTypeCreateModal').html('');
+        }
+        function ClosePopupDetail() {
+            $('#MstInventoryTypeDetailModal').modal('hide');
+            $('#MstInventoryTypeCreateModal').html('');
+        }
+        function ClosePopupUpdate() {
+            $('#MstInventoryTypeUpdateModal').modal('hide');
+            $('#MstInventoryTypeCreateModal').html('');
+        }
+    </script>
+
+    <script type="text/javascript">
+        function SaveData() {
+            var ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+            ajaxSettings.Url = '@Url.Action("Create", "Mst_InventoryType")';
+            var objMst_InventoryType = new Mst_InventoryType();
+            objMst_InventoryType.ActionType = 'create';
+            objMst_InventoryType.ajaxSettings = ajaxSettings;
+            objMst_InventoryType.saveData();
+        }
+
+        function SaveDataUpdate() {
+            let ajaxSettings = {};
+            ajaxSettings.Type = 'post';
+            ajaxSettings.DataType = 'json';
+
+            ajaxSettings.Url = '@Url.Action("Edit", "Mst_InventoryType")';
+
+            var objMst_InventoryType = new Mst_InventoryType();
+            objMst_InventoryType.ActionType = 'edit';
+            objMst_InventoryType.ajaxSettings = ajaxSettings;
+            objMst_InventoryType.saveData();
+        }
+    </script>
+    <!-- #region table sort -->
+    <script>
+        var initDefault = function () {
+            $('#dynamic-table-thead').idnTable({
+                searchTextbox: '#dynamic-table-thead-search', columnToggleButton: '#togglecolumn',
+                cookieId: '#viewid',
+            });
+        };
+        var initCustom = function () {
+            var tb = $('#dynamic-table-thead').idnTable();
+
+            $('#dynamic-table-thead-search').keyup(function () {
+                var kw = $(this).val();
+                tb.search(kw);
+            });
+
+            //tb.showColumns(['STT'], false);
+            //tb.reload();
+            var colList = tb.getAllColumns();
+            $('#togglecolumn').html('');
+
+            for (var i = 0; i < colList.length; ++i) {
+
+                var col = colList[i];
+                var fieldid = col.id;
+                var title = col.name;
+
+                if (title !== undefined && title !== null && title.toString().trim().length > 0) {
+                    title = title.toString().trim();
+                } else {
+                    title = '';
+                }
+
+                var fieldactive = col.show;
+
+                //B2: Sinh popup tùy chỉnh các cột trong bảng #dynamic-table-thead
+                var $input = $('<input>');
+                $input.attr('type', 'checkbox');
+                $input.attr('name', fieldid);
+
+                if (fieldactive === true) { //Nếu trạng thái bằng 0 cho hiện cột và checked ô input tương ứng
+                    $input.attr('checked', 'checked');
+
+                }
+
+                var $spaninput = $('<span>');
+                $spaninput.append($input);
+                $spaninput.css('margin-right', '10px');
+
+                var $spantext = $('<span>');
+                $spantext.text(title);
+
+                var $li = $('<li>');
+                $li.css('line-height', '19px');
+                $li.css('margin-bottom', '18px');
+                $li.append($spaninput);
+                $li.append($spantext);
+
+                $('#togglecolumn').append($li);
+
+                $input.click(function () {
+                    if ($(this).is(':checked')) {
+                        tb.showColumns([$(this).attr('name')], false);
+                    }
+                    else {
+                        tb.hideColumns([$(this).attr('name')], false);
+                    }
+                });
+            }
+        };
+        $(document).ready(function () {
+            initDefault();
+            //initCustom();
+        });
+        $(document).ready(function () {
+            (function ($) {
+                var body = $('body');
+                body.on('keyup', '#dynamic-table-thead-search', function () {
+                    var datafilter = $(this).val();
+                    if (datafilter !== undefined && datafilter !== null && datafilter.toString().trim()) {
+                        datafilter = datafilter.toUpperCase().trim();
+                    }
+                    var rex = new RegExp($(this).val(), 'i');
+                    $('#table-tbodyID tr').hide();
+                    $('#table-tbodyID tr').filter(function () {
+                        //debugger
+                        var dataOfRow = $(this).text();
+                        if (dataOfRow !== undefined && dataOfRow !== null && dataOfRow.toString().trim().length > 0) {
+                            dataOfRow = dataOfRow.toUpperCase().trim();
+                        }
+                        if (dataOfRow.toUpperCase().indexOf(datafilter) > -1) {
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }
+                    }).show();
+                });
+
+            }(jQuery));
+
+        });
+        $(document).ready(function () {
+            //debugger;
+            var viewId = commonUtils.returnValueText('#viewid');
+            if (!commonUtils.isNullOrEmpty(viewId)) {
+                var cookie = commonUtils.getCookie(viewId);
+                if (commonUtils.isNullOrEmpty(cookie)) {
+                    var cookieValue = 'CONTROL|STT|INVTYPE|INVTYPENAME|FLAGACTIVE';
+                    commonUtils.setCookie(viewId, cookieValue, 10);
+                }
+            }
+            initDefault();
+
+            //initCustom();
+
+        });
+    </script>
+    <!-- #endregion -->
+    <!-- #region cookies -->
+    <script>
+        document.addEventListener('DOMContentLoaded',
+            function () {
+                //debugger;
+                readCookies("Mst_InventoryType");
+                var checkboxs = document.querySelectorAll('#togglecolumn.ulshowdata input[type="checkbox"]');
+                for (let checkbox of checkboxs) {
+                    checkbox.addEventListener('change', setCookie)
+                }
+            });
+
+        function saveSelectedToCookie() {
+            //debugger;
+            setCookie("Mst_InventoryType",
+                {
+                    path: '/',
+                    expires: 10
+                });
+        }
+
+        function setCookie(name, options = {}) {
+            //debugger;
+            var checkboxs = document.querySelectorAll('#togglecolumn.ulshowdata input[type="checkbox"]');
+            var value = new Object();
+            for (const ckb of checkboxs) {
+                value[ckb.name] = ckb.checked === true ? "0" : "1";
+            }
+            let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(JSON.stringify(value));
+
+            if (options.expires instanceof Date) {
+                options.expires = options.expires.toUTCString();
+            }
+
+            for (let optionKey in options) {
+                updatedCookie += "; " + optionKey;
+                let optionValue = options[optionKey];
+                if (optionValue !== true) {
+                    updatedCookie += "=" + optionValue;
+                }
+            }
+            document.cookie = updatedCookie;
+        }
+
+        function readCookies(name) {
+            //debugger;
+            var result = document.cookie.match(new RegExp(name + '=([^;]+)'));
+            result && (result = JSON.parse(decodeURIComponent(result[1])));
+            if (result != null && result != undefined) {
+                for (const key in result) {
+                    $('#dynamic-table-thead').find('th[fieldid="' + key + '"]').attr('fieldactive', result[key]);
+                }
+            }
+        }
+    </script>
+    <!-- #endregion -->
+}

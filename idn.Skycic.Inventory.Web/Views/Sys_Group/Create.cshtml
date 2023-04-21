@@ -1,0 +1,96 @@
+﻿@model Sys_Group
+@{
+    Layout = "~/Views/Shared/CoreLayoutQuanTri.cshtml";
+    var title = "TẠO MỚI NHÓM NGƯỜI DÙNG";
+    var titleMng = "Quản lý nhóm người dùng";
+    ViewBag.Title = title;
+}
+<script type="text/javascript">
+    @*var parents = new Array();
+    parents.push("@Url.Action("Index", "Sys_Group")");
+    parents.push("");
+    var parentsText = new Array();
+    parentsText.push("@MvcHtmlString.Create(titleMng)");
+    parentsText.push("@MvcHtmlString.Create(title)");
+    setAdminCurrentTag(parents, parentsText);*@
+</script>
+
+<div class="row no-margin">
+    <div class="col-xs-12">
+        <!-- PAGE CONTENT BEGINS -->
+        <div class="panel-group" id="steps">
+            <div class="panel panel-info">
+                @*<div class="title">
+                    <p style="vertical-align: bottom">@MvcHtmlString.Create(title)</p>
+                </div>*@
+                <div class="panel-body" id="panel-body" style="">
+                    <aside class="row no-margin box-shadow-tk">
+                        @using (Html.BeginForm("Create", "Sys_Group", FormMethod.Post, new { id = "manageForm", @class = "form-horizontal" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                            <div class="col-xs-4 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mã nhóm người dùng <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="GroupCode" name="GroupCode" class="col-xs-11 GroupCode" onkeyup="locdau(this);" value="" autocomplete="off" required />
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-4 no-padding">
+                                <div class="form-group margin-bottom-5">
+                                    <label for="" class="col-xs-12 col-sm-6 control-label no-padding-right font-weight-500 ">@MvcHtmlString.Create("Mô tả nhóm người dùng <span style=\"color: red\">*</span>")</label>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="GroupName" name="GroupName" class="col-xs-11 GroupName" value="" autocomplete="off" required />
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                        }
+                    </aside>
+                    <div class="col-xs-12 no-padding">
+                        <div class="clearfix">
+                            <div class="row no-margin" style="float: right">
+                                @RenderItemFormat("BTN_TAO_MOI_NHOM_ND_LUU", "<a href=\"javascript: void(0); \" class=\"btn font-color mybtn-Button\" style=\"margin-top: 20px; padding-left: 15px!important;\" onclick=\"SaveData();\">Lưu</a>", "", "")
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/mine/Sys_Group.js")"></script>
+    <script type="text/javascript">
+        @*Active Menu*@
+        setAdminCurrentUrl('@Url.Action("Index", "Sys_Group")');
+        processAjaxForm($('#manageForm'), function (response) {
+            processAjaxFormResult(response);
+        });
+        @* Set focus *@
+        $(document).ready(function () {
+            $('#UnitCode').focus();
+        });
+        var _getForm = document.getElementById("manageForm");
+        _getForm.addEventListener('reset', function () {
+            document.getElementById("").focus();
+        });
+        var objSys_Group = new Sys_Group();
+
+        function SaveData() {
+            var check = objSys_Group.checkForm();
+            if (check) {
+                $("#manageForm").attr('action', '@Url.Action("Create","Sys_Group")').submit();
+            }
+        }
+    </script>
+}

@@ -1,0 +1,60 @@
+﻿<nav id="menu-header" class="navbar navbar-nav" style="padding: 5px 10px" role="navigation">
+    <div class="navbar-header">
+        <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-left" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <a href="@Url.Action("Index","Dashboard")">
+            <div class="navbar-brand">
+                <img style="height: 27px;margin: 10px;" class="img-responsive" src="@Url.Content("~/images/logo.white.svg")" alt="Logo">
+            </div>
+        </a>
+    </div>
+    <div class="collapse navbar-collapse navbar-right" id="navbar-right" style="padding-top:10px;">
+        <ul class="nav navbar-nav" style="width: 100%">
+            @*<li>
+            @RenderSubMenuItemNoIcon("QL_HOA_DON_DAU_RA", "HÓA ĐƠN ĐẦU RA", "Index", "Invoice_Invoice")
+        </li>
+        <li>
+            @RenderSubMenuItemNoIcon("QL_HOA_DON_DAU_VAO", "HÓA ĐƠN ĐẦU VÀO", "InvoiceOut", "Invoice_Invoice")
+        </li>
+        <li>
+            @RenderSubMenuItemNoIcon("MENU_QL_MAU_HOA_DON", "MẪU HÓA ĐƠN", "Index", "Invoice_TempInvoice")
+        </li>*@
+            @*<li>
+            @RenderSubMenuItemNoIcon("MENU_BAO_CAO", "BÁO CÁO", "RptInvF_InventoryInFGSum", "Reports")
+        </li>*@
+            <li>
+                @RenderSubMenuItemNoIcon("MENU_IN_TEM", "IN TEM", "Index", "Temp_PrintTemp")
+            </li>
+            <li>
+                @RenderSubMenuItemNoIcon("MENU_KHO", "KHO", "Index", "Mst_Inventory")
+            </li>
+            <li>
+                @RenderSubMenuItemNoIcon("MENU_BAO_CAO", "BÁO CÁO", "RptInvF_InventoryInFGSum", "Reports")
+            </li>
+            <li>
+                @RenderSubMenuItemNoIcon("MENU_QUAN_TRI", "QUẢN TRỊ", "Index", "Mst_Part")
+            </li>
+            <li>
+                @RenderSubMenuItemNoIcon("MENU_MUA_LICENSE", "LICENSE", "Index", "License")
+            </li>
+            <li>
+                @*@RenderSubMenuItemNoIcon("MENU_HUONG_DAN", "HƯỚNG DẪN", "Index", "")*@
+                <a href="#">HƯỚNG DẪN</a>
+            </li>
+            @if (Request.IsAuthenticated)
+            {
+                @*<li>
+                <a href="#"><i class="fa fa-user" aria-hidden="true"></i> @MvcHtmlString.Create(ViewBag.UserName)</a>
+            </li>
+            <li>
+                <a href="javascript:document.getElementById('logoutForm').submit()"><i class="fa fa-sign-out" aria-hidden="true"></i> Thoát</a>
+            </li>*@
+                <li class="light-blue dropdown-modal">
+                    @Html.Partial("_LoginPartial")
+                </li>
+            }
+        </ul>
+    </div>
+</nav>

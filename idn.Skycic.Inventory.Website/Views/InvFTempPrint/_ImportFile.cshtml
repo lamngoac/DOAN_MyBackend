@@ -1,0 +1,69 @@
+﻿
+
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <a href="javascript:void();" onclick="CloseModalImportFile()" class="close" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </a>
+            <h3 class="modal-title" id="exampleModalLabel">Nhập file</h3>
+        </div>
+        <div class="modal-body">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "manageFormImportFile" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group margin-bottom-5">
+                    <input type="file" name="file" id="file" />
+                </div>
+            }
+
+        </div>
+        <div class="modal-footer">
+            <a href="javascript:void(0);" class="btn mybtn-Button" onclick="Import()" id="btnSaveImport" style="padding-left: 10px!important; padding-right: 10px!important; font-size: 16px; font-weight: 500;">Nhập</a>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    var objMst_TempPrintGroup_ImportFile = new Mst_TempPrintGroup();
+
+    $(document).ready(function () {
+        $('input[type="file"]').change(function (e) {
+            objMst_TempPrintGroup_ImportFile.checkFileImport(this, e)
+        });  
+    });
+
+    function CloseModalImportFile() {
+        objMst_TempPrintGroup_ImportFile.closeModalImportFile('ImportFileModal');
+    }
+
+    function Import(title) {
+        var file = $("#file").val();
+        if (file.length === 0) {
+            alert("Nhập file cần Import");
+            $("#file").val('');
+            return false;
+        } else {
+            debugger
+            var checkFile = false;
+            var _index = file.lastIndexOf('.');
+            if (_index !== undefined && _index !== null && _index > 0) {
+                var fileType = commonUtils.toLowerCase(file.substring(_index + 1, file.length));
+                if (fileType === 'rtmpl') {
+                    checkFile = true;
+                }
+            }
+            if (checkFile) {
+                ImportFile();
+            } else {
+                alert("File Import không hợp lệ!");
+            }
+        }
+    }
+</script>
+
+
+
+
+
